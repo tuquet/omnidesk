@@ -19,8 +19,36 @@ A production-ready monorepo boilerplate for building cross-platform desktop appl
 
 - [Node.js](https://nodejs.org/) >= 20
 - [pnpm](https://pnpm.io/) >= 9
-- [Rust](https://rustup.rs/) stable
+- **Rust Toolchain**: Không yêu cầu cài đặt sẵn, dự án sử dụng GNU Toolchain qua `scoop` để tránh việc phải tải Visual Studio Build Tools nặng nề.
 - Platform-specific Tauri [prerequisites](https://v2.tauri.app/start/prerequisites/)
+
+## Environment Setup (Windows)
+
+Để bắt đầu, bạn cần cài đặt môi trường Rust GNU. Bạn không cần quyền Admin hay cài Visual Studio cồng kềnh.
+
+1. **Cài đặt Scoop** (nếu chưa có):
+```powershell
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+Invoke-RestMethod -Uri https://get.scoop.sh | Invoke-Expression
+```
+
+2. **Cài đặt Node.js, pnpm, MinGW & Rustup**:
+```powershell
+scoop install nodejs pnpm mingw rustup
+```
+
+3. **Cấu hình Rust sang target GNU**:
+```powershell
+rustup default stable-x86_64-pc-windows-gnu
+rustup target add x86_64-pc-windows-gnu
+```
+
+4. **Kiểm tra môi trường**:
+```powershell
+node -v
+pnpm -v
+rustc --version
+```
 
 ## Getting Started
 
@@ -88,17 +116,6 @@ pnpm --filter @kbm/desktop tauri build  # Build desktop installer (.exe/.msi)
 | Docs Site        | VitePress                 |
 
 ## 🔥 Troubleshooting
-
-### ❌ `link.exe not found` (Rust compile error)
-
-**Nguyên nhân:** Rust đang dùng MSVC target nhưng chưa cài Visual Studio Build Tools.
-
-**Fix (không cần quyền Admin / tải VS nặng):**
-```powershell
-scoop install mingw
-rustup default stable-x86_64-pc-windows-gnu
-rustup target add x86_64-pc-windows-gnu
-```
 
 ### ❌ Tauri dev server port conflict
 
