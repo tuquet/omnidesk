@@ -2,6 +2,7 @@
   "extends": "../config/tsconfig/react.json",
   "compilerOptions": {
     "baseUrl": ".",
+    "ignoreDeprecations": "6.0",
     "paths": {
       "@/*": ["./src/*"]
     }

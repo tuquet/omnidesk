@@ -18,45 +18,53 @@ function LoadingFallback() {
   );
 }
 
+import { AppLayout } from './layout';
+
 export const router = createBrowserRouter([
   {
     path: '/',
-    element: (
-      <Suspense fallback={<LoadingFallback />}>
-        <DashboardPage />
-      </Suspense>
-    ),
-  },
-  {
-    path: '/issues',
-    element: (
-      <Suspense fallback={<LoadingFallback />}>
-        <IssuesPage />
-      </Suspense>
-    ),
-  },
-  {
-    path: '/crawler',
-    element: (
-      <Suspense fallback={<LoadingFallback />}>
-        <CrawlerPage />
-      </Suspense>
-    ),
-  },
-  {
-    path: '/mcp',
-    element: (
-      <Suspense fallback={<LoadingFallback />}>
-        <McpPage />
-      </Suspense>
-    ),
-  },
-  {
-    path: '/settings',
-    element: (
-      <Suspense fallback={<LoadingFallback />}>
-        <SettingsPage />
-      </Suspense>
-    ),
+    element: <AppLayout />,
+    children: [
+      {
+        index: true,
+        element: (
+          <Suspense fallback={<LoadingFallback />}>
+            <DashboardPage />
+          </Suspense>
+        ),
+      },
+      {
+        path: 'issues',
+        element: (
+          <Suspense fallback={<LoadingFallback />}>
+            <IssuesPage />
+          </Suspense>
+        ),
+      },
+      {
+        path: 'crawler',
+        element: (
+          <Suspense fallback={<LoadingFallback />}>
+            <CrawlerPage />
+          </Suspense>
+        ),
+      },
+      {
+        path: 'mcp',
+        element: (
+          <Suspense fallback={<LoadingFallback />}>
+            <McpPage />
+          </Suspense>
+        ),
+      },
+      {
+        path: 'settings',
+        element: (
+          <Suspense fallback={<LoadingFallback />}>
+            <SettingsPage />
+          </Suspense>
+        ),
+      },
+    ],
   },
 ]);
