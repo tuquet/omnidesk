@@ -1,0 +1,84 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    // ==========================================
+    // === Tauri Desktop App
+    // ==========================================
+    {
+      "name": "🖥️ Tauri: Dev (Full Stack)",
+      "type": "node",
+      "request": "launch",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": ["--filter", "@kbm/desktop", "tauri", "dev"],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "skipFiles": ["<node_internals>/**"]
+    },
+    {
+      "name": "🌐 Web: Dev Server",
+      "type": "node",
+      "request": "launch",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": ["--filter", "@kbm/web", "dev"],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "skipFiles": ["<node_internals>/**"]
+    },
+
+    // ==========================================
+    // === Rust Backend (Tauri)
+    // ==========================================
+    {
+      "name": "🦀 Rust: Debug Tauri",
+      "type": "lldb",
+      "request": "launch",
+      "program": "${workspaceFolder}/apps/desktop/src-tauri/target/debug/kill-bug-machine",
+      "args": [],
+      "cwd": "${workspaceFolder}/apps/desktop/src-tauri",
+      "sourceLanguages": ["rust"],
+      "preLaunchTask": "🦀 Rust: Check"
+    },
+
+    // ==========================================
+    // === Chrome Browser Debug
+    // ==========================================
+    {
+      "name": "🌍 Chrome: Debug Web",
+      "type": "chrome",
+      "request": "launch",
+      "url": "http://localhost:1420",
+      "webRoot": "${workspaceFolder}/apps/web/src",
+      "sourceMaps": true,
+      "sourceMapPathOverrides": {
+        "webpack:///./src/*": "${webRoot}/*"
+      },
+      "preLaunchTask": "🌐 Dev: Web (Vite)"
+    },
+
+    // ==========================================
+    // === MCP Server (future Phase 6)
+    // ==========================================
+    {
+      "name": "🤖 MCP: Debug Server",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/packages/mcp-server/dist/index.js",
+      "args": [],
+      "cwd": "${workspaceFolder}/packages/mcp-server",
+      "console": "integratedTerminal",
+      "skipFiles": ["<node_internals>/**"],
+      "env": {
+        "NODE_ENV": "development",
+        "LOG_LEVEL": "debug"
+      },
+      "preLaunchTask": "📦 Build: All (Turbo)"
+    }
+  ],
+  "compounds": [
+    {
+      "name": "🚀 Full Stack (Web + Tauri)",
+      "configurations": ["🌐 Web: Dev Server", "🖥️ Tauri: Dev (Full Stack)"],
+      "stopAll": true
+    }
+  ]
+}

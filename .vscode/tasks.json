@@ -1,0 +1,266 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    // ==========================================
+    // === Development Servers
+    // ==========================================
+    {
+      "label": "🌐 Dev: Web (Vite)",
+      "type": "shell",
+      "command": "pnpm --filter @kbm/web dev",
+      "group": "build",
+      "isBackground": true,
+      "problemMatcher": {
+        "pattern": { "regexp": ".", "file": 1, "line": 2, "message": 3 },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": "VITE",
+          "endsPattern": "ready in"
+        }
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "group": "dev"
+      }
+    },
+    {
+      "label": "🖥️ Dev: Desktop (Tauri)",
+      "type": "shell",
+      "command": "pnpm --filter @kbm/desktop tauri dev",
+      "group": "build",
+      "isBackground": true,
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "group": "dev"
+      }
+    },
+    {
+      "label": "🚀 Dev: All (Turbo)",
+      "type": "shell",
+      "command": "pnpm turbo dev",
+      "group": "build",
+      "isBackground": true,
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "group": "dev"
+      }
+    },
+
+    // ==========================================
+    // === Type Checking
+    // ==========================================
+    {
+      "label": "⚡ TypeCheck: Native (tsgo)",
+      "type": "shell",
+      "command": "pnpm typecheck:native",
+      "group": "build",
+      "problemMatcher": "$tsc",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "group": "checks"
+      }
+    },
+    {
+      "label": "🔍 TypeCheck: Standard (tsc)",
+      "type": "shell",
+      "command": "pnpm turbo typecheck",
+      "group": "build",
+      "problemMatcher": "$tsc",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "group": "checks"
+      }
+    },
+
+    // ==========================================
+    // === Linting & Formatting
+    // ==========================================
+    {
+      "label": "🧹 Lint: All",
+      "type": "shell",
+      "command": "pnpm turbo lint",
+      "group": "build",
+      "problemMatcher": "$eslint-stylish",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "group": "checks"
+      }
+    },
+    {
+      "label": "✨ Format: All",
+      "type": "shell",
+      "command": "pnpm format",
+      "group": "build",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "📋 Format: Check",
+      "type": "shell",
+      "command": "pnpm format:check",
+      "group": "build",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    },
+
+    // ==========================================
+    // === Build
+    // ==========================================
+    {
+      "label": "📦 Build: All (Turbo)",
+      "type": "shell",
+      "command": "pnpm turbo build",
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "problemMatcher": "$tsc",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "group": "build"
+      }
+    },
+    {
+      "label": "📦 Build: Web Only",
+      "type": "shell",
+      "command": "pnpm --filter @kbm/web build",
+      "group": "build",
+      "problemMatcher": "$tsc",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "group": "build"
+      }
+    },
+    {
+      "label": "📦 Build: Desktop (Tauri)",
+      "type": "shell",
+      "command": "pnpm --filter @kbm/desktop tauri build",
+      "group": "build",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "group": "build"
+      }
+    },
+
+    // ==========================================
+    // === Testing
+    // ==========================================
+    {
+      "label": "🧪 Test: All",
+      "type": "shell",
+      "command": "pnpm turbo test",
+      "group": {
+        "kind": "test",
+        "isDefault": true
+      },
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "group": "test"
+      }
+    },
+
+    // ==========================================
+    // === Utilities
+    // ==========================================
+    {
+      "label": "📥 Install: Dependencies",
+      "type": "shell",
+      "command": "pnpm install",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "🗑️ Clean: All",
+      "type": "shell",
+      "command": "pnpm clean",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    },
+
+    // ==========================================
+    // === Rust (Tauri Backend)
+    // ==========================================
+    {
+      "label": "🦀 Rust: Check",
+      "type": "shell",
+      "command": "cargo check",
+      "options": {
+        "cwd": "${workspaceFolder}/apps/desktop/src-tauri"
+      },
+      "problemMatcher": "$rustc",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "group": "rust"
+      }
+    },
+    {
+      "label": "🦀 Rust: Test",
+      "type": "shell",
+      "command": "cargo test",
+      "options": {
+        "cwd": "${workspaceFolder}/apps/desktop/src-tauri"
+      },
+      "problemMatcher": "$rustc",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "group": "rust"
+      }
+    },
+    {
+      "label": "🦀 Rust: Clippy",
+      "type": "shell",
+      "command": "cargo clippy -- -W clippy::all",
+      "options": {
+        "cwd": "${workspaceFolder}/apps/desktop/src-tauri"
+      },
+      "problemMatcher": "$rustc",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "group": "rust"
+      }
+    },
+
+    // ==========================================
+    // === Git
+    // ==========================================
+    {
+      "label": "📤 Git: Push",
+      "type": "shell",
+      "command": "git push origin main",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    }
+  ]
+}

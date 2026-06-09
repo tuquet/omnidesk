@@ -1,5 +1,5 @@
 {
-  "extends": "@kbm/config/tsconfig/node.json",
+  "extends": "../../packages/config/tsconfig/node.json",
   "compilerOptions": {
     "composite": true,
     "noEmit": false,

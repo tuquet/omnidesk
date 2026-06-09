@@ -8,21 +8,23 @@
     "build": "turbo run build",
     "lint": "turbo run lint",
     "typecheck": "turbo run typecheck",
+    "typecheck:native": "tsgo --noEmit",
     "test": "turbo run test",
     "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md,css}\"",
     "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,md,css}\"",
-    "clean": "turbo run clean && rimraf node_modules",
+    "clean": "turbo run clean",
     "prepare": "husky"
   },
   "devDependencies": {
     "@changesets/cli": "^2.27.0",
     "@tauri-apps/cli": "^2.11.2",
+    "@typescript/native-preview": "7.0.0-dev.20260421.2",
     "husky": "^9.1.0",
     "lint-staged": "^15.2.0",
     "prettier": "^3.4.0",
     "rimraf": "^6.0.0",
     "turbo": "^2.3.0",
-    "typescript": "^5.7.0"
+    "typescript": "^6.0.3"
   },
   "lint-staged": {
     "*.{ts,tsx,js,jsx}": [
