@@ -66,11 +66,17 @@ kill-bug-machine/
 
 ---
 
-## 🛠️ Prerequisites (No Admin Required)
+## 🛠️ Prerequisites
 
-> **Toàn bộ setup KHÔNG cần quyền Administrator (UAC).** Sử dụng [Scoop](https://scoop.sh) để cài mọi thứ vào user profile.
+Bạn có thể cài đặt môi trường bằng hai cách tùy thuộc vào việc bạn có quyền Administrator (UAC) hay không.
 
-### Bước 1: Cài Scoop (nếu chưa có)
+### 🛡️ Cách 1: KHÔNG có quyền Admin (Khuyên dùng)
+> Sử dụng [Scoop](https://scoop.sh) và MinGW (GNU target) để cài đặt mọi thứ vào User Profile.
+
+<details>
+<summary><b>👉 Click để xem hướng dẫn cài đặt Không Admin</b></summary>
+
+#### Bước 1: Cài Scoop (nếu chưa có)
 
 Mở PowerShell (user bình thường, KHÔNG cần admin):
 
@@ -82,78 +88,39 @@ Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
 irm get.scoop.sh | iex
 ```
 
-Verify:
-```powershell
-scoop --version
-```
-
-### Bước 2: Cài Node.js + pnpm
+#### Bước 2: Cài Node.js + pnpm
 
 ```powershell
-# Cài Node.js LTS (hiện tại v22+)
 scoop install nodejs-lts
-
-# Verify
-node --version    # >= 20.0.0
-npm --version
-
-# Cài pnpm via corepack (built into Node.js)
 corepack enable
 corepack prepare pnpm@latest --activate
-
-# Verify
-pnpm --version    # >= 9.0.0
 ```
 
-### Bước 3: Cài Rust + Cargo (GNU target — KHÔNG cần Visual Studio)
+#### Bước 3: Cài Rust + Cargo (GNU target)
 
 ```powershell
-# Cài Rust via rustup (tự cài vào ~/.cargo, không cần admin)
 scoop install rustup
 
-# QUAN TRỌNG: Chọn GNU target khi setup
-# Nếu rustup hỏi, chọn: x86_64-pc-windows-gnu
+# Chọn GNU target khi setup: x86_64-pc-windows-gnu
 rustup-init -y --default-toolchain stable --default-host x86_64-pc-windows-gnu
 
-# Reload PATH
 $env:PATH = "$env:USERPROFILE\.cargo\bin;$env:PATH"
-
-# Verify
-rustc --version
-cargo --version
 ```
 
-### Bước 4: Cài MinGW (GCC cho Windows — thay thế MSVC)
+#### Bước 4: Cài MinGW (GCC thay thế MSVC)
 
 ```powershell
-# MinGW cung cấp linker + C compiler, KHÔNG cần Visual Studio Build Tools
 scoop install mingw
-
-# Verify — phải có gcc và ld (linker)
-gcc --version
-ld --version
 ```
 
-### Bước 5: Cấu hình Rust dùng GNU target (thay vì MSVC)
+#### Bước 5: Cấu hình Rust dùng GNU target
 
 ```powershell
-# Thêm GNU target
 rustup target add x86_64-pc-windows-gnu
-
-# Set GNU làm default (QUAN TRỌNG!)
 rustup default stable-x86_64-pc-windows-gnu
 
-# Verify
-rustup show
-# Output phải hiện: default host: x86_64-pc-windows-gnu
-```
-
-Tạo file cấu hình Cargo để luôn dùng GCC linker:
-
-```powershell
-# Tạo file config cho Cargo
+# Tạo file config cho Cargo để dùng GCC
 New-Item -ItemType Directory -Force -Path "$env:USERPROFILE\.cargo" | Out-Null
-
 @"
 [target.x86_64-pc-windows-gnu]
 linker = "x86_64-w64-mingw32-gcc"
@@ -163,64 +130,80 @@ target = "x86_64-pc-windows-gnu"
 "@ | Set-Content "$env:USERPROFILE\.cargo\config.toml"
 ```
 
-### Bước 6: Cài Git (nếu chưa có)
+#### Bước 6: Cài Git
 
 ```powershell
 scoop install git
-
-# Config
-git config --global user.name "Your Name"
-git config --global user.email "your@email.com"
 git config --global core.autocrlf true
 ```
 
-### Bước 7 (Optional): Cài thêm tools
+</details>
 
+### 🔑 Cách 2: CÓ quyền Admin
+> Sử dụng Winget và Visual Studio Build Tools (MSVC target) - tiêu chuẩn của Microsoft.
+
+<details>
+<summary><b>👉 Click để xem hướng dẫn cài đặt Có Admin</b></summary>
+
+#### Bước 1: Cài Node.js + pnpm
+
+Mở PowerShell:
 ```powershell
-# VS Code (nếu chưa có)
-scoop bucket add extras
-scoop install vscode
-
-# WebView2 Runtime (Tauri cần — thường đã có sẵn trên Windows 10/11)
-# Kiểm tra: mở Edge browser, nếu chạy được thì đã có WebView2
-
-# Playwright browsers (cho Crawler — cài khi cần)
-# npx playwright install chromium
+winget install OpenJS.NodeJS.LTS
+corepack enable
+corepack prepare pnpm@latest --activate
 ```
 
-### ✅ Kiểm tra tất cả
+#### Bước 2: Cài Visual Studio Build Tools
+
+**QUAN TRỌNG:** Mở PowerShell **Run as Administrator** để chạy lệnh này:
+```powershell
+winget install Microsoft.VisualStudio.2022.BuildTools --override "--wait --quiet --add Microsoft.VisualStudio.Workload.VCTools --includeRecommended"
+```
+*(Quá trình này tải khoảng 2GB và mất 5-10 phút)*
+
+#### Bước 3: Cài Rust (MSVC target)
+
+```powershell
+winget install Rustlang.Rustup
+
+# Chọn MSVC target khi setup: x86_64-pc-windows-msvc
+rustup-init -y --default-toolchain stable --default-host x86_64-pc-windows-msvc
+```
+
+#### Bước 4: Cài Git
+
+```powershell
+winget install Git.Git
+git config --global core.autocrlf true
+```
+
+</details>
+
+---
+
+### ✅ Kiểm tra môi trường chung
+
+Sau khi cài đặt bằng 1 trong 2 cách trên, chạy script sau để kiểm tra:
 
 ```powershell
 Write-Host "=== Kill Bug Machine — Prerequisites Check ==="
 Write-Host ""
 
-# Node.js
 $node = node --version 2>$null
-Write-Host "Node.js:    $node $(if ($node) {'✅'} else {'❌ scoop install nodejs-lts'})"
+Write-Host "Node.js:    $node $(if ($node) {'✅'} else {'❌'})"
 
-# pnpm
 $pnpm = pnpm --version 2>$null
-Write-Host "pnpm:       $pnpm $(if ($pnpm) {'✅'} else {'❌ corepack enable'})"
+Write-Host "pnpm:       $pnpm $(if ($pnpm) {'✅'} else {'❌'})"
 
-# Rust
 $rustc = rustc --version 2>$null
-Write-Host "Rust:       $rustc $(if ($rustc) {'✅'} else {'❌ scoop install rustup'})"
+Write-Host "Rust:       $rustc $(if ($rustc) {'✅'} else {'❌'})"
 
-# Cargo
-$cargo = cargo --version 2>$null
-Write-Host "Cargo:      $cargo $(if ($cargo) {'✅'} else {'❌'})"
-
-# GCC (MinGW)
-$gcc = gcc --version 2>$null | Select-Object -First 1
-Write-Host "GCC:        $gcc $(if ($gcc) {'✅'} else {'❌ scoop install mingw'})"
-
-# Git
 $git = git --version 2>$null
-Write-Host "Git:        $git $(if ($git) {'✅'} else {'❌ scoop install git'})"
+Write-Host "Git:        $git $(if ($git) {'✅'} else {'❌'})"
 
-# Rust target
 $target = rustup default 2>$null
-Write-Host "Rust target: $target $(if ($target -match 'gnu') {'✅'} else {'⚠️ Run: rustup default stable-x86_64-pc-windows-gnu'})"
+Write-Host "Rust target: $target $(if ($target) {'✅'} else {'❌'})"
 
 Write-Host ""
 Write-Host "=== All checks passed? You're ready! ==="
