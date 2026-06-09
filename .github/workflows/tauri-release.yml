@@ -36,10 +36,9 @@ jobs:
       - name: Install Rust stable
         uses: dtolnay/rust-toolchain@stable
 
-      - name: Force MSVC on Windows by removing GNU config
-        if: matrix.platform == 'windows-latest'
-        run: Remove-Item -Path apps/desktop/src-tauri/.cargo/config.toml -ErrorAction SilentlyContinue
-        shell: pwsh
+      - name: Force default host target by removing local GNU config
+        run: rm -f apps/desktop/src-tauri/.cargo/config.toml
+        shell: bash
 
       - name: Install dependencies (Ubuntu only)
         if: matrix.platform == 'ubuntu-22.04'
