@@ -22,6 +22,7 @@ export * from './components/ui/toggle';
 export * from './components/ui/tooltip';
 export * from './components/ui/field';
 export * from './components/ui/form';
+export * from './components/ui/menubar';
 
 export { cn } from './lib/utils';
 export * from './blocks/auth/login-form';
