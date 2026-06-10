@@ -18,6 +18,7 @@ import {
   useSidebar,
 } from '@kbm/ui';
 import { MoreHorizontalIcon, FolderIcon, ShareIcon, Trash2Icon } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 export function NavDocuments({
   items,
@@ -29,17 +30,18 @@ export function NavDocuments({
   }[];
 }) {
   const { isMobile } = useSidebar();
+  const { t } = useTranslation();
 
   return (
     <SidebarGroup className="group-data-[collapsible=icon]:hidden">
-      <SidebarGroupLabel>Documents</SidebarGroupLabel>
+      <SidebarGroupLabel>{t('nav.Documents', 'Documents')}</SidebarGroupLabel>
       <SidebarMenu>
         {items.map((item) => (
           <SidebarMenuItem key={item.name}>
             <SidebarMenuButton asChild>
-              <Link to={item.url}>
+              <Link to={item.url} activeProps={{ 'data-active': true } as any}>
                 {item.icon}
-                <span>{item.name}</span>
+                <span>{t(`nav.${item.name}`, item.name)}</span>
               </Link>
             </SidebarMenuButton>
             <DropdownMenu>

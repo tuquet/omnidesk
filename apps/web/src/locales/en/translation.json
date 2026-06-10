@@ -58,5 +58,25 @@
       "title": "Subscription Expiring",
       "message": "Your subscription will expire on {{date}}. Please renew to avoid interruption"
     }
+  },
+  "nav": {
+    "Dashboard": "Dashboard",
+    "Projects": "Projects",
+    "Tasks": "Tasks",
+    "Lifecycle": "Lifecycle",
+    "Analytics": "Analytics",
+    "Team": "Team",
+    "Data Library": "Data Library",
+    "Reports": "Reports",
+    "Settings": "Settings",
+    "Get Help": "Get Help",
+    "Search": "Search",
+    "Component Showcase": "Component Showcase",
+    "Error Pages": "Error Pages",
+    "Quick Create": "Quick Create",
+    "Documents": "Documents",
+    "Main": "Main",
+    "Search everywhere...": "Search everywhere...",
+    "Settings & More": "Settings & More"
   }
 }

@@ -15,6 +15,8 @@ import {
 } from '@kbm/ui';
 import { BREADCRUMB_MAP, type BreadcrumbEntry } from '@/config';
 import { ChevronDownIcon } from 'lucide-react';
+import { useDevStore } from '@/stores/use-dev-store';
+import { toast } from 'sonner';
 
 /**
  * Fallback: humanize a raw URL segment when it is not in the breadcrumb map.
@@ -51,11 +53,33 @@ function resolveBreadcrumbs(pathname: string): BreadcrumbEntry[] {
 export function SmartBreadcrumb() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const items = React.useMemo(() => resolveBreadcrumbs(pathname), [pathname]);
+  const { toggleDevMode } = useDevStore();
+  
+  // Easter egg state
+  const clickCountRef = React.useRef(0);
+  const lastClickTimeRef = React.useRef(0);
+
+  const handleBreadcrumbClick = () => {
+    const now = Date.now();
+    if (now - lastClickTimeRef.current > 500) {
+      // Reset if more than 500ms since last click
+      clickCountRef.current = 1;
+    } else {
+      clickCountRef.current += 1;
+    }
+    lastClickTimeRef.current = now;
+
+    if (clickCountRef.current === 10) {
+      toggleDevMode();
+      clickCountRef.current = 0; // Reset after trigger
+      toast.success('Developer Mode toggled!');
+    }
+  };
 
   if (items.length === 0) return null;
 
   return (
-    <Breadcrumb>
+    <Breadcrumb onClick={handleBreadcrumbClick}>
       <BreadcrumbList>
         {items.map((item, index) => {
           const isLast = index === items.length - 1;

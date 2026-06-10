@@ -8,6 +8,7 @@ import {
   SidebarMenuItem,
 } from '@kbm/ui';
 import { CirclePlusIcon, MailIcon } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 export function NavMain({
   items,
@@ -18,6 +19,8 @@ export function NavMain({
     icon?: React.ReactNode;
   }[];
 }) {
+  const { t } = useTranslation();
+
   return (
     <SidebarGroup>
       <SidebarGroupContent className="flex flex-col gap-2">
@@ -28,7 +31,7 @@ export function NavMain({
               className="min-w-8 bg-primary text-primary-foreground duration-200 ease-linear hover:bg-primary/90 hover:text-primary-foreground active:bg-primary/90 active:text-primary-foreground"
             >
               <CirclePlusIcon />
-              <span>Quick Create</span>
+              <span>{t('nav.Quick Create', 'Quick Create')}</span>
             </SidebarMenuButton>
             <Button
               size="icon"
@@ -44,9 +47,9 @@ export function NavMain({
           {items.map((item) => (
             <SidebarMenuItem key={item.title}>
               <SidebarMenuButton tooltip={item.title} asChild>
-                <Link to={item.url}>
+                <Link to={item.url} activeProps={{ 'data-active': true } as any}>
                   {item.icon}
-                  <span>{item.title}</span>
+                  <span>{t(`nav.${item.title}`, item.title)}</span>
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>

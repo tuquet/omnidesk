@@ -3,6 +3,8 @@ import {
   Link,
   Outlet,
 } from '@tanstack/react-router';
+import { useEffect } from 'react';
+import { useDevStore } from '@/stores/use-dev-store';
 import type { AuthState } from '@/features/auth/stores/use-auth-store';
 import { Button } from '@kbm/ui';
 import { ArrowLeft, Ghost } from 'lucide-react';
@@ -64,7 +66,22 @@ function NotFound() {
   );
 }
 
+function RootComponent() {
+  const { setDevMode } = useDevStore();
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.has('dev')) {
+      const dev = params.get('dev');
+      if (dev === '1') setDevMode(true);
+      else if (dev === '0') setDevMode(false);
+    }
+  }, [setDevMode]);
+
+  return <Outlet />;
+}
+
 export const Route = createRootRouteWithContext<MyRouterContext>()({
-  component: () => <Outlet />,
+  component: RootComponent,
   notFoundComponent: NotFound,
 });

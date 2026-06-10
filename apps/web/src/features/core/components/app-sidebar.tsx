@@ -28,9 +28,13 @@ import {
   NAV_DOCUMENTS,
 } from '@/config';
 import { useRBAC } from '@/hooks/use-rbac';
+import { useDevStore } from '@/stores/use-dev-store';
+import { useTranslation } from 'react-i18next';
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { can, filterNav } = useRBAC();
+  const { isDevMode } = useDevStore();
+  const { t } = useTranslation();
 
   const mainItems = filterNav(NAV_MAIN);
   const showcaseItems = filterNav(NAV_SHOWCASE.items);
@@ -61,18 +65,18 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           }))}
         />
 
-        {/* Component Showcase — only if user can see the group */}
-        {can(NAV_SHOWCASE.requiredPermission) && showcaseItems.length > 0 && (
+        {/* Component Showcase — only if user can see the group and in Dev Mode */}
+        {isDevMode && can(NAV_SHOWCASE.requiredPermission) && showcaseItems.length > 0 && (
           <SidebarGroup>
-            <SidebarGroupLabel>{NAV_SHOWCASE.label}</SidebarGroupLabel>
+            <SidebarGroupLabel>{t(`nav.${NAV_SHOWCASE.label}`, NAV_SHOWCASE.label)}</SidebarGroupLabel>
             <SidebarGroupContent>
               <SidebarMenu>
                 {showcaseItems.map((item) => (
                   <SidebarMenuItem key={item.title}>
-                    <SidebarMenuButton tooltip={item.title} asChild>
-                      <Link to={item.url}>
+                    <SidebarMenuButton tooltip={t(`nav.${item.title}`, item.title)} asChild>
+                      <Link to={item.url} activeProps={{ 'data-active': true } as any}>
                         <item.icon />
-                        <span>{item.title}</span>
+                        <span>{t(`nav.${item.title}`, item.title)}</span>
                       </Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
@@ -82,18 +86,18 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           </SidebarGroup>
         )}
 
-        {/* Error Pages — only if user can see the group */}
-        {can(NAV_ERROR_PAGES.requiredPermission) && errorItems.length > 0 && (
+        {/* Error Pages — only if user can see the group and in Dev Mode */}
+        {isDevMode && can(NAV_ERROR_PAGES.requiredPermission) && errorItems.length > 0 && (
           <SidebarGroup>
-            <SidebarGroupLabel>{NAV_ERROR_PAGES.label}</SidebarGroupLabel>
+            <SidebarGroupLabel>{t(`nav.${NAV_ERROR_PAGES.label}`, NAV_ERROR_PAGES.label)}</SidebarGroupLabel>
             <SidebarGroupContent>
               <SidebarMenu>
                 {errorItems.map((item) => (
                   <SidebarMenuItem key={item.title}>
-                    <SidebarMenuButton tooltip={item.title} asChild>
-                      <Link to={item.url}>
+                    <SidebarMenuButton tooltip={t(`nav.${item.title}`, item.title)} asChild>
+                      <Link to={item.url} activeProps={{ 'data-active': true } as any}>
                         <item.icon />
-                        <span>{item.title}</span>
+                        <span>{t(`nav.${item.title}`, item.title)}</span>
                       </Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
@@ -103,13 +107,15 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           </SidebarGroup>
         )}
 
-        <NavDocuments
-          items={documentItems.map((d) => ({
-            name: d.name,
-            url: d.url,
-            icon: <d.icon />,
-          }))}
-        />
+        {isDevMode && (
+          <NavDocuments
+            items={documentItems.map((d) => ({
+              name: d.name,
+              url: d.url,
+              icon: <d.icon />,
+            }))}
+          />
+        )}
         <NavSecondary
           items={secondaryItems.map((item) => ({
             title: item.title,

@@ -58,5 +58,25 @@
       "title": "Gói đăng ký sắp hết hạn",
       "message": "Gói đăng ký của bạn sẽ hết hạn vào {{date}}. Vui lòng gia hạn để tránh gián đoạn"
     }
+  },
+  "nav": {
+    "Dashboard": "Bảng Điều Khiển",
+    "Projects": "Dự Án",
+    "Tasks": "Công Việc",
+    "Lifecycle": "Vòng Đời",
+    "Analytics": "Phân Tích",
+    "Team": "Đội Ngũ",
+    "Data Library": "Thư Viện Dữ Liệu",
+    "Reports": "Báo Cáo",
+    "Settings": "Cài Đặt",
+    "Get Help": "Trợ Giúp",
+    "Search": "Tìm Kiếm",
+    "Component Showcase": "Mẫu Giao Diện",
+    "Error Pages": "Trang Báo Lỗi",
+    "Quick Create": "Tạo Nhanh",
+    "Documents": "Tài Liệu",
+    "Main": "Chính",
+    "Search everywhere...": "Tìm kiếm mọi nơi...",
+    "Settings & More": "Cài Đặt & Khác"
   }
 }

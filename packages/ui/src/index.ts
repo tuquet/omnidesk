@@ -25,7 +25,10 @@ export * from './components/ui/form';
 export * from './components/ui/menubar';
 export * from './components/ui/popover';
 export * from './components/ui/scroll-area';
-
+export * from './components/ui/command';
+export * from './components/ui/dialog';
+export * from './components/ui/textarea';
+export * from './components/ui/input-group';
 export { cn } from './lib/utils';
 export * from './blocks/auth/login-form';
 export * from './blocks/auth/signup-form';
