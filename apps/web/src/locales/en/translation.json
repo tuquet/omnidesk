@@ -1,3 +1,62 @@
 {
-  "welcome": "Welcome to Kill Bug Machine B2B SaaS"
+  "welcome": "Welcome to Kill Bug Machine B2B SaaS",
+  "errors": {
+    "auth": {
+      "invalid_credentials": "Invalid email or password",
+      "token_expired": "Your session has expired. Please log in again",
+      "unauthorized": "You are not authorized to perform this action",
+      "forbidden": "You do not have permission to access this resource",
+      "account_locked": "Your account has been locked. Please contact support",
+      "email_not_verified": "Please verify your email address before continuing",
+      "invalid_reset_token": "This password reset link is invalid or has expired"
+    },
+    "validation": {
+      "title": "Validation Error",
+      "required": "{{field}} is required",
+      "min_length": "{{field}} must be at least {{min}} characters",
+      "max_length": "{{field}} must be at most {{max}} characters",
+      "invalid_email": "Please enter a valid email address",
+      "invalid_format": "{{field}} format is invalid",
+      "already_exists": "{{field}} already exists",
+      "not_found": "{{field}} was not found",
+      "passwords_mismatch": "Passwords do not match"
+    },
+    "server": {
+      "internal_error": "An unexpected error occurred. Please try again later",
+      "service_unavailable": "Service is temporarily unavailable. Please try again later",
+      "rate_limit": "Too many requests. Please wait a moment and try again",
+      "maintenance": "System is under maintenance. We'll be back shortly"
+    },
+    "resource": {
+      "not_found": "The requested {{resource}} was not found",
+      "conflict": "This {{resource}} has been modified by another user. Please refresh and try again",
+      "gone": "This {{resource}} is no longer available"
+    }
+  },
+  "notifications": {
+    "update_available": {
+      "title": "Update Available",
+      "message": "Version {{version}} is ready to install"
+    },
+    "welcome": {
+      "title": "Welcome!",
+      "message": "Your account has been set up successfully"
+    },
+    "password_changed": {
+      "title": "Password Changed",
+      "message": "Your password was changed successfully"
+    },
+    "invite_received": {
+      "title": "Invitation Received",
+      "message": "{{inviter}} invited you to join {{organization}}"
+    },
+    "export_ready": {
+      "title": "Export Ready",
+      "message": "Your {{type}} export is ready for download"
+    },
+    "subscription_expiring": {
+      "title": "Subscription Expiring",
+      "message": "Your subscription will expire on {{date}}. Please renew to avoid interruption"
+    }
+  }
 }

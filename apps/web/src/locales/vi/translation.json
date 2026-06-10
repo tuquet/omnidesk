@@ -1,3 +1,62 @@
 {
-  "welcome": "Chào mừng đến với hệ thống B2B SaaS Kill Bug Machine"
+  "welcome": "Chào mừng đến với hệ thống B2B SaaS Kill Bug Machine",
+  "errors": {
+    "auth": {
+      "invalid_credentials": "Email hoặc mật khẩu không đúng",
+      "token_expired": "Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại",
+      "unauthorized": "Bạn không có quyền thực hiện hành động này",
+      "forbidden": "Bạn không có quyền truy cập tài nguyên này",
+      "account_locked": "Tài khoản của bạn đã bị khóa. Vui lòng liên hệ hỗ trợ",
+      "email_not_verified": "Vui lòng xác minh email trước khi tiếp tục",
+      "invalid_reset_token": "Liên kết đặt lại mật khẩu không hợp lệ hoặc đã hết hạn"
+    },
+    "validation": {
+      "title": "Lỗi xác thực",
+      "required": "{{field}} là bắt buộc",
+      "min_length": "{{field}} phải có ít nhất {{min}} ký tự",
+      "max_length": "{{field}} không được vượt quá {{max}} ký tự",
+      "invalid_email": "Vui lòng nhập địa chỉ email hợp lệ",
+      "invalid_format": "Định dạng {{field}} không hợp lệ",
+      "already_exists": "{{field}} đã tồn tại",
+      "not_found": "Không tìm thấy {{field}}",
+      "passwords_mismatch": "Mật khẩu không khớp"
+    },
+    "server": {
+      "internal_error": "Đã xảy ra lỗi không mong muốn. Vui lòng thử lại sau",
+      "service_unavailable": "Dịch vụ tạm thời không khả dụng. Vui lòng thử lại sau",
+      "rate_limit": "Quá nhiều yêu cầu. Vui lòng đợi một chút và thử lại",
+      "maintenance": "Hệ thống đang bảo trì. Chúng tôi sẽ quay lại sớm"
+    },
+    "resource": {
+      "not_found": "Không tìm thấy {{resource}} được yêu cầu",
+      "conflict": "{{resource}} này đã được chỉnh sửa bởi người dùng khác. Vui lòng tải lại và thử lại",
+      "gone": "{{resource}} này không còn khả dụng"
+    }
+  },
+  "notifications": {
+    "update_available": {
+      "title": "Có bản cập nhật",
+      "message": "Phiên bản {{version}} đã sẵn sàng để cài đặt"
+    },
+    "welcome": {
+      "title": "Chào mừng!",
+      "message": "Tài khoản của bạn đã được thiết lập thành công"
+    },
+    "password_changed": {
+      "title": "Đã đổi mật khẩu",
+      "message": "Mật khẩu của bạn đã được thay đổi thành công"
+    },
+    "invite_received": {
+      "title": "Nhận lời mời",
+      "message": "{{inviter}} đã mời bạn tham gia {{organization}}"
+    },
+    "export_ready": {
+      "title": "Xuất dữ liệu sẵn sàng",
+      "message": "Dữ liệu {{type}} đã sẵn sàng để tải xuống"
+    },
+    "subscription_expiring": {
+      "title": "Gói đăng ký sắp hết hạn",
+      "message": "Gói đăng ký của bạn sẽ hết hạn vào {{date}}. Vui lòng gia hạn để tránh gián đoạn"
+    }
+  }
 }

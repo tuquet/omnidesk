@@ -1,5 +1,6 @@
 import { cn } from '@kbm/ui';
 import { Link } from '@tanstack/react-router';
+import { toast } from 'sonner';
 import {
   Button,
   Field,
@@ -17,12 +18,13 @@ export function SignupForm({ className, ...props }: React.ComponentProps<'form'>
       alert("Vui lòng điền VITE_GITHUB_CLIENT_ID vào file .env ở thư mục apps/web");
       return;
     }
+    toast.info('Redirecting to GitHub...');
     const redirectUri = `${window.location.origin}/auth/callback`;
     window.location.href = `https://github.com/login/oauth/authorize?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=user`;
   };
 
   return (
-    <form className={cn('flex flex-col gap-6', className)} {...props}>
+    <form className={cn('flex flex-col gap-6', className)} onSubmit={(e) => { e.preventDefault(); toast.success('Account created successfully!'); }} {...props}>
       <FieldGroup>
         <div className="flex flex-col items-center gap-1 text-center">
           <h1 className="text-2xl font-bold">Create your account</h1>

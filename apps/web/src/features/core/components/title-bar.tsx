@@ -19,11 +19,13 @@ import {
   MenubarTrigger,
 } from '@kbm/ui';
 import { WindowControls } from './window-controls';
+import { GITHUB_REPO, GITHUB_ISSUES, API_DOCS_URL } from '@/config';
 
 export function TitleBar() {
   const navigate = useNavigate();
   const { setTheme, theme } = useTheme();
   const { i18n } = useTranslation();
+
 
   if (!isTauri()) return null;
 
@@ -143,7 +145,7 @@ export function TitleBar() {
               Tools
             </MenubarTrigger>
             <MenubarContent>
-              <MenubarItem onClick={() => openExternal('http://127.0.0.1:1421/scalar')}>
+              <MenubarItem onClick={() => openExternal(API_DOCS_URL)}>
                 API Documentation
               </MenubarItem>
               <MenubarSeparator />
@@ -186,12 +188,12 @@ export function TitleBar() {
               Help
             </MenubarTrigger>
             <MenubarContent>
-              <MenubarItem onClick={() => openExternal('https://github.com/tuquet/kill-bug-machine')}>
+              <MenubarItem onClick={() => openExternal(GITHUB_REPO)}>
                 Documentation
                 <MenubarShortcut>F1</MenubarShortcut>
               </MenubarItem>
               <MenubarSeparator />
-              <MenubarItem onClick={() => openExternal('https://github.com/tuquet/kill-bug-machine/issues')}>
+              <MenubarItem onClick={() => openExternal(GITHUB_ISSUES)}>
                 Report a Bug
               </MenubarItem>
               <MenubarSeparator />
@@ -203,8 +205,24 @@ export function TitleBar() {
         </Menubar>
       </div>
 
-      {/* Drag region (spacer) */}
-      <div className="flex-1" data-tauri-drag-region />
+      {/* Drag region — mimics native Windows title bar behavior */}
+      <div
+        className="flex-1 h-full"
+        style={{ cursor: 'default' }}
+        data-tauri-drag-region
+        onMouseDown={(e) => {
+          if (e.button !== 0) return;
+          e.preventDefault();
+          e.stopPropagation();
+
+          if (e.detail >= 2) {
+            // Browser-native double-click detection (respects OS dblclick speed)
+            getCurrentWindow().toggleMaximize();
+          } else {
+            getCurrentWindow().startDragging();
+          }
+        }}
+      />
 
       {/* Window controls */}
       <WindowControls />

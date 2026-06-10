@@ -1,6 +1,7 @@
 import { cn } from "@kbm/ui"
 import { Link, useNavigate } from "@tanstack/react-router"
 import { UserRound } from "lucide-react"
+import { toast } from 'sonner'
 import {
   Button,
   Field,
@@ -24,17 +25,19 @@ export function LoginForm({
       alert("Vui lòng điền VITE_GITHUB_CLIENT_ID vào file .env ở thư mục apps/web");
       return;
     }
+    toast.info('Redirecting to GitHub...');
     const redirectUri = `${window.location.origin}/auth/callback`;
     window.location.href = `https://github.com/login/oauth/authorize?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=user`;
   };
 
   const handleGuestLogin = () => {
     authActions.loginAsGuest();
+    toast.success('Logged in as Guest');
     navigate({ to: '/dashboard' });
   };
 
   return (
-    <form className={cn("flex flex-col gap-6", className)} {...props}>
+    <form className={cn("flex flex-col gap-6", className)} onSubmit={(e) => { e.preventDefault(); toast.success('Login successful!'); }} {...props}>
       <FieldGroup>
         <div className="flex flex-col items-center gap-1 text-center">
           <h1 className="text-2xl font-bold">Login to your account</h1>
@@ -57,12 +60,12 @@ export function LoginForm({
         <Field>
           <div className="flex items-center">
             <FieldLabel htmlFor="password">Password</FieldLabel>
-            <a
-              href="#"
+            <Link
+              to="/forgot-password"
               className="ms-auto text-sm underline-offset-4 hover:underline"
             >
               Forgot your password?
-            </a>
+            </Link>
           </div>
           <Input
             id="password"

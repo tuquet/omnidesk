@@ -1,4 +1,5 @@
-﻿import { Button } from '@kbm/ui';
+import { Link } from '@tanstack/react-router';
+import { Button } from '@kbm/ui';
 import {
   SidebarGroup,
   SidebarGroupContent,
@@ -42,9 +43,11 @@ export function NavMain({
         <SidebarMenu>
           {items.map((item) => (
             <SidebarMenuItem key={item.title}>
-              <SidebarMenuButton tooltip={item.title}>
-                {item.icon}
-                <span>{item.title}</span>
+              <SidebarMenuButton tooltip={item.title} asChild>
+                <Link to={item.url}>
+                  {item.icon}
+                  <span>{item.title}</span>
+                </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
           ))}

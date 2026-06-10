@@ -1,13 +1,20 @@
 import { createClient } from '@hey-api/client-fetch';
-const client = createClient({});
 import { toast } from 'sonner';
+import i18n from '@/lib/i18n';
+import { authActions } from '@/features/auth/stores/use-auth-store';
+import type { ApiResponse, ApiError } from '@kbm/types';
+import { ERROR_CODES } from '@kbm/types';
 
-// Cấu hình cơ bản cho API Client
+const client = createClient({});
+
+// ─── Config ────────────────────────────────────────────────────────────────────
+
 client.setConfig({
-  baseUrl: 'http://localhost:8000', // Sẽ thay bằng ENV ở môi trường thực tế
+  baseUrl: 'http://localhost:1421', // Tauri Axum backend
 });
 
-// Interceptor cho Request: Tự động đính kèm Token
+// ─── Request Interceptor: Auto-attach Bearer Token ─────────────────────────────
+
 client.interceptors.request.use((request: any) => {
   const token = localStorage.getItem('kbm-auth-token');
 
@@ -18,19 +25,101 @@ client.interceptors.request.use((request: any) => {
   return request;
 });
 
-// Interceptor cho Response: Xử lý lỗi tập trung
-client.interceptors.response.use((response: any) => {
-  if (!response.ok) {
-    if (response.status === 401) {
-      toast.error('Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.');
-      // Xử lý logic logout ở đây (ví dụ clear store/storage và redirect về /login)
-    } else if (response.status >= 500) {
-      toast.error('Lỗi máy chủ nội bộ. Đội ngũ kỹ thuật đã được thông báo.');
-    } else {
-      toast.error(`Lỗi: ${response.statusText}`);
-    }
+// ─── Error Resolution ──────────────────────────────────────────────────────────
+
+/**
+ * Resolve a single ApiError to a localized message string.
+ * Falls back to error.code if no translation found.
+ */
+function resolveErrorMessage(error: ApiError): string {
+  const translated = i18n.t(error.code, error.params ?? {});
+  // i18n.t returns the key itself if no translation found
+  return translated !== error.code ? translated : error.code;
+}
+
+/**
+ * Show toast(s) for an array of ApiErrors.
+ * Groups field-level validation errors into a single toast.
+ */
+function showApiErrors(errors: ApiError[]) {
+  const fieldErrors = errors.filter((e) => e.field);
+  const generalErrors = errors.filter((e) => !e.field);
+
+  // Show general errors as individual toasts
+  for (const error of generalErrors) {
+    toast.error(resolveErrorMessage(error));
   }
+
+  // Group field-level validation errors into one toast
+  if (fieldErrors.length > 0) {
+    const messages = fieldErrors
+      .map((e) => `• ${resolveErrorMessage(e)}`)
+      .join('\n');
+    toast.error(i18n.t('errors.validation.title', 'Validation Error'), {
+      description: messages,
+    });
+  }
+}
+
+// ─── Response Interceptor: Centralized Error Handling ──────────────────────────
+
+client.interceptors.response.use(async (response: any) => {
+  if (response.ok) return response;
+
+  // Try to parse response body as ApiResponse
+  let body: ApiResponse | null = null;
+  try {
+    body = await response.clone().json();
+  } catch {
+    // Response body is not JSON
+  }
+
+  // If backend returned structured errors, resolve via i18n
+  if (body?.errors && body.errors.length > 0) {
+    showApiErrors(body.errors);
+
+    // Special handling: 401 → auto logout
+    if (body.status === 401) {
+      const hasTokenExpired = body.errors.some(
+        (e) => e.code === ERROR_CODES.AUTH.TOKEN_EXPIRED
+      );
+      if (hasTokenExpired) {
+        authActions.logout();
+        window.location.href = '/login';
+      }
+    }
+
+    return response;
+  }
+
+  // Fallback: backend didn't return structured errors
+  switch (response.status) {
+    case 401:
+      toast.error(i18n.t(ERROR_CODES.AUTH.UNAUTHORIZED));
+      authActions.logout();
+      window.location.href = '/login';
+      break;
+    case 403:
+      toast.error(i18n.t(ERROR_CODES.AUTH.FORBIDDEN));
+      break;
+    case 404:
+      toast.error(i18n.t(ERROR_CODES.RESOURCE.NOT_FOUND));
+      break;
+    case 429:
+      toast.error(i18n.t(ERROR_CODES.SERVER.RATE_LIMIT));
+      break;
+    case 503:
+      toast.error(i18n.t(ERROR_CODES.SERVER.SERVICE_UNAVAILABLE));
+      break;
+    default:
+      if (response.status >= 500) {
+        toast.error(i18n.t(ERROR_CODES.SERVER.INTERNAL_ERROR));
+      } else {
+        toast.error(`${response.status}: ${response.statusText}`);
+      }
+  }
+
   return response;
 });
 
-export { client };
+export { client, resolveErrorMessage, showApiErrors };
