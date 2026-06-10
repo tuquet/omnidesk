@@ -1,6 +1,10 @@
 import { Separator } from '@kbm/ui';
 import { SidebarTrigger } from '@kbm/ui';
 import { UpdaterButton } from '@/features/core/components/updater-button';
+import { ThemeToggle } from '@/features/core/components/theme-toggle';
+import { LanguageSwitcher } from '@/features/core/components/language-switcher';
+import { FullscreenToggle } from '@/features/core/components/fullscreen-toggle';
+import { NotificationButton } from '@/features/core/components/notification-button';
 
 export function SiteHeader() {
   return (
@@ -10,7 +14,13 @@ export function SiteHeader() {
         <Separator orientation="vertical" className="mx-2 data-[orientation=vertical]:h-4" />
         <h1 className="text-base font-medium">Bảng Điều Khiển</h1>
         <div className="flex-1" />
-        <UpdaterButton />
+        <div className="flex items-center gap-1">
+          <NotificationButton />
+          <LanguageSwitcher />
+          <ThemeToggle />
+          <FullscreenToggle />
+          <UpdaterButton />
+        </div>
       </div>
     </header>
   );

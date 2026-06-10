@@ -1,6 +1,5 @@
 import * as React from 'react';
-import { useStore } from '@tanstack/react-store';
-import { authStore, Role } from '../stores/use-auth-store';
+import { useAuth, type Role } from '../stores/use-auth-store';
 
 const ROLE_HIERARCHY: Record<Role, number> = {
   GUEST: 0,
@@ -14,8 +13,18 @@ interface CanProps {
   fallback?: React.ReactNode;
 }
 
+/**
+ * RBAC Wrapper Component — hiển thị `children` khi role hiện tại >= role yêu cầu.
+ *
+ * @example
+ * ```tsx
+ * <Can role="USER" fallback={<LoginBanner />}>
+ *   <SecretPanel />
+ * </Can>
+ * ```
+ */
 export function Can({ role, children, fallback = null }: CanProps) {
-  const currentRole = useStore(authStore, (state: any) => state.role as Role);
+  const { role: currentRole } = useAuth();
 
   const hasAccess = ROLE_HIERARCHY[currentRole] >= ROLE_HIERARCHY[role];
 
