@@ -20,7 +20,6 @@ import {
 import { CommandIcon } from 'lucide-react';
 import {
   APP_NAME,
-  DEFAULT_USER,
   NAV_MAIN,
   NAV_SHOWCASE,
   NAV_ERROR_PAGES,
@@ -30,16 +29,17 @@ import {
 import { useRBAC } from '@/hooks/use-rbac';
 import { useDevStore } from '@/stores/use-dev-store';
 import { useTranslation } from 'react-i18next';
-import { useStore } from '@tanstack/react-store';
-import { launcherStore } from '@/features/launcher/stores/use-launcher-store';
+import { useLauncherStore } from '@/features/launcher/stores/use-launcher-store';
 import { Blocks } from 'lucide-react';
+import { useAuth } from '@/features/auth/stores/use-auth-store';
 
 const AppSidebarInner = ({ ...props }: React.ComponentProps<typeof Sidebar>) => {
   const { can, filterNav } = useRBAC();
   const { isDevMode } = useDevStore();
   const { t } = useTranslation();
+  const { displayName, user } = useAuth();
 
-  const { installedApps } = useStore(launcherStore);
+  const { installedApps } = useLauncherStore();
 
   // Filter NAV_MAIN by launcher installed apps first
   const launcherFilteredMainNav = NAV_MAIN.filter(item => {
@@ -149,7 +149,11 @@ const AppSidebarInner = ({ ...props }: React.ComponentProps<typeof Sidebar>) => 
         />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={DEFAULT_USER} />
+        <NavUser user={{
+          name: displayName ?? 'User',
+          email: user?.email ?? '',
+          avatar: user?.user_metadata?.avatar_url ?? '',
+        }} />
       </SidebarFooter>
     </Sidebar>
   );

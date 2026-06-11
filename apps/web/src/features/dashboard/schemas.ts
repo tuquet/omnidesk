@@ -38,13 +38,5 @@ export const createIssueFormSchema = z.object({
   assigneeId: z.string().nullable().optional(),
 });
 
+
 export type CreateIssueFormValues = z.infer<typeof createIssueFormSchema>;
-
-// ─── Login Form Schema ──────────────────────────────────────────────────────
-
-export const loginFormSchema = z.object({
-  email: z.string().email('Please enter a valid email address'),
-  password: z.string().min(6, 'Password must be at least 6 characters'),
-});
-
-export type LoginFormValues = z.infer<typeof loginFormSchema>;

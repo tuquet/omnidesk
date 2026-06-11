@@ -6,8 +6,6 @@ import {
   ChartBarIcon,
   FolderIcon,
   UsersIcon,
-  CameraIcon,
-  FileTextIcon,
   Settings2Icon,
   CircleHelpIcon,
   SearchIcon,
@@ -93,36 +91,11 @@ export const NAV_ERROR_PAGES: NavGroup = {
   ],
 };
 
-export const NAV_CLOUDS: NavItem[] = [
-  {
-    title: 'Capture',
-    icon: CameraIcon,
-    isActive: true,
-    url: '#',
-    items: [
-      { title: 'Active Proposals', url: '#' },
-      { title: 'Archived', url: '#' },
-    ],
-  },
-  {
-    title: 'Proposal',
-    icon: FileTextIcon,
-    url: '#',
-    items: [
-      { title: 'Active Proposals', url: '#' },
-      { title: 'Archived', url: '#' },
-    ],
-  },
-  {
-    title: 'Prompts',
-    icon: FileTextIcon,
-    url: '#',
-    items: [
-      { title: 'Active Proposals', url: '#' },
-      { title: 'Archived', url: '#' },
-    ],
-  },
-];
+/**
+ * Cloud integration nav items — reserved for future cloud service connections.
+ * Items here will appear in the sidebar "Clouds" section when populated.
+ */
+export const NAV_CLOUDS: NavItem[] = [];
 
 export const NAV_SECONDARY: NavItem[] = [
   { title: 'Settings', url: '#', icon: Settings2Icon, requiredPermission: 'settings:view' },

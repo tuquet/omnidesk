@@ -3,8 +3,6 @@ import { Link, useNavigate } from "@tanstack/react-router"
 import { UserRound, Loader2 } from "lucide-react"
 import { toast } from 'sonner'
 import { useForm } from '@tanstack/react-form'
-import { isDesktop } from '@/utils/platform'
-import { openUrl } from '@tauri-apps/plugin-opener'
 import { DEFAULT_AUTHENTICATED_ROUTE } from '@/config/route-config'
 import {
   Button,
@@ -16,7 +14,7 @@ import {
   Input,
 } from "@kbm/ui"
 import { authActions } from "../stores/use-auth-store"
-import { loginFormSchema } from "@/features/dashboard/schemas"
+import { loginFormSchema } from "../schemas"
 
 export function LoginForm({
   className,
@@ -30,44 +28,35 @@ export function LoginForm({
       password: 'password',
     },
     onSubmit: async ({ value }) => {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 500));
-      authActions.setAuth('ADMIN', 'mock-token', value.email);
-      toast.success('Login successful!');
-      navigate({ to: DEFAULT_AUTHENTICATED_ROUTE });
+      try {
+        await authActions.signInWithPassword(value.email, value.password);
+        toast.success('Login successful!');
+        navigate({ to: DEFAULT_AUTHENTICATED_ROUTE });
+      } catch (err) {
+        const message = err instanceof Error ? err.message : 'Login failed';
+        toast.error(message);
+      }
     },
   });
 
   const handleGitHubLogin = async () => {
-    const clientId = import.meta.env.VITE_GITHUB_CLIENT_ID;
-    if (!clientId) {
-      alert("Vui lòng điền VITE_GITHUB_CLIENT_ID vào file .env ở thư mục apps/web");
-      return;
-    }
-    toast.info('Opening browser for GitHub login...');
-    
-    // GitHub only allows ONE callback URL per OAuth App (usually the Web platform URL).
-    // To support Desktop Deep Links without a separate backend, we redirect to the Web platform
-    // with state=desktop. The Web platform will then bounce it back to the Desktop app via deep link.
-    const webUrl = import.meta.env.VITE_WEB_URL || 'http://localhost:1420';
-    const redirectUri = `${webUrl}/auth/callback`;
-    const state = isDesktop() ? 'desktop' : 'web';
-      
-    const url = `https://github.com/login/oauth/authorize?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=user&state=${state}`;
-    
-    // In Tauri desktop app, open in system browser to avoid replacing the app webview
-    // which would destroy the custom TitleBar and window controls.
-    if (isDesktop()) {
-      await openUrl(url);
-    } else {
-      window.location.href = url;
+    try {
+      await authActions.signInWithGitHub();
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'GitHub login failed';
+      toast.error(message);
     }
   };
 
-  const handleGuestLogin = () => {
-    authActions.loginAsGuest();
-    toast.success('Logged in as Guest');
-    navigate({ to: DEFAULT_AUTHENTICATED_ROUTE });
+  const handleGuestLogin = async () => {
+    try {
+      await authActions.signInAnonymously();
+      toast.success('Logged in as Guest');
+      navigate({ to: DEFAULT_AUTHENTICATED_ROUTE });
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Guest login failed';
+      toast.error(message);
+    }
   };
 
   return (

@@ -1,9 +1,14 @@
+pub mod auth;
+
 use axum::{Router, routing::get, response::IntoResponse, Json};
 use sqlx::SqlitePool;
 use std::net::SocketAddr;
 use tokio::net::TcpListener;
+use tower_http::cors::CorsLayer;
 use utoipa::OpenApi;
 use utoipa_scalar::{Scalar, Servable};
+
+use auth::Claims;
 
 #[derive(Clone)]
 pub struct AppState {
@@ -15,10 +20,12 @@ pub struct AppState {
     paths(
         health_check,
         ping,
-        latest_update
+        latest_update,
+        me
     ),
     tags(
-        (name = "health", description = "Health check endpoints")
+        (name = "health", description = "Health check endpoints"),
+        (name = "auth", description = "Authenticated endpoints")
     )
 )]
 struct ApiDoc;
@@ -32,6 +39,8 @@ pub async fn serve(pool: SqlitePool, port: u16) {
         .route("/health", get(health_check))
         .route("/ping", get(ping))
         .route("/updates/latest.json", get(latest_update))
+        .route("/api/me", get(me))
+        .layer(CorsLayer::permissive())
         .with_state(state);
 
     let addr = SocketAddr::from(([0, 0, 0, 0], port));
@@ -88,5 +97,23 @@ async fn latest_update() -> impl IntoResponse {
                 "url": "http://127.0.0.1:1421/downloads/update.zip"
             }
         }
+    }))
+}
+
+/// Protected: Returns the authenticated user's info from their JWT claims.
+#[utoipa::path(
+    get,
+    path = "/api/me",
+    responses(
+        (status = 200, description = "Returns authenticated user info"),
+        (status = 401, description = "Unauthorized — missing or invalid token")
+    )
+)]
+async fn me(claims: Claims) -> impl IntoResponse {
+    Json(serde_json::json!({
+        "user_id": claims.user_id(),
+        "email": claims.email,
+        "is_admin": claims.is_admin(),
+        "role": claims.role,
     }))
 }

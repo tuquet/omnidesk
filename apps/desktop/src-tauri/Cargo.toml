@@ -2,7 +2,7 @@
 name = "kill-bug-machine"
 default-run = "kill-bug-machine"
 version = "0.1.0"
-description = "Tauri + React + Axum monorepo boilerplate"
+description = "Premium B2B Enterprise Platform with App Marketplace"
 authors = ["KBM Team"]
 edition = "2021"
 
@@ -35,6 +35,9 @@ keyring = "3"
 reqwest = { version = "0.12", features = ["json"] }
 utoipa-scalar = { version = "0.2", features = ["axum"] }
 tauri-plugin-deep-link = "~2"
+jsonwebtoken = "9"
+axum-extra = { version = "0.9", features = ["typed-header"] }
+tower-http = { version = "0.6", features = ["cors"] }
 
 [[bin]]
 name = "kbm-cli"

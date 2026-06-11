@@ -1,89 +1,93 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
-import { useEffect } from 'react';
-import { authActions } from '@/features/auth/stores/use-auth-store';
+import { useEffect, useState } from 'react';
+import { supabase } from '@/lib/supabase';
 import { toast } from 'sonner';
-import { z } from 'zod';
 import { DEFAULT_AUTHENTICATED_ROUTE } from '@/config/route-config';
 
-const searchSchema = z.object({
-  code: z.string().optional(),
-  state: z.string().optional(),
-}).catch({});
-
 export const Route = createFileRoute('/auth/callback')({
-  validateSearch: searchSchema,
   component: AuthCallbackPage,
 });
 
 function AuthCallbackPage() {
   const navigate = useNavigate();
-  const { code, state } = Route.useSearch();
-  const isDesktopFlow = state === 'desktop';
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!code) {
-      toast.error('Không tìm thấy mã xác thực từ GitHub.');
-      navigate({ to: '/login' });
-      return;
-    }
+    const handleCallback = async () => {
+      try {
+        // Supabase handles the code exchange automatically when
+        // the URL contains the auth parameters (code, access_token, etc.)
+        const { data: { session }, error: authError } = await supabase.auth.getSession();
+        
+        if (authError) {
+          throw authError;
+        }
 
-    // Always authenticate the user in the background so the web session is active
-    toast.info('Đang xác thực với GitHub...');
-    const timer = setTimeout(() => {
-      authActions.setAuth('USER', `github-token-${code}`);
-      toast.success('Đăng nhập GitHub thành công!');
-      
-      // If it's a web flow, navigate automatically
-      if (!isDesktopFlow) {
-        navigate({ to: DEFAULT_AUTHENTICATED_ROUTE });
+        if (session) {
+          toast.success('Đăng nhập thành công!');
+          navigate({ to: DEFAULT_AUTHENTICATED_ROUTE });
+        } else {
+          // If no session yet, Supabase may still be processing
+          // Listen for the auth state change
+          const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+            if (event === 'SIGNED_IN' && session) {
+              toast.success('Đăng nhập thành công!');
+              navigate({ to: DEFAULT_AUTHENTICATED_ROUTE });
+              subscription.unsubscribe();
+            }
+          });
+
+          // Timeout after 10 seconds
+          const timeoutId = setTimeout(() => {
+            subscription.unsubscribe();
+            setError('Xác thực hết thời gian. Vui lòng thử lại.');
+          }, 10000);
+
+          // Cleanup on unmount
+          return () => {
+            clearTimeout(timeoutId);
+            subscription.unsubscribe();
+          };
+        }
+      } catch (err) {
+        const message = err instanceof Error ? err.message : 'Lỗi xác thực không xác định';
+        setError(message);
+        toast.error(message);
       }
-    }, 1500);
+    };
 
-    return () => clearTimeout(timer);
-  }, [code, navigate, isDesktopFlow]);
+    handleCallback();
+  }, [navigate]);
 
-  if (isDesktopFlow) {
-    const deepLinkUrl = `kbm://auth/callback?code=${code}`;
+  if (error) {
     return (
-      <div className="flex min-h-svh w-full items-center justify-center p-6 bg-background text-foreground">
-        <div className="flex w-full max-w-sm flex-col items-center gap-6 text-center">
-          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-green-500/20">
-            <svg className="h-8 w-8 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+      <div className="flex flex-1 w-full items-center justify-center p-6">
+        <div className="flex flex-col items-center gap-4 text-center">
+          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-destructive/20">
+            <svg className="h-8 w-8 text-destructive" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
           </div>
           <div className="space-y-2">
-            <h1 className="text-2xl font-bold tracking-tight">Xác thực thành công</h1>
-            <p className="text-sm text-muted-foreground">
-              Tài khoản GitHub của bạn đã được kết nối. Trình duyệt đã sẵn sàng trả bạn về ứng dụng Kill Bug Machine.
-            </p>
+            <h1 className="text-2xl font-bold tracking-tight">Xác thực thất bại</h1>
+            <p className="text-sm text-muted-foreground">{error}</p>
           </div>
-          <a
-            href={deepLinkUrl}
-            className="inline-flex h-10 w-full items-center justify-center rounded-md bg-primary px-8 text-sm font-medium text-primary-foreground shadow transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-          >
-            Mở Ứng dụng Desktop
-          </a>
           <button
-            onClick={() => navigate({ to: DEFAULT_AUTHENTICATED_ROUTE })}
-            className="inline-flex h-10 w-full items-center justify-center rounded-md border border-input bg-background px-8 text-sm font-medium shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+            onClick={() => navigate({ to: '/login' })}
+            className="inline-flex h-10 items-center justify-center rounded-md bg-primary px-8 text-sm font-medium text-primary-foreground shadow transition-colors hover:bg-primary/90"
           >
-            Tiếp tục trên Web Dashboard
+            Quay lại Đăng nhập
           </button>
-          <p className="mt-4 text-xs text-muted-foreground">
-            Lưu ý: Trình duyệt sẽ yêu cầu quyền mở ứng dụng. Hãy nhấn "Cho phép" (Allow). <br /><br />
-            Nếu desktop app không tự mở, có thể máy bạn chưa đăng ký Deep Link (cần chạy `pnpm tauri dev` bằng Terminal quyền Administrator 1 lần).
-          </p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="flex min-h-svh w-full items-center justify-center p-6">
+    <div className="flex flex-1 w-full items-center justify-center p-6">
       <div className="flex flex-col items-center gap-4">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-blue-500 border-t-transparent" />
-        <p className="text-muted-foreground text-sm font-medium">Đang xử lý đăng nhập GitHub...</p>
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+        <p className="text-muted-foreground text-sm font-medium">Đang xử lý đăng nhập...</p>
       </div>
     </div>
   );

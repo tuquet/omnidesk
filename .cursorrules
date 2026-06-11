@@ -1,4 +1,4 @@
-# B2B SaaS Boilerplate - AI Agent Guidelines (TanStack Intent)
+# KBM — AI Agent Guidelines (TanStack Intent)
 
 You are an expert AI programming assistant assisting the developer with a bleeding-edge B2B SaaS Monorepo.
 You MUST adhere to these strict architectural and technological intents (TanStack Intent):
@@ -7,22 +7,40 @@ You MUST adhere to these strict architectural and technological intents (TanStac
 - **TypeScript:** `v7.0 Beta` (tsgo). Always use `@typescript/native-preview@beta` and `tsgo` engine for typechecking.
 - **Framework:** React 19 + Vite + Tauri v2 (for Desktop).
 - **Styling:** Tailwind CSS v4.0 + Shadcn UI (Customized).
+- **Backend:** Supabase (Auth, Database, Storage, Edge Functions). The Rust Axum server is a desktop-only companion for local features (keyring, updater proxy).
 - **Monorepo:** Turborepo with pnpm workspaces.
   - `@kbm/web`: The main application (Tauri + React).
   - `@kbm/ui`: Shared UI components (Shadcn + TanStack Form).
+  - `@kbm/types`: Shared TypeScript types and Zod schemas.
+  - `@kbm/config`: Shared ESLint, TypeScript, Prettier configs.
 
 ## 2. The TanStack Ecosystem (CRITICAL)
-This project heavily relies on the **TanStack Ecosystem**. DO NOT use alternative libraries (like React Router, React Hook Form, or Zustand) unless explicitly requested.
+This project heavily relies on the **TanStack Ecosystem**. DO NOT use alternative libraries (like React Router, React Hook Form, Zustand, or Redux) unless explicitly requested.
 - **Routing:** `@tanstack/react-router` (File-based routing using `routeTree.gen.ts`).
-- **Data Fetching:** `@tanstack/react-query` (with `@hey-api/client-fetch` for generated API clients).
+- **Data Fetching:** `@tanstack/react-query` (with Supabase client as primary data source, `@hey-api/client-fetch` for Axum-specific endpoints).
 - **Form Management:** `@tanstack/react-form` + Zod adapter. Shadcn UI forms have been adapted to use TanStack Form render props.
-- **Global State:** `@tanstack/react-store`.
+- **Global State:** `@tanstack/react-store` (NOT Zustand).
 - **Virtualization:** `@tanstack/react-virtual`.
 - **Tables:** `@tanstack/react-table`.
 
-## 3. Coding Standards
+## 3. Supabase Integration
+- **Auth:** Use `supabase.auth.*` for all authentication (email/password, OAuth providers, anonymous). NEVER store raw tokens in localStorage manually.
+- **Database:** Use Supabase client (`supabase.from(...)`) for all data operations. RLS policies enforce access control.
+- **Edge Functions:** Use for server-side logic that cannot be expressed as RLS policies.
+- **Realtime:** Use Supabase Realtime for live data subscriptions when needed.
+- **Client:** Import from `@/lib/supabase.ts`. Env vars use `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`.
+
+## 4. App Launcher / Marketplace
+- The platform uses an **App Marketplace** pattern where features are modular "apps" that can be installed/uninstalled per user.
+- **Registry:** App definitions in `features/launcher/config/registry.ts`, backed by Supabase `marketplace_apps` table.
+- **Store:** Installation state in `features/launcher/stores/use-launcher-store.ts` (TanStack Store + localStorage, migrating to Supabase).
+- **Sidebar:** Navigation items are dynamically filtered by installed apps.
+
+## 5. Coding Standards
 - **No `any` policy:** Strictly define types for all props, state, and API responses.
 - **File Structure:** Organize by features (`src/features/auth`, `src/features/dashboard`) rather than technical type (`components/`, `hooks/`).
 - **Type Safety First:** Leverage generated types from OpenAPI and TanStack Router to ensure 100% end-to-end type safety.
+- **Zod Validation:** Use Zod schemas for all form validation and API response validation at runtime.
+- **Cross-Feature Imports:** Features must NOT import directly from other features' internal modules. Use public API exports (index.ts).
 
 When generating code, always prioritize the TanStack way. Use Render Props for forms, File-based routing conventions, and direct TanStack Store access.

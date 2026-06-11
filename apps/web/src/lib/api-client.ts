@@ -1,7 +1,7 @@
 import { createClient } from '@hey-api/client-fetch';
 import { toast } from 'sonner';
 import i18n from '@/lib/i18n';
-import { authActions } from '@/features/auth/stores/use-auth-store';
+import { authActions, authStore } from '@/features/auth/stores/use-auth-store';
 import type { ApiResponse, ApiError } from '@kbm/types';
 import { ERROR_CODES } from '@kbm/types';
 
@@ -16,7 +16,7 @@ client.setConfig({
 // ─── Request Interceptor: Auto-attach Bearer Token ─────────────────────────────
 
 client.interceptors.request.use((request: Request) => {
-  const token = localStorage.getItem('kbm-auth-token');
+  const token = authStore.state.session?.access_token;
 
   if (token && request.headers) {
     request.headers.set('Authorization', `Bearer ${token}`);
@@ -84,7 +84,7 @@ client.interceptors.response.use(async (response: Response) => {
         (e) => e.code === ERROR_CODES.AUTH.TOKEN_EXPIRED
       );
       if (hasTokenExpired) {
-        authActions.logout();
+        authActions.logout().catch(console.error);
         window.location.href = '/login';
       }
     }
@@ -96,7 +96,7 @@ client.interceptors.response.use(async (response: Response) => {
   switch (response.status) {
     case 401:
       toast.error(i18n.t(ERROR_CODES.AUTH.UNAUTHORIZED));
-      authActions.logout();
+      authActions.logout().catch(console.error);
       window.location.href = '/login';
       break;
     case 403:
