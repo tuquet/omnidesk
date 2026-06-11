@@ -31,7 +31,7 @@ import { useRBAC } from '@/hooks/use-rbac';
 import { useDevStore } from '@/stores/use-dev-store';
 import { useTranslation } from 'react-i18next';
 
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+const AppSidebarInner = ({ ...props }: React.ComponentProps<typeof Sidebar>) => {
   const { can, filterNav } = useRBAC();
   const { isDevMode } = useDevStore();
   const { t } = useTranslation();
@@ -74,7 +74,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 {showcaseItems.map((item) => (
                   <SidebarMenuItem key={item.title}>
                     <SidebarMenuButton tooltip={t(`nav.${item.title}`, item.title)} asChild>
-                      <Link to={item.url} activeProps={{ 'data-active': true } as any}>
+                      <Link to={item.url} activeProps={{ 'data-active': true } as Record<string, boolean>}>
                         <item.icon />
                         <span>{t(`nav.${item.title}`, item.title)}</span>
                       </Link>
@@ -95,7 +95,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 {errorItems.map((item) => (
                   <SidebarMenuItem key={item.title}>
                     <SidebarMenuButton tooltip={t(`nav.${item.title}`, item.title)} asChild>
-                      <Link to={item.url} activeProps={{ 'data-active': true } as any}>
+                      <Link to={item.url} activeProps={{ 'data-active': true } as Record<string, boolean>}>
                         <item.icon />
                         <span>{t(`nav.${item.title}`, item.title)}</span>
                       </Link>
@@ -130,4 +130,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarFooter>
     </Sidebar>
   );
-}
+};
+
+export const AppSidebar = React.memo(AppSidebarInner);
+AppSidebar.displayName = 'AppSidebar';

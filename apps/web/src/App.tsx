@@ -3,6 +3,8 @@ import { QueryClientProvider } from '@tanstack/react-query';
 import { TooltipProvider, Toaster } from '@kbm/ui';
 import { ThemeProvider } from 'next-themes';
 import { queryClient } from './app/query-client';
+import { ErrorBoundary } from '@/components/error-boundary';
+import { ConfirmDialogProvider } from '@/components/confirm-dialog';
 
 // Import the generated route tree
 import { routeTree } from './routeTree.gen';
@@ -32,15 +34,19 @@ import { TanStackRouterDevtools } from '@tanstack/react-router-devtools';
 export default function App() {
   const auth = useStore(authStore);
   return (
-    <QueryClientProvider client={queryClient}>
-      <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-        <TooltipProvider>
-          <RouterProvider router={router} context={{ auth }} />
-          <Toaster richColors position="bottom-right" />
-        </TooltipProvider>
-      </ThemeProvider>
-      <ReactQueryDevtools initialIsOpen={false} />
-      <TanStackRouterDevtools router={router} position="bottom-right" />
-    </QueryClientProvider>
+    <ErrorBoundary>
+      <QueryClientProvider client={queryClient}>
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+          <TooltipProvider>
+            <ConfirmDialogProvider>
+              <RouterProvider router={router} context={{ auth }} />
+            </ConfirmDialogProvider>
+            <Toaster richColors position="bottom-right" />
+          </TooltipProvider>
+        </ThemeProvider>
+        <ReactQueryDevtools initialIsOpen={false} />
+        <TanStackRouterDevtools router={router} position="bottom-right" />
+      </QueryClientProvider>
+    </ErrorBoundary>
   );
 }

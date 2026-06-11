@@ -1,35 +1,43 @@
-import * as React from 'react';
-import { useAuth, type Role } from '../stores/use-auth-store';
-
-const ROLE_HIERARCHY: Record<Role, number> = {
-  GUEST: 0,
-  USER: 1,
-  ADMIN: 2,
-};
+import type { ReactNode } from 'react';
+import { useRBAC } from '@/hooks/use-rbac';
+import type { Permission } from '@/config/rbac';
 
 interface CanProps {
-  role: Role;
-  children: React.ReactNode;
-  fallback?: React.ReactNode;
+  /** Permission required to render children (e.g., 'team:manage') */
+  permission?: Permission;
+  /** Fallback content when permission is denied */
+  fallback?: ReactNode;
+  children: ReactNode;
 }
 
 /**
- * RBAC Wrapper Component — hiển thị `children` khi role hiện tại >= role yêu cầu.
+ * RBAC Wrapper Component — unified with `config/rbac.ts` permission system.
+ * Shows `children` when the current user has the specified permission.
+ * When RBAC is disabled (default demo mode), always renders children.
  *
  * @example
  * ```tsx
- * <Can role="USER" fallback={<LoginBanner />}>
- *   <SecretPanel />
+ * <Can permission="team:manage" fallback={<NoAccess />}>
+ *   <TeamSettings />
+ * </Can>
+ *
+ * // Always visible (no permission check):
+ * <Can>
+ *   <PublicContent />
  * </Can>
  * ```
  */
-export function Can({ role, children, fallback = null }: CanProps) {
-  const { role: currentRole } = useAuth();
+export function Can({ permission, children, fallback = null }: CanProps) {
+  const { can } = useRBAC();
 
-  const hasAccess = ROLE_HIERARCHY[currentRole] >= ROLE_HIERARCHY[role];
-
-  if (hasAccess) {
+  // No permission required → always render
+  if (!permission) {
     return <>{children}</>;
   }
+
+  if (can(permission)) {
+    return <>{children}</>;
+  }
+
   return <>{fallback}</>;
 }

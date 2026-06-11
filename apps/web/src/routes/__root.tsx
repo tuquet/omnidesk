@@ -81,7 +81,15 @@ function RootComponent() {
   return <Outlet />;
 }
 
+import { DefaultErrorFallback } from '@/components/error-boundary';
+
 export const Route = createRootRouteWithContext<MyRouterContext>()({
   component: RootComponent,
   notFoundComponent: NotFound,
+  errorComponent: ({ error, reset }) => (
+    <DefaultErrorFallback
+      error={error instanceof Error ? error : new Error(String(error))}
+      reset={reset}
+    />
+  ),
 });

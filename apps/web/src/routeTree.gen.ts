@@ -22,20 +22,44 @@ import { Route as R404RouteImport } from './routes/404'
 import { Route as R403RouteImport } from './routes/403'
 import { Route as R401RouteImport } from './routes/401'
 import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
-import { Route as AuthenticatedTeamRouteImport } from './routes/_authenticated/team'
-import { Route as AuthenticatedProjectsRouteImport } from './routes/_authenticated/projects'
-import { Route as AuthenticatedLifecycleRouteImport } from './routes/_authenticated/lifecycle'
-import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
-import { Route as AuthenticatedAnalyticsRouteImport } from './routes/_authenticated/analytics'
-import { Route as AuthenticatedShowcaseNavigationRouteImport } from './routes/_authenticated/showcase.navigation'
-import { Route as AuthenticatedShowcaseFeedbackRouteImport } from './routes/_authenticated/showcase.feedback'
-import { Route as AuthenticatedShowcaseCardsRouteImport } from './routes/_authenticated/showcase.cards'
-import { Route as AuthenticatedShowcaseButtonsRouteImport } from './routes/_authenticated/showcase.buttons'
-import { Route as AuthenticatedDocumentsWordAssistantRouteImport } from './routes/_authenticated/documents.word-assistant'
-import { Route as AuthenticatedDocumentsReportsRouteImport } from './routes/_authenticated/documents.reports'
-import { Route as AuthenticatedDocumentsDataLibraryRouteImport } from './routes/_authenticated/documents.data-library'
 
 const IndexLazyRouteImport = createFileRoute('/')()
+const AuthenticatedTeamLazyRouteImport = createFileRoute(
+  '/_authenticated/team',
+)()
+const AuthenticatedProjectsLazyRouteImport = createFileRoute(
+  '/_authenticated/projects',
+)()
+const AuthenticatedLifecycleLazyRouteImport = createFileRoute(
+  '/_authenticated/lifecycle',
+)()
+const AuthenticatedDashboardLazyRouteImport = createFileRoute(
+  '/_authenticated/dashboard',
+)()
+const AuthenticatedAnalyticsLazyRouteImport = createFileRoute(
+  '/_authenticated/analytics',
+)()
+const AuthenticatedShowcaseNavigationLazyRouteImport = createFileRoute(
+  '/_authenticated/showcase/navigation',
+)()
+const AuthenticatedShowcaseFeedbackLazyRouteImport = createFileRoute(
+  '/_authenticated/showcase/feedback',
+)()
+const AuthenticatedShowcaseCardsLazyRouteImport = createFileRoute(
+  '/_authenticated/showcase/cards',
+)()
+const AuthenticatedShowcaseButtonsLazyRouteImport = createFileRoute(
+  '/_authenticated/showcase/buttons',
+)()
+const AuthenticatedDocumentsWordAssistantLazyRouteImport = createFileRoute(
+  '/_authenticated/documents/word-assistant',
+)()
+const AuthenticatedDocumentsReportsLazyRouteImport = createFileRoute(
+  '/_authenticated/documents/reports',
+)()
+const AuthenticatedDocumentsDataLibraryLazyRouteImport = createFileRoute(
+  '/_authenticated/documents/data-library',
+)()
 
 const SignupRoute = SignupRouteImport.update({
   id: '/signup',
@@ -91,78 +115,118 @@ const IndexLazyRoute = IndexLazyRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any).lazy(() => import('./routes/index.lazy').then((d) => d.Route))
+const AuthenticatedTeamLazyRoute = AuthenticatedTeamLazyRouteImport.update({
+  id: '/team',
+  path: '/team',
+  getParentRoute: () => AuthenticatedRoute,
+} as any).lazy(() =>
+  import('./routes/_authenticated/team.lazy').then((d) => d.Route),
+)
+const AuthenticatedProjectsLazyRoute =
+  AuthenticatedProjectsLazyRouteImport.update({
+    id: '/projects',
+    path: '/projects',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any).lazy(() =>
+    import('./routes/_authenticated/projects.lazy').then((d) => d.Route),
+  )
+const AuthenticatedLifecycleLazyRoute =
+  AuthenticatedLifecycleLazyRouteImport.update({
+    id: '/lifecycle',
+    path: '/lifecycle',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any).lazy(() =>
+    import('./routes/_authenticated/lifecycle.lazy').then((d) => d.Route),
+  )
+const AuthenticatedDashboardLazyRoute =
+  AuthenticatedDashboardLazyRouteImport.update({
+    id: '/dashboard',
+    path: '/dashboard',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any).lazy(() =>
+    import('./routes/_authenticated/dashboard.lazy').then((d) => d.Route),
+  )
+const AuthenticatedAnalyticsLazyRoute =
+  AuthenticatedAnalyticsLazyRouteImport.update({
+    id: '/analytics',
+    path: '/analytics',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any).lazy(() =>
+    import('./routes/_authenticated/analytics.lazy').then((d) => d.Route),
+  )
 const AuthCallbackRoute = AuthCallbackRouteImport.update({
   id: '/auth/callback',
   path: '/auth/callback',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedTeamRoute = AuthenticatedTeamRouteImport.update({
-  id: '/team',
-  path: '/team',
-  getParentRoute: () => AuthenticatedRoute,
-} as any)
-const AuthenticatedProjectsRoute = AuthenticatedProjectsRouteImport.update({
-  id: '/projects',
-  path: '/projects',
-  getParentRoute: () => AuthenticatedRoute,
-} as any)
-const AuthenticatedLifecycleRoute = AuthenticatedLifecycleRouteImport.update({
-  id: '/lifecycle',
-  path: '/lifecycle',
-  getParentRoute: () => AuthenticatedRoute,
-} as any)
-const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
-  id: '/dashboard',
-  path: '/dashboard',
-  getParentRoute: () => AuthenticatedRoute,
-} as any)
-const AuthenticatedAnalyticsRoute = AuthenticatedAnalyticsRouteImport.update({
-  id: '/analytics',
-  path: '/analytics',
-  getParentRoute: () => AuthenticatedRoute,
-} as any)
-const AuthenticatedShowcaseNavigationRoute =
-  AuthenticatedShowcaseNavigationRouteImport.update({
+const AuthenticatedShowcaseNavigationLazyRoute =
+  AuthenticatedShowcaseNavigationLazyRouteImport.update({
     id: '/showcase/navigation',
     path: '/showcase/navigation',
     getParentRoute: () => AuthenticatedRoute,
-  } as any)
-const AuthenticatedShowcaseFeedbackRoute =
-  AuthenticatedShowcaseFeedbackRouteImport.update({
+  } as any).lazy(() =>
+    import('./routes/_authenticated/showcase.navigation.lazy').then(
+      (d) => d.Route,
+    ),
+  )
+const AuthenticatedShowcaseFeedbackLazyRoute =
+  AuthenticatedShowcaseFeedbackLazyRouteImport.update({
     id: '/showcase/feedback',
     path: '/showcase/feedback',
     getParentRoute: () => AuthenticatedRoute,
-  } as any)
-const AuthenticatedShowcaseCardsRoute =
-  AuthenticatedShowcaseCardsRouteImport.update({
+  } as any).lazy(() =>
+    import('./routes/_authenticated/showcase.feedback.lazy').then(
+      (d) => d.Route,
+    ),
+  )
+const AuthenticatedShowcaseCardsLazyRoute =
+  AuthenticatedShowcaseCardsLazyRouteImport.update({
     id: '/showcase/cards',
     path: '/showcase/cards',
     getParentRoute: () => AuthenticatedRoute,
-  } as any)
-const AuthenticatedShowcaseButtonsRoute =
-  AuthenticatedShowcaseButtonsRouteImport.update({
+  } as any).lazy(() =>
+    import('./routes/_authenticated/showcase.cards.lazy').then((d) => d.Route),
+  )
+const AuthenticatedShowcaseButtonsLazyRoute =
+  AuthenticatedShowcaseButtonsLazyRouteImport.update({
     id: '/showcase/buttons',
     path: '/showcase/buttons',
     getParentRoute: () => AuthenticatedRoute,
-  } as any)
-const AuthenticatedDocumentsWordAssistantRoute =
-  AuthenticatedDocumentsWordAssistantRouteImport.update({
+  } as any).lazy(() =>
+    import('./routes/_authenticated/showcase.buttons.lazy').then(
+      (d) => d.Route,
+    ),
+  )
+const AuthenticatedDocumentsWordAssistantLazyRoute =
+  AuthenticatedDocumentsWordAssistantLazyRouteImport.update({
     id: '/documents/word-assistant',
     path: '/documents/word-assistant',
     getParentRoute: () => AuthenticatedRoute,
-  } as any)
-const AuthenticatedDocumentsReportsRoute =
-  AuthenticatedDocumentsReportsRouteImport.update({
+  } as any).lazy(() =>
+    import('./routes/_authenticated/documents.word-assistant.lazy').then(
+      (d) => d.Route,
+    ),
+  )
+const AuthenticatedDocumentsReportsLazyRoute =
+  AuthenticatedDocumentsReportsLazyRouteImport.update({
     id: '/documents/reports',
     path: '/documents/reports',
     getParentRoute: () => AuthenticatedRoute,
-  } as any)
-const AuthenticatedDocumentsDataLibraryRoute =
-  AuthenticatedDocumentsDataLibraryRouteImport.update({
+  } as any).lazy(() =>
+    import('./routes/_authenticated/documents.reports.lazy').then(
+      (d) => d.Route,
+    ),
+  )
+const AuthenticatedDocumentsDataLibraryLazyRoute =
+  AuthenticatedDocumentsDataLibraryLazyRouteImport.update({
     id: '/documents/data-library',
     path: '/documents/data-library',
     getParentRoute: () => AuthenticatedRoute,
-  } as any)
+  } as any).lazy(() =>
+    import('./routes/_authenticated/documents.data-library.lazy').then(
+      (d) => d.Route,
+    ),
+  )
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexLazyRoute
@@ -175,19 +239,19 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/maintenance': typeof MaintenanceRoute
   '/signup': typeof SignupRoute
-  '/analytics': typeof AuthenticatedAnalyticsRoute
-  '/dashboard': typeof AuthenticatedDashboardRoute
-  '/lifecycle': typeof AuthenticatedLifecycleRoute
-  '/projects': typeof AuthenticatedProjectsRoute
-  '/team': typeof AuthenticatedTeamRoute
   '/auth/callback': typeof AuthCallbackRoute
-  '/documents/data-library': typeof AuthenticatedDocumentsDataLibraryRoute
-  '/documents/reports': typeof AuthenticatedDocumentsReportsRoute
-  '/documents/word-assistant': typeof AuthenticatedDocumentsWordAssistantRoute
-  '/showcase/buttons': typeof AuthenticatedShowcaseButtonsRoute
-  '/showcase/cards': typeof AuthenticatedShowcaseCardsRoute
-  '/showcase/feedback': typeof AuthenticatedShowcaseFeedbackRoute
-  '/showcase/navigation': typeof AuthenticatedShowcaseNavigationRoute
+  '/analytics': typeof AuthenticatedAnalyticsLazyRoute
+  '/dashboard': typeof AuthenticatedDashboardLazyRoute
+  '/lifecycle': typeof AuthenticatedLifecycleLazyRoute
+  '/projects': typeof AuthenticatedProjectsLazyRoute
+  '/team': typeof AuthenticatedTeamLazyRoute
+  '/documents/data-library': typeof AuthenticatedDocumentsDataLibraryLazyRoute
+  '/documents/reports': typeof AuthenticatedDocumentsReportsLazyRoute
+  '/documents/word-assistant': typeof AuthenticatedDocumentsWordAssistantLazyRoute
+  '/showcase/buttons': typeof AuthenticatedShowcaseButtonsLazyRoute
+  '/showcase/cards': typeof AuthenticatedShowcaseCardsLazyRoute
+  '/showcase/feedback': typeof AuthenticatedShowcaseFeedbackLazyRoute
+  '/showcase/navigation': typeof AuthenticatedShowcaseNavigationLazyRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexLazyRoute
@@ -200,19 +264,19 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/maintenance': typeof MaintenanceRoute
   '/signup': typeof SignupRoute
-  '/analytics': typeof AuthenticatedAnalyticsRoute
-  '/dashboard': typeof AuthenticatedDashboardRoute
-  '/lifecycle': typeof AuthenticatedLifecycleRoute
-  '/projects': typeof AuthenticatedProjectsRoute
-  '/team': typeof AuthenticatedTeamRoute
   '/auth/callback': typeof AuthCallbackRoute
-  '/documents/data-library': typeof AuthenticatedDocumentsDataLibraryRoute
-  '/documents/reports': typeof AuthenticatedDocumentsReportsRoute
-  '/documents/word-assistant': typeof AuthenticatedDocumentsWordAssistantRoute
-  '/showcase/buttons': typeof AuthenticatedShowcaseButtonsRoute
-  '/showcase/cards': typeof AuthenticatedShowcaseCardsRoute
-  '/showcase/feedback': typeof AuthenticatedShowcaseFeedbackRoute
-  '/showcase/navigation': typeof AuthenticatedShowcaseNavigationRoute
+  '/analytics': typeof AuthenticatedAnalyticsLazyRoute
+  '/dashboard': typeof AuthenticatedDashboardLazyRoute
+  '/lifecycle': typeof AuthenticatedLifecycleLazyRoute
+  '/projects': typeof AuthenticatedProjectsLazyRoute
+  '/team': typeof AuthenticatedTeamLazyRoute
+  '/documents/data-library': typeof AuthenticatedDocumentsDataLibraryLazyRoute
+  '/documents/reports': typeof AuthenticatedDocumentsReportsLazyRoute
+  '/documents/word-assistant': typeof AuthenticatedDocumentsWordAssistantLazyRoute
+  '/showcase/buttons': typeof AuthenticatedShowcaseButtonsLazyRoute
+  '/showcase/cards': typeof AuthenticatedShowcaseCardsLazyRoute
+  '/showcase/feedback': typeof AuthenticatedShowcaseFeedbackLazyRoute
+  '/showcase/navigation': typeof AuthenticatedShowcaseNavigationLazyRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -227,19 +291,19 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/maintenance': typeof MaintenanceRoute
   '/signup': typeof SignupRoute
-  '/_authenticated/analytics': typeof AuthenticatedAnalyticsRoute
-  '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
-  '/_authenticated/lifecycle': typeof AuthenticatedLifecycleRoute
-  '/_authenticated/projects': typeof AuthenticatedProjectsRoute
-  '/_authenticated/team': typeof AuthenticatedTeamRoute
   '/auth/callback': typeof AuthCallbackRoute
-  '/_authenticated/documents/data-library': typeof AuthenticatedDocumentsDataLibraryRoute
-  '/_authenticated/documents/reports': typeof AuthenticatedDocumentsReportsRoute
-  '/_authenticated/documents/word-assistant': typeof AuthenticatedDocumentsWordAssistantRoute
-  '/_authenticated/showcase/buttons': typeof AuthenticatedShowcaseButtonsRoute
-  '/_authenticated/showcase/cards': typeof AuthenticatedShowcaseCardsRoute
-  '/_authenticated/showcase/feedback': typeof AuthenticatedShowcaseFeedbackRoute
-  '/_authenticated/showcase/navigation': typeof AuthenticatedShowcaseNavigationRoute
+  '/_authenticated/analytics': typeof AuthenticatedAnalyticsLazyRoute
+  '/_authenticated/dashboard': typeof AuthenticatedDashboardLazyRoute
+  '/_authenticated/lifecycle': typeof AuthenticatedLifecycleLazyRoute
+  '/_authenticated/projects': typeof AuthenticatedProjectsLazyRoute
+  '/_authenticated/team': typeof AuthenticatedTeamLazyRoute
+  '/_authenticated/documents/data-library': typeof AuthenticatedDocumentsDataLibraryLazyRoute
+  '/_authenticated/documents/reports': typeof AuthenticatedDocumentsReportsLazyRoute
+  '/_authenticated/documents/word-assistant': typeof AuthenticatedDocumentsWordAssistantLazyRoute
+  '/_authenticated/showcase/buttons': typeof AuthenticatedShowcaseButtonsLazyRoute
+  '/_authenticated/showcase/cards': typeof AuthenticatedShowcaseCardsLazyRoute
+  '/_authenticated/showcase/feedback': typeof AuthenticatedShowcaseFeedbackLazyRoute
+  '/_authenticated/showcase/navigation': typeof AuthenticatedShowcaseNavigationLazyRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -254,12 +318,12 @@ export interface FileRouteTypes {
     | '/login'
     | '/maintenance'
     | '/signup'
+    | '/auth/callback'
     | '/analytics'
     | '/dashboard'
     | '/lifecycle'
     | '/projects'
     | '/team'
-    | '/auth/callback'
     | '/documents/data-library'
     | '/documents/reports'
     | '/documents/word-assistant'
@@ -279,12 +343,12 @@ export interface FileRouteTypes {
     | '/login'
     | '/maintenance'
     | '/signup'
+    | '/auth/callback'
     | '/analytics'
     | '/dashboard'
     | '/lifecycle'
     | '/projects'
     | '/team'
-    | '/auth/callback'
     | '/documents/data-library'
     | '/documents/reports'
     | '/documents/word-assistant'
@@ -305,12 +369,12 @@ export interface FileRouteTypes {
     | '/login'
     | '/maintenance'
     | '/signup'
+    | '/auth/callback'
     | '/_authenticated/analytics'
     | '/_authenticated/dashboard'
     | '/_authenticated/lifecycle'
     | '/_authenticated/projects'
     | '/_authenticated/team'
-    | '/auth/callback'
     | '/_authenticated/documents/data-library'
     | '/_authenticated/documents/reports'
     | '/_authenticated/documents/word-assistant'
@@ -414,6 +478,41 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexLazyRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/team': {
+      id: '/_authenticated/team'
+      path: '/team'
+      fullPath: '/team'
+      preLoaderRoute: typeof AuthenticatedTeamLazyRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/projects': {
+      id: '/_authenticated/projects'
+      path: '/projects'
+      fullPath: '/projects'
+      preLoaderRoute: typeof AuthenticatedProjectsLazyRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/lifecycle': {
+      id: '/_authenticated/lifecycle'
+      path: '/lifecycle'
+      fullPath: '/lifecycle'
+      preLoaderRoute: typeof AuthenticatedLifecycleLazyRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/dashboard': {
+      id: '/_authenticated/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof AuthenticatedDashboardLazyRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/analytics': {
+      id: '/_authenticated/analytics'
+      path: '/analytics'
+      fullPath: '/analytics'
+      preLoaderRoute: typeof AuthenticatedAnalyticsLazyRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/auth/callback': {
       id: '/auth/callback'
       path: '/auth/callback'
@@ -421,123 +520,91 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthCallbackRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_authenticated/team': {
-      id: '/_authenticated/team'
-      path: '/team'
-      fullPath: '/team'
-      preLoaderRoute: typeof AuthenticatedTeamRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/projects': {
-      id: '/_authenticated/projects'
-      path: '/projects'
-      fullPath: '/projects'
-      preLoaderRoute: typeof AuthenticatedProjectsRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/lifecycle': {
-      id: '/_authenticated/lifecycle'
-      path: '/lifecycle'
-      fullPath: '/lifecycle'
-      preLoaderRoute: typeof AuthenticatedLifecycleRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/dashboard': {
-      id: '/_authenticated/dashboard'
-      path: '/dashboard'
-      fullPath: '/dashboard'
-      preLoaderRoute: typeof AuthenticatedDashboardRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/analytics': {
-      id: '/_authenticated/analytics'
-      path: '/analytics'
-      fullPath: '/analytics'
-      preLoaderRoute: typeof AuthenticatedAnalyticsRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
     '/_authenticated/showcase/navigation': {
       id: '/_authenticated/showcase/navigation'
       path: '/showcase/navigation'
       fullPath: '/showcase/navigation'
-      preLoaderRoute: typeof AuthenticatedShowcaseNavigationRouteImport
+      preLoaderRoute: typeof AuthenticatedShowcaseNavigationLazyRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/showcase/feedback': {
       id: '/_authenticated/showcase/feedback'
       path: '/showcase/feedback'
       fullPath: '/showcase/feedback'
-      preLoaderRoute: typeof AuthenticatedShowcaseFeedbackRouteImport
+      preLoaderRoute: typeof AuthenticatedShowcaseFeedbackLazyRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/showcase/cards': {
       id: '/_authenticated/showcase/cards'
       path: '/showcase/cards'
       fullPath: '/showcase/cards'
-      preLoaderRoute: typeof AuthenticatedShowcaseCardsRouteImport
+      preLoaderRoute: typeof AuthenticatedShowcaseCardsLazyRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/showcase/buttons': {
       id: '/_authenticated/showcase/buttons'
       path: '/showcase/buttons'
       fullPath: '/showcase/buttons'
-      preLoaderRoute: typeof AuthenticatedShowcaseButtonsRouteImport
+      preLoaderRoute: typeof AuthenticatedShowcaseButtonsLazyRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/documents/word-assistant': {
       id: '/_authenticated/documents/word-assistant'
       path: '/documents/word-assistant'
       fullPath: '/documents/word-assistant'
-      preLoaderRoute: typeof AuthenticatedDocumentsWordAssistantRouteImport
+      preLoaderRoute: typeof AuthenticatedDocumentsWordAssistantLazyRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/documents/reports': {
       id: '/_authenticated/documents/reports'
       path: '/documents/reports'
       fullPath: '/documents/reports'
-      preLoaderRoute: typeof AuthenticatedDocumentsReportsRouteImport
+      preLoaderRoute: typeof AuthenticatedDocumentsReportsLazyRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/documents/data-library': {
       id: '/_authenticated/documents/data-library'
       path: '/documents/data-library'
       fullPath: '/documents/data-library'
-      preLoaderRoute: typeof AuthenticatedDocumentsDataLibraryRouteImport
+      preLoaderRoute: typeof AuthenticatedDocumentsDataLibraryLazyRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
   }
 }
 
 interface AuthenticatedRouteChildren {
-  AuthenticatedAnalyticsRoute: typeof AuthenticatedAnalyticsRoute
-  AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
-  AuthenticatedLifecycleRoute: typeof AuthenticatedLifecycleRoute
-  AuthenticatedProjectsRoute: typeof AuthenticatedProjectsRoute
-  AuthenticatedTeamRoute: typeof AuthenticatedTeamRoute
-  AuthenticatedDocumentsDataLibraryRoute: typeof AuthenticatedDocumentsDataLibraryRoute
-  AuthenticatedDocumentsReportsRoute: typeof AuthenticatedDocumentsReportsRoute
-  AuthenticatedDocumentsWordAssistantRoute: typeof AuthenticatedDocumentsWordAssistantRoute
-  AuthenticatedShowcaseButtonsRoute: typeof AuthenticatedShowcaseButtonsRoute
-  AuthenticatedShowcaseCardsRoute: typeof AuthenticatedShowcaseCardsRoute
-  AuthenticatedShowcaseFeedbackRoute: typeof AuthenticatedShowcaseFeedbackRoute
-  AuthenticatedShowcaseNavigationRoute: typeof AuthenticatedShowcaseNavigationRoute
+  AuthenticatedAnalyticsLazyRoute: typeof AuthenticatedAnalyticsLazyRoute
+  AuthenticatedDashboardLazyRoute: typeof AuthenticatedDashboardLazyRoute
+  AuthenticatedLifecycleLazyRoute: typeof AuthenticatedLifecycleLazyRoute
+  AuthenticatedProjectsLazyRoute: typeof AuthenticatedProjectsLazyRoute
+  AuthenticatedTeamLazyRoute: typeof AuthenticatedTeamLazyRoute
+  AuthenticatedDocumentsDataLibraryLazyRoute: typeof AuthenticatedDocumentsDataLibraryLazyRoute
+  AuthenticatedDocumentsReportsLazyRoute: typeof AuthenticatedDocumentsReportsLazyRoute
+  AuthenticatedDocumentsWordAssistantLazyRoute: typeof AuthenticatedDocumentsWordAssistantLazyRoute
+  AuthenticatedShowcaseButtonsLazyRoute: typeof AuthenticatedShowcaseButtonsLazyRoute
+  AuthenticatedShowcaseCardsLazyRoute: typeof AuthenticatedShowcaseCardsLazyRoute
+  AuthenticatedShowcaseFeedbackLazyRoute: typeof AuthenticatedShowcaseFeedbackLazyRoute
+  AuthenticatedShowcaseNavigationLazyRoute: typeof AuthenticatedShowcaseNavigationLazyRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
-  AuthenticatedAnalyticsRoute: AuthenticatedAnalyticsRoute,
-  AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
-  AuthenticatedLifecycleRoute: AuthenticatedLifecycleRoute,
-  AuthenticatedProjectsRoute: AuthenticatedProjectsRoute,
-  AuthenticatedTeamRoute: AuthenticatedTeamRoute,
-  AuthenticatedDocumentsDataLibraryRoute:
-    AuthenticatedDocumentsDataLibraryRoute,
-  AuthenticatedDocumentsReportsRoute: AuthenticatedDocumentsReportsRoute,
-  AuthenticatedDocumentsWordAssistantRoute:
-    AuthenticatedDocumentsWordAssistantRoute,
-  AuthenticatedShowcaseButtonsRoute: AuthenticatedShowcaseButtonsRoute,
-  AuthenticatedShowcaseCardsRoute: AuthenticatedShowcaseCardsRoute,
-  AuthenticatedShowcaseFeedbackRoute: AuthenticatedShowcaseFeedbackRoute,
-  AuthenticatedShowcaseNavigationRoute: AuthenticatedShowcaseNavigationRoute,
+  AuthenticatedAnalyticsLazyRoute: AuthenticatedAnalyticsLazyRoute,
+  AuthenticatedDashboardLazyRoute: AuthenticatedDashboardLazyRoute,
+  AuthenticatedLifecycleLazyRoute: AuthenticatedLifecycleLazyRoute,
+  AuthenticatedProjectsLazyRoute: AuthenticatedProjectsLazyRoute,
+  AuthenticatedTeamLazyRoute: AuthenticatedTeamLazyRoute,
+  AuthenticatedDocumentsDataLibraryLazyRoute:
+    AuthenticatedDocumentsDataLibraryLazyRoute,
+  AuthenticatedDocumentsReportsLazyRoute:
+    AuthenticatedDocumentsReportsLazyRoute,
+  AuthenticatedDocumentsWordAssistantLazyRoute:
+    AuthenticatedDocumentsWordAssistantLazyRoute,
+  AuthenticatedShowcaseButtonsLazyRoute: AuthenticatedShowcaseButtonsLazyRoute,
+  AuthenticatedShowcaseCardsLazyRoute: AuthenticatedShowcaseCardsLazyRoute,
+  AuthenticatedShowcaseFeedbackLazyRoute:
+    AuthenticatedShowcaseFeedbackLazyRoute,
+  AuthenticatedShowcaseNavigationLazyRoute:
+    AuthenticatedShowcaseNavigationLazyRoute,
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(

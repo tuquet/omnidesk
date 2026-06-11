@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { Separator, Button, DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuLabel } from '@kbm/ui';
 import { SidebarTrigger } from '@kbm/ui';
 import { WrenchIcon, TrashIcon, BugIcon, LogOutIcon } from 'lucide-react';
@@ -9,7 +10,7 @@ import { SmartBreadcrumb } from '@/features/core/components/smart-breadcrumb';
 import { GlobalSearch } from '@/features/core/components/global-search';
 import { useDevStore } from '@/stores/use-dev-store';
 
-export function SiteHeader() {
+export const SiteHeader = memo(function SiteHeader() {
   const { isDevMode, setDevMode } = useDevStore();
 
   return (
@@ -66,4 +67,4 @@ export function SiteHeader() {
       </div>
     </header>
   );
-}
+});
