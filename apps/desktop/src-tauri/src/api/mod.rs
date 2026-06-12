@@ -11,9 +11,13 @@ use utoipa_scalar::{Scalar, Servable};
 
 use auth::Claims;
 
+use std::{collections::HashMap, sync::Arc};
+use tokio::sync::{mpsc, RwLock};
+
 #[derive(Clone)]
 pub struct AppState {
     pub db: SqlitePool,
+    pub mcp_sessions: Arc<RwLock<HashMap<String, mpsc::Sender<serde_json::Value>>>>,
 }
 
 #[derive(OpenApi)]
@@ -37,7 +41,10 @@ pub struct AppState {
 struct ApiDoc;
 
 pub async fn serve(pool: SqlitePool, port: u16) {
-    let state = AppState { db: pool };
+    let state = AppState { 
+        db: pool,
+        mcp_sessions: Arc::new(RwLock::new(HashMap::new())),
+    };
 
     let app = Router::new()
         .route("/", get(|| async { axum::response::Redirect::temporary("/scalar") }))
@@ -49,6 +56,8 @@ pub async fn serve(pool: SqlitePool, port: u16) {
         .route("/api/apps", get(handlers::apps::get_apps))
         .route("/api/apps/installed", get(handlers::apps::get_installed_apps))
         .route("/api/apps/install/:id", post(handlers::apps::install_app).delete(handlers::apps::uninstall_app))
+        .route("/mcp/sse", get(handlers::mcp::mcp_sse))
+        .route("/mcp/messages", post(handlers::mcp::mcp_messages))
         .layer(CorsLayer::permissive())
         .with_state(state);
 
