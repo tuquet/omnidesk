@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Maximize, Minimize } from 'lucide-react';
-import { Button } from '@kbm/ui';
+import { Button } from '@omnidesk/ui';
 
 export function FullscreenToggle() {
   const [isFullscreen, setIsFullscreen] = useState(false);

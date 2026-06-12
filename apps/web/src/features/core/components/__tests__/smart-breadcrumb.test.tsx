@@ -1,4 +1,3 @@
-
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { SmartBreadcrumb } from '../smart-breadcrumb';
@@ -29,14 +28,18 @@ vi.mock('@/config', () => ({
     '/documents/reports': [
       { label: 'Dashboard', url: '/dashboard' },
       { label: 'Documents', url: '/documents' },
-      { label: 'Reports', url: '/documents/reports' }
-    ]
-  }
+      { label: 'Reports', url: '/documents/reports' },
+    ],
+  },
 }));
 
 // Mock UI components simply
-vi.mock('@kbm/ui', () => ({
-  Breadcrumb: ({ children, onClick }: any) => <nav onClick={onClick} aria-label="breadcrumb">{children}</nav>,
+vi.mock('@omnidesk/ui', () => ({
+  Breadcrumb: ({ children, onClick }: any) => (
+    <nav onClick={onClick} aria-label="breadcrumb">
+      {children}
+    </nav>
+  ),
   BreadcrumbList: ({ children }: any) => <ol>{children}</ol>,
   BreadcrumbItem: ({ children }: any) => <li>{children}</li>,
   BreadcrumbLink: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
@@ -56,7 +59,7 @@ describe('SmartBreadcrumb Component', () => {
   it('renders generic breadcrumbs based on pathname if not in map', () => {
     (useRouterState as any).mockReturnValue('/unknown/path');
     render(<SmartBreadcrumb />);
-    
+
     expect(screen.getByText('Dashboard')).toBeInTheDocument();
     expect(screen.getByText('Unknown')).toBeInTheDocument();
     expect(screen.getByText('Path')).toBeInTheDocument();
@@ -65,7 +68,7 @@ describe('SmartBreadcrumb Component', () => {
   it('renders exact breadcrumbs from config map', () => {
     (useRouterState as any).mockReturnValue('/documents/reports');
     render(<SmartBreadcrumb />);
-    
+
     expect(screen.getByText('Dashboard')).toBeInTheDocument();
     expect(screen.getByText('Documents')).toBeInTheDocument();
     expect(screen.getByText('Reports')).toBeInTheDocument();
@@ -74,13 +77,13 @@ describe('SmartBreadcrumb Component', () => {
   it('triggers dev mode after 10 rapid clicks', () => {
     (useRouterState as any).mockReturnValue('/dashboard');
     render(<SmartBreadcrumb />);
-    
+
     const breadcrumb = screen.getByRole('navigation');
-    
+
     for (let i = 0; i < 10; i++) {
       fireEvent.click(breadcrumb);
     }
-    
+
     expect(mockToggleDevMode).toHaveBeenCalledTimes(1);
   });
 });

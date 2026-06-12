@@ -12,7 +12,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@kbm/ui';
+} from '@omnidesk/ui';
 import {
   PlusIcon,
   FileChartColumnIcon,
@@ -134,9 +134,7 @@ export function ReportsPage() {
       <div className="flex items-start justify-between">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Reports</h1>
-          <p className="text-muted-foreground">
-            Generate, view, and manage analytical reports.
-          </p>
+          <p className="text-muted-foreground">Generate, view, and manage analytical reports.</p>
         </div>
         <Button>
           <PlusIcon className="size-4" />
@@ -167,9 +165,7 @@ export function ReportsPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">2</div>
-            <p className="text-xs text-muted-foreground">
-              Estimated ~15 min remaining
-            </p>
+            <p className="text-xs text-muted-foreground">Estimated ~15 min remaining</p>
           </CardContent>
         </Card>
         <Card>
@@ -179,9 +175,7 @@ export function ReportsPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">1</div>
-            <p className="text-xs text-muted-foreground">
-              Next run: Jun 12 at 6:00 AM
-            </p>
+            <p className="text-xs text-muted-foreground">Next run: Jun 12 at 6:00 AM</p>
           </CardContent>
         </Card>
       </div>
@@ -217,24 +211,16 @@ export function ReportsPage() {
                       </div>
                     </TableCell>
                     <TableCell>
-                      <Badge variant={typeBadgeVariant(report.type)}>
-                        {report.type}
-                      </Badge>
+                      <Badge variant={typeBadgeVariant(report.type)}>{report.type}</Badge>
                     </TableCell>
                     <TableCell>
-                      <Badge
-                        variant={statusCfg.variant}
-                      >
+                      <Badge variant={statusCfg.variant}>
                         <StatusIcon className="size-3" />
                         {report.status}
                       </Badge>
                     </TableCell>
-                    <TableCell className="text-muted-foreground">
-                      {report.generated}
-                    </TableCell>
-                    <TableCell className="text-muted-foreground">
-                      {report.size}
-                    </TableCell>
+                    <TableCell className="text-muted-foreground">{report.generated}</TableCell>
+                    <TableCell className="text-muted-foreground">{report.size}</TableCell>
                     <TableCell className="text-right">
                       <div className="flex items-center justify-end gap-1">
                         <Button

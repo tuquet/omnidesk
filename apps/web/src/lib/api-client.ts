@@ -2,8 +2,8 @@ import { createClient } from '@hey-api/client-fetch';
 import { toast } from 'sonner';
 import i18n from '@/lib/i18n';
 import { authActions, authStore } from '@/features/auth/stores/use-auth-store';
-import type { ApiResponse, ApiError } from '@kbm/types';
-import { ERROR_CODES } from '@kbm/types';
+import type { ApiResponse, ApiError } from '@omnidesk/types';
+import { ERROR_CODES } from '@omnidesk/types';
 
 const client = createClient({});
 
@@ -52,9 +52,7 @@ function showApiErrors(errors: ApiError[]) {
 
   // Group field-level validation errors into one toast
   if (fieldErrors.length > 0) {
-    const messages = fieldErrors
-      .map((e) => `• ${resolveErrorMessage(e)}`)
-      .join('\n');
+    const messages = fieldErrors.map((e) => `• ${resolveErrorMessage(e)}`).join('\n');
     toast.error(i18n.t('errors.validation.title', 'Validation Error'), {
       description: messages,
     });
@@ -80,9 +78,7 @@ client.interceptors.response.use(async (response: Response) => {
 
     // Special handling: 401 → auto logout
     if (body.status === 401) {
-      const hasTokenExpired = body.errors.some(
-        (e) => e.code === ERROR_CODES.AUTH.TOKEN_EXPIRED
-      );
+      const hasTokenExpired = body.errors.some((e) => e.code === ERROR_CODES.AUTH.TOKEN_EXPIRED);
       if (hasTokenExpired) {
         authActions.logout().catch(console.error);
         window.location.href = '/login';

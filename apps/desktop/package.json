@@ -1,5 +1,5 @@
 {
-  "name": "@kbm/desktop",
+  "name": "@omnidesk/desktop",
   "private": true,
   "version": "0.1.0",
   "type": "module",
@@ -9,7 +9,7 @@
     "tauri": "tauri"
   },
   "dependencies": {
-    "@kbm/web": "workspace:*"
+    "@omnidesk/web": "workspace:*"
   },
   "devDependencies": {
     "@tauri-apps/cli": "^2.11.0",

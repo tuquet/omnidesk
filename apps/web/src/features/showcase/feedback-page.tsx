@@ -44,7 +44,7 @@ import {
   TabsContent,
   TabsList,
   TabsTrigger,
-} from '@kbm/ui';
+} from '@omnidesk/ui';
 import { toast } from 'sonner';
 import {
   AlertCircle,
@@ -74,12 +74,9 @@ export function FeedbackShowcase() {
   return (
     <div className="flex flex-1 flex-col gap-6 p-6">
       <div>
-        <h1 className="text-2xl font-bold tracking-tight">
-          Feedback &amp; Overlays
-        </h1>
+        <h1 className="text-2xl font-bold tracking-tight">Feedback &amp; Overlays</h1>
         <p className="text-muted-foreground">
-          Toasts, menus, sheets, drawers, selects, and tabs for user
-          interaction.
+          Toasts, menus, sheets, drawers, selects, and tabs for user interaction.
         </p>
       </div>
 
@@ -90,8 +87,7 @@ export function FeedbackShowcase() {
         <CardHeader>
           <CardTitle>Toast Notifications</CardTitle>
           <CardDescription>
-            Click any button to trigger a toast notification with different
-            styles.
+            Click any button to trigger a toast notification with different styles.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -142,9 +138,7 @@ export function FeedbackShowcase() {
             <Button
               variant="outline"
               onClick={() => {
-                const promise = new Promise((resolve) =>
-                  setTimeout(resolve, 2000),
-                );
+                const promise = new Promise((resolve) => setTimeout(resolve, 2000));
                 toast.promise(promise, {
                   loading: 'Uploading file...',
                   success: 'File uploaded successfully!',
@@ -179,8 +173,7 @@ export function FeedbackShowcase() {
         <CardHeader>
           <CardTitle>Dropdown Menus</CardTitle>
           <CardDescription>
-            Contextual menus with icons, groups, separators, and keyboard
-            shortcuts.
+            Contextual menus with icons, groups, separators, and keyboard shortcuts.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -287,8 +280,7 @@ export function FeedbackShowcase() {
         <CardHeader>
           <CardTitle>Sheet (Slide-in Panel)</CardTitle>
           <CardDescription>
-            Panels that slide in from the edge of the screen for secondary
-            content.
+            Panels that slide in from the edge of the screen for secondary content.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -304,8 +296,7 @@ export function FeedbackShowcase() {
                 <SheetHeader>
                   <SheetTitle>Edit Profile</SheetTitle>
                   <SheetDescription>
-                    Make changes to your profile here. Click save when
-                    you&apos;re done.
+                    Make changes to your profile here. Click save when you&apos;re done.
                   </SheetDescription>
                 </SheetHeader>
                 <div className="flex flex-col gap-4 px-4">
@@ -315,11 +306,7 @@ export function FeedbackShowcase() {
                   </div>
                   <div className="flex flex-col gap-2">
                     <Label htmlFor="sheet-email">Email</Label>
-                    <Input
-                      id="sheet-email"
-                      placeholder="john@example.com"
-                      type="email"
-                    />
+                    <Input id="sheet-email" placeholder="john@example.com" type="email" />
                   </div>
                   <div className="flex flex-col gap-2">
                     <Label htmlFor="sheet-bio">Bio</Label>
@@ -342,18 +329,14 @@ export function FeedbackShowcase() {
               <SheetContent side="left">
                 <SheetHeader>
                   <SheetTitle>Navigation</SheetTitle>
-                  <SheetDescription>
-                    A slide-in panel from the left side.
-                  </SheetDescription>
+                  <SheetDescription>A slide-in panel from the left side.</SheetDescription>
                 </SheetHeader>
                 <div className="flex flex-col gap-2 px-4">
-                  {['Dashboard', 'Projects', 'Team', 'Settings'].map(
-                    (item) => (
-                      <Button key={item} variant="ghost" className="justify-start">
-                        {item}
-                      </Button>
-                    ),
-                  )}
+                  {['Dashboard', 'Projects', 'Team', 'Settings'].map((item) => (
+                    <Button key={item} variant="ghost" className="justify-start">
+                      {item}
+                    </Button>
+                  ))}
                 </div>
               </SheetContent>
             </Sheet>
@@ -380,8 +363,7 @@ export function FeedbackShowcase() {
         <CardHeader>
           <CardTitle>Drawer</CardTitle>
           <CardDescription>
-            A mobile-friendly bottom sheet drawer with drag-to-close
-            interaction.
+            A mobile-friendly bottom sheet drawer with drag-to-close interaction.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -394,9 +376,7 @@ export function FeedbackShowcase() {
                 <div className="mx-auto w-full max-w-sm">
                   <DrawerHeader>
                     <DrawerTitle>Move Goal</DrawerTitle>
-                    <DrawerDescription>
-                      Set your daily activity goal.
-                    </DrawerDescription>
+                    <DrawerDescription>Set your daily activity goal.</DrawerDescription>
                   </DrawerHeader>
                   <div className="flex items-center justify-center gap-4 p-4">
                     <Button
@@ -407,18 +387,10 @@ export function FeedbackShowcase() {
                       <Minus />
                     </Button>
                     <div className="text-center">
-                      <div className="text-5xl font-bold tracking-tighter">
-                        {goal}
-                      </div>
-                      <div className="text-sm text-muted-foreground">
-                        Goals/day
-                      </div>
+                      <div className="text-5xl font-bold tracking-tighter">{goal}</div>
+                      <div className="text-sm text-muted-foreground">Goals/day</div>
                     </div>
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      onClick={() => setGoal(goal + 1)}
-                    >
+                    <Button variant="outline" size="icon" onClick={() => setGoal(goal + 1)}>
                       <Plus />
                     </Button>
                   </div>
@@ -439,9 +411,7 @@ export function FeedbackShowcase() {
       <Card>
         <CardHeader>
           <CardTitle>Select Dropdowns</CardTitle>
-          <CardDescription>
-            Dropdown selects for choosing from a list of options.
-          </CardDescription>
+          <CardDescription>Dropdown selects for choosing from a list of options.</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -507,16 +477,12 @@ export function FeedbackShowcase() {
       <Card>
         <CardHeader>
           <CardTitle>Tabs</CardTitle>
-          <CardDescription>
-            Organize content into switchable tabbed sections.
-          </CardDescription>
+          <CardDescription>Organize content into switchable tabbed sections.</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex flex-col gap-8">
             <div>
-              <p className="mb-3 text-sm font-medium text-muted-foreground">
-                Default Tabs
-              </p>
+              <p className="mb-3 text-sm font-medium text-muted-foreground">Default Tabs</p>
               <Tabs defaultValue="overview">
                 <TabsList>
                   <TabsTrigger value="overview">Overview</TabsTrigger>
@@ -529,14 +495,12 @@ export function FeedbackShowcase() {
                     <CardHeader>
                       <CardTitle className="text-base">Overview</CardTitle>
                       <CardDescription>
-                        A high-level summary of your project metrics and recent
-                        activity.
+                        A high-level summary of your project metrics and recent activity.
                       </CardDescription>
                     </CardHeader>
                     <CardContent>
                       <p className="text-sm text-muted-foreground">
-                        Your project is on track. 12 tasks completed this week,
-                        3 pending review.
+                        Your project is on track. 12 tasks completed this week, 3 pending review.
                       </p>
                     </CardContent>
                   </Card>
@@ -551,8 +515,7 @@ export function FeedbackShowcase() {
                     </CardHeader>
                     <CardContent>
                       <p className="text-sm text-muted-foreground">
-                        Page views increased by 23% this week. Bounce rate
-                        decreased to 34%.
+                        Page views increased by 23% this week. Bounce rate decreased to 34%.
                       </p>
                     </CardContent>
                   </Card>
@@ -561,9 +524,7 @@ export function FeedbackShowcase() {
                   <Card>
                     <CardHeader>
                       <CardTitle className="text-base">Reports</CardTitle>
-                      <CardDescription>
-                        Generated reports and exportable data.
-                      </CardDescription>
+                      <CardDescription>Generated reports and exportable data.</CardDescription>
                     </CardHeader>
                     <CardContent>
                       <p className="text-sm text-muted-foreground">
@@ -576,14 +537,11 @@ export function FeedbackShowcase() {
                   <Card>
                     <CardHeader>
                       <CardTitle className="text-base">Notifications</CardTitle>
-                      <CardDescription>
-                        Manage your notification preferences.
-                      </CardDescription>
+                      <CardDescription>Manage your notification preferences.</CardDescription>
                     </CardHeader>
                     <CardContent>
                       <p className="text-sm text-muted-foreground">
-                        You have 5 unread notifications. Email alerts are
-                        enabled.
+                        You have 5 unread notifications. Email alerts are enabled.
                       </p>
                     </CardContent>
                   </Card>

@@ -1,10 +1,10 @@
 {
-  "name": "kill-bug-machine",
+  "name": "omnidesk",
   "private": true,
   "version": "0.1.0",
   "description": "Tauri + React + Axum monorepo boilerplate",
   "scripts": {
-    "dev": "pnpm --filter @kbm/web dev",
+    "dev": "pnpm --filter @omnidesk/web dev",
     "build": "turbo run build",
     "lint": "turbo run lint",
     "typecheck": "turbo run typecheck",
@@ -18,7 +18,7 @@
     "docs:build": "vitepress build docs",
     "docs:preview": "vitepress preview docs",
     "dev:all": "concurrently -n WEB,DOCS -c blue,green \"pnpm dev\" \"pnpm docs:dev\"",
-    "dev:desktop": "pnpm --filter @kbm/desktop tauri dev"
+    "dev:desktop": "pnpm --filter @omnidesk/desktop tauri dev"
   },
   "devDependencies": {
     "@changesets/cli": "^2.27.0",

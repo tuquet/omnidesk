@@ -1,5 +1,5 @@
 import { Link, useLocation } from '@tanstack/react-router';
-import { Button } from '@kbm/ui';
+import { Button } from '@omnidesk/ui';
 import {
   SidebarGroup,
   SidebarGroupContent,
@@ -12,7 +12,7 @@ import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
-} from '@kbm/ui';
+} from '@omnidesk/ui';
 import { CirclePlusIcon, MailIcon, ChevronRight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
@@ -58,7 +58,7 @@ export function NavMain({
         <SidebarMenu>
           {items.map((item) => {
             const isPathActive = location.pathname.startsWith(item.url);
-            
+
             return (
               <Collapsible
                 key={item.title}
@@ -82,7 +82,11 @@ export function NavMain({
                         {item.items.map((subItem) => (
                           <SidebarMenuSubItem key={subItem.title}>
                             <SidebarMenuSubButton asChild>
-                              <Link to={subItem.url} activeProps={{ 'data-active': true } as any} exact>
+                              <Link
+                                to={subItem.url}
+                                activeProps={{ 'data-active': true } as any}
+                                exact
+                              >
                                 <span>{t(`nav.${subItem.title}`, subItem.title)}</span>
                               </Link>
                             </SidebarMenuSubButton>

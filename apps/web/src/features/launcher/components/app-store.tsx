@@ -20,7 +20,7 @@ import {
   TabsList,
   TabsTrigger,
   cn,
-} from '@kbm/ui';
+} from '@omnidesk/ui';
 import {
   Search,
   Package,
@@ -80,9 +80,7 @@ function AppCard({
           {app.name}
           {app.is_core && <Shield className="h-3 w-3 text-muted-foreground" />}
         </h3>
-        <p className="text-[13px] text-muted-foreground truncate mt-0.5">
-          {app.description}
-        </p>
+        <p className="text-[13px] text-muted-foreground truncate mt-0.5">{app.description}</p>
         <p className="text-[11px] font-medium text-muted-foreground/60 uppercase tracking-wider mt-1">
           {app.category}
         </p>
@@ -120,7 +118,7 @@ function AppCard({
           </Button>
         )}
       </div>
-      
+
       {/* Subtle bottom separator for list view */}
       <div className="absolute bottom-0 right-0 left-[104px] h-[1px] bg-border/40 group-hover:bg-transparent transition-colors" />
     </div>
@@ -134,7 +132,7 @@ function FeaturedBanner({ app, isInstalled, isInstalling, onInstall, onClick }: 
   const Icon = localApp?.icon || Package;
 
   return (
-    <div 
+    <div
       className="group relative overflow-hidden rounded-[2rem] bg-gradient-to-br from-muted/50 via-muted/20 to-background p-8 sm:p-10 cursor-pointer border border-primary/5 transition-all duration-500 hover:shadow-xl hover:shadow-primary/5 hover:border-primary/10"
       onClick={onClick}
     >
@@ -142,20 +140,29 @@ function FeaturedBanner({ app, isInstalled, isInstalling, onInstall, onClick }: 
         <div className="flex h-28 w-28 shrink-0 items-center justify-center rounded-[1.8rem] bg-background shadow-lg border transition-transform duration-500 group-hover:scale-105">
           <Icon className="h-12 w-12 text-primary" />
         </div>
-        
+
         <div className="flex flex-col flex-1 text-center sm:text-left max-w-xl">
-          <div className="text-xs font-bold text-primary tracking-widest uppercase mb-2">Editor's Choice</div>
+          <div className="text-xs font-bold text-primary tracking-widest uppercase mb-2">
+            Editor's Choice
+          </div>
           <h2 className="text-3xl font-bold mb-2 tracking-tight">{app.name}</h2>
           <p className="text-muted-foreground text-base line-clamp-2 mb-6">{app.description}</p>
-          
-          <div className="flex items-center justify-center sm:justify-start gap-4" onClick={(e) => e.stopPropagation()}>
+
+          <div
+            className="flex items-center justify-center sm:justify-start gap-4"
+            onClick={(e) => e.stopPropagation()}
+          >
             {isInstalled ? (
-              <Button className="rounded-full px-8 font-semibold shadow-sm" variant="secondary" disabled>
+              <Button
+                className="rounded-full px-8 font-semibold shadow-sm"
+                variant="secondary"
+                disabled
+              >
                 Installed
               </Button>
             ) : (
-              <Button 
-                className="rounded-full px-8 font-semibold shadow-sm" 
+              <Button
+                className="rounded-full px-8 font-semibold shadow-sm"
                 onClick={onInstall}
                 disabled={isInstalling}
               >
@@ -163,7 +170,9 @@ function FeaturedBanner({ app, isInstalled, isInstalling, onInstall, onClick }: 
                 GET
               </Button>
             )}
-            <p className="text-xs text-muted-foreground font-medium uppercase tracking-wider">{app.category}</p>
+            <p className="text-xs text-muted-foreground font-medium uppercase tracking-wider">
+              {app.category}
+            </p>
           </div>
         </div>
       </div>
@@ -187,8 +196,7 @@ export function AppStore() {
     refetch: refetchApps,
   } = useMarketplaceApps();
 
-  const { data: serverInstalledApps, isLoading: isLoadingInstalled } =
-    useInstalledApps();
+  const { data: serverInstalledApps, isLoading: isLoadingInstalled } = useInstalledApps();
 
   const installMutation = useInstallApp();
   const uninstallMutation = useUninstallApp();
@@ -200,7 +208,8 @@ export function AppStore() {
   }, [serverInstalledApps]);
 
   const apps: MarketplaceApp[] = useMemo(() => {
-    const rawApps = marketplaceApps ??
+    const rawApps =
+      marketplaceApps ??
       Object.values(APP_REGISTRY).map((app) => ({
         id: app.id,
         name: app.name,
@@ -211,7 +220,7 @@ export function AppStore() {
         sort_order: 0,
         created_at: new Date().toISOString(),
       }));
-    return rawApps.filter(a => !a.is_core);
+    return rawApps.filter((a) => !a.is_core);
   }, [marketplaceApps]);
 
   const handleInstall = useCallback(
@@ -290,9 +299,7 @@ export function AppStore() {
         </div>
         <div className="space-y-2">
           <h2 className="text-2xl font-bold tracking-tight">Cannot connect to App Store</h2>
-          <p className="text-muted-foreground max-w-md">
-            {appsError.message}
-          </p>
+          <p className="text-muted-foreground max-w-md">{appsError.message}</p>
         </div>
         <Button className="rounded-full px-8 mt-4" onClick={() => refetchApps()}>
           <RefreshCw className="mr-2 h-4 w-4" />
@@ -304,7 +311,7 @@ export function AppStore() {
 
   // Determine App Categories
   const categoriesToRender = ['Productivity', 'Utilities', 'Development'];
-  const featuredApp = apps.find(a => a.id === 'analytics') || apps[0];
+  const featuredApp = apps.find((a) => a.id === 'analytics') || apps[0];
 
   const searchFilteredApps = searchQuery.trim()
     ? apps.filter((app) => {
@@ -325,7 +332,7 @@ export function AppStore() {
           <div className="flex items-center gap-3">
             <h1 className="text-3xl font-bold tracking-tight">App Store</h1>
           </div>
-          
+
           {/* Search Box */}
           <div className="relative w-full max-w-xs hidden sm:block">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -340,15 +347,25 @@ export function AppStore() {
 
         {/* Tab Navigation */}
         <div className="flex items-center gap-6 text-[15px] font-medium border-b border-transparent">
-          <button 
+          <button
             onClick={() => setActiveTab('discover')}
-            className={cn("pb-2 border-b-2 transition-colors", activeTab === 'discover' ? "border-primary text-foreground" : "border-transparent text-muted-foreground hover:text-foreground")}
+            className={cn(
+              'pb-2 border-b-2 transition-colors',
+              activeTab === 'discover'
+                ? 'border-primary text-foreground'
+                : 'border-transparent text-muted-foreground hover:text-foreground',
+            )}
           >
             Discover
           </button>
-          <button 
+          <button
             onClick={() => setActiveTab('installed')}
-            className={cn("pb-2 border-b-2 transition-colors", activeTab === 'installed' ? "border-primary text-foreground" : "border-transparent text-muted-foreground hover:text-foreground")}
+            className={cn(
+              'pb-2 border-b-2 transition-colors',
+              activeTab === 'installed'
+                ? 'border-primary text-foreground'
+                : 'border-transparent text-muted-foreground hover:text-foreground',
+            )}
           >
             Installed
           </button>
@@ -370,7 +387,9 @@ export function AppStore() {
                     app={app}
                     isInstalled={installedApps.includes(app.id)}
                     isInstalling={installMutation.isPending && installMutation.variables === app.id}
-                    isUninstalling={uninstallMutation.isPending && uninstallMutation.variables === app.id}
+                    isUninstalling={
+                      uninstallMutation.isPending && uninstallMutation.variables === app.id
+                    }
                     onInstall={() => handleInstall(app.id, app.name)}
                     onUninstall={() => handleUninstall(app.id, app.name)}
                     onClick={() => navigate({ to: '/launcher/$appId', params: { appId: app.id } })}
@@ -387,18 +406,22 @@ export function AppStore() {
               <span className="text-sm text-muted-foreground">{installedApps.length} Apps</span>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-x-6 gap-y-2">
-              {apps.filter(app => installedApps.includes(app.id)).map((app) => (
-                <AppCard
-                  key={app.id}
-                  app={app}
-                  isInstalled={true}
-                  isInstalling={false}
-                  isUninstalling={uninstallMutation.isPending && uninstallMutation.variables === app.id}
-                  onInstall={() => {}}
-                  onUninstall={() => handleUninstall(app.id, app.name)}
-                  onClick={() => navigate({ to: '/launcher/$appId', params: { appId: app.id } })}
-                />
-              ))}
+              {apps
+                .filter((app) => installedApps.includes(app.id))
+                .map((app) => (
+                  <AppCard
+                    key={app.id}
+                    app={app}
+                    isInstalled={true}
+                    isInstalling={false}
+                    isUninstalling={
+                      uninstallMutation.isPending && uninstallMutation.variables === app.id
+                    }
+                    onInstall={() => {}}
+                    onUninstall={() => handleUninstall(app.id, app.name)}
+                    onClick={() => navigate({ to: '/launcher/$appId', params: { appId: app.id } })}
+                  />
+                ))}
             </div>
           </div>
         ) : (
@@ -409,45 +432,58 @@ export function AppStore() {
               <FeaturedBanner
                 app={featuredApp}
                 isInstalled={installedApps.includes(featuredApp.id)}
-                isInstalling={installMutation.isPending && installMutation.variables === featuredApp.id}
+                isInstalling={
+                  installMutation.isPending && installMutation.variables === featuredApp.id
+                }
                 onInstall={() => handleInstall(featuredApp.id, featuredApp.name)}
-                onClick={() => navigate({ to: '/launcher/$appId', params: { appId: featuredApp.id } })}
+                onClick={() =>
+                  navigate({ to: '/launcher/$appId', params: { appId: featuredApp.id } })
+                }
               />
             )}
 
             {/* Horizontal Categories */}
             {categoriesToRender.map((category) => {
-              const categoryApps = apps.filter(app => app.category === category);
+              const categoryApps = apps.filter((app) => app.category === category);
               if (categoryApps.length === 0) return null;
 
               return (
                 <div key={category} className="flex flex-col gap-4">
                   <div className="flex items-center justify-between">
                     <h2 className="text-2xl font-bold tracking-tight">Must-Have {category}</h2>
-                    <Button variant="ghost" className="text-primary hover:text-primary hover:bg-primary/10">
+                    <Button
+                      variant="ghost"
+                      className="text-primary hover:text-primary hover:bg-primary/10"
+                    >
                       See All
                     </Button>
                   </div>
-                  
+
                   {/* Responsive Grid Container */}
                   <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-x-6 gap-y-2">
-                    {categoryApps.map(app => (
+                    {categoryApps.map((app) => (
                       <AppCard
                         key={app.id}
                         app={app}
                         isInstalled={installedApps.includes(app.id)}
-                        isInstalling={installMutation.isPending && installMutation.variables === app.id}
-                        isUninstalling={uninstallMutation.isPending && uninstallMutation.variables === app.id}
+                        isInstalling={
+                          installMutation.isPending && installMutation.variables === app.id
+                        }
+                        isUninstalling={
+                          uninstallMutation.isPending && uninstallMutation.variables === app.id
+                        }
                         onInstall={() => handleInstall(app.id, app.name)}
                         onUninstall={() => handleUninstall(app.id, app.name)}
-                        onClick={() => navigate({ to: '/launcher/$appId', params: { appId: app.id } })}
+                        onClick={() =>
+                          navigate({ to: '/launcher/$appId', params: { appId: app.id } })
+                        }
                       />
                     ))}
                   </div>
                 </div>
               );
             })}
-            
+
             {/* All other apps grid */}
             <div className="flex flex-col gap-4 pt-4 border-t border-border/40">
               <h2 className="text-2xl font-bold tracking-tight">Top Apps</h2>
@@ -458,7 +494,9 @@ export function AppStore() {
                     app={app}
                     isInstalled={installedApps.includes(app.id)}
                     isInstalling={installMutation.isPending && installMutation.variables === app.id}
-                    isUninstalling={uninstallMutation.isPending && uninstallMutation.variables === app.id}
+                    isUninstalling={
+                      uninstallMutation.isPending && uninstallMutation.variables === app.id
+                    }
                     onInstall={() => handleInstall(app.id, app.name)}
                     onUninstall={() => handleUninstall(app.id, app.name)}
                     onClick={() => navigate({ to: '/launcher/$appId', params: { appId: app.id } })}
@@ -469,7 +507,6 @@ export function AppStore() {
           </>
         )}
       </div>
-
     </div>
   );
 }

@@ -15,14 +15,8 @@ import {
   TableHeader,
   TableRow,
   Input,
-} from '@kbm/ui';
-import {
-  UserPlusIcon,
-  SearchIcon,
-  UsersIcon,
-  ActivityIcon,
-  BuildingIcon,
-} from 'lucide-react';
+} from '@omnidesk/ui';
+import { UserPlusIcon, SearchIcon, UsersIcon, ActivityIcon, BuildingIcon } from 'lucide-react';
 
 const stats = [
   {
@@ -143,11 +137,7 @@ const teamMembers: TeamMember[] = [
 
 function StatusDot({ status }: { status: TeamMemberStatus }) {
   const color =
-    status === 'Online'
-      ? 'bg-green-500'
-      : status === 'Away'
-        ? 'bg-yellow-500'
-        : 'bg-gray-400';
+    status === 'Online' ? 'bg-green-500' : status === 'Away' ? 'bg-yellow-500' : 'bg-gray-400';
 
   return (
     <span className="flex items-center gap-2">
@@ -164,9 +154,7 @@ export function TeamPage() {
       <div className="flex items-start justify-between">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Team</h1>
-          <p className="text-muted-foreground">
-            Manage team members, roles, and permissions.
-          </p>
+          <p className="text-muted-foreground">Manage team members, roles, and permissions.</p>
         </div>
         <Button>
           <UserPlusIcon className="mr-2 h-4 w-4" />
@@ -181,9 +169,7 @@ export function TeamPage() {
         {stats.map((stat) => (
           <Card key={stat.title}>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium">
-                {stat.title}
-              </CardTitle>
+              <CardTitle className="text-sm font-medium">{stat.title}</CardTitle>
               <stat.icon className="text-muted-foreground h-4 w-4" />
             </CardHeader>
             <CardContent>
@@ -226,17 +212,11 @@ export function TeamPage() {
                   <TableCell>
                     <div className="flex items-center gap-3">
                       <Avatar className="h-8 w-8">
-                        <AvatarFallback className="text-xs">
-                          {member.initials}
-                        </AvatarFallback>
+                        <AvatarFallback className="text-xs">{member.initials}</AvatarFallback>
                       </Avatar>
                       <div>
-                        <p className="text-sm font-medium leading-none">
-                          {member.name}
-                        </p>
-                        <p className="text-muted-foreground text-xs">
-                          {member.email}
-                        </p>
+                        <p className="text-sm font-medium leading-none">{member.name}</p>
+                        <p className="text-muted-foreground text-xs">{member.email}</p>
                       </div>
                     </div>
                   </TableCell>

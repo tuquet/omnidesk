@@ -7,7 +7,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@kbm/ui';
+} from '@omnidesk/ui';
 
 const LANGUAGES = [
   { code: 'vi', label: '🇻🇳 Tiếng Việt' },

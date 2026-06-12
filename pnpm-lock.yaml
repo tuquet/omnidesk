@@ -47,7 +47,7 @@ importers:
 
   apps/desktop:
     dependencies:
-      '@kbm/web':
+      '@omnidesk/web':
         specifier: workspace:*
         version: link:../web
     devDependencies:
@@ -78,10 +78,10 @@ importers:
       '@hey-api/client-fetch':
         specifier: ^0.13.1
         version: 0.13.1(@hey-api/openapi-ts@0.98.2(magicast@0.5.3)(typescript@6.0.3))
-      '@kbm/types':
+      '@omnidesk/types':
         specifier: workspace:*
         version: link:../../packages/types
-      '@kbm/ui':
+      '@omnidesk/ui':
         specifier: workspace:*
         version: link:../../packages/ui
       '@radix-ui/react-slot':
@@ -190,7 +190,7 @@ importers:
       '@hey-api/openapi-ts':
         specifier: ^0.98.2
         version: 0.98.2(magicast@0.5.3)(typescript@6.0.3)
-      '@kbm/config':
+      '@omnidesk/config':
         specifier: workspace:*
         version: link:../../packages/config
       '@tailwindcss/vite':
@@ -339,7 +339,7 @@ importers:
         specifier: ^4.4.3
         version: 4.4.3
     devDependencies:
-      '@kbm/config':
+      '@omnidesk/config':
         specifier: workspace:*
         version: link:../config
       '@types/react':

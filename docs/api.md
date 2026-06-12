@@ -13,7 +13,7 @@ Returns the health status of the backend service.
 ```json
 {
   "status": "ok",
-  "service": "kbm-backend"
+  "service": "omnidesk-backend"
 }
 ```
 

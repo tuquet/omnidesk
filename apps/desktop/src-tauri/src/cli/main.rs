@@ -1,8 +1,8 @@
 use clap::{Parser, Subcommand};
 
 #[derive(Parser)]
-#[command(name = "kbm-cli")]
-#[command(about = "Kill Bug Machine CLI Tool (via REST API)", long_about = None)]
+#[command(name = "omnidesk-cli")]
+#[command(about = "OmniDesk CLI Tool (via REST API)", long_about = None)]
 struct Cli {
     #[command(subcommand)]
     command: Commands,

@@ -19,7 +19,7 @@ impl Serialize for KeyringError {
 }
 
 // OS Keyring namespace
-const SERVICE_NAME: &str = "com.kbm.devtool.credentials";
+const SERVICE_NAME: &str = "com.omnidesk.devtool.credentials";
 
 #[tauri::command]
 pub async fn set_credential(key: String, secret: String) -> Result<(), KeyringError> {

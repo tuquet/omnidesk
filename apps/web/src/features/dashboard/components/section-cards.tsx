@@ -1,7 +1,7 @@
 ﻿'use client';
 
-import { Badge } from '@kbm/ui';
-import { Card, CardAction, CardDescription, CardFooter, CardHeader, CardTitle } from '@kbm/ui';
+import { Badge } from '@omnidesk/ui';
+import { Card, CardAction, CardDescription, CardFooter, CardHeader, CardTitle } from '@omnidesk/ui';
 import { TrendingUpIcon, TrendingDownIcon } from 'lucide-react';
 
 export function SectionCards() {

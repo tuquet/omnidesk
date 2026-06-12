@@ -4,12 +4,19 @@ import * as React from 'react';
 import { Area, AreaChart, CartesianGrid, XAxis } from 'recharts';
 
 import { useIsMobile } from '@/hooks/use-mobile';
-import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle } from '@kbm/ui';
-import { ChartContainer, ChartTooltip, ChartTooltipContent, type ChartConfig } from '@kbm/ui';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@kbm/ui';
-import { ToggleGroup, ToggleGroupItem } from '@kbm/ui';
+import {
+  Card,
+  CardAction,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@omnidesk/ui';
+import { ChartContainer, ChartTooltip, ChartTooltipContent, type ChartConfig } from '@omnidesk/ui';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@omnidesk/ui';
+import { ToggleGroup, ToggleGroupItem } from '@omnidesk/ui';
 
-import { useSidebar } from '@kbm/ui';
+import { useSidebar } from '@omnidesk/ui';
 import { SIDEBAR_TRANSITION_DURATION, CHART_FREEZE_BUFFER } from '@/config';
 
 export const description = 'An interactive area chart';
@@ -126,7 +133,7 @@ export function ChartAreaInteractive() {
   const isMobile = useIsMobile();
   const { state } = useSidebar();
   const [timeRange, setTimeRange] = React.useState('90d');
-  
+
   const containerRef = React.useRef<HTMLDivElement>(null);
   const [frozenWidth, setFrozenWidth] = React.useState<number | null>(null);
 
@@ -134,11 +141,11 @@ export function ChartAreaInteractive() {
     if (containerRef.current) {
       const rect = containerRef.current.getBoundingClientRect();
       setFrozenWidth(rect.width);
-      
+
       const timer = setTimeout(() => {
         setFrozenWidth(null);
       }, SIDEBAR_TRANSITION_DURATION + CHART_FREEZE_BUFFER);
-      
+
       return () => clearTimeout(timer);
     }
   }, [state]);
@@ -235,7 +242,7 @@ export function ChartAreaInteractive() {
                   return date.toLocaleDateString('en-US', {
                     month: 'short',
                     day: 'numeric',
-                    });
+                  });
                 }}
               />
               <ChartTooltip

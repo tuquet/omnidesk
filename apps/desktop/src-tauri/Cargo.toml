@@ -1,20 +1,20 @@
 [package]
-name = "kill-bug-machine"
-default-run = "kill-bug-machine"
+name = "omnidesk"
+default-run = "omnidesk"
 version = "0.1.0"
 description = "Premium B2B Enterprise Platform with App Marketplace"
-authors = ["KBM Team"]
+authors = ["OmniDesk Team"]
 edition = "2021"
 
 [lib]
-name = "kbm_lib"
+name = "omnidesk_lib"
 crate-type = ["lib"]
 
 [build-dependencies]
 tauri-build = { version = "2", features = [] }
 
 [dependencies]
-tauri = { version = "2", features = ["macos-private-api"] }
+tauri = { version = "2", features = ["macos-private-api", "tray-icon"] }
 tauri-plugin-single-instance = { version = "2", features = ["deep-link"] }
 tauri-plugin-opener = "2"
 tauri-plugin-store = "2"
@@ -39,7 +39,16 @@ tauri-plugin-deep-link = "~2"
 jsonwebtoken = "9"
 axum-extra = { version = "0.9", features = ["typed-header"] }
 tower-http = { version = "0.6", features = ["cors"] }
+dotenvy = "0.15.7"
+rsa = { version = "0.9", features = ["sha2"] }
+rand = "0.8"
+base64 = "0.22"
+pkcs8 = { version = "0.10", features = ["alloc", "std"] }
+tokio-tungstenite = { version = "0.21", features = ["native-tls"] }
+futures-util = "0.3"
+url = "2.5"
+sha2 = "0.11.0"
 
 [[bin]]
-name = "kbm-cli"
+name = "omnidesk-cli"
 path = "src/cli/main.rs"

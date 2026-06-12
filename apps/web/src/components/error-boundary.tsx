@@ -1,5 +1,5 @@
 import { Component, type ErrorInfo, type ReactNode } from 'react';
-import { Button } from '@kbm/ui';
+import { Button } from '@omnidesk/ui';
 import { AlertTriangle, RefreshCw, ArrowLeft } from 'lucide-react';
 
 // ─── Types ───────────────────────────────────────────────────────────────────

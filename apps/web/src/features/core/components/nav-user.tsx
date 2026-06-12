@@ -1,4 +1,4 @@
-import { Avatar, AvatarFallback, AvatarImage } from '@kbm/ui';
+import { Avatar, AvatarFallback, AvatarImage } from '@omnidesk/ui';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -7,8 +7,8 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@kbm/ui';
-import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from '@kbm/ui';
+} from '@omnidesk/ui';
+import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from '@omnidesk/ui';
 import {
   EllipsisVerticalIcon,
   CircleUserRoundIcon,

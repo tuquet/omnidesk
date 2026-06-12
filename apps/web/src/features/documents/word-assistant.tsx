@@ -7,7 +7,7 @@ import {
   CardHeader,
   CardTitle,
   Separator,
-} from '@kbm/ui';
+} from '@omnidesk/ui';
 import {
   FileTextIcon,
   FilePlusIcon,
@@ -82,8 +82,7 @@ const templates = [
   },
   {
     title: 'Meeting Notes',
-    description:
-      'Capture agendas, action items, and decisions with a clean meeting notes format.',
+    description: 'Capture agendas, action items, and decisions with a clean meeting notes format.',
     badge: 'New',
   },
   {
@@ -105,9 +104,7 @@ export function WordAssistantPage() {
     <div className="flex flex-1 flex-col gap-6 p-6">
       <div>
         <h1 className="text-2xl font-bold tracking-tight">Word Assistant</h1>
-        <p className="text-muted-foreground">
-          AI-powered writing tools and document templates.
-        </p>
+        <p className="text-muted-foreground">AI-powered writing tools and document templates.</p>
       </div>
 
       <Separator />
@@ -132,17 +129,10 @@ export function WordAssistantPage() {
                   >
                     <FileTextIcon className="size-4 shrink-0 text-muted-foreground" />
                     <div className="min-w-0 flex-1">
-                      <p className="truncate text-sm font-medium">
-                        {doc.name}
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        {doc.lastEdited}
-                      </p>
+                      <p className="truncate text-sm font-medium">{doc.name}</p>
+                      <p className="text-xs text-muted-foreground">{doc.lastEdited}</p>
                     </div>
-                    <Badge
-                      variant="outline"
-                      className="shrink-0 text-[10px] font-normal"
-                    >
+                    <Badge variant="outline" className="shrink-0 text-[10px] font-normal">
                       {doc.type}
                     </Badge>
                   </button>
@@ -156,9 +146,7 @@ export function WordAssistantPage() {
         <div className="flex flex-1 flex-col gap-6">
           {/* Quick Actions */}
           <div>
-            <h2 className="mb-3 text-lg font-semibold tracking-tight">
-              Quick Actions
-            </h2>
+            <h2 className="mb-3 text-lg font-semibold tracking-tight">Quick Actions</h2>
             <div className="grid gap-3 sm:grid-cols-2">
               {quickActions.map((action) => (
                 <Card
@@ -173,9 +161,7 @@ export function WordAssistantPage() {
                     </div>
                     <div>
                       <p className="text-sm font-medium">{action.title}</p>
-                      <p className="text-xs text-muted-foreground">
-                        {action.description}
-                      </p>
+                      <p className="text-xs text-muted-foreground">{action.description}</p>
                     </div>
                   </CardContent>
                 </Card>
@@ -185,9 +171,7 @@ export function WordAssistantPage() {
 
           {/* Templates */}
           <div>
-            <h2 className="mb-3 text-lg font-semibold tracking-tight">
-              Templates
-            </h2>
+            <h2 className="mb-3 text-lg font-semibold tracking-tight">Templates</h2>
             <div className="grid gap-3 sm:grid-cols-2">
               {templates.map((template) => (
                 <Card key={template.title}>
@@ -203,9 +187,7 @@ export function WordAssistantPage() {
                         </Badge>
                       )}
                     </div>
-                    <CardDescription className="text-xs">
-                      {template.description}
-                    </CardDescription>
+                    <CardDescription className="text-xs">{template.description}</CardDescription>
                   </CardHeader>
                   <CardContent>
                     <Button variant="outline" size="sm" className="w-full">

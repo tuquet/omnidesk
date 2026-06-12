@@ -1,6 +1,7 @@
 pub mod auth;
+pub mod handlers;
 
-use axum::{Router, routing::get, response::IntoResponse, Json};
+use axum::{Router, routing::{get, post}, response::IntoResponse, Json};
 use sqlx::SqlitePool;
 use std::net::SocketAddr;
 use tokio::net::TcpListener;
@@ -21,11 +22,16 @@ pub struct AppState {
         health_check,
         ping,
         latest_update,
-        me
+        me,
+        handlers::apps::get_apps,
+        handlers::apps::get_installed_apps,
+        handlers::apps::install_app,
+        handlers::apps::uninstall_app
     ),
     tags(
         (name = "health", description = "Health check endpoints"),
-        (name = "auth", description = "Authenticated endpoints")
+        (name = "auth", description = "Authenticated endpoints"),
+        (name = "apps", description = "Marketplace apps endpoints")
     )
 )]
 struct ApiDoc;
@@ -40,6 +46,9 @@ pub async fn serve(pool: SqlitePool, port: u16) {
         .route("/ping", get(ping))
         .route("/updates/latest.json", get(latest_update))
         .route("/api/me", get(me))
+        .route("/api/apps", get(handlers::apps::get_apps))
+        .route("/api/apps/installed", get(handlers::apps::get_installed_apps))
+        .route("/api/apps/install/:id", post(handlers::apps::install_app).delete(handlers::apps::uninstall_app))
         .layer(CorsLayer::permissive())
         .with_state(state);
 
@@ -63,7 +72,7 @@ pub async fn serve(pool: SqlitePool, port: u16) {
 async fn health_check() -> impl IntoResponse {
     Json(serde_json::json!({
         "status": "ok",
-        "service": "kbm-backend"
+        "service": "omnidesk-backend"
     }))
 }
 
@@ -86,7 +95,6 @@ async fn ping() -> &'static str {
     )
 )]
 async fn latest_update() -> impl IntoResponse {
-    // Trong môi trường dev, luôn trả về version lớn hơn (ví dụ 0.1.1)
     Json(serde_json::json!({
         "version": "0.1.1",
         "notes": "Test update from Dev Server",

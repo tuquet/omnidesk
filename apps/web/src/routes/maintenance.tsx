@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from '@tanstack/react-router';
-import { Button } from '@kbm/ui';
+import { Button } from '@omnidesk/ui';
 import { ArrowLeft, Clock, RefreshCw, Wrench } from 'lucide-react';
 
 export const Route = createFileRoute('/maintenance')({
@@ -59,11 +59,7 @@ function MaintenancePage() {
 
         {/* Action buttons */}
         <div className="flex flex-col gap-3 sm:flex-row">
-          <Button
-            size="lg"
-            className="gap-2 px-8"
-            onClick={() => window.location.reload()}
-          >
+          <Button size="lg" className="gap-2 px-8" onClick={() => window.location.reload()}>
             <RefreshCw className="h-4 w-4" />
             Check Status
           </Button>

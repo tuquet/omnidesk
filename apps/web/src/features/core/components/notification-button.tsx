@@ -10,7 +10,7 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator,
   Badge,
-} from '@kbm/ui';
+} from '@omnidesk/ui';
 
 interface Notification {
   id: string;
@@ -33,7 +33,7 @@ function timeAgo(dateString: string) {
   const date = new Date(dateString);
   const now = new Date();
   const seconds = Math.floor((now.getTime() - date.getTime()) / 1000);
-  
+
   if (seconds < 60) return `Just now`;
   const minutes = Math.floor(seconds / 60);
   if (minutes < 60) return `${minutes}m ago`;
@@ -59,7 +59,7 @@ export function NotificationButton() {
         .eq('user_id', user.id)
         .order('created_at', { ascending: false })
         .limit(20);
-      
+
       if (!error && data) {
         setNotifications(data as Notification[]);
       }
@@ -71,19 +71,29 @@ export function NotificationButton() {
       .channel('realtime_notifications')
       .on(
         'postgres_changes',
-        { event: 'INSERT', schema: 'public', table: 'notifications', filter: `user_id=eq.${user.id}` },
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'notifications',
+          filter: `user_id=eq.${user.id}`,
+        },
         (payload) => {
           setNotifications((prev) => [payload.new as Notification, ...prev]);
-        }
+        },
       )
       .on(
         'postgres_changes',
-        { event: 'UPDATE', schema: 'public', table: 'notifications', filter: `user_id=eq.${user.id}` },
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'notifications',
+          filter: `user_id=eq.${user.id}`,
+        },
         (payload) => {
           setNotifications((prev) =>
-            prev.map((n) => (n.id === payload.new.id ? (payload.new as Notification) : n))
+            prev.map((n) => (n.id === payload.new.id ? (payload.new as Notification) : n)),
           );
-        }
+        },
       )
       .subscribe();
 
@@ -97,12 +107,18 @@ export function NotificationButton() {
   const markAllAsRead = async () => {
     if (!user) return;
     setNotifications((prev) => prev.map((n) => ({ ...n, is_read: true })));
-    await supabase.from('notifications').update({ is_read: true }).eq('user_id', user.id).eq('is_read', false);
+    await supabase
+      .from('notifications')
+      .update({ is_read: true })
+      .eq('user_id', user.id)
+      .eq('is_read', false);
   };
 
   const handleNotificationClick = async (notification: Notification) => {
     if (!notification.is_read) {
-      setNotifications((prev) => prev.map((n) => n.id === notification.id ? { ...n, is_read: true } : n));
+      setNotifications((prev) =>
+        prev.map((n) => (n.id === notification.id ? { ...n, is_read: true } : n)),
+      );
       await supabase.from('notifications').update({ is_read: true }).eq('id', notification.id);
     }
     if (notification.action_url) {
@@ -133,7 +149,10 @@ export function NotificationButton() {
           <div className="flex items-center gap-2">
             <h4 className="font-medium text-sm">Notifications</h4>
             {unreadCount > 0 && (
-              <Badge variant="outline" className="text-[10px] h-4 px-1 bg-primary/10 text-primary border-none">
+              <Badge
+                variant="outline"
+                className="text-[10px] h-4 px-1 bg-primary/10 text-primary border-none"
+              >
                 {unreadCount} new
               </Badge>
             )}
@@ -163,7 +182,9 @@ export function NotificationButton() {
                     <div className="mt-0.5">{typeIcon[notification.type]}</div>
                     <div className="flex flex-col gap-1 min-w-0 flex-1">
                       <div className="flex items-center justify-between gap-2">
-                        <span className={`text-xs font-medium ${!notification.is_read ? 'text-foreground' : 'text-muted-foreground'}`}>
+                        <span
+                          className={`text-xs font-medium ${!notification.is_read ? 'text-foreground' : 'text-muted-foreground'}`}
+                        >
                           {notification.title}
                         </span>
                         {!notification.is_read && (

@@ -1,202 +1,73 @@
-# Kill Bug Machine
-
-A **Premium B2B Enterprise Platform** with an **App Marketplace**, built as a cross-platform monorepo powered by the TanStack Ecosystem and Supabase.
-
-![Tauri](https://img.shields.io/badge/Tauri-v2-blue?logo=tauri)
-![React](https://img.shields.io/badge/React-19-61dafb?logo=react)
-![Supabase](https://img.shields.io/badge/Supabase-Backend-3ECF8E?logo=supabase)
-![TanStack](https://img.shields.io/badge/TanStack-Ecosystem-FF4154)
-![shadcn/ui](https://img.shields.io/badge/shadcn/ui-latest-000?logo=shadcnui)
-
-## 🌍 The Big Picture (Project Context)
-
-**Kill Bug Machine** is a **Premium B2B Enterprise SaaS Platform** designed to function like an Operating System for teams. Instead of a rigid, bloated interface, it provides a modular **App Marketplace** where users can "install" or "uninstall" features (e.g., Analytics, Projects, Documents) to tailor their workspace.
-
-### Key Architectural Pillars:
-
-1. **Cross-Platform Delivery**: Ships as a Web App (React/Vite) and a Desktop App (Tauri v2). The Desktop app features a Rust Axum companion API for OS-level integrations and uses deep-linking (`kbm://`) to handle OAuth callbacks seamlessly.
-2. **Supabase Backend**: Fully relies on Supabase for robust Authentication (GitHub OAuth, Anonymous, Email/Password), PostgreSQL Database (with strict Row Level Security), and Realtime Subscriptions (for instant notifications).
-3. **App Marketplace (Monolith Feature Flags)**: The core UX paradigm. Features are built as modules. A user's installed apps are stored in Supabase, synced via TanStack Query to local state, and dynamically render UI elements (like the Sidebar).
-4. **TanStack Ecosystem**: The frontend heavily leverages TanStack Router (file-based routing), TanStack Query (server state), and TanStack Store (client state) to ensure maximum type-safety and performance.
-
-## What's Included
-
-- **Frontend**: React 19, Vite 6, Tailwind CSS v4, shadcn/ui (56+ components), TanStack Router, TanStack Store, TanStack Query, TanStack Form, TanStack Table
-- **Backend**: Supabase (Auth, PostgreSQL + RLS, Storage, Edge Functions, Realtime)
-- **Desktop**: Tauri v2 shell with Rust Axum companion API (keyring, updater, local SQLite)
-- **App Marketplace**: Modular feature system — install/uninstall apps to customize your workspace
-- **Monorepo**: Turborepo + pnpm workspaces with shared config, types, and UI packages
-- **Tooling**: ESLint 9, Prettier, Husky, lint-staged, TypeScript 7 (tsgo), Vitest
-- **i18n**: Vietnamese + English with i18next
-- **Docs**: VitePress documentation site
-
-## Prerequisites
-
-- [Node.js](https://nodejs.org/) >= 20
-- [pnpm](https://pnpm.io/) >= 9
-- [Supabase CLI](https://supabase.com/docs/guides/cli) (for local development)
-- **Rust Toolchain**: Không yêu cầu cài đặt sẵn, dự án sử dụng GNU Toolchain qua `scoop` để tránh việc phải tải Visual Studio Build Tools nặng nề.
-- Platform-specific Tauri [prerequisites](https://v2.tauri.app/start/prerequisites/)
-
-## Environment Setup (Windows)
-
-Để bắt đầu, bạn cần cài đặt môi trường Rust GNU. Bạn không cần quyền Admin hay cài Visual Studio cồng kềnh.
-
-1. **Cài đặt Scoop** (nếu chưa có):
-
-```powershell
-Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
-Invoke-RestMethod -Uri https://get.scoop.sh | Invoke-Expression
-```
-
-2. **Cài đặt Node.js, pnpm, MinGW & Rustup**:
-
-```powershell
-scoop install nodejs pnpm mingw rustup
-```
-
-3. **Cấu hình Rust sang target GNU**:
-
-```powershell
-rustup default stable-x86_64-pc-windows-gnu
-rustup target add x86_64-pc-windows-gnu
-```
-
-4. **Kiểm tra môi trường**:
-
-```powershell
-node -v
-pnpm -v
-rustc --version
-```
-
-## Getting Started
-
-```bash
-git clone https://github.com/tuquet/kill-bug-machine.git
-cd kill-bug-machine
-cp .env.example .env
-# Fill in VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in .env
-pnpm install
-```
-
-## Development
-
-```bash
-# Start everything (web + desktop + docs)
-pnpm dev:all
-
-# Or individually
-pnpm --filter @kbm/web dev        # Web frontend → http://localhost:1420
-pnpm --filter @kbm/desktop tauri dev  # Tauri desktop app
-pnpm docs:dev                      # VitePress docs → http://localhost:5173
-
-# Supabase local development
-npx supabase start                 # Start local Supabase
-npx supabase db diff               # Generate migration from schema changes
-npx supabase db push               # Apply migrations
-```
-
-When the desktop app is running, the Axum companion API is available at `http://localhost:1421` with OpenAPI documentation at `/scalar`.
-
-## VS Code Integration
-
-This project includes pre-configured VS Code tasks and launch configs. Press `F1` → `Run Task` to see all available options, or use `Ctrl+Shift+B` to build.
-
-Recommended extensions will be suggested automatically when you open the project.
-
-## Project Structure
-
-```
-├── apps/
-│   ├── desktop/           # Tauri v2 desktop shell (Rust Axum companion)
-│   └── web/               # React 19 + Vite 6 frontend
-│       └── src/
-│           ├── features/  # Feature modules (auth, dashboard, launcher, ...)
-│           ├── config/    # App config, navigation, RBAC, routes
-│           ├── lib/       # Supabase client, API client, i18n
-│           ├── stores/    # Global TanStack Stores (dev, console)
-│           └── routes/    # TanStack Router file-based routes
-├── packages/
-│   ├── config/            # Shared ESLint, TypeScript, Prettier configs
-│   ├── types/             # Shared TypeScript types & Zod schemas
-│   └── ui/                # shadcn/ui components (56+ components)
-├── supabase/              # Supabase project (migrations, functions, config)
-├── docs/                  # VitePress documentation
-├── .github/workflows/     # CI pipeline
-└── .vscode/               # Tasks, launch configs, extensions
-```
-
-## Build
-
-```bash
-pnpm build                             # Build all packages
-pnpm --filter @kbm/desktop tauri build  # Build desktop installer (.exe/.msi)
-```
-
-## Tech Stack
-
-| Layer             | Technology                                           |
-| :---------------- | :--------------------------------------------------- |
-| Desktop Shell     | Tauri v2                                             |
-| Backend (Primary) | Supabase (Auth, PostgreSQL, Storage, Edge Functions) |
-| Backend (Desktop) | Rust Axum (keyring, updater, local SQLite)           |
-| Frontend          | React 19, Vite 6                                     |
-| UI Components     | shadcn/ui, Radix UI                                  |
-| Styling           | Tailwind CSS v4                                      |
-| State Management  | TanStack Store, TanStack Query                       |
-| Routing           | TanStack Router (file-based)                         |
-| Forms             | TanStack Form + Zod                                  |
-| Tables            | TanStack Table + TanStack Virtual                    |
-| Monorepo          | Turborepo, pnpm workspaces                           |
-| API Docs          | OpenAPI (utoipa) + Scalar                            |
-| i18n              | i18next (vi, en)                                     |
-| Testing           | Vitest + Testing Library                             |
-| Docs Site         | VitePress                                            |
-
-## App Marketplace
-
-The platform includes a modular **App Marketplace** where each feature is a standalone app:
-
-- **Core Apps** (always installed): Dashboard, Team
-- **Optional Apps**: Analytics, Projects, Lifecycle, Documents, UI Showcase, Error Pages Simulator
-- Users can install/uninstall apps to customize their workspace
-- Sidebar navigation dynamically updates based on installed apps
-
-## 🔥 Troubleshooting
-
-### ❌ Tauri dev server port conflict
-
-**Nguyên nhân:** Cổng 1420 (Vite) đang bị kẹt bởi một process Node khác.
-
-**Fix (PowerShell):**
-
-```powershell
-Get-Process -Id (Get-NetTCPConnection -LocalPort 1420 -ErrorAction SilentlyContinue).OwningProcess -ErrorAction SilentlyContinue | Stop-Process -Force
-```
-
-### ❌ WebView2 not found
-
-**Nguyên nhân:** Máy chưa có trình duyệt nhúng Edge WebView2 Runtime.
-
-**Fix:**
-
-```powershell
-scoop install webview2-runtime
-```
-
-### ❌ Supabase connection failed
-
-**Nguyên nhân:** Missing or incorrect `VITE_SUPABASE_URL` / `VITE_SUPABASE_ANON_KEY` in `.env`.
-
-**Fix:**
-
-1. Copy `.env.example` to `.env`
-2. Get your keys from [Supabase Dashboard](https://supabase.com/dashboard) → Project Settings → API
-3. Fill in `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`
+<div align="center">
+  <img src="https://raw.githubusercontent.com/tauri-apps/tauri/HEAD/app-icon.png" width="120" alt="OmniDesk Logo" />
+  <h1>OmniDesk</h1>
+  <p><strong>The Local-First Enterprise OS & Developer Workspace</strong></p>
+  <p><i>Formerly known as OmniDesk (OmniDesk)</i></p>
+</div>
 
 ---
 
-## License
+## 🌌 Vision: The Local-First Enterprise OS
 
-[MIT](./LICENSE)
+OmniDesk is not just a standard application; it is a **Micro-OS (Operating System)** designed for enterprises and developers.
+
+- **The Launcher (Kernel):** OmniDesk's core acts as the kernel. It is strictly responsible for Authentication, System Deep Links (`omnidesk://`), Database Connections (Local SQLite), Background Services (Axum API Gateway), and Window Management.
+- **The Apps (Userland):** Everything else—including the App Marketplace, internal tools, and plugins—are independent "Apps". They live in isolation and communicate with the system exclusively through the internal Axum API Gateway.
+
+## 🧠 Architecture Philosophy & Mindset
+
+To ensure OmniDesk scales securely and efficiently, we adhere to 4 extreme architectural philosophies:
+
+### 1. Micro-App / Feature Isolation
+
+Each app within OmniDesk (e.g., App Store, Settings, specific tools) is strictly isolated. They reside in separate `features/` folders or standalone packages. Apps cannot directly import code from one another. All cross-app communication must route through the Launcher's Event Bus or API Gateway.
+
+### 2. Local-First, Cloud-Second
+
+OmniDesk is built for **0ms latency and full offline capability**.
+When an action occurs (like installing an app), the data is immediately written to the local SQLite database. The Cloud (Supabase) acts only as a background synchronization layer (2-way sync), ensuring your workspace is backed up and available across devices.
+
+### 3. Backend is the Real API Gateway
+
+The React Frontend is just a view layer. **Absolute power belongs to the Rust Backend.**
+File system access, network requests, app installations, and heavy lifting are handled by Rust and exposed via HTTP (`localhost:1421/api/...`). This decoupled design ensures we can build CLIs or alternative clients without touching the frontend.
+
+### 4. Zero-Trust External Web
+
+We adhere to strict Enterprise Security standards. **No internal WebViews are used for external content or authentication.**
+OAuth and external login flows are routed to the user's default OS browser. Upon successful authentication, the system securely catches the payload via Deep Links (`omnidesk://` or `omnidesk://`).
+
+---
+
+## 🛠 Tech Stack
+
+- **Core/Backend:** Rust 🦀, Tauri v2, Axum (HTTP API Gateway), SQLx (SQLite Local DB)
+- **Frontend:** React 19, TypeScript, Vite, TanStack Query v5
+- **UI/UX:** Tailwind CSS v4, Shadcn/ui (Strict Enterprise Aesthetics)
+- **Cloud/Sync:** Supabase (PostgreSQL, Auth, Edge Functions)
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+- Node.js >= 20 & `pnpm`
+- Rust >= 1.80 & Cargo
+- Tauri CLI dependencies installed
+
+### Installation
+
+```bash
+# 1. Clone the repository
+git clone https://github.com/tuquet/omnidesk.git
+cd omnidesk
+
+# 2. Install dependencies
+pnpm install
+
+# 3. Start the Local-First OS (Development)
+pnpm --filter @omnidesk/desktop tauri dev
+```
+
+## 📖 Documentation
+
+Detailed architectural guidelines and developer rules can be found in the `docs/` directory.

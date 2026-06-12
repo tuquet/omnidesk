@@ -1,9 +1,9 @@
-import { cn } from "@kbm/ui"
-import { Link, useNavigate } from "@tanstack/react-router"
-import { UserRound, Loader2 } from "lucide-react"
-import { toast } from 'sonner'
-import { useForm } from '@tanstack/react-form'
-import { DEFAULT_AUTHENTICATED_ROUTE } from '@/config/route-config'
+import { cn } from '@omnidesk/ui';
+import { Link, useNavigate } from '@tanstack/react-router';
+import { UserRound, Loader2 } from 'lucide-react';
+import { toast } from 'sonner';
+import { useForm } from '@tanstack/react-form';
+import { DEFAULT_AUTHENTICATED_ROUTE } from '@/config/route-config';
 import {
   Button,
   Field,
@@ -12,19 +12,16 @@ import {
   FieldLabel,
   FieldSeparator,
   Input,
-} from "@kbm/ui"
-import { authActions } from "../stores/use-auth-store"
-import { loginFormSchema } from "../schemas"
+} from '@omnidesk/ui';
+import { authActions } from '../stores/use-auth-store';
+import { loginFormSchema } from '../schemas';
 
-export function LoginForm({
-  className,
-  ...props
-}: React.ComponentProps<"div">) {
+export function LoginForm({ className, ...props }: React.ComponentProps<'div'>) {
   const navigate = useNavigate();
 
   const form = useForm({
     defaultValues: {
-      email: 'admin@kbm.com',
+      email: 'admin@omnidesk.com',
       password: 'password',
     },
     onSubmit: async ({ value }) => {
@@ -60,7 +57,7 @@ export function LoginForm({
   };
 
   return (
-    <div className={cn("flex flex-col gap-6", className)} {...props}>
+    <div className={cn('flex flex-col gap-6', className)} {...props}>
       <form
         onSubmit={(e) => {
           e.preventDefault();
@@ -94,8 +91,8 @@ export function LoginForm({
                   onBlur={field.handleBlur}
                   onChange={(e) => field.handleChange(e.target.value)}
                   className={cn(
-                    "bg-background",
-                    field.state.meta.errors.length > 0 && "border-destructive"
+                    'bg-background',
+                    field.state.meta.errors.length > 0 && 'border-destructive',
                   )}
                 />
                 {field.state.meta.errors.length > 0 && (
@@ -132,8 +129,8 @@ export function LoginForm({
                   onBlur={field.handleBlur}
                   onChange={(e) => field.handleChange(e.target.value)}
                   className={cn(
-                    "bg-background",
-                    field.state.meta.errors.length > 0 && "border-destructive"
+                    'bg-background',
+                    field.state.meta.errors.length > 0 && 'border-destructive',
                   )}
                 />
                 {field.state.meta.errors.length > 0 && (
@@ -174,7 +171,7 @@ export function LoginForm({
               </Button>
             </div>
             <FieldDescription className="text-center">
-              Don&apos;t have an account?{" "}
+              Don&apos;t have an account?{' '}
               <Link to="/signup" className="underline underline-offset-4">
                 Sign up
               </Link>
@@ -183,5 +180,5 @@ export function LoginForm({
         </FieldGroup>
       </form>
     </div>
-  )
+  );
 }

@@ -10,8 +10,8 @@
 ## Installation
 
 ```bash
-git clone https://github.com/tuquet/kill-bug-machine.git
-cd kill-bug-machine
+git clone https://github.com/tuquet/omnidesk.git
+cd omnidesk
 cp .env.example .env
 pnpm install
 ```
@@ -33,7 +33,7 @@ This starts:
 To also run the Tauri desktop app (which includes the Axum backend):
 
 ```bash
-pnpm --filter @kbm/desktop tauri dev
+pnpm --filter @omnidesk/desktop tauri dev
 ```
 
 The Axum API server runs at `http://localhost:8080`. OpenAPI documentation is available at `/scalar`.
@@ -45,7 +45,7 @@ Press `F1` → `Run Task` to access pre-configured tasks for building, linting, 
 ## Building for Production
 
 ```bash
-pnpm --filter @kbm/desktop tauri build
+pnpm --filter @omnidesk/desktop tauri build
 ```
 
 This produces platform-specific installers in `apps/desktop/src-tauri/target/release/bundle/`.

@@ -9,7 +9,7 @@
       "type": "node",
       "request": "launch",
       "runtimeExecutable": "pnpm",
-      "runtimeArgs": ["--filter", "@kbm/desktop", "tauri", "dev"],
+      "runtimeArgs": ["--filter", "@omnidesk/desktop", "tauri", "dev"],
       "cwd": "${workspaceFolder}",
       "console": "integratedTerminal",
       "skipFiles": ["<node_internals>/**"]
@@ -19,7 +19,7 @@
       "type": "node",
       "request": "launch",
       "runtimeExecutable": "pnpm",
-      "runtimeArgs": ["--filter", "@kbm/web", "dev"],
+      "runtimeArgs": ["--filter", "@omnidesk/web", "dev"],
       "cwd": "${workspaceFolder}",
       "console": "integratedTerminal",
       "skipFiles": ["<node_internals>/**"]
@@ -32,7 +32,7 @@
       "name": "🦀 Rust: Debug Tauri",
       "type": "lldb",
       "request": "launch",
-      "program": "${workspaceFolder}/apps/desktop/src-tauri/target/debug/kill-bug-machine",
+      "program": "${workspaceFolder}/apps/desktop/src-tauri/target/debug/omnidesk",
       "args": [],
       "cwd": "${workspaceFolder}/apps/desktop/src-tauri",
       "sourceLanguages": ["rust"],

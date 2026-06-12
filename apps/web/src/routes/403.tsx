@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from '@tanstack/react-router';
-import { Button } from '@kbm/ui';
+import { Button } from '@omnidesk/ui';
 import { ArrowLeft, Lock } from 'lucide-react';
 
 export const Route = createFileRoute('/403')({
@@ -21,10 +21,7 @@ function ForbiddenPage() {
         <div className="relative mb-6">
           <div className="absolute inset-0 animate-ping rounded-full bg-primary/5 [animation-duration:3s]" />
           <div className="relative rounded-full bg-muted/50 p-4">
-            <Lock
-              className="h-12 w-12 text-muted-foreground/60"
-              strokeWidth={1.5}
-            />
+            <Lock className="h-12 w-12 text-muted-foreground/60" strokeWidth={1.5} />
           </div>
         </div>
 
@@ -43,17 +40,13 @@ function ForbiddenPage() {
 
         {/* Description */}
         <p className="mb-10 max-w-md text-base leading-relaxed text-muted-foreground">
-          You don&apos;t have permission to access this resource. If you
-          believe this is an error, contact your administrator.
+          You don&apos;t have permission to access this resource. If you believe this is an error,
+          contact your administrator.
         </p>
 
         {/* Action buttons */}
         <div className="flex flex-col gap-3 sm:flex-row">
-          <Button
-            size="lg"
-            className="gap-2 px-8"
-            onClick={() => window.history.back()}
-          >
+          <Button size="lg" className="gap-2 px-8" onClick={() => window.history.back()}>
             <ArrowLeft className="h-4 w-4" />
             Go Back
           </Button>

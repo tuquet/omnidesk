@@ -1,16 +1,16 @@
-
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-// Mock @kbm/ui BEFORE importing GlobalSearch — cmdk's CommandDialog needs
+// Mock @omnidesk/ui BEFORE importing GlobalSearch — cmdk's CommandDialog needs
 // ResizeObserver which jsdom doesn't provide, so we mock the UI components.
-vi.mock('@kbm/ui', () => ({
+vi.mock('@omnidesk/ui', () => ({
   Button: ({ children, onClick, className }: any) => (
-    <button onClick={onClick} className={className}>{children}</button>
+    <button onClick={onClick} className={className}>
+      {children}
+    </button>
   ),
   Command: ({ children }: any) => <div>{children}</div>,
-  CommandDialog: ({ children, open }: any) =>
-    open ? <div role="dialog">{children}</div> : null,
+  CommandDialog: ({ children, open }: any) => (open ? <div role="dialog">{children}</div> : null),
   CommandEmpty: ({ children }: any) => <div>{children}</div>,
   CommandGroup: ({ children, heading }: any) => (
     <div>
@@ -20,7 +20,9 @@ vi.mock('@kbm/ui', () => ({
   ),
   CommandInput: ({ placeholder }: any) => <input placeholder={placeholder} />,
   CommandItem: ({ children, onSelect }: any) => (
-    <div role="option" onClick={onSelect}>{children}</div>
+    <div role="option" onClick={onSelect}>
+      {children}
+    </div>
   ),
   CommandList: ({ children }: any) => <div>{children}</div>,
   CommandSeparator: () => <hr />,
@@ -64,13 +66,13 @@ describe('GlobalSearch Component', () => {
 
   it('opens dialog when button is clicked', () => {
     render(<GlobalSearch />);
-    
+
     // Dialog shouldn't be open initially
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
-    
+
     // Click the trigger button
     fireEvent.click(screen.getByText('Search everywhere...'));
-    
+
     // Now the dialog should be visible
     expect(screen.getByRole('dialog')).toBeInTheDocument();
     expect(screen.getByPlaceholderText('Type a command or search...')).toBeInTheDocument();
@@ -78,12 +80,12 @@ describe('GlobalSearch Component', () => {
 
   it('opens dialog when Cmd+K is pressed', () => {
     render(<GlobalSearch />);
-    
+
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
-    
+
     // Simulate Cmd+K
     fireEvent.keyDown(document, { key: 'k', metaKey: true });
-    
+
     expect(screen.getByRole('dialog')).toBeInTheDocument();
   });
 });

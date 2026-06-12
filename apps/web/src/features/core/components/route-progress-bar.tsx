@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { useRouterState } from '@tanstack/react-router';
 import { isDesktop } from '@/utils/platform';
-import { cn } from '@kbm/ui';
+import { cn } from '@omnidesk/ui';
 import { TITLE_BAR_HEIGHT, PROGRESS_BAR_HEIGHT, PROGRESS_BAR_Z } from '@/config';
 
 export function RouteProgressBar() {
@@ -16,7 +16,7 @@ export function RouteProgressBar() {
     if (status === 'pending') {
       setVisible(true);
       setProgress(10);
-      
+
       interval = setInterval(() => {
         setProgress((prev) => {
           if (prev >= 90) return prev;
@@ -46,7 +46,7 @@ export function RouteProgressBar() {
     <div
       className={cn(
         'fixed left-0 right-0 w-full bg-transparent transition-opacity duration-300',
-        progress === 100 ? 'opacity-0' : 'opacity-100'
+        progress === 100 ? 'opacity-0' : 'opacity-100',
       )}
       style={{
         top: `${topOffset}px`,

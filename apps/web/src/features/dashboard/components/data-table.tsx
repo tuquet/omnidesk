@@ -38,10 +38,10 @@ import { toast } from 'sonner';
 import { z } from 'zod';
 
 import { useIsMobile } from '@/hooks/use-mobile';
-import { Badge } from '@kbm/ui';
-import { Button } from '@kbm/ui';
-import { ChartContainer, ChartTooltip, ChartTooltipContent, type ChartConfig } from '@kbm/ui';
-import { Checkbox } from '@kbm/ui';
+import { Badge } from '@omnidesk/ui';
+import { Button } from '@omnidesk/ui';
+import { ChartContainer, ChartTooltip, ChartTooltipContent, type ChartConfig } from '@omnidesk/ui';
+import { Checkbox } from '@omnidesk/ui';
 import {
   Drawer,
   DrawerClose,
@@ -51,7 +51,7 @@ import {
   DrawerHeader,
   DrawerTitle,
   DrawerTrigger,
-} from '@kbm/ui';
+} from '@omnidesk/ui';
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -59,9 +59,9 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@kbm/ui';
-import { Input } from '@kbm/ui';
-import { Label } from '@kbm/ui';
+} from '@omnidesk/ui';
+import { Input } from '@omnidesk/ui';
+import { Label } from '@omnidesk/ui';
 import {
   Select,
   SelectContent,
@@ -69,10 +69,10 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@kbm/ui';
-import { Separator } from '@kbm/ui';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@kbm/ui';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@kbm/ui';
+} from '@omnidesk/ui';
+import { Separator } from '@omnidesk/ui';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@omnidesk/ui';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@omnidesk/ui';
 import {
   GripVerticalIcon,
   CircleCheckIcon,

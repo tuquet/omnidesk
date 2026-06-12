@@ -25,7 +25,7 @@ import {
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from '@kbm/ui';
+} from '@omnidesk/ui';
 import {
   ArrowUpRight,
   CircleCheck,
@@ -100,12 +100,9 @@ export function CardsShowcase() {
   return (
     <div className="flex flex-1 flex-col gap-6 p-6">
       <div>
-        <h1 className="text-2xl font-bold tracking-tight">
-          Cards &amp; Data Display
-        </h1>
+        <h1 className="text-2xl font-bold tracking-tight">Cards &amp; Data Display</h1>
         <p className="text-muted-foreground">
-          Cards, badges, avatars, tables, and more for presenting data
-          beautifully.
+          Cards, badges, avatars, tables, and more for presenting data beautifully.
         </p>
       </div>
 
@@ -168,9 +165,7 @@ export function CardsShowcase() {
         <Card>
           <CardHeader>
             <CardTitle>Card with Form</CardTitle>
-            <CardDescription>
-              Cards can contain forms for inline data entry.
-            </CardDescription>
+            <CardDescription>Cards can contain forms for inline data entry.</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="flex flex-col gap-4">
@@ -180,10 +175,7 @@ export function CardsShowcase() {
               </div>
               <div className="flex flex-col gap-2">
                 <Label htmlFor="description">Description</Label>
-                <Input
-                  id="description"
-                  placeholder="A brief description..."
-                />
+                <Input id="description" placeholder="A brief description..." />
               </div>
             </div>
           </CardContent>
@@ -196,9 +188,7 @@ export function CardsShowcase() {
         <Card>
           <CardHeader>
             <CardTitle>Recent Activity</CardTitle>
-            <CardDescription>
-              A card showing a list of recent events.
-            </CardDescription>
+            <CardDescription>A card showing a list of recent events.</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="flex flex-col gap-4">
@@ -230,9 +220,7 @@ export function CardsShowcase() {
                   </div>
                   <div className="flex-1">
                     <p className="text-sm font-medium">{item.action}</p>
-                    <p className="text-xs text-muted-foreground">
-                      {item.time}
-                    </p>
+                    <p className="text-xs text-muted-foreground">{item.time}</p>
                   </div>
                 </div>
               ))}
@@ -245,16 +233,12 @@ export function CardsShowcase() {
       <Card>
         <CardHeader>
           <CardTitle>Badge Variants</CardTitle>
-          <CardDescription>
-            Badges for statuses, labels, and categorization.
-          </CardDescription>
+          <CardDescription>Badges for statuses, labels, and categorization.</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex flex-col gap-6">
             <div>
-              <p className="mb-3 text-sm font-medium text-muted-foreground">
-                Variants
-              </p>
+              <p className="mb-3 text-sm font-medium text-muted-foreground">Variants</p>
               <div className="flex flex-wrap items-center gap-2">
                 <Badge variant="default">Default</Badge>
                 <Badge variant="secondary">Secondary</Badge>
@@ -263,9 +247,7 @@ export function CardsShowcase() {
               </div>
             </div>
             <div>
-              <p className="mb-3 text-sm font-medium text-muted-foreground">
-                Use Cases
-              </p>
+              <p className="mb-3 text-sm font-medium text-muted-foreground">Use Cases</p>
               <div className="flex flex-wrap items-center gap-2">
                 <Badge variant="default">
                   <CircleCheck className="size-3" />
@@ -294,8 +276,7 @@ export function CardsShowcase() {
         <CardHeader>
           <CardTitle>Avatars</CardTitle>
           <CardDescription>
-            User avatars with image sources, fallback initials, and various
-            sizes.
+            User avatars with image sources, fallback initials, and various sizes.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -323,9 +304,7 @@ export function CardsShowcase() {
               </div>
             </div>
             <div>
-              <p className="mb-3 text-sm font-medium text-muted-foreground">
-                With Images
-              </p>
+              <p className="mb-3 text-sm font-medium text-muted-foreground">With Images</p>
               <div className="flex items-center gap-3">
                 <Avatar className="size-10">
                   <AvatarImage
@@ -358,15 +337,10 @@ export function CardsShowcase() {
               </div>
             </div>
             <div>
-              <p className="mb-3 text-sm font-medium text-muted-foreground">
-                Stacked Avatars
-              </p>
+              <p className="mb-3 text-sm font-medium text-muted-foreground">Stacked Avatars</p>
               <div className="flex -space-x-3">
                 {['OM', 'JL', 'IN', 'WK', 'SD'].map((initials) => (
-                  <Avatar
-                    key={initials}
-                    className="size-10 border-2 border-background"
-                  >
+                  <Avatar key={initials} className="size-10 border-2 border-background">
                     <AvatarFallback>{initials}</AvatarFallback>
                   </Avatar>
                 ))}
@@ -383,16 +357,12 @@ export function CardsShowcase() {
       <Card>
         <CardHeader>
           <CardTitle>Skeleton Loading</CardTitle>
-          <CardDescription>
-            Placeholder shimmer effects for loading states.
-          </CardDescription>
+          <CardDescription>Placeholder shimmer effects for loading states.</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid gap-6 sm:grid-cols-2">
             <div className="flex flex-col gap-4">
-              <p className="text-sm font-medium text-muted-foreground">
-                Card Skeleton
-              </p>
+              <p className="text-sm font-medium text-muted-foreground">Card Skeleton</p>
               <div className="flex flex-col gap-3">
                 <Skeleton className="h-32 w-full rounded-lg" />
                 <Skeleton className="h-4 w-3/4" />
@@ -400,9 +370,7 @@ export function CardsShowcase() {
               </div>
             </div>
             <div className="flex flex-col gap-4">
-              <p className="text-sm font-medium text-muted-foreground">
-                User List Skeleton
-              </p>
+              <p className="text-sm font-medium text-muted-foreground">User List Skeleton</p>
               <div className="flex flex-col gap-3">
                 {[1, 2, 3].map((i) => (
                   <div key={i} className="flex items-center gap-3">
@@ -423,9 +391,7 @@ export function CardsShowcase() {
       <Card>
         <CardHeader>
           <CardTitle>Tooltips</CardTitle>
-          <CardDescription>
-            Hover over elements to reveal additional context.
-          </CardDescription>
+          <CardDescription>Hover over elements to reveal additional context.</CardDescription>
         </CardHeader>
         <CardContent>
           <TooltipProvider>
@@ -480,9 +446,7 @@ export function CardsShowcase() {
       <Card>
         <CardHeader>
           <CardTitle>Data Table</CardTitle>
-          <CardDescription>
-            A structured table displaying team member information.
-          </CardDescription>
+          <CardDescription>A structured table displaying team member information.</CardDescription>
         </CardHeader>
         <CardContent>
           <Table>
@@ -501,20 +465,14 @@ export function CardsShowcase() {
                 <TableRow key={member.email}>
                   <TableCell>
                     <Avatar className="size-8">
-                      <AvatarFallback className="text-xs">
-                        {member.avatar}
-                      </AvatarFallback>
+                      <AvatarFallback className="text-xs">{member.avatar}</AvatarFallback>
                     </Avatar>
                   </TableCell>
                   <TableCell className="font-medium">{member.name}</TableCell>
-                  <TableCell className="text-muted-foreground">
-                    {member.email}
-                  </TableCell>
+                  <TableCell className="text-muted-foreground">{member.email}</TableCell>
                   <TableCell>{member.role}</TableCell>
                   <TableCell className="text-right">
-                    <Badge variant={statusBadgeVariant(member.status)}>
-                      {member.status}
-                    </Badge>
+                    <Badge variant={statusBadgeVariant(member.status)}>{member.status}</Badge>
                   </TableCell>
                 </TableRow>
               ))}
@@ -527,24 +485,18 @@ export function CardsShowcase() {
       <Card>
         <CardHeader>
           <CardTitle>Separators</CardTitle>
-          <CardDescription>
-            Visual dividers for grouping content sections.
-          </CardDescription>
+          <CardDescription>Visual dividers for grouping content sections.</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex flex-col gap-4">
             <div>
               <p className="text-sm font-medium">Horizontal Separator</p>
-              <p className="text-sm text-muted-foreground">
-                Content above the line.
-              </p>
+              <p className="text-sm text-muted-foreground">Content above the line.</p>
             </div>
             <Separator />
             <div>
               <p className="text-sm font-medium">Section Two</p>
-              <p className="text-sm text-muted-foreground">
-                Content below the first separator.
-              </p>
+              <p className="text-sm text-muted-foreground">Content below the first separator.</p>
             </div>
             <Separator />
             <div>

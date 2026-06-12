@@ -1,19 +1,19 @@
 {
   "$schema": "https://raw.githubusercontent.com/tauri-apps/tauri/dev/crates/tauri-cli/schema.json",
-  "productName": "Kill Bug Machine",
+  "productName": "OmniDesk",
   "version": "0.1.0",
-  "identifier": "com.kbm.devtool",
+  "identifier": "com.omnidesk.devtool",
   "build": {
-    "beforeDevCommand": "pnpm --filter @kbm/web dev",
+    "beforeDevCommand": "pnpm --filter @omnidesk/web dev",
     "devUrl": "http://localhost:1420",
-    "beforeBuildCommand": "pnpm --filter @kbm/web build",
+    "beforeBuildCommand": "pnpm --filter @omnidesk/web build",
     "frontendDist": "../../web/dist"
   },
   "app": {
     "macOSPrivateApi": true,
     "windows": [
       {
-        "title": "Kill Bug Machine",
+        "title": "OmniDesk",
         "width": 1280,
         "height": 800,
         "minWidth": 900,
@@ -47,13 +47,13 @@
   },
   "plugins": {
     "deep-link": {
-      "schemes": ["kbm"]
+      "schemes": ["omnidesk"]
     },
     "updater": {
       "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDk0MkYzRjlERDEyNjgzNEQKUldSTmd5YlJuVDh2bE9wVi9aSVpOTlFId2h1bnpIZytHZ1YrMlJJR3ZkUXU0dXYyM0xlSjYrbjgK",
       "endpoints": [
         "http://127.0.0.1:1421/updates/latest.json",
-        "https://github.com/tuquet/kill-bug-machine/releases/latest/download/latest.json"
+        "https://github.com/tuquet/omnidesk/releases/latest/download/latest.json"
       ]
     }
   }

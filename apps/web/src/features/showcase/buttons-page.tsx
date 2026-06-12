@@ -13,7 +13,7 @@ import {
   ToggleGroup,
   ToggleGroupItem,
   Separator,
-} from '@kbm/ui';
+} from '@omnidesk/ui';
 import {
   ArrowRight,
   Download,
@@ -125,9 +125,7 @@ export function ButtonsShowcase() {
       <Card>
         <CardHeader>
           <CardTitle>Buttons with Icons</CardTitle>
-          <CardDescription>
-            Combine icons with text for clear, actionable buttons.
-          </CardDescription>
+          <CardDescription>Combine icons with text for clear, actionable buttons.</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex flex-wrap items-center gap-3">
@@ -177,10 +175,7 @@ export function ButtonsShowcase() {
         </CardHeader>
         <CardContent>
           <div className="flex flex-wrap items-center gap-3">
-            <Button
-              disabled={loading['save']}
-              onClick={() => simulateLoading('save')}
-            >
+            <Button disabled={loading['save']} onClick={() => simulateLoading('save')}>
               {loading['save'] && <Loader2 className="animate-spin" />}
               {loading['save'] ? 'Saving...' : 'Save Changes'}
             </Button>
@@ -228,19 +223,11 @@ export function ButtonsShowcase() {
             </div>
             <div className="flex flex-col gap-2">
               <Label htmlFor="email-input">Email</Label>
-              <Input
-                id="email-input"
-                type="email"
-                placeholder="name@example.com"
-              />
+              <Input id="email-input" type="email" placeholder="name@example.com" />
             </div>
             <div className="flex flex-col gap-2">
               <Label htmlFor="password-input">Password</Label>
-              <Input
-                id="password-input"
-                type="password"
-                placeholder="Enter password"
-              />
+              <Input id="password-input" type="password" placeholder="Enter password" />
             </div>
             <div className="flex flex-col gap-2">
               <Label htmlFor="disabled-input">Disabled</Label>
@@ -255,11 +242,7 @@ export function ButtonsShowcase() {
               <Label htmlFor="search-input">Search with Icon</Label>
               <div className="relative">
                 <Search className="absolute left-2.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-                <Input
-                  id="search-input"
-                  className="pl-8"
-                  placeholder="Search..."
-                />
+                <Input id="search-input" className="pl-8" placeholder="Search..." />
               </div>
             </div>
             <div className="flex flex-col gap-2">
@@ -321,9 +304,7 @@ export function ButtonsShowcase() {
         <CardContent>
           <div className="flex flex-col gap-6">
             <div>
-              <p className="mb-3 text-sm font-medium text-muted-foreground">
-                Default Variant
-              </p>
+              <p className="mb-3 text-sm font-medium text-muted-foreground">Default Variant</p>
               <div className="flex flex-wrap items-center gap-2">
                 <Toggle aria-label="Toggle bold">
                   <Bold />
@@ -346,9 +327,7 @@ export function ButtonsShowcase() {
               </div>
             </div>
             <div>
-              <p className="mb-3 text-sm font-medium text-muted-foreground">
-                Outline Variant
-              </p>
+              <p className="mb-3 text-sm font-medium text-muted-foreground">Outline Variant</p>
               <div className="flex flex-wrap items-center gap-2">
                 <Toggle variant="outline" aria-label="Toggle bold">
                   <Bold />
@@ -408,10 +387,7 @@ export function ButtonsShowcase() {
                 <ToggleGroupItem value="italic" aria-label="Toggle italic">
                   <Italic />
                 </ToggleGroupItem>
-                <ToggleGroupItem
-                  value="underline"
-                  aria-label="Toggle underline"
-                >
+                <ToggleGroupItem value="underline" aria-label="Toggle underline">
                   <Underline />
                 </ToggleGroupItem>
               </ToggleGroup>
@@ -420,12 +396,7 @@ export function ButtonsShowcase() {
               <p className="mb-3 text-sm font-medium text-muted-foreground">
                 Outline Variant — No Spacing
               </p>
-              <ToggleGroup
-                type="single"
-                variant="outline"
-                spacing={0}
-                defaultValue="center"
-              >
+              <ToggleGroup type="single" variant="outline" spacing={0} defaultValue="center">
                 <ToggleGroupItem value="left" aria-label="Align left">
                   <AlignLeft />
                 </ToggleGroupItem>

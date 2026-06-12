@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from '@tanstack/react-router';
-import { Button } from '@kbm/ui';
+import { Button } from '@omnidesk/ui';
 import { ArrowLeft, RefreshCw, ServerCrash } from 'lucide-react';
 
 export const Route = createFileRoute('/503')({
@@ -21,10 +21,7 @@ function ServiceUnavailablePage() {
         <div className="relative mb-6">
           <div className="absolute inset-0 animate-ping rounded-full bg-orange-500/10 [animation-duration:2s]" />
           <div className="relative rounded-full bg-muted/50 p-4">
-            <ServerCrash
-              className="h-12 w-12 text-muted-foreground/60"
-              strokeWidth={1.5}
-            />
+            <ServerCrash className="h-12 w-12 text-muted-foreground/60" strokeWidth={1.5} />
           </div>
         </div>
 
@@ -43,8 +40,8 @@ function ServiceUnavailablePage() {
 
         {/* Description */}
         <p className="mb-4 max-w-md text-base leading-relaxed text-muted-foreground">
-          We&apos;re performing scheduled maintenance or experiencing high
-          traffic. Our team is working to restore service.
+          We&apos;re performing scheduled maintenance or experiencing high traffic. Our team is
+          working to restore service.
         </p>
 
         {/* Animated loading dots */}
@@ -59,11 +56,7 @@ function ServiceUnavailablePage() {
 
         {/* Action buttons */}
         <div className="flex flex-col gap-3 sm:flex-row">
-          <Button
-            size="lg"
-            className="gap-2 px-8"
-            onClick={() => window.location.reload()}
-          >
+          <Button size="lg" className="gap-2 px-8" onClick={() => window.location.reload()}>
             <RefreshCw className="h-4 w-4" />
             Try Again
           </Button>

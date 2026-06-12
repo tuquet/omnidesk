@@ -1,7 +1,7 @@
 import { Store } from '@tanstack/store';
 import { useStore } from '@tanstack/react-store';
 
-const STORAGE_KEY = 'kbm:dev-mode';
+const STORAGE_KEY = 'omnidesk:dev-mode';
 
 export interface DevState {
   isDevMode: boolean;

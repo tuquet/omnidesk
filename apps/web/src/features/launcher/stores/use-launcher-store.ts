@@ -4,8 +4,8 @@ import { APP_REGISTRY } from '../config/registry';
 
 // Get default installed apps (core apps are always installed)
 const defaultInstalledApps = Object.values(APP_REGISTRY)
-  .filter(app => app.isCore)
-  .map(app => app.id);
+  .filter((app) => app.isCore)
+  .map((app) => app.id);
 
 export interface LauncherState {
   /** List of installed app IDs */
@@ -16,7 +16,9 @@ export interface LauncherState {
 
 // Ensure Core Apps are always in the installed list
 const enforceCoreApps = (apps: string[]) => {
-  const coreApps = Object.values(APP_REGISTRY).filter(a => a.isCore).map(a => a.id);
+  const coreApps = Object.values(APP_REGISTRY)
+    .filter((a) => a.isCore)
+    .map((a) => a.id);
   const combined = new Set([...apps, ...coreApps]);
   return Array.from(combined);
 };
@@ -24,7 +26,7 @@ const enforceCoreApps = (apps: string[]) => {
 // Initialize from localStorage if available (offline-first fallback)
 const loadState = (): LauncherState => {
   try {
-    const stored = localStorage.getItem('kbm-launcher-state');
+    const stored = localStorage.getItem('omnidesk-launcher-state');
     if (stored) {
       const parsed = JSON.parse(stored);
       return {
@@ -43,9 +45,12 @@ export const launcherStore = new Store<LauncherState>(loadState());
 // Subscribe to state changes and persist to localStorage (offline fallback)
 launcherStore.subscribe(() => {
   try {
-    localStorage.setItem('kbm-launcher-state', JSON.stringify({
-      installedApps: launcherStore.state.installedApps,
-    }));
+    localStorage.setItem(
+      'omnidesk-launcher-state',
+      JSON.stringify({
+        installedApps: launcherStore.state.installedApps,
+      }),
+    );
   } catch (e) {
     console.error('Failed to save launcher state', e);
   }
@@ -77,7 +82,7 @@ export const launcherActions = {
       };
     });
   },
-  
+
   /**
    * Optimistically uninstall an app (UI updates immediately).
    * Core apps cannot be uninstalled.
@@ -91,7 +96,7 @@ export const launcherActions = {
       installedApps: state.installedApps.filter((id) => id !== appId),
     }));
   },
-  
+
   /**
    * Check if an app is currently installed.
    */

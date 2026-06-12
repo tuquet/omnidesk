@@ -1,5 +1,5 @@
 {
-  "name": "@kbm/web",
+  "name": "@omnidesk/web",
   "private": true,
   "version": "0.1.0",
   "type": "module",
@@ -20,8 +20,8 @@
     "@dnd-kit/utilities": "^3.2.2",
     "@fontsource-variable/inter": "^5.2.8",
     "@hey-api/client-fetch": "^0.13.1",
-    "@kbm/types": "workspace:*",
-    "@kbm/ui": "workspace:*",
+    "@omnidesk/types": "workspace:*",
+    "@omnidesk/ui": "workspace:*",
     "@radix-ui/react-slot": "^1.2.5",
     "@supabase/supabase-js": "^2.108.1",
     "@tabler/icons-react": "^3.44.0",
@@ -59,7 +59,7 @@
   "devDependencies": {
     "@eslint/js": "^9.21.0",
     "@hey-api/openapi-ts": "^0.98.2",
-    "@kbm/config": "workspace:*",
+    "@omnidesk/config": "workspace:*",
     "@tailwindcss/vite": "^4.0.0",
     "@tanstack/react-query-devtools": "^5.101.0",
     "@tanstack/react-router-devtools": "^1.167.0",

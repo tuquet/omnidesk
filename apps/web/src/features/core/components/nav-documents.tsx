@@ -7,7 +7,7 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@kbm/ui';
+} from '@omnidesk/ui';
 import {
   SidebarGroup,
   SidebarGroupLabel,
@@ -16,7 +16,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   useSidebar,
-} from '@kbm/ui';
+} from '@omnidesk/ui';
 import { MoreHorizontalIcon, FolderIcon, ShareIcon, Trash2Icon } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 

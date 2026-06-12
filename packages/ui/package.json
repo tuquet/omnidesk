@@ -1,5 +1,5 @@
 {
-  "name": "@kbm/ui",
+  "name": "@omnidesk/ui",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -34,7 +34,7 @@
     "react-dom": "^19.1.0"
   },
   "devDependencies": {
-    "@kbm/config": "workspace:*",
+    "@omnidesk/config": "workspace:*",
     "@types/react": "^19.1.0",
     "@types/react-dom": "^19.1.0",
     "@typescript/native-preview": "7.0.0-dev.20260421.2"

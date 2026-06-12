@@ -10,17 +10,11 @@ import {
   CommandItem,
   CommandList,
   CommandSeparator,
-} from '@kbm/ui';
+} from '@omnidesk/ui';
 import { useDevStore } from '@/stores/use-dev-store';
 import { useRBAC } from '@/hooks/use-rbac';
 import { SearchIcon } from 'lucide-react';
-import {
-  NAV_MAIN,
-  NAV_DOCUMENTS,
-  NAV_SECONDARY,
-  NAV_SHOWCASE,
-  NAV_ERROR_PAGES,
-} from '@/config';
+import { NAV_MAIN, NAV_DOCUMENTS, NAV_SECONDARY, NAV_SHOWCASE, NAV_ERROR_PAGES } from '@/config';
 import { useTranslation } from 'react-i18next';
 import { useLauncherStore } from '@/features/launcher/stores/use-launcher-store';
 import { APP_REGISTRY } from '@/features/launcher/config/registry';
@@ -43,13 +37,10 @@ export function GlobalSearch() {
     return () => document.removeEventListener('keydown', down);
   }, []);
 
-  const runCommand = React.useCallback(
-    (command: () => unknown) => {
-      setOpen(false);
-      command();
-    },
-    []
-  );
+  const runCommand = React.useCallback((command: () => unknown) => {
+    setOpen(false);
+    command();
+  }, []);
 
   const mainItems = filterNav(NAV_MAIN);
   const documentItems = filterNav(NAV_DOCUMENTS);
@@ -58,7 +49,7 @@ export function GlobalSearch() {
   const errorItems = filterNav(NAV_ERROR_PAGES.items);
 
   const { installedApps } = useLauncherStore();
-  const installedAppItems = installedApps.map(appId => APP_REGISTRY[appId]).filter(Boolean);
+  const installedAppItems = installedApps.map((appId) => APP_REGISTRY[appId]).filter(Boolean);
 
   return (
     <>
@@ -68,7 +59,9 @@ export function GlobalSearch() {
         onClick={() => setOpen(true)}
       >
         <SearchIcon className="h-4 w-4 lg:mr-2" />
-        <span className="hidden lg:inline-flex">{t('nav.Search everywhere...', 'Search everywhere...')}</span>
+        <span className="hidden lg:inline-flex">
+          {t('nav.Search everywhere...', 'Search everywhere...')}
+        </span>
         <kbd className="pointer-events-none absolute right-[0.3rem] top-[0.3rem] hidden h-6 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium opacity-100 lg:flex">
           <span className="text-xs">⌘</span>K
         </kbd>
@@ -77,116 +70,116 @@ export function GlobalSearch() {
         <Command>
           <CommandInput placeholder="Type a command or search..." />
           <CommandList>
-          <CommandEmpty>No results found.</CommandEmpty>
-          
-          {mainItems.length > 0 && (
-            <CommandGroup heading={t('nav.Main', 'Main')}>
-              {mainItems.map((item) => (
-                <CommandItem
-                  key={item.url}
-                  value={t(`nav.${item.title}`, item.title)}
-                  onSelect={() => runCommand(() => navigate({ to: item.url }))}
-                >
-                  <item.icon className="mr-2 h-4 w-4" />
-                  <span>{t(`nav.${item.title}`, item.title)}</span>
-                </CommandItem>
-              ))}
-            </CommandGroup>
-          )}
-          
-          {documentItems.length > 0 && (
-            <>
-              <CommandSeparator />
-              <CommandGroup heading={t('nav.Documents', 'Documents')}>
-                {documentItems.map((item) => (
+            <CommandEmpty>No results found.</CommandEmpty>
+
+            {mainItems.length > 0 && (
+              <CommandGroup heading={t('nav.Main', 'Main')}>
+                {mainItems.map((item) => (
                   <CommandItem
                     key={item.url}
-                    value={t(`nav.${item.name}`, item.name)}
+                    value={t(`nav.${item.title}`, item.title)}
                     onSelect={() => runCommand(() => navigate({ to: item.url }))}
                   >
                     <item.icon className="mr-2 h-4 w-4" />
-                    <span>{t(`nav.${item.name}`, item.name)}</span>
+                    <span>{t(`nav.${item.title}`, item.title)}</span>
                   </CommandItem>
                 ))}
               </CommandGroup>
-            </>
-          )}
+            )}
 
-          {installedAppItems.length > 0 && (
-            <>
-              <CommandSeparator />
-              <CommandGroup heading={t('nav.My Apps', 'My Apps')}>
-                {installedAppItems.map((app) => {
-                  const Icon = app.icon;
-                  return (
+            {documentItems.length > 0 && (
+              <>
+                <CommandSeparator />
+                <CommandGroup heading={t('nav.Documents', 'Documents')}>
+                  {documentItems.map((item) => (
                     <CommandItem
-                      key={app.id}
-                      value={app.name}
-                      onSelect={() => runCommand(() => navigate({ to: app.href }))}
+                      key={item.url}
+                      value={t(`nav.${item.name}`, item.name)}
+                      onSelect={() => runCommand(() => navigate({ to: item.url }))}
                     >
-                      {Icon && <Icon className="mr-2 h-4 w-4" />}
-                      <span>{app.name}</span>
+                      <item.icon className="mr-2 h-4 w-4" />
+                      <span>{t(`nav.${item.name}`, item.name)}</span>
                     </CommandItem>
-                  );
-                })}
-              </CommandGroup>
-            </>
-          )}
+                  ))}
+                </CommandGroup>
+              </>
+            )}
 
-          {secondaryItems.length > 0 && (
-            <>
-              <CommandSeparator />
-              <CommandGroup heading={t('nav.Settings & More', 'Settings & More')}>
-                {secondaryItems.map((item) => (
-                  <CommandItem
-                    key={item.url}
-                    value={t(`nav.${item.title}`, item.title)}
-                    onSelect={() => runCommand(() => navigate({ to: item.url }))}
-                  >
-                    <item.icon className="mr-2 h-4 w-4" />
-                    <span>{t(`nav.${item.title}`, item.title)}</span>
-                  </CommandItem>
-                ))}
-              </CommandGroup>
-            </>
-          )}
+            {installedAppItems.length > 0 && (
+              <>
+                <CommandSeparator />
+                <CommandGroup heading={t('nav.My Apps', 'My Apps')}>
+                  {installedAppItems.map((app) => {
+                    const Icon = app.icon;
+                    return (
+                      <CommandItem
+                        key={app.id}
+                        value={app.name}
+                        onSelect={() => runCommand(() => navigate({ to: app.href }))}
+                      >
+                        {Icon && <Icon className="mr-2 h-4 w-4" />}
+                        <span>{app.name}</span>
+                      </CommandItem>
+                    );
+                  })}
+                </CommandGroup>
+              </>
+            )}
 
-          {isDevMode && can(NAV_SHOWCASE.requiredPermission) && showcaseItems.length > 0 && (
-            <>
-              <CommandSeparator />
-              <CommandGroup heading={t(`nav.${NAV_SHOWCASE.label}`, NAV_SHOWCASE.label)}>
-                {showcaseItems.map((item) => (
-                  <CommandItem
-                    key={item.url}
-                    value={t(`nav.${item.title}`, item.title)}
-                    onSelect={() => runCommand(() => navigate({ to: item.url }))}
-                  >
-                    <item.icon className="mr-2 h-4 w-4" />
-                    <span>{t(`nav.${item.title}`, item.title)}</span>
-                  </CommandItem>
-                ))}
-              </CommandGroup>
-            </>
-          )}
+            {secondaryItems.length > 0 && (
+              <>
+                <CommandSeparator />
+                <CommandGroup heading={t('nav.Settings & More', 'Settings & More')}>
+                  {secondaryItems.map((item) => (
+                    <CommandItem
+                      key={item.url}
+                      value={t(`nav.${item.title}`, item.title)}
+                      onSelect={() => runCommand(() => navigate({ to: item.url }))}
+                    >
+                      <item.icon className="mr-2 h-4 w-4" />
+                      <span>{t(`nav.${item.title}`, item.title)}</span>
+                    </CommandItem>
+                  ))}
+                </CommandGroup>
+              </>
+            )}
 
-          {isDevMode && can(NAV_ERROR_PAGES.requiredPermission) && errorItems.length > 0 && (
-            <>
-              <CommandSeparator />
-              <CommandGroup heading={t(`nav.${NAV_ERROR_PAGES.label}`, NAV_ERROR_PAGES.label)}>
-                {errorItems.map((item) => (
-                  <CommandItem
-                    key={item.url}
-                    value={t(`nav.${item.title}`, item.title)}
-                    onSelect={() => runCommand(() => navigate({ to: item.url }))}
-                  >
-                    <item.icon className="mr-2 h-4 w-4" />
-                    <span>{t(`nav.${item.title}`, item.title)}</span>
-                  </CommandItem>
-                ))}
-              </CommandGroup>
-            </>
-          )}
-        </CommandList>
+            {isDevMode && can(NAV_SHOWCASE.requiredPermission) && showcaseItems.length > 0 && (
+              <>
+                <CommandSeparator />
+                <CommandGroup heading={t(`nav.${NAV_SHOWCASE.label}`, NAV_SHOWCASE.label)}>
+                  {showcaseItems.map((item) => (
+                    <CommandItem
+                      key={item.url}
+                      value={t(`nav.${item.title}`, item.title)}
+                      onSelect={() => runCommand(() => navigate({ to: item.url }))}
+                    >
+                      <item.icon className="mr-2 h-4 w-4" />
+                      <span>{t(`nav.${item.title}`, item.title)}</span>
+                    </CommandItem>
+                  ))}
+                </CommandGroup>
+              </>
+            )}
+
+            {isDevMode && can(NAV_ERROR_PAGES.requiredPermission) && errorItems.length > 0 && (
+              <>
+                <CommandSeparator />
+                <CommandGroup heading={t(`nav.${NAV_ERROR_PAGES.label}`, NAV_ERROR_PAGES.label)}>
+                  {errorItems.map((item) => (
+                    <CommandItem
+                      key={item.url}
+                      value={t(`nav.${item.title}`, item.title)}
+                      onSelect={() => runCommand(() => navigate({ to: item.url }))}
+                    >
+                      <item.icon className="mr-2 h-4 w-4" />
+                      <span>{t(`nav.${item.title}`, item.title)}</span>
+                    </CommandItem>
+                  ))}
+                </CommandGroup>
+              </>
+            )}
+          </CommandList>
         </Command>
       </CommandDialog>
     </>

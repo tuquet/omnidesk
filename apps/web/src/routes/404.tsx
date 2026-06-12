@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from '@tanstack/react-router';
-import { Button } from '@kbm/ui';
+import { Button } from '@omnidesk/ui';
 import { ArrowLeft, Ghost } from 'lucide-react';
 
 export const Route = createFileRoute('/404')({
@@ -37,8 +37,8 @@ function NotFoundPage() {
 
         {/* Description */}
         <p className="mb-10 max-w-md text-base leading-relaxed text-muted-foreground">
-          The page you&apos;re looking for doesn&apos;t exist or has been moved.
-          Let&apos;s get you back on track.
+          The page you&apos;re looking for doesn&apos;t exist or has been moved. Let&apos;s get you
+          back on track.
         </p>
 
         {/* Go Home button */}

@@ -13,14 +13,8 @@ import {
   TabsContent,
   TabsList,
   TabsTrigger,
-} from '@kbm/ui';
-import {
-  SearchIcon,
-  DatabaseIcon,
-  HardDriveIcon,
-  LayersIcon,
-  ClockIcon,
-} from 'lucide-react';
+} from '@omnidesk/ui';
+import { SearchIcon, DatabaseIcon, HardDriveIcon, LayersIcon, ClockIcon } from 'lucide-react';
 
 const dataItems = [
   {
@@ -111,11 +105,7 @@ const typeBadgeVariant = (type: string) => {
   }
 };
 
-function DataCard({
-  item,
-}: {
-  item: (typeof dataItems)[number];
-}) {
+function DataCard({ item }: { item: (typeof dataItems)[number] }) {
   const Icon = typeIcon(item.type);
 
   return (
@@ -126,9 +116,7 @@ function DataCard({
             <Icon className="size-5 text-muted-foreground" />
           </div>
           <div className="min-w-0">
-            <CardTitle className="text-base leading-tight">
-              {item.name}
-            </CardTitle>
+            <CardTitle className="text-base leading-tight">{item.name}</CardTitle>
             <CardDescription className="mt-1 flex items-center gap-2 text-xs">
               <span>{item.size}</span>
               <span>·</span>
@@ -143,13 +131,9 @@ function DataCard({
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Avatar className="size-6">
-                <AvatarFallback className="text-[10px]">
-                  {item.ownerInitials}
-                </AvatarFallback>
+                <AvatarFallback className="text-[10px]">{item.ownerInitials}</AvatarFallback>
               </Avatar>
-              <span className="text-sm text-muted-foreground">
-                {item.owner}
-              </span>
+              <span className="text-sm text-muted-foreground">{item.owner}</span>
             </div>
             <div className="flex items-center gap-1 text-xs text-muted-foreground">
               <ClockIcon className="size-3" />
@@ -158,11 +142,7 @@ function DataCard({
           </div>
           <div className="flex flex-wrap gap-1.5">
             {item.tags.map((tag) => (
-              <Badge
-                key={tag}
-                variant="outline"
-                className="px-1.5 py-0 text-[10px] font-normal"
-              >
+              <Badge key={tag} variant="outline" className="px-1.5 py-0 text-[10px] font-normal">
                 {tag}
               </Badge>
             ))}
@@ -178,9 +158,7 @@ export function DataLibraryPage() {
     <div className="flex flex-1 flex-col gap-6 p-6">
       <div>
         <h1 className="text-2xl font-bold tracking-tight">Data Library</h1>
-        <p className="text-muted-foreground">
-          Browse and manage your data collections.
-        </p>
+        <p className="text-muted-foreground">Browse and manage your data collections.</p>
       </div>
 
       <Separator />

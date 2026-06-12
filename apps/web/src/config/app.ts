@@ -6,11 +6,11 @@
  */
 
 // ─── Branding ────────────────────────────────────────────────────────────────
-export const APP_NAME = 'Kill Bug Machine';
+export const APP_NAME = 'OmniDesk';
 export const APP_DESCRIPTION = 'Premium B2B Enterprise Platform with App Store';
 
 // ─── External URLs ───────────────────────────────────────────────────────────
-export const GITHUB_REPO = 'https://github.com/tuquet/kill-bug-machine';
+export const GITHUB_REPO = 'https://github.com/tuquet/omnidesk';
 export const GITHUB_ISSUES = `${GITHUB_REPO}/issues`;
 export const API_DOCS_URL = 'http://127.0.0.1:1421/scalar';
 

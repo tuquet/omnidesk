@@ -1,10 +1,10 @@
 {
   "openapi": "3.1.0",
   "info": {
-    "title": "kill-bug-machine",
+    "title": "omnidesk",
     "description": "Cross-platform Desktop DevTool — Crawl, manage, and expose bugs via MCP",
     "contact": {
-      "name": "KBM Team"
+      "name": "OmniDesk Team"
     },
     "license": {
       "name": ""

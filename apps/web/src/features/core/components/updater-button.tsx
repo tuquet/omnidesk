@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { isDesktop } from '@/utils/platform';
 import { check } from '@tauri-apps/plugin-updater';
 import { relaunch } from '@tauri-apps/plugin-process';
-import { Button } from '@kbm/ui';
+import { Button } from '@omnidesk/ui';
 import { RefreshCw } from 'lucide-react';
 import { toast } from 'sonner';
 

@@ -1,4 +1,4 @@
-import { cn } from '@kbm/ui';
+import { cn } from '@omnidesk/ui';
 import { Link } from '@tanstack/react-router';
 import { toast } from 'sonner';
 import { useForm } from '@tanstack/react-form';
@@ -11,7 +11,7 @@ import {
   FieldLabel,
   FieldSeparator,
   Input,
-} from '@kbm/ui';
+} from '@omnidesk/ui';
 import { authActions } from '../stores/use-auth-store';
 
 export function SignupForm({ className, ...props }: React.ComponentProps<'form'>) {

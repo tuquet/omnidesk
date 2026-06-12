@@ -17,7 +17,7 @@ import {
   MenubarSeparator,
   MenubarShortcut,
   MenubarTrigger,
-} from '@kbm/ui';
+} from '@omnidesk/ui';
 import { WindowControls } from './window-controls';
 import { GITHUB_REPO, GITHUB_ISSUES, API_DOCS_URL } from '@/config';
 import { DEFAULT_AUTHENTICATED_ROUTE } from '@/config/route-config';
@@ -26,7 +26,6 @@ export function TitleBar() {
   const navigate = useNavigate();
   const { setTheme, theme } = useTheme();
   const { i18n } = useTranslation();
-
 
   if (!isDesktop()) return null;
 
@@ -75,9 +74,7 @@ export function TitleBar() {
                 <MenubarShortcut>Ctrl+N</MenubarShortcut>
               </MenubarItem>
               <MenubarSeparator />
-              <MenubarItem onClick={() => openExternal('file://')}>
-                Open Data Folder
-              </MenubarItem>
+              <MenubarItem onClick={() => openExternal('file://')}>Open Data Folder</MenubarItem>
               <MenubarSeparator />
               <MenubarItem onClick={quitApp}>
                 Quit
@@ -194,13 +191,9 @@ export function TitleBar() {
                 <MenubarShortcut>F1</MenubarShortcut>
               </MenubarItem>
               <MenubarSeparator />
-              <MenubarItem onClick={() => openExternal(GITHUB_ISSUES)}>
-                Report a Bug
-              </MenubarItem>
+              <MenubarItem onClick={() => openExternal(GITHUB_ISSUES)}>Report a Bug</MenubarItem>
               <MenubarSeparator />
-              <MenubarItem onClick={checkUpdate}>
-                Check for Updates...
-              </MenubarItem>
+              <MenubarItem onClick={checkUpdate}>Check for Updates...</MenubarItem>
             </MenubarContent>
           </MenubarMenu>
         </Menubar>

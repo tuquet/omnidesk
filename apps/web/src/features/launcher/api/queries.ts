@@ -17,14 +17,6 @@ const marketplaceAppSchema = z.object({
 
 export type MarketplaceApp = z.infer<typeof marketplaceAppSchema>;
 
-const userInstalledAppSchema = z.object({
-  user_id: z.string(),
-  app_id: z.string(),
-  installed_at: z.string(),
-});
-
-export type UserInstalledApp = z.infer<typeof userInstalledAppSchema>;
-
 // ─── Query Keys ─────────────────────────────────────────────────────────────
 
 export const launcherKeys = {
@@ -33,87 +25,91 @@ export const launcherKeys = {
   installedApps: () => [...launcherKeys.all, 'installed-apps'] as const,
 } as const;
 
-// ─── Queries ────────────────────────────────────────────────────────────────
+// ─── API Helpers ────────────────────────────────────────────────────────────
+// The new Architecture routes through the Rust Backend API Gateway (port 1421)
+
+const API_BASE = 'http://127.0.0.1:1421/api';
 
 /**
- * Fetch all available apps from the marketplace.
- * Falls back to empty array on error.
+ * Fetch JWT to pass to Axum backend.
  */
+async function getAuthHeaders() {
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+  if (!session?.access_token) {
+    throw new Error('Not authenticated');
+  }
+  return {
+    Authorization: `Bearer ${session.access_token}`,
+    'Content-Type': 'application/json',
+  };
+}
+
+// ─── Queries ────────────────────────────────────────────────────────────────
+
 export function useMarketplaceApps() {
   return useQuery({
     queryKey: launcherKeys.marketplaceApps(),
     queryFn: async (): Promise<MarketplaceApp[]> => {
-      const { data, error } = await supabase
-        .from('marketplace_apps')
-        .select('*')
-        .order('sort_order', { ascending: true });
+      // Dùng Supabase Anonymous call có thể làm trực tiếp vì nó public,
+      // Nhưng để chuẩn API Gateway thì mình fetch qua Rust.
+      // Tuy nhiên nếu endpoint GET /api/apps không có auth thì không cần JWT.
+      const res = await fetch(`${API_BASE}/apps`);
+      if (!res.ok) throw new Error('Failed to fetch apps from gateway');
 
-      if (error) throw error;
-
-      // Validate at runtime with Zod
+      const data = await res.json();
       return z.array(marketplaceAppSchema).parse(data);
     },
-    staleTime: 5 * 60 * 1000, // 5 minutes — app registry doesn't change often
+    staleTime: 5 * 60 * 1000,
   });
 }
 
-/**
- * Fetch the current user's installed app IDs.
- * Returns an array of app_id strings for easy lookup.
- */
 export function useInstalledApps() {
   return useQuery({
     queryKey: launcherKeys.installedApps(),
     queryFn: async (): Promise<string[]> => {
-      const { data, error } = await supabase
-        .from('user_installed_apps')
-        .select('app_id');
+      const headers = await getAuthHeaders();
+      const res = await fetch(`${API_BASE}/apps/installed`, { headers });
 
-      if (error) throw error;
+      if (!res.ok) throw new Error('Failed to fetch installed apps');
 
-      return z.array(z.object({ app_id: z.string() }))
-        .parse(data)
-        .map((row) => row.app_id);
+      const data = await res.json();
+      // Data expected to be string[]
+      return z.array(z.string()).parse(data);
     },
-    staleTime: 60 * 1000, // 1 minute
+    staleTime: 60 * 1000,
   });
 }
 
 // ─── Mutations ──────────────────────────────────────────────────────────────
 
-/**
- * Install an app for the current user.
- * Optimistically updates the installed apps cache.
- */
 export function useInstallApp() {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: async (appId: string) => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error('Not authenticated');
+      const headers = await getAuthHeaders();
+      const res = await fetch(`${API_BASE}/apps/install/${appId}`, {
+        method: 'POST',
+        headers,
+      });
 
-      const { error } = await supabase
-        .from('user_installed_apps')
-        .insert({ user_id: user.id, app_id: appId });
-
-      if (error) throw error;
+      if (!res.ok) {
+        const errorText = await res.text().catch(() => 'Unknown Error');
+        throw new Error(`Failed to install app: ${errorText}`);
+      }
     },
-    // Optimistic update
     onMutate: async (appId) => {
       await queryClient.cancelQueries({ queryKey: launcherKeys.installedApps() });
-
       const previousApps = queryClient.getQueryData<string[]>(launcherKeys.installedApps());
-
-      queryClient.setQueryData<string[]>(
-        launcherKeys.installedApps(),
-        (old) => [...(old ?? []), appId],
-      );
-
+      queryClient.setQueryData<string[]>(launcherKeys.installedApps(), (old) => [
+        ...(old ?? []),
+        appId,
+      ]);
       return { previousApps };
     },
     onError: (_err, _appId, context) => {
-      // Rollback on error
       if (context?.previousApps) {
         queryClient.setQueryData(launcherKeys.installedApps(), context.previousApps);
       }
@@ -124,37 +120,28 @@ export function useInstallApp() {
   });
 }
 
-/**
- * Uninstall an app for the current user.
- * Optimistically removes from the installed apps cache.
- */
 export function useUninstallApp() {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: async (appId: string) => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error('Not authenticated');
+      const headers = await getAuthHeaders();
+      const res = await fetch(`${API_BASE}/apps/install/${appId}`, {
+        method: 'DELETE',
+        headers,
+      });
 
-      const { error } = await supabase
-        .from('user_installed_apps')
-        .delete()
-        .eq('user_id', user.id)
-        .eq('app_id', appId);
-
-      if (error) throw error;
+      if (!res.ok) {
+        const errorText = await res.text().catch(() => 'Unknown Error');
+        throw new Error(`Failed to uninstall app: ${errorText}`);
+      }
     },
-    // Optimistic update
     onMutate: async (appId) => {
       await queryClient.cancelQueries({ queryKey: launcherKeys.installedApps() });
-
       const previousApps = queryClient.getQueryData<string[]>(launcherKeys.installedApps());
-
-      queryClient.setQueryData<string[]>(
-        launcherKeys.installedApps(),
-        (old) => (old ?? []).filter((id) => id !== appId),
+      queryClient.setQueryData<string[]>(launcherKeys.installedApps(), (old) =>
+        (old ?? []).filter((id) => id !== appId),
       );
-
       return { previousApps };
     },
     onError: (_err, _appId, context) => {

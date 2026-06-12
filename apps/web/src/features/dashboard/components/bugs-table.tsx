@@ -9,8 +9,8 @@ import {
 } from '@tanstack/react-table';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { useQuery } from '@tanstack/react-query';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, Badge } from '@kbm/ui';
-import { Card } from '@kbm/ui';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, Badge } from '@omnidesk/ui';
+import { Card } from '@omnidesk/ui';
 
 // 1. Mock Data Generator
 type Bug = {

@@ -1,6 +1,6 @@
 import { RouterProvider, createRouter } from '@tanstack/react-router';
 import { QueryClientProvider } from '@tanstack/react-query';
-import { TooltipProvider, Toaster } from '@kbm/ui';
+import { TooltipProvider, Toaster } from '@omnidesk/ui';
 import { ThemeProvider } from 'next-themes';
 import { queryClient } from './app/query-client';
 import { ErrorBoundary } from '@/components/error-boundary';

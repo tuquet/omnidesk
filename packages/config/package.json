@@ -1,5 +1,5 @@
 {
-  "name": "@kbm/config",
+  "name": "@omnidesk/config",
   "version": "0.1.0",
   "private": true,
   "exports": {

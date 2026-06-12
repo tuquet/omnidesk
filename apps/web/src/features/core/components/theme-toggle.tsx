@@ -1,5 +1,5 @@
 import { useTheme } from 'next-themes';
-import { Button } from '@kbm/ui';
+import { Button } from '@omnidesk/ui';
 
 export function ThemeToggle() {
   const { resolvedTheme, setTheme } = useTheme();

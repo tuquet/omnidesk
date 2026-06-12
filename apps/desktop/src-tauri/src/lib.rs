@@ -1,15 +1,22 @@
 pub mod commands;
 pub mod db;
 pub mod api;
+pub mod system;
+pub mod error;
+pub mod services;
 
 use commands::credentials;
-use tauri::{Manager, Emitter};
+use tauri::{
+    menu::{Menu, MenuItem},
+    tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent},
+    Manager, Emitter, WindowEvent,
+};
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_single_instance::init(|app, args, _cwd| {
-            if let Some(url) = args.iter().find(|a| a.starts_with("kbm://")) {
+            if let Some(url) = args.iter().find(|a| a.starts_with("omnidesk://")) {
                 let _ = app.emit("deep-link-received", url.clone());
             }
             let _ = app.get_webview_window("main").expect("no main window").set_focus();
@@ -20,7 +27,71 @@ pub fn run() {
         .plugin(tauri_plugin_shell::init())
         .plugin(tauri_plugin_updater::Builder::new().build())
         .plugin(tauri_plugin_process::init())
+        .on_window_event(|window, event| {
+            // Intercept window close to hide it instead of exiting the app
+            if let WindowEvent::CloseRequested { api, .. } = event {
+                let _ = window.hide();
+                api.prevent_close();
+            }
+        })
         .setup(|app| {
+            // Setup System Tray
+            let quit_i = MenuItem::with_id(app, "quit", "Quit OmniDesk", true, None::<&str>)?;
+            let toggle_i = MenuItem::with_id(app, "toggle", "Show/Hide OmniDesk", true, None::<&str>)?;
+            let menu = Menu::with_items(app, &[&toggle_i, &quit_i])?;
+
+            let _tray = TrayIconBuilder::new()
+                .icon(app.default_window_icon().unwrap().clone())
+                .menu(&menu)
+                .menu_on_left_click(false)
+                .on_menu_event(|app, event| match event.id.as_ref() {
+                    "quit" => {
+                        std::process::exit(0);
+                    }
+                    "toggle" => {
+                        if let Some(window) = app.get_webview_window("main") {
+                            let _ = window.is_visible().map(|visible| {
+                                if visible {
+                                    let _ = window.hide();
+                                } else {
+                                    let _ = window.show();
+                                    let _ = window.set_focus();
+                                }
+                            });
+                        }
+                    }
+                    _ => {}
+                })
+                .on_tray_icon_event(|tray, event| match event {
+                    TrayIconEvent::Click {
+                        button: MouseButton::Left,
+                        button_state: MouseButtonState::Up,
+                        ..
+                    } => {
+                        let app = tray.app_handle();
+                        if let Some(window) = app.get_webview_window("main") {
+                            let _ = window.is_visible().map(|visible| {
+                                if visible {
+                                    let _ = window.hide();
+                                } else {
+                                    let _ = window.show();
+                                    let _ = window.set_focus();
+                                }
+                            });
+                        }
+                    }
+                    _ => {}
+                })
+                .build(app)?;
+
+            // Attempt to load .env from workspace root for dev
+            if let Ok(workspace_dir) = std::env::current_dir().map(|p| p.join("../../apps/web")) {
+                let _ = dotenvy::from_path(workspace_dir.join(".env"));
+            }
+            
+            // Smart user-mode deep link registration (bypasses UAC admin requirement)
+            system::deep_link::register_protocol_user_mode("omnidesk");
+            
             let app_handle = app.handle().clone();
             
             tauri::async_runtime::spawn(async move {
@@ -30,6 +101,12 @@ pub fn run() {
                         if let Ok(pool) = db::init_db(app_dir).await {
                             // Manage state for Tauri commands
                             app_handle.manage(pool.clone());
+                            
+                            // Start Background Worker for Offline Queue
+                            services::worker::start_background_worker(pool.clone());
+                            
+                            // Start Realtime WebSocket listener
+                            services::realtime::start_realtime_listener(app_handle.clone(), pool.clone());
                             
                             // Start Axum REST API and Swagger UI on port 1421
                             api::serve(pool, 1421).await;
@@ -52,5 +129,5 @@ pub fn run() {
             credentials::delete_credential,
         ])
         .run(tauri::generate_context!())
-        .expect("error while running Kill Bug Machine");
+        .expect("error while running OmniDesk");
 }

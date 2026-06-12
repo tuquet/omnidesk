@@ -11,7 +11,7 @@ import {
   DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuItem,
-} from '@kbm/ui';
+} from '@omnidesk/ui';
 import { BREADCRUMB_MAP, type BreadcrumbEntry } from '@/config';
 import { useTranslation } from 'react-i18next';
 import { ChevronDownIcon } from 'lucide-react';
@@ -39,7 +39,7 @@ function resolveBreadcrumbs(pathname: string): BreadcrumbEntry[] {
 
   // Generic fallback
   const segments = pathname.split('/').filter(Boolean);
-  
+
   if (segments[0] === 'launcher') {
     const trail: BreadcrumbEntry[] = [{ label: 'App Store', url: '/launcher' }];
     if (segments.length > 1) {
@@ -64,7 +64,7 @@ export function SmartBreadcrumb() {
   const items = React.useMemo(() => resolveBreadcrumbs(pathname), [pathname]);
   const { toggleDevMode } = useDevStore();
   const { t } = useTranslation();
-  
+
   // Easter egg state
   const clickCountRef = React.useRef(0);
   const lastClickTimeRef = React.useRef(0);
@@ -100,7 +100,9 @@ export function SmartBreadcrumb() {
               <BreadcrumbItem>
                 {isLast ? (
                   /* ── Current page ── */
-                  <BreadcrumbPage className="font-medium">{t(`nav.${item.label}`, item.label)}</BreadcrumbPage>
+                  <BreadcrumbPage className="font-medium">
+                    {t(`nav.${item.label}`, item.label)}
+                  </BreadcrumbPage>
                 ) : hasSiblings ? (
                   /* ── Parent with sibling dropdown ── */
                   <DropdownMenu>

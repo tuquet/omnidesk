@@ -30,7 +30,7 @@ jobs:
         run: pnpm typecheck
 
       - name: Build Web
-        run: pnpm --filter @kbm/web build
+        run: pnpm --filter @omnidesk/web build
 
   backend:
     name: Backend (Cargo Check + Clippy)

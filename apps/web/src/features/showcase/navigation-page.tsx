@@ -30,7 +30,7 @@ import {
   Checkbox,
   Button,
   Badge,
-} from '@kbm/ui';
+} from '@omnidesk/ui';
 import {
   ChevronRight,
   Code,
@@ -48,12 +48,9 @@ export function NavigationShowcase() {
   return (
     <div className="flex flex-1 flex-col gap-6 p-6">
       <div>
-        <h1 className="text-2xl font-bold tracking-tight">
-          Navigation &amp; Layout
-        </h1>
+        <h1 className="text-2xl font-bold tracking-tight">Navigation &amp; Layout</h1>
         <p className="text-muted-foreground">
-          Breadcrumbs, tabs, menubars, and labels for navigation and layout
-          structure.
+          Breadcrumbs, tabs, menubars, and labels for navigation and layout structure.
         </p>
       </div>
 
@@ -64,16 +61,13 @@ export function NavigationShowcase() {
         <CardHeader>
           <CardTitle>Breadcrumbs</CardTitle>
           <CardDescription>
-            Hierarchical navigation trails showing the user&apos;s current
-            location.
+            Hierarchical navigation trails showing the user&apos;s current location.
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex flex-col gap-6">
             <div>
-              <p className="mb-3 text-sm font-medium text-muted-foreground">
-                Simple Breadcrumb
-              </p>
+              <p className="mb-3 text-sm font-medium text-muted-foreground">Simple Breadcrumb</p>
               <Breadcrumb>
                 <BreadcrumbList>
                   <BreadcrumbItem>
@@ -92,9 +86,7 @@ export function NavigationShowcase() {
             </div>
 
             <div>
-              <p className="mb-3 text-sm font-medium text-muted-foreground">
-                With Icons
-              </p>
+              <p className="mb-3 text-sm font-medium text-muted-foreground">With Icons</p>
               <Breadcrumb>
                 <BreadcrumbList>
                   <BreadcrumbItem>
@@ -135,9 +127,7 @@ export function NavigationShowcase() {
             </div>
 
             <div>
-              <p className="mb-3 text-sm font-medium text-muted-foreground">
-                Deep Navigation
-              </p>
+              <p className="mb-3 text-sm font-medium text-muted-foreground">Deep Navigation</p>
               <Breadcrumb>
                 <BreadcrumbList>
                   <BreadcrumbItem>
@@ -204,19 +194,12 @@ export function NavigationShowcase() {
                   </div>
                   <div className="flex flex-col gap-2">
                     <Label htmlFor="tab-email">Email</Label>
-                    <Input
-                      id="tab-email"
-                      defaultValue="john@example.com"
-                      type="email"
-                    />
+                    <Input id="tab-email" defaultValue="john@example.com" type="email" />
                   </div>
                 </div>
                 <div className="flex flex-col gap-2">
                   <Label htmlFor="tab-bio">Bio</Label>
-                  <Input
-                    id="tab-bio"
-                    defaultValue="Full-stack developer passionate about UX."
-                  />
+                  <Input id="tab-bio" defaultValue="Full-stack developer passionate about UX." />
                 </div>
                 <div className="flex justify-end">
                   <Button>Save Changes</Button>
@@ -233,18 +216,12 @@ export function NavigationShowcase() {
                   </div>
                   <div className="flex flex-col gap-2">
                     <Label htmlFor="tab-new-password">New Password</Label>
-                    <Input
-                      id="tab-new-password"
-                      type="password"
-                      placeholder="••••••••"
-                    />
+                    <Input id="tab-new-password" type="password" placeholder="••••••••" />
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
                   <Checkbox id="tab-2fa" />
-                  <Label htmlFor="tab-2fa">
-                    Enable two-factor authentication
-                  </Label>
+                  <Label htmlFor="tab-2fa">Enable two-factor authentication</Label>
                 </div>
                 <div className="flex justify-end">
                   <Button>Update Security</Button>
@@ -285,19 +262,11 @@ export function NavigationShowcase() {
                         {integration.name[0]}
                       </div>
                       <div>
-                        <p className="text-sm font-medium">
-                          {integration.name}
-                        </p>
-                        <p className="text-xs text-muted-foreground">
-                          {integration.status}
-                        </p>
+                        <p className="text-sm font-medium">{integration.name}</p>
+                        <p className="text-xs text-muted-foreground">{integration.status}</p>
                       </div>
                     </div>
-                    <Badge
-                      variant={
-                        integration.connected ? 'default' : 'outline'
-                      }
-                    >
+                    <Badge variant={integration.connected ? 'default' : 'outline'}>
                       {integration.connected ? 'Connected' : 'Connect'}
                     </Badge>
                   </div>
@@ -313,21 +282,15 @@ export function NavigationShowcase() {
                 </div>
                 <div className="flex items-center gap-2">
                   <Checkbox id="tab-beta" defaultChecked />
-                  <Label htmlFor="tab-beta">
-                    Opt in to beta features
-                  </Label>
+                  <Label htmlFor="tab-beta">Opt in to beta features</Label>
                 </div>
                 <div className="flex items-center gap-2">
                   <Checkbox id="tab-telemetry" defaultChecked />
-                  <Label htmlFor="tab-telemetry">
-                    Send anonymous usage data
-                  </Label>
+                  <Label htmlFor="tab-telemetry">Send anonymous usage data</Label>
                 </div>
                 <Separator />
                 <div>
-                  <p className="text-sm font-medium text-destructive">
-                    Danger Zone
-                  </p>
+                  <p className="text-sm font-medium text-destructive">Danger Zone</p>
                   <p className="mb-3 text-xs text-muted-foreground">
                     Irreversible actions that affect your account.
                   </p>
@@ -344,8 +307,8 @@ export function NavigationShowcase() {
         <CardHeader>
           <CardTitle>Menubar</CardTitle>
           <CardDescription>
-            A horizontal menu bar with dropdown menus, submenus, and keyboard
-            shortcuts — like a native app.
+            A horizontal menu bar with dropdown menus, submenus, and keyboard shortcuts — like a
+            native app.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -431,9 +394,7 @@ export function NavigationShowcase() {
                 <MenubarItem>Documentation</MenubarItem>
                 <MenubarItem>Release Notes</MenubarItem>
                 <MenubarSeparator />
-                <MenubarItem>
-                  About
-                </MenubarItem>
+                <MenubarItem>About</MenubarItem>
               </MenubarContent>
             </MenubarMenu>
           </Menubar>
@@ -471,37 +432,30 @@ export function NavigationShowcase() {
                   { label: 'Active', value: '18' },
                   { label: 'Completed', value: '6' },
                 ].map((stat) => (
-                  <div
-                    key={stat.label}
-                    className="rounded-lg border p-4 text-center"
-                  >
+                  <div key={stat.label} className="rounded-lg border p-4 text-center">
                     <p className="text-2xl font-bold">{stat.value}</p>
-                    <p className="text-sm text-muted-foreground">
-                      {stat.label}
-                    </p>
+                    <p className="text-sm text-muted-foreground">{stat.label}</p>
                   </div>
                 ))}
               </div>
             </TabsContent>
             <TabsContent value="projects" className="mt-4">
               <div className="flex flex-col gap-2">
-                {['Project Alpha', 'Project Beta', 'Project Gamma'].map(
-                  (name) => (
-                    <div
-                      key={name}
-                      className="flex items-center justify-between rounded-lg border p-3"
-                    >
-                      <span className="text-sm font-medium">{name}</span>
-                      <Badge variant="secondary">In Progress</Badge>
-                    </div>
-                  ),
-                )}
+                {['Project Alpha', 'Project Beta', 'Project Gamma'].map((name) => (
+                  <div
+                    key={name}
+                    className="flex items-center justify-between rounded-lg border p-3"
+                  >
+                    <span className="text-sm font-medium">{name}</span>
+                    <Badge variant="secondary">In Progress</Badge>
+                  </div>
+                ))}
               </div>
             </TabsContent>
             <TabsContent value="docs" className="mt-4">
               <p className="text-sm text-muted-foreground">
-                Documentation files will appear here. Start by creating a new
-                document or importing from your repository.
+                Documentation files will appear here. Start by creating a new document or importing
+                from your repository.
               </p>
             </TabsContent>
           </Tabs>
@@ -532,9 +486,7 @@ export function NavigationShowcase() {
             </div>
             <div className="flex items-center gap-2">
               <Checkbox id="label-agree" />
-              <Label htmlFor="label-agree">
-                I agree to the terms of service
-              </Label>
+              <Label htmlFor="label-agree">I agree to the terms of service</Label>
             </div>
             <div className="flex items-center gap-2">
               <Checkbox id="label-remember" defaultChecked />
@@ -544,11 +496,7 @@ export function NavigationShowcase() {
               <Label htmlFor="label-disabled" className="text-muted-foreground">
                 Disabled Field
               </Label>
-              <Input
-                id="label-disabled"
-                disabled
-                placeholder="Cannot edit"
-              />
+              <Input id="label-disabled" disabled placeholder="Cannot edit" />
             </div>
           </div>
         </CardContent>

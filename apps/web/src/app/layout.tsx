@@ -2,7 +2,7 @@ import { Outlet, useRouterState } from '@tanstack/react-router';
 import { AppSidebar } from '@/features/core/components/app-sidebar';
 import { SiteHeader } from '@/features/core/components/site-header';
 import { RouteProgressBar } from '@/features/core/components/route-progress-bar';
-import { SidebarInset, SidebarProvider } from '@kbm/ui';
+import { SidebarInset, SidebarProvider } from '@omnidesk/ui';
 import { SIDEBAR_WIDTH, HEADER_HEIGHT } from '@/config';
 import { useLayoutStore } from '@/stores/use-layout-store';
 

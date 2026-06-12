@@ -7,7 +7,7 @@ export interface LayoutState {
   panelSizes: number[];
 }
 
-export const layoutStore = createPersistentStore<LayoutState>('kbm-layout-state', {
+export const layoutStore = createPersistentStore<LayoutState>('omnidesk-layout-state', {
   sidebarOpen: true,
   theme: 'system',
   panelSizes: [20, 80],

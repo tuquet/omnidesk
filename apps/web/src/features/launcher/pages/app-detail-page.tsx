@@ -7,7 +7,7 @@ import {
   type MarketplaceApp,
 } from '../api/queries';
 import { APP_REGISTRY } from '../config/registry';
-import { Button, Skeleton, cn } from '@kbm/ui';
+import { Button, Skeleton, cn } from '@omnidesk/ui';
 import {
   ChevronLeft,
   Loader2,
@@ -36,16 +36,20 @@ export function AppDetailPage() {
   const serverApp = marketplaceApps?.find((a) => a.id === appId);
   const localRegistryApp = Object.values(APP_REGISTRY).find((a) => a.id === appId);
 
-  const app: MarketplaceApp | undefined = serverApp || (localRegistryApp ? {
-    id: localRegistryApp.id,
-    name: localRegistryApp.name,
-    description: localRegistryApp.description,
-    icon_name: localRegistryApp.icon.displayName ?? 'Box',
-    category: localRegistryApp.category,
-    is_core: localRegistryApp.isCore ?? false,
-    sort_order: 0,
-    created_at: new Date().toISOString(),
-  } : undefined);
+  const app: MarketplaceApp | undefined =
+    serverApp ||
+    (localRegistryApp
+      ? {
+          id: localRegistryApp.id,
+          name: localRegistryApp.name,
+          description: localRegistryApp.description,
+          icon_name: localRegistryApp.icon.displayName ?? 'Box',
+          category: localRegistryApp.category,
+          is_core: localRegistryApp.isCore ?? false,
+          sort_order: 0,
+          created_at: new Date().toISOString(),
+        }
+      : undefined);
 
   const isInstalled = installedApps.includes(appId);
   const isInstalling = installMutation.isPending && installMutation.variables === appId;
@@ -132,7 +136,11 @@ export function AppDetailPage() {
     <div className="flex flex-col w-full max-w-[1400px] mx-auto pb-20">
       {/* Sticky Header Navigation */}
       <div className="sticky top-0 z-30 flex items-center justify-between bg-background/95 backdrop-blur-2xl px-6 py-4 border-b border-border/40">
-        <Button variant="ghost" className="gap-2 text-muted-foreground hover:text-foreground" onClick={() => navigate({ to: '/launcher' })}>
+        <Button
+          variant="ghost"
+          className="gap-2 text-muted-foreground hover:text-foreground"
+          onClick={() => navigate({ to: '/launcher' })}
+        >
           <ChevronLeft className="h-4 w-4" />
           App Store
         </Button>
@@ -149,9 +157,7 @@ export function AppDetailPage() {
             <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-foreground truncate mb-1">
               {app.name}
             </h1>
-            <p className="text-lg text-muted-foreground font-medium mb-1">
-              Kill Bug Machine, Inc.
-            </p>
+            <p className="text-lg text-muted-foreground font-medium mb-1">OmniDesk, Inc.</p>
             <p className="text-sm text-muted-foreground/70 uppercase tracking-wider mb-6">
               {app.category}
             </p>
@@ -185,8 +191,12 @@ export function AppDetailPage() {
                   {isInstalling ? <Loader2 className="h-4 w-4 animate-spin" /> : 'GET'}
                 </Button>
               )}
-              
-              <Button variant="ghost" size="icon" className="rounded-full h-10 w-10 text-primary hover:bg-primary/10">
+
+              <Button
+                variant="ghost"
+                size="icon"
+                className="rounded-full h-10 w-10 text-primary hover:bg-primary/10"
+              >
                 <Share className="h-5 w-5" />
               </Button>
             </div>
@@ -196,24 +206,32 @@ export function AppDetailPage() {
         {/* Stats Bar */}
         <div className="flex items-center justify-between sm:justify-start gap-4 sm:gap-12 py-4 border-y border-border/40 overflow-x-auto hide-scrollbar">
           <div className="flex flex-col items-center gap-1 min-w-[80px]">
-            <span className="text-[11px] uppercase text-muted-foreground font-medium tracking-wider">Rating</span>
+            <span className="text-[11px] uppercase text-muted-foreground font-medium tracking-wider">
+              Rating
+            </span>
             <div className="flex items-center gap-1 font-bold text-xl text-foreground">
               4.8 <Star className="h-4 w-4 fill-foreground text-foreground" />
             </div>
           </div>
           <div className="w-px h-10 bg-border/40 hidden sm:block" />
           <div className="flex flex-col items-center gap-1 min-w-[80px]">
-            <span className="text-[11px] uppercase text-muted-foreground font-medium tracking-wider">Age</span>
+            <span className="text-[11px] uppercase text-muted-foreground font-medium tracking-wider">
+              Age
+            </span>
             <span className="font-bold text-xl text-foreground">4+</span>
           </div>
           <div className="w-px h-10 bg-border/40 hidden sm:block" />
           <div className="flex flex-col items-center gap-1 min-w-[80px]">
-            <span className="text-[11px] uppercase text-muted-foreground font-medium tracking-wider">Category</span>
+            <span className="text-[11px] uppercase text-muted-foreground font-medium tracking-wider">
+              Category
+            </span>
             <Icon className="h-6 w-6 text-foreground" />
           </div>
           <div className="w-px h-10 bg-border/40 hidden sm:block" />
           <div className="flex flex-col items-center gap-1 min-w-[80px]">
-            <span className="text-[11px] uppercase text-muted-foreground font-medium tracking-wider">Developer</span>
+            <span className="text-[11px] uppercase text-muted-foreground font-medium tracking-wider">
+              Developer
+            </span>
             <Shield className="h-6 w-6 text-foreground" />
           </div>
         </div>
@@ -221,18 +239,27 @@ export function AppDetailPage() {
         {/* Screenshots Placeholder Gallery */}
         <div className="flex flex-col gap-4">
           <h2 className="text-xl font-bold tracking-tight">Preview</h2>
-          <div className="flex overflow-x-auto gap-4 pb-4 snap-x snap-mandatory hide-scrollbar" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
-            <style dangerouslySetInnerHTML={{__html: `
+          <div
+            className="flex overflow-x-auto gap-4 pb-4 snap-x snap-mandatory hide-scrollbar"
+            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+          >
+            <style
+              dangerouslySetInnerHTML={{
+                __html: `
               .hide-scrollbar::-webkit-scrollbar { display: none; }
-            `}} />
+            `,
+              }}
+            />
             {[1, 2, 3, 4].map((i) => (
-              <div 
-                key={i} 
+              <div
+                key={i}
                 className="relative flex h-[340px] w-[240px] shrink-0 snap-center flex-col items-center justify-center overflow-hidden rounded-3xl bg-gradient-to-b from-muted/50 to-muted/10 border border-border/40"
               >
                 <div className="absolute inset-0 bg-grid-white/10 [mask-image:linear-gradient(0deg,transparent,black)] dark:bg-grid-white/5" />
                 <Icon className="h-20 w-20 text-muted-foreground/20" />
-                <span className="mt-4 text-xs font-medium text-muted-foreground/50 uppercase tracking-widest">Screenshot {i}</span>
+                <span className="mt-4 text-xs font-medium text-muted-foreground/50 uppercase tracking-widest">
+                  Screenshot {i}
+                </span>
               </div>
             ))}
           </div>
@@ -244,13 +271,12 @@ export function AppDetailPage() {
           <div className="text-[15px] leading-relaxed text-foreground/90 whitespace-pre-line">
             {app.description}
             {'\n\n'}
-            This powerful B2B application seamlessly integrates into your workflow, providing advanced tools to enhance productivity and collaboration. Designed for scale, it adapts to your team's needs whether you are a small startup or a large enterprise.
+            This powerful B2B application seamlessly integrates into your workflow, providing
+            advanced tools to enhance productivity and collaboration. Designed for scale, it adapts
+            to your team's needs whether you are a small startup or a large enterprise.
             {'\n\n'}
-            Key Features:
-            • Real-time synchronization
-            • Advanced analytics and reporting
-            • Secure role-based access control
-            • Cross-platform compatibility
+            Key Features: • Real-time synchronization • Advanced analytics and reporting • Secure
+            role-based access control • Cross-platform compatibility
           </div>
         </div>
 
@@ -260,7 +286,7 @@ export function AppDetailPage() {
           <div className="flex flex-col gap-0 border-y border-border/40">
             <div className="flex items-center justify-between py-4 border-b border-border/40 last:border-0">
               <span className="text-[15px] text-muted-foreground">Provider</span>
-              <span className="text-[15px] font-medium">Kill Bug Machine, Inc.</span>
+              <span className="text-[15px] font-medium">OmniDesk, Inc.</span>
             </div>
             <div className="flex items-center justify-between py-4 border-b border-border/40 last:border-0">
               <span className="text-[15px] text-muted-foreground">Size</span>
@@ -281,12 +307,13 @@ export function AppDetailPage() {
             {app.is_core && (
               <div className="flex items-center justify-between py-4 border-b border-border/40 last:border-0">
                 <span className="text-[15px] text-muted-foreground">System Integration</span>
-                <span className="text-[15px] font-medium flex items-center gap-1"><Shield className="h-4 w-4" /> Required Component</span>
+                <span className="text-[15px] font-medium flex items-center gap-1">
+                  <Shield className="h-4 w-4" /> Required Component
+                </span>
               </div>
             )}
           </div>
         </div>
-
       </div>
     </div>
   );

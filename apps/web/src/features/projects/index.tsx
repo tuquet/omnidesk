@@ -9,7 +9,7 @@ import {
   Avatar,
   AvatarFallback,
   Separator,
-} from '@kbm/ui';
+} from '@omnidesk/ui';
 import { ProgressBar } from '@/components/progress-bar';
 import { PlusIcon, FolderIcon, ClockIcon, UsersIcon } from 'lucide-react';
 
@@ -49,8 +49,7 @@ const projects = [
   },
   {
     name: 'Design System',
-    description:
-      'Build a unified component library and design token system for all product teams.',
+    description: 'Build a unified component library and design token system for all product teams.',
     status: 'Active' as const,
     progress: 88,
     team: ['MG', 'ET'],
@@ -103,9 +102,7 @@ export function ProjectsPage() {
       <div className="flex items-start justify-between">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Projects</h1>
-          <p className="text-muted-foreground">
-            Manage and track all your projects in one place.
-          </p>
+          <p className="text-muted-foreground">Manage and track all your projects in one place.</p>
         </div>
         <Button>
           <PlusIcon className="mr-2 h-4 w-4" />
@@ -117,10 +114,7 @@ export function ProjectsPage() {
 
       <div className="grid gap-6 lg:grid-cols-2">
         {projects.map((project) => (
-          <Card
-            key={project.name}
-            className="transition-shadow hover:shadow-md"
-          >
+          <Card key={project.name} className="transition-shadow hover:shadow-md">
             <CardHeader className="pb-3">
               <div className="flex items-start justify-between">
                 <div className="flex items-center gap-2">
@@ -130,17 +124,13 @@ export function ProjectsPage() {
                 <Badge
                   variant={getStatusVariant(project.status)}
                   className={
-                    project.status === 'Completed'
-                      ? 'bg-green-600 hover:bg-green-700'
-                      : ''
+                    project.status === 'Completed' ? 'bg-green-600 hover:bg-green-700' : ''
                   }
                 >
                   {project.status}
                 </Badge>
               </div>
-              <CardDescription className="pt-1">
-                {project.description}
-              </CardDescription>
+              <CardDescription className="pt-1">{project.description}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               {/* Progress */}
@@ -155,11 +145,7 @@ export function ProjectsPage() {
               {/* Tags */}
               <div className="flex flex-wrap gap-1.5">
                 {project.tags.map((tag) => (
-                  <Badge
-                    key={tag}
-                    variant="secondary"
-                    className="text-xs font-normal"
-                  >
+                  <Badge key={tag} variant="secondary" className="text-xs font-normal">
                     {tag}
                   </Badge>
                 ))}
@@ -171,20 +157,13 @@ export function ProjectsPage() {
                   <UsersIcon className="text-muted-foreground mr-1 h-4 w-4" />
                   <div className="flex -space-x-2">
                     {project.team.map((initials) => (
-                      <Avatar
-                        key={initials}
-                        className="border-background h-7 w-7 border-2"
-                      >
-                        <AvatarFallback className="text-[10px]">
-                          {initials}
-                        </AvatarFallback>
+                      <Avatar key={initials} className="border-background h-7 w-7 border-2">
+                        <AvatarFallback className="text-[10px]">{initials}</AvatarFallback>
                       </Avatar>
                     ))}
                     {project.extra > 0 && (
                       <Avatar className="border-background h-7 w-7 border-2">
-                        <AvatarFallback className="text-[10px]">
-                          +{project.extra}
-                        </AvatarFallback>
+                        <AvatarFallback className="text-[10px]">+{project.extra}</AvatarFallback>
                       </Avatar>
                     )}
                   </div>

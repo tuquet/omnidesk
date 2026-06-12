@@ -10,7 +10,7 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-} from '@kbm/ui';
+} from '@omnidesk/ui';
 
 export function NavSecondary({
   items,
@@ -31,13 +31,15 @@ export function NavSecondary({
           {items.map((item) => (
             <SidebarMenuItem key={item.title}>
               <SidebarMenuButton asChild>
-                <Link 
-                  to={item.url} 
+                <Link
+                  to={item.url}
                   activeProps={{ 'data-active': true } as any}
                   onClick={(e) => {
                     if (item.title === 'Search') {
                       e.preventDefault();
-                      document.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', ctrlKey: true }));
+                      document.dispatchEvent(
+                        new KeyboardEvent('keydown', { key: 'k', ctrlKey: true }),
+                      );
                     }
                   }}
                 >

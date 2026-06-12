@@ -5,8 +5,8 @@ Thank you for your interest in contributing.
 ## Setup
 
 ```bash
-git clone https://github.com/tuquet/kill-bug-machine.git
-cd kill-bug-machine
+git clone https://github.com/tuquet/omnidesk.git
+cd omnidesk
 pnpm install
 pnpm dev
 ```
@@ -19,7 +19,7 @@ pnpm dev
    ```bash
    pnpm lint
    pnpm typecheck
-   pnpm --filter @kbm/web build
+   pnpm --filter @omnidesk/web build
    cargo check --manifest-path apps/desktop/src-tauri/Cargo.toml
    ```
 4. Commit using [Conventional Commits](https://www.conventionalcommits.org/) (`feat:`, `fix:`, `docs:`, etc.).

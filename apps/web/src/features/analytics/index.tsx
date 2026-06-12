@@ -18,7 +18,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@kbm/ui';
+} from '@omnidesk/ui';
 import { ProgressBar } from '@/components/progress-bar';
 import {
   ArrowUpIcon,
@@ -125,14 +125,13 @@ const deviceBreakdown = [
   },
 ];
 
-const sourceBadgeVariant: Record<string, 'default' | 'secondary' | 'outline'> =
-  {
-    organic: 'default',
-    direct: 'secondary',
-    social: 'outline',
-    referral: 'secondary',
-    email: 'outline',
-  };
+const sourceBadgeVariant: Record<string, 'default' | 'secondary' | 'outline'> = {
+  organic: 'default',
+  direct: 'secondary',
+  social: 'outline',
+  referral: 'secondary',
+  email: 'outline',
+};
 
 export function AnalyticsPage() {
   const [dateRange, setDateRange] = useState('30d');
@@ -142,9 +141,7 @@ export function AnalyticsPage() {
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Analytics</h1>
-          <p className="text-muted-foreground">
-            Monitor performance metrics and insights.
-          </p>
+          <p className="text-muted-foreground">Monitor performance metrics and insights.</p>
         </div>
         <Select value={dateRange} onValueChange={setDateRange}>
           <SelectTrigger className="w-[180px]">
@@ -166,9 +163,7 @@ export function AnalyticsPage() {
         {summaryStats.map((stat) => (
           <Card key={stat.title}>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium">
-                {stat.title}
-              </CardTitle>
+              <CardTitle className="text-sm font-medium">{stat.title}</CardTitle>
               <TrendingUpIcon className="text-muted-foreground h-4 w-4" />
             </CardHeader>
             <CardContent>
@@ -190,9 +185,7 @@ export function AnalyticsPage() {
                     <span className="text-muted-foreground">{stat.change}</span>
                   </>
                 )}
-                <span className="text-muted-foreground">
-                  {stat.description}
-                </span>
+                <span className="text-muted-foreground">{stat.description}</span>
               </div>
             </CardContent>
           </Card>
@@ -206,9 +199,7 @@ export function AnalyticsPage() {
             <GlobeIcon className="text-muted-foreground h-5 w-5" />
             <div>
               <CardTitle>Traffic Sources</CardTitle>
-              <CardDescription>
-                Where your visitors are coming from
-              </CardDescription>
+              <CardDescription>Where your visitors are coming from</CardDescription>
             </div>
           </div>
         </CardHeader>
@@ -227,20 +218,12 @@ export function AnalyticsPage() {
                 <TableRow key={source.source}>
                   <TableCell>
                     <div className="flex items-center gap-2">
-                      <Badge variant={sourceBadgeVariant[source.type]}>
-                        {source.source}
-                      </Badge>
+                      <Badge variant={sourceBadgeVariant[source.type]}>{source.source}</Badge>
                     </div>
                   </TableCell>
-                  <TableCell className="text-right font-medium">
-                    {source.visitors}
-                  </TableCell>
-                  <TableCell className="text-right">
-                    {source.bounceRate}
-                  </TableCell>
-                  <TableCell className="text-right">
-                    {source.avgDuration}
-                  </TableCell>
+                  <TableCell className="text-right font-medium">{source.visitors}</TableCell>
+                  <TableCell className="text-right">{source.bounceRate}</TableCell>
+                  <TableCell className="text-right">{source.avgDuration}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
@@ -268,12 +251,8 @@ export function AnalyticsPage() {
               <TableBody>
                 {topPages.map((page) => (
                   <TableRow key={page.page}>
-                    <TableCell className="font-mono text-sm">
-                      {page.page}
-                    </TableCell>
-                    <TableCell className="text-right font-medium">
-                      {page.views}
-                    </TableCell>
+                    <TableCell className="font-mono text-sm">{page.page}</TableCell>
+                    <TableCell className="text-right font-medium">{page.views}</TableCell>
                     <TableCell className="text-right">{page.unique}</TableCell>
                   </TableRow>
                 ))}
@@ -286,9 +265,7 @@ export function AnalyticsPage() {
         <Card>
           <CardHeader>
             <CardTitle>Device Breakdown</CardTitle>
-            <CardDescription>
-              Traffic distribution across devices
-            </CardDescription>
+            <CardDescription>Traffic distribution across devices</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-6">
@@ -297,13 +274,9 @@ export function AnalyticsPage() {
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <device.icon className="text-muted-foreground h-4 w-4" />
-                      <span className="text-sm font-medium">
-                        {device.device}
-                      </span>
+                      <span className="text-sm font-medium">{device.device}</span>
                     </div>
-                    <span className="text-sm font-bold">
-                      {device.percentage}%
-                    </span>
+                    <span className="text-sm font-bold">{device.percentage}%</span>
                   </div>
                   <ProgressBar value={device.percentage} className="h-2" />
                 </div>

@@ -12,15 +12,9 @@ import {
   TabsContent,
   TabsList,
   TabsTrigger,
-} from '@kbm/ui';
+} from '@omnidesk/ui';
 import { ProgressBar } from '@/components/progress-bar';
-import {
-  CalendarIcon,
-  ClockIcon,
-  CheckCircle2Icon,
-  AlertCircleIcon,
-  PlusIcon,
-} from 'lucide-react';
+import { CalendarIcon, ClockIcon, CheckCircle2Icon, AlertCircleIcon, PlusIcon } from 'lucide-react';
 
 interface Task {
   id: string;
@@ -182,9 +176,7 @@ function TaskCard({ task }: { task: Task }) {
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between">
           <div className="space-y-1">
-            <CardTitle className="text-sm font-medium leading-tight">
-              {task.title}
-            </CardTitle>
+            <CardTitle className="text-sm font-medium leading-tight">{task.title}</CardTitle>
             <CardDescription className="text-xs">{task.id}</CardDescription>
           </div>
           <Badge variant={priorityVariant[task.priority]}>{task.priority}</Badge>
@@ -194,13 +186,9 @@ function TaskCard({ task }: { task: Task }) {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Avatar className="h-6 w-6">
-              <AvatarFallback className="text-[10px]">
-                {task.initials}
-              </AvatarFallback>
+              <AvatarFallback className="text-[10px]">{task.initials}</AvatarFallback>
             </Avatar>
-            <span className="text-muted-foreground text-xs">
-              {task.assignee}
-            </span>
+            <span className="text-muted-foreground text-xs">{task.assignee}</span>
           </div>
           <div className="text-muted-foreground flex items-center gap-1 text-xs">
             <CalendarIcon className="h-3 w-3" />
@@ -231,10 +219,7 @@ function TaskColumn({ tasks }: { tasks: Task[] }) {
 
 export function LifecyclePage() {
   const totalTasks =
-    backlogTasks.length +
-    inProgressTasks.length +
-    reviewTasks.length +
-    doneTasks.length;
+    backlogTasks.length + inProgressTasks.length + reviewTasks.length + doneTasks.length;
 
   const stats = [
     {
@@ -267,9 +252,7 @@ export function LifecyclePage() {
     <div className="flex flex-1 flex-col gap-6 p-6">
       <div>
         <h1 className="text-2xl font-bold tracking-tight">Lifecycle</h1>
-        <p className="text-muted-foreground">
-          Track items through their lifecycle stages.
-        </p>
+        <p className="text-muted-foreground">Track items through their lifecycle stages.</p>
       </div>
 
       <Separator />
@@ -278,16 +261,12 @@ export function LifecyclePage() {
         {stats.map((stat) => (
           <Card key={stat.title}>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium">
-                {stat.title}
-              </CardTitle>
+              <CardTitle className="text-sm font-medium">{stat.title}</CardTitle>
               <stat.icon className="text-muted-foreground h-4 w-4" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{stat.value}</div>
-              <p className="text-muted-foreground text-xs">
-                {stat.description}
-              </p>
+              <p className="text-muted-foreground text-xs">{stat.description}</p>
             </CardContent>
           </Card>
         ))}
@@ -295,15 +274,9 @@ export function LifecyclePage() {
 
       <Tabs defaultValue="backlog">
         <TabsList>
-          <TabsTrigger value="backlog">
-            Backlog ({backlogTasks.length})
-          </TabsTrigger>
-          <TabsTrigger value="in-progress">
-            In Progress ({inProgressTasks.length})
-          </TabsTrigger>
-          <TabsTrigger value="review">
-            Review ({reviewTasks.length})
-          </TabsTrigger>
+          <TabsTrigger value="backlog">Backlog ({backlogTasks.length})</TabsTrigger>
+          <TabsTrigger value="in-progress">In Progress ({inProgressTasks.length})</TabsTrigger>
+          <TabsTrigger value="review">Review ({reviewTasks.length})</TabsTrigger>
           <TabsTrigger value="done">Done ({doneTasks.length})</TabsTrigger>
         </TabsList>
         <TabsContent value="backlog" className="mt-4">

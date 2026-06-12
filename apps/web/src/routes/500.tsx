@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from '@tanstack/react-router';
-import { Button } from '@kbm/ui';
+import { Button } from '@omnidesk/ui';
 import { ArrowLeft, Bug, RefreshCw } from 'lucide-react';
 
 export const Route = createFileRoute('/500')({
@@ -21,10 +21,7 @@ function InternalServerErrorPage() {
         <div className="relative mb-6">
           <div className="absolute inset-0 animate-ping rounded-full bg-purple-500/10 [animation-duration:2s]" />
           <div className="relative rounded-full bg-muted/50 p-4">
-            <Bug
-              className="h-12 w-12 text-muted-foreground/60"
-              strokeWidth={1.5}
-            />
+            <Bug className="h-12 w-12 text-muted-foreground/60" strokeWidth={1.5} />
           </div>
         </div>
 
@@ -58,17 +55,12 @@ function InternalServerErrorPage() {
 
         {/* Description */}
         <p className="mb-10 max-w-md text-base leading-relaxed text-muted-foreground">
-          Something went wrong on our end. We&apos;re looking into it.
-          Please try again in a moment.
+          Something went wrong on our end. We&apos;re looking into it. Please try again in a moment.
         </p>
 
         {/* Action buttons */}
         <div className="flex flex-col gap-3 sm:flex-row">
-          <Button
-            size="lg"
-            className="gap-2 px-8"
-            onClick={() => window.location.reload()}
-          >
+          <Button size="lg" className="gap-2 px-8" onClick={() => window.location.reload()}>
             <RefreshCw className="h-4 w-4" />
             Try Again
           </Button>

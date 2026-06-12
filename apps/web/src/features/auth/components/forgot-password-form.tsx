@@ -1,14 +1,7 @@
-import { cn } from '@kbm/ui';
+import { cn } from '@omnidesk/ui';
 import { Link } from '@tanstack/react-router';
 import { toast } from 'sonner';
-import {
-  Button,
-  Field,
-  FieldDescription,
-  FieldGroup,
-  FieldLabel,
-  Input,
-} from '@kbm/ui';
+import { Button, Field, FieldDescription, FieldGroup, FieldLabel, Input } from '@omnidesk/ui';
 
 export function ForgotPasswordForm({ className, ...props }: React.ComponentProps<'form'>) {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {

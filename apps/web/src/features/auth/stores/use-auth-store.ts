@@ -73,7 +73,7 @@ export const authActions = {
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'github',
         options: {
-          redirectTo: 'kbm://auth/callback',
+          redirectTo: 'omnidesk://auth/callback',
           skipBrowserRedirect: true,
         },
       });
@@ -124,15 +124,17 @@ export const authActions = {
   /** Initialize auth — call once on app mount */
   initialize: async () => {
     // Get initial session
-    const { data: { session } } = await supabase.auth.getSession();
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
     syncAuthState(session);
 
     // Listen for auth changes (login, logout, token refresh)
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
-        syncAuthState(session);
-      },
-    );
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      syncAuthState(session);
+    });
 
     return subscription;
   },

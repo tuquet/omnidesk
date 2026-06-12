@@ -10,21 +10,21 @@ export enum TaskStatus {
   IN_PROGRESS = 'IN_PROGRESS',
   REVIEW = 'REVIEW',
   DONE = 'DONE',
-  CANCELED = 'CANCELED'
+  CANCELED = 'CANCELED',
 }
 
 export enum TaskPriority {
   LOW = 'LOW',
   MEDIUM = 'MEDIUM',
   HIGH = 'HIGH',
-  URGENT = 'URGENT'
+  URGENT = 'URGENT',
 }
 
 export enum TaskType {
   BUG = 'BUG',
   FEATURE = 'FEATURE',
   CHORE = 'CHORE',
-  EPIC = 'EPIC'
+  EPIC = 'EPIC',
 }
 ```
 
@@ -36,31 +36,31 @@ The standard object returned when querying tasks.
 export interface TaskDTO {
   id: string; // UUID
   projectId: string; // UUID
-  
-  /** Automatically generated human-readable ID (e.g., "KBM-101") */
+
+  /** Automatically generated human-readable ID (e.g., "OmniDesk-101") */
   key: string;
-  
+
   title: string;
   description?: string | null; // Supports markdown
-  
+
   status: TaskStatus;
   priority: TaskPriority;
   type: TaskType;
-  
+
   /** 0 to 100 representing completion percentage */
   progress: number;
-  
+
   /** The user assigned to work on the task */
   assigneeId?: string | null;
-  
+
   /** The user who created/reported the task */
   reporterId: string;
-  
+
   dueDate?: string | null; // ISO 8601 string (Date only usually)
-  
+
   /** Array of tag/label names */
   tags: string[];
-  
+
   createdAt: string; // ISO 8601 string
   updatedAt: string; // ISO 8601 string
 }

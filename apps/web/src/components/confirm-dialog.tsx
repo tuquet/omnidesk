@@ -1,5 +1,13 @@
 import { useState, useCallback, createContext, useContext, type ReactNode } from 'react';
-import { Button, Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@kbm/ui';
+import {
+  Button,
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@omnidesk/ui';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -63,14 +71,11 @@ const initialState: ConfirmDialogState = {
 export function ConfirmDialogProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<ConfirmDialogState>(initialState);
 
-  const confirm = useCallback(
-    (options: ConfirmDialogOptions): Promise<boolean> => {
-      return new Promise<boolean>((resolve) => {
-        setState({ ...options, open: true, resolve });
-      });
-    },
-    [],
-  );
+  const confirm = useCallback((options: ConfirmDialogOptions): Promise<boolean> => {
+    return new Promise<boolean>((resolve) => {
+      setState({ ...options, open: true, resolve });
+    });
+  }, []);
 
   const handleClose = useCallback(
     (confirmed: boolean) => {
@@ -87,9 +92,7 @@ export function ConfirmDialogProvider({ children }: { children: ReactNode }) {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>{state.title}</DialogTitle>
-            {state.description && (
-              <DialogDescription>{state.description}</DialogDescription>
-            )}
+            {state.description && <DialogDescription>{state.description}</DialogDescription>}
           </DialogHeader>
           <DialogFooter>
             <Button variant="outline" onClick={() => handleClose(false)}>

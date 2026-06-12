@@ -7,7 +7,7 @@
     {
       "label": "🌐 Dev: Web (Vite)",
       "type": "shell",
-      "command": "pnpm --filter @kbm/web dev",
+      "command": "pnpm --filter @omnidesk/web dev",
       "group": "build",
       "isBackground": true,
       "problemMatcher": {
@@ -40,7 +40,7 @@
     {
       "label": "🖥️ Dev: Desktop (Tauri)",
       "type": "shell",
-      "command": "pnpm --filter @kbm/desktop tauri dev",
+      "command": "pnpm --filter @omnidesk/desktop tauri dev",
       "group": "build",
       "isBackground": true,
       "problemMatcher": [],
@@ -150,7 +150,7 @@
     {
       "label": "📦 Build: Web Only",
       "type": "shell",
-      "command": "pnpm --filter @kbm/web build",
+      "command": "pnpm --filter @omnidesk/web build",
       "group": "build",
       "problemMatcher": "$tsc",
       "presentation": {
@@ -162,7 +162,7 @@
     {
       "label": "📦 Build: Desktop (Tauri)",
       "type": "shell",
-      "command": "pnpm --filter @kbm/desktop tauri build",
+      "command": "pnpm --filter @omnidesk/desktop tauri build",
       "group": "build",
       "problemMatcher": [],
       "presentation": {

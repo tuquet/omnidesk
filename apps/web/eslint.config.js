@@ -1,4 +1,4 @@
-import { reactConfig } from '@kbm/config/eslint';
+import { reactConfig } from '@omnidesk/config/eslint';
 import reactRefresh from 'eslint-plugin-react-refresh';
 import { defineConfig, globalIgnores } from 'eslint/config';
 

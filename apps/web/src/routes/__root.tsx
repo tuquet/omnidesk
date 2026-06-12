@@ -1,12 +1,8 @@
-import {
-  createRootRouteWithContext,
-  Link,
-  Outlet,
-} from '@tanstack/react-router';
+import { createRootRouteWithContext, Link, Outlet } from '@tanstack/react-router';
 import { useEffect } from 'react';
 import { useDevStore } from '@/stores/use-dev-store';
 import type { AuthState } from '@/features/auth/stores/use-auth-store';
-import { Button } from '@kbm/ui';
+import { Button } from '@omnidesk/ui';
 import { ArrowLeft, Ghost } from 'lucide-react';
 import { TitleBar } from '@/features/core/components/title-bar';
 import { ResizeHandles } from '@/features/core/components/resize-handles';
@@ -28,10 +24,7 @@ function NotFound() {
       <div className="relative z-10 flex flex-col items-center text-center">
         {/* Ghost icon */}
         <div className="mb-6 animate-bounce [animation-duration:3s]">
-          <Ghost
-            className="h-16 w-16 text-muted-foreground/40"
-            strokeWidth={1}
-          />
+          <Ghost className="h-16 w-16 text-muted-foreground/40" strokeWidth={1} />
         </div>
 
         {/* Large 404 */}
@@ -49,8 +42,8 @@ function NotFound() {
 
         {/* Description */}
         <p className="mb-10 max-w-md text-base leading-relaxed text-muted-foreground">
-          The page you&apos;re looking for doesn&apos;t exist or has been moved.
-          Let&apos;s get you back on track.
+          The page you&apos;re looking for doesn&apos;t exist or has been moved. Let&apos;s get you
+          back on track.
         </p>
 
         {/* Go Home button */}

@@ -1,6 +1,15 @@
 import { memo } from 'react';
-import { Separator, Button, DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuLabel } from '@kbm/ui';
-import { SidebarTrigger } from '@kbm/ui';
+import {
+  Separator,
+  Button,
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuLabel,
+} from '@omnidesk/ui';
+import { SidebarTrigger } from '@omnidesk/ui';
 import { WrenchIcon, TrashIcon, BugIcon, LogOutIcon } from 'lucide-react';
 import { ThemeToggle } from '@/features/core/components/theme-toggle';
 import { LanguageSwitcher } from '@/features/core/components/language-switcher';
@@ -35,21 +44,25 @@ export const SiteHeader = memo(function SiteHeader() {
                 <DropdownMenuContent align="end" className="w-56">
                   <DropdownMenuLabel>Developer Tools</DropdownMenuLabel>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={() => {
-                    localStorage.clear();
-                    window.location.reload();
-                  }}>
+                  <DropdownMenuItem
+                    onClick={() => {
+                      localStorage.clear();
+                      window.location.reload();
+                    }}
+                  >
                     <TrashIcon className="mr-2 h-4 w-4" />
                     Clear Local Storage
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => {
-                    throw new Error('Simulated application crash for testing');
-                  }}>
+                  <DropdownMenuItem
+                    onClick={() => {
+                      throw new Error('Simulated application crash for testing');
+                    }}
+                  >
                     <BugIcon className="mr-2 h-4 w-4" />
                     Simulate Error
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem 
+                  <DropdownMenuItem
                     onClick={() => setDevMode(false)}
                     className="text-destructive focus:text-destructive focus:bg-destructive/10"
                   >

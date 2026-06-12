@@ -16,7 +16,7 @@ import {
   SidebarGroup,
   SidebarGroupLabel,
   SidebarGroupContent,
-} from '@kbm/ui';
+} from '@omnidesk/ui';
 import { CommandIcon, CompassIcon, AlertTriangleIcon, DatabaseIcon } from 'lucide-react';
 import {
   APP_NAME,
@@ -42,7 +42,7 @@ const AppSidebarInner = ({ ...props }: React.ComponentProps<typeof Sidebar>) => 
   const { installedApps } = useLauncherStore();
 
   // Filter NAV_MAIN by launcher installed apps first
-  const launcherFilteredMainNav = NAV_MAIN.filter(item => {
+  const launcherFilteredMainNav = NAV_MAIN.filter((item) => {
     const appId = item.url.replace('/', '');
     return installedApps.includes(appId);
   });
@@ -50,9 +50,9 @@ const AppSidebarInner = ({ ...props }: React.ComponentProps<typeof Sidebar>) => 
   const mainItems = filterNav(launcherFilteredMainNav);
   const showcaseItems = filterNav(NAV_SHOWCASE.items);
   const errorItems = filterNav(NAV_ERROR_PAGES.items);
-  
+
   const secondaryItems = filterNav(NAV_SECONDARY);
-  
+
   const documentItems = filterNav(NAV_DOCUMENTS);
 
   const hasShowcase = installedApps.includes('showcase');
@@ -61,7 +61,12 @@ const AppSidebarInner = ({ ...props }: React.ComponentProps<typeof Sidebar>) => 
 
   const combinedMainItems = [...mainItems];
 
-  if (hasShowcase && isDevMode && can(NAV_SHOWCASE.requiredPermission) && showcaseItems.length > 0) {
+  if (
+    hasShowcase &&
+    isDevMode &&
+    can(NAV_SHOWCASE.requiredPermission) &&
+    showcaseItems.length > 0
+  ) {
     combinedMainItems.push({
       title: NAV_SHOWCASE.label,
       url: showcaseItems[0].url,
@@ -70,7 +75,12 @@ const AppSidebarInner = ({ ...props }: React.ComponentProps<typeof Sidebar>) => 
     } as any);
   }
 
-  if (hasErrorPages && isDevMode && can(NAV_ERROR_PAGES.requiredPermission) && errorItems.length > 0) {
+  if (
+    hasErrorPages &&
+    isDevMode &&
+    can(NAV_ERROR_PAGES.requiredPermission) &&
+    errorItems.length > 0
+  ) {
     combinedMainItems.push({
       title: NAV_ERROR_PAGES.label,
       url: errorItems[0].url,
@@ -84,7 +94,7 @@ const AppSidebarInner = ({ ...props }: React.ComponentProps<typeof Sidebar>) => 
       title: 'Documents',
       url: documentItems[0].url,
       icon: DatabaseIcon,
-      items: documentItems.map(d => ({ title: d.name, url: d.url })),
+      items: documentItems.map((d) => ({ title: d.name, url: d.url })),
     } as any);
   }
 
@@ -121,11 +131,13 @@ const AppSidebarInner = ({ ...props }: React.ComponentProps<typeof Sidebar>) => 
         />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={{
-          name: displayName ?? 'User',
-          email: user?.email ?? '',
-          avatar: user?.user_metadata?.avatar_url ?? '',
-        }} />
+        <NavUser
+          user={{
+            name: displayName ?? 'User',
+            email: user?.email ?? '',
+            avatar: user?.user_metadata?.avatar_url ?? '',
+          }}
+        />
       </SidebarFooter>
     </Sidebar>
   );
