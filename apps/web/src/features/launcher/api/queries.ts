@@ -13,6 +13,8 @@ const marketplaceAppSchema = z.object({
   is_core: z.boolean(),
   sort_order: z.number(),
   created_at: z.string(),
+  current_version: z.string().optional(),
+  download_url: z.string().nullable().optional(),
 });
 
 export type MarketplaceApp = z.infer<typeof marketplaceAppSchema>;
@@ -58,7 +60,7 @@ export function useMarketplaceApps() {
       const res = await fetch(`${API_BASE}/apps`);
       if (!res.ok) throw new Error('Failed to fetch apps from gateway');
 
-      const data = await res.json();
+      const data: unknown = await res.json();
       return z.array(marketplaceAppSchema).parse(data);
     },
     staleTime: 5 * 60 * 1000,
@@ -74,9 +76,32 @@ export function useInstalledApps() {
 
       if (!res.ok) throw new Error('Failed to fetch installed apps');
 
-      const data = await res.json();
+      const data: unknown = await res.json();
       // Data expected to be string[]
       return z.array(z.string()).parse(data);
+    },
+    staleTime: 60 * 1000,
+  });
+}
+
+const installedAppDetailsSchema = z.object({
+  app_id: z.string(),
+  version: z.string(),
+});
+
+export type InstalledAppDetails = z.infer<typeof installedAppDetailsSchema>;
+
+export function useInstalledAppsDetails() {
+  return useQuery({
+    queryKey: [...launcherKeys.all, 'installed-apps-details'] as const,
+    queryFn: async (): Promise<InstalledAppDetails[]> => {
+      const headers = await getAuthHeaders();
+      const res = await fetch(`${API_BASE}/apps/installed-details`, { headers });
+
+      if (!res.ok) throw new Error('Failed to fetch installed apps details');
+
+      const data: unknown = await res.json();
+      return z.array(installedAppDetailsSchema).parse(data);
     },
     staleTime: 60 * 1000,
   });
@@ -115,7 +140,7 @@ export function useInstallApp() {
       }
     },
     onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: launcherKeys.installedApps() });
+      queryClient.invalidateQueries({ queryKey: launcherKeys.all });
     },
   });
 }
@@ -150,7 +175,7 @@ export function useUninstallApp() {
       }
     },
     onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: launcherKeys.installedApps() });
+      queryClient.invalidateQueries({ queryKey: launcherKeys.all });
     },
   });
 }

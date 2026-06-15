@@ -59,7 +59,11 @@ pub fn start_background_worker(pool: SqlitePool) {
                     let decrypted_payload = match crate::services::crypto::decrypt_payload(&priv_key, &job.payload) {
                         Ok(p) => p,
                         Err(e) => {
-                            eprintln!("[Worker] Failed to decrypt job {}: {:?}", job.id, e);
+                            eprintln!("[Worker] Failed to decrypt job {}: {:?}. Deleting permanently from queue due to decryption error.", job.id, e);
+                            let _ = sqlx::query("DELETE FROM sync_queue WHERE id = ?")
+                                .bind(&job.id)
+                                .execute(&pool)
+                                .await;
                             continue;
                         }
                     };

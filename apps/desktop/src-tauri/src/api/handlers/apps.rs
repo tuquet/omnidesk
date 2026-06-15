@@ -42,6 +42,25 @@ pub async fn get_installed_apps(
     Ok(Json(installed))
 }
 
+/// Fetch installed apps for the current user with versions
+#[utoipa::path(
+    get,
+    path = "/api/apps/installed-details",
+    responses(
+        (status = 200, description = "Returns list of installed apps with versions")
+    ),
+    security(
+        ("bearerAuth" = [])
+    )
+)]
+pub async fn get_installed_details(
+    State(state): State<AppState>,
+    claims: Claims,
+) -> Result<impl IntoResponse, AppError> {
+    let installed = marketplace::get_installed_details(&state.db, claims.user_id()).await?;
+    Ok(Json(installed))
+}
+
 fn extract_jwt(headers: &HeaderMap) -> Result<String, AppError> {
     headers
         .get("authorization")
@@ -73,7 +92,7 @@ pub async fn install_app(
     Path(app_id): Path<String>,
 ) -> Result<impl IntoResponse, AppError> {
     let jwt = extract_jwt(&headers)?;
-    marketplace::install_app_impl(&state.db, claims.user_id(), &app_id, &jwt).await?;
+    marketplace::install_app_impl(&state.db, &state.app_dir, claims.user_id(), &app_id, &jwt).await?;
     Ok(Json(serde_json::json!({ "status": "success", "app_id": app_id })))
 }
 
@@ -99,6 +118,6 @@ pub async fn uninstall_app(
     Path(app_id): Path<String>,
 ) -> Result<impl IntoResponse, AppError> {
     let jwt = extract_jwt(&headers)?;
-    marketplace::uninstall_app_impl(&state.db, claims.user_id(), &app_id, &jwt).await?;
+    marketplace::uninstall_app_impl(&state.db, &state.app_dir, claims.user_id(), &app_id, &jwt).await?;
     Ok(Json(serde_json::json!({ "status": "success", "app_id": app_id })))
 }

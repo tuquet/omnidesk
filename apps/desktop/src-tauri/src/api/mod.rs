@@ -4,8 +4,10 @@ pub mod handlers;
 use axum::{Router, routing::{get, post}, response::IntoResponse, Json};
 use sqlx::SqlitePool;
 use std::net::SocketAddr;
+use std::path::PathBuf;
 use tokio::net::TcpListener;
 use tower_http::cors::CorsLayer;
+use tower_http::services::ServeDir;
 use utoipa::OpenApi;
 use utoipa_scalar::{Scalar, Servable};
 
@@ -18,6 +20,7 @@ use tokio::sync::{mpsc, RwLock};
 pub struct AppState {
     pub db: SqlitePool,
     pub mcp_sessions: Arc<RwLock<HashMap<String, mpsc::Sender<serde_json::Value>>>>,
+    pub app_dir: PathBuf,
 }
 
 #[derive(OpenApi)]
@@ -29,6 +32,7 @@ pub struct AppState {
         me,
         handlers::apps::get_apps,
         handlers::apps::get_installed_apps,
+        handlers::apps::get_installed_details,
         handlers::apps::install_app,
         handlers::apps::uninstall_app
     ),
@@ -40,11 +44,17 @@ pub struct AppState {
 )]
 struct ApiDoc;
 
-pub async fn serve(pool: SqlitePool, port: u16) {
+pub async fn serve(pool: SqlitePool, app_dir: PathBuf, port: u16) {
     let state = AppState { 
         db: pool,
         mcp_sessions: Arc::new(RwLock::new(HashMap::new())),
+        app_dir: app_dir.clone(),
     };
+
+    let apps_sandbox_dir = app_dir.join("apps");
+    if let Err(e) = std::fs::create_dir_all(&apps_sandbox_dir) {
+        eprintln!("Failed to create apps sandbox directory: {}", e);
+    }
 
     let app = Router::new()
         .route("/", get(|| async { axum::response::Redirect::temporary("/scalar") }))
@@ -55,9 +65,12 @@ pub async fn serve(pool: SqlitePool, port: u16) {
         .route("/api/me", get(me))
         .route("/api/apps", get(handlers::apps::get_apps))
         .route("/api/apps/installed", get(handlers::apps::get_installed_apps))
+        .route("/api/apps/installed-details", get(handlers::apps::get_installed_details))
         .route("/api/apps/install/:id", post(handlers::apps::install_app).delete(handlers::apps::uninstall_app))
         .route("/mcp/sse", get(handlers::mcp::mcp_sse))
         .route("/mcp/messages", post(handlers::mcp::mcp_messages))
+        .route("/api/projects/:project_id/run-script/:script", get(handlers::projects::run_project_script))
+        .nest_service("/apps", ServeDir::new(apps_sandbox_dir))
         .layer(CorsLayer::permissive())
         .with_state(state);
 

@@ -11,10 +11,24 @@ import {
   Separator,
 } from '@omnidesk/ui';
 import { ProgressBar } from '@/components/progress-bar';
-import { PlusIcon, FolderIcon, ClockIcon, UsersIcon } from 'lucide-react';
+import { PlusIcon, FolderIcon, ClockIcon, UsersIcon, ExternalLink } from 'lucide-react';
+import { Link } from '@tanstack/react-router';
 
 const projects = [
   {
+    id: 'nhaatelier',
+    name: 'Nha Atelier Tattoo Studio',
+    description:
+      'WordPress GitOps content sync application powered by wp-sync-cli, managing content and media library.',
+    status: 'Active' as const,
+    progress: 100,
+    team: ['AT', 'PT'],
+    extra: 0,
+    lastUpdated: 'Just now',
+    tags: ['WordPress', 'GitOps', 'TypeScript', 'CLI'],
+  },
+  {
+    id: 'website-redesign',
     name: 'Website Redesign',
     description:
       'Complete overhaul of the corporate website with modern design patterns and improved UX.',
@@ -26,6 +40,7 @@ const projects = [
     tags: ['React', 'TypeScript', 'Tailwind'],
   },
   {
+    id: 'mobile-app-v2',
     name: 'Mobile App v2',
     description:
       'Second major release of the mobile application with offline support and push notifications.',
@@ -37,6 +52,7 @@ const projects = [
     tags: ['React Native', 'TypeScript'],
   },
   {
+    id: 'api-migration',
     name: 'API Migration',
     description:
       'Migrate legacy REST endpoints to a new GraphQL-based API layer with improved caching.',
@@ -48,6 +64,7 @@ const projects = [
     tags: ['Rust', 'GraphQL', 'Docker'],
   },
   {
+    id: 'design-system',
     name: 'Design System',
     description: 'Build a unified component library and design token system for all product teams.',
     status: 'Active' as const,
@@ -58,6 +75,7 @@ const projects = [
     tags: ['React', 'Storybook', 'Figma'],
   },
   {
+    id: 'e-commerce-platform',
     name: 'E-commerce Platform',
     description:
       'Full-stack e-commerce solution with inventory management, payments, and analytics dashboard.',
@@ -69,6 +87,7 @@ const projects = [
     tags: ['Python', 'PostgreSQL', 'Stripe'],
   },
   {
+    id: 'data-pipeline',
     name: 'Data Pipeline',
     description:
       'Real-time data ingestion and transformation pipeline for business intelligence reporting.',
@@ -168,10 +187,19 @@ export function ProjectsPage() {
                     )}
                   </div>
                 </div>
-                <div className="text-muted-foreground flex items-center gap-1 text-xs">
-                  <ClockIcon className="h-3 w-3" />
-                  {project.lastUpdated}
-                </div>
+                {project.id === 'nhaatelier' ? (
+                  <Button size="sm" variant="outline" asChild className="gap-1.5">
+                    <Link to="/projects/$projectId" params={{ projectId: project.id }}>
+                      Manage Sync
+                      <ExternalLink className="h-3.5 w-3.5" />
+                    </Link>
+                  </Button>
+                ) : (
+                  <div className="text-muted-foreground flex items-center gap-1 text-xs">
+                    <ClockIcon className="h-3 w-3" />
+                    {project.lastUpdated}
+                  </div>
+                )}
               </div>
             </CardContent>
           </Card>

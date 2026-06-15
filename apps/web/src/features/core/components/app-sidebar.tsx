@@ -1,7 +1,6 @@
 import * as React from 'react';
 import { Link } from '@tanstack/react-router';
 
-import { NavDocuments } from './nav-documents';
 import { NavMain } from './nav-main';
 import { NavSecondary } from './nav-secondary';
 import { NavUser } from './nav-user';
@@ -13,9 +12,6 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarGroup,
-  SidebarGroupLabel,
-  SidebarGroupContent,
 } from '@omnidesk/ui';
 import { CommandIcon, CompassIcon, AlertTriangleIcon, DatabaseIcon } from 'lucide-react';
 import {
@@ -28,15 +24,12 @@ import {
 } from '@/config';
 import { useRBAC } from '@/hooks/use-rbac';
 import { useDevStore } from '@/stores/use-dev-store';
-import { useTranslation } from 'react-i18next';
 import { useLauncherStore } from '@/features/launcher/stores/use-launcher-store';
-import { Blocks } from 'lucide-react';
 import { useAuth } from '@/features/auth/stores/use-auth-store';
 
 const AppSidebarInner = ({ ...props }: React.ComponentProps<typeof Sidebar>) => {
   const { can, filterNav } = useRBAC();
   const { isDevMode } = useDevStore();
-  const { t } = useTranslation();
   const { displayName, user } = useAuth();
 
   const { installedApps } = useLauncherStore();
@@ -67,12 +60,13 @@ const AppSidebarInner = ({ ...props }: React.ComponentProps<typeof Sidebar>) => 
     can(NAV_SHOWCASE.requiredPermission) &&
     showcaseItems.length > 0
   ) {
+    const firstShowcaseUrl = showcaseItems[0]?.url ?? '';
     combinedMainItems.push({
       title: NAV_SHOWCASE.label,
-      url: showcaseItems[0].url,
+      url: firstShowcaseUrl,
       icon: CompassIcon,
       items: showcaseItems,
-    } as any);
+    } as unknown as (typeof mainItems)[number]);
   }
 
   if (
@@ -81,21 +75,23 @@ const AppSidebarInner = ({ ...props }: React.ComponentProps<typeof Sidebar>) => 
     can(NAV_ERROR_PAGES.requiredPermission) &&
     errorItems.length > 0
   ) {
+    const firstErrorUrl = errorItems[0]?.url ?? '';
     combinedMainItems.push({
       title: NAV_ERROR_PAGES.label,
-      url: errorItems[0].url,
+      url: firstErrorUrl,
       icon: AlertTriangleIcon,
       items: errorItems,
-    } as any);
+    } as unknown as (typeof mainItems)[number]);
   }
 
   if (hasDocuments && documentItems.length > 0) {
+    const firstDocUrl = documentItems[0]?.url ?? '';
     combinedMainItems.push({
       title: 'Documents',
-      url: documentItems[0].url,
+      url: firstDocUrl,
       icon: DatabaseIcon,
       items: documentItems.map((d) => ({ title: d.name, url: d.url })),
-    } as any);
+    } as unknown as (typeof mainItems)[number]);
   }
 
   return (
@@ -135,7 +131,7 @@ const AppSidebarInner = ({ ...props }: React.ComponentProps<typeof Sidebar>) => 
           user={{
             name: displayName ?? 'User',
             email: user?.email ?? '',
-            avatar: user?.user_metadata?.avatar_url ?? '',
+            avatar: (user?.user_metadata?.avatar_url as string) ?? '',
           }}
         />
       </SidebarFooter>

@@ -84,9 +84,25 @@ pub fn run() {
                 })
                 .build(app)?;
 
-            // Attempt to load .env from workspace root for dev
-            if let Ok(workspace_dir) = std::env::current_dir().map(|p| p.join("../../apps/web")) {
-                let _ = dotenvy::from_path(workspace_dir.join(".env"));
+            // Smart dev .env loader (scan parent directories for .env or apps/web/.env)
+            if let Ok(mut current) = std::env::current_dir() {
+                for _ in 0..10 {
+                    let env_path = current.join(".env");
+                    if env_path.exists() {
+                        let _ = dotenvy::from_path(env_path);
+                        break;
+                    }
+                    let web_env_path = current.join("apps/web/.env");
+                    if web_env_path.exists() {
+                        let _ = dotenvy::from_path(web_env_path);
+                        break;
+                    }
+                    if let Some(parent) = current.parent() {
+                        current = parent.to_path_buf();
+                    } else {
+                        break;
+                    }
+                }
             }
             
             // Smart user-mode deep link registration (bypasses UAC admin requirement)
@@ -98,7 +114,7 @@ pub fn run() {
                 if let Ok(app_dir) = app_handle.path().app_data_dir() {
                     if std::fs::create_dir_all(&app_dir).is_ok() {
                         // Initialize database
-                        if let Ok(pool) = db::init_db(app_dir).await {
+                        if let Ok(pool) = db::init_db(app_dir.clone()).await {
                             // Manage state for Tauri commands
                             app_handle.manage(pool.clone());
                             
@@ -109,7 +125,7 @@ pub fn run() {
                             services::realtime::start_realtime_listener(app_handle.clone(), pool.clone());
                             
                             // Start Axum REST API and Swagger UI on port 1421
-                            api::serve(pool, 1421).await;
+                            api::serve(pool, app_dir, 1421).await;
                         } else {
                             eprintln!("Failed to initialize database");
                         }

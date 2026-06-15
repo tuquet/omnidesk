@@ -40,8 +40,8 @@ function resolveBreadcrumbs(pathname: string): BreadcrumbEntry[] {
   // Generic fallback
   const segments = pathname.split('/').filter(Boolean);
 
-  if (segments[0] === 'launcher') {
-    const trail: BreadcrumbEntry[] = [{ label: 'App Store', url: '/launcher' }];
+  if (segments[0] === 'app-store') {
+    const trail: BreadcrumbEntry[] = [{ label: 'App Store', url: '/app-store' }];
     if (segments.length > 1) {
       trail.push({ label: humanize(segments[1] || ''), url: pathname });
     }
@@ -113,7 +113,7 @@ export function SmartBreadcrumb() {
                       <ChevronDownIcon className="size-3.5 opacity-60" />
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="start" className="min-w-44">
-                      {item.siblings!.map((sibling) => (
+                      {item.siblings?.map((sibling) => (
                         <DropdownMenuItem key={sibling.url} asChild>
                           <Link
                             to={sibling.url}

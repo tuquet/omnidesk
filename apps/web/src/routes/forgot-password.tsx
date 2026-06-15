@@ -6,7 +6,7 @@ import { DEFAULT_AUTHENTICATED_ROUTE } from '@/config/route-config';
 export const Route = createFileRoute('/forgot-password')({
   beforeLoad: () => {
     const auth = authStore.state;
-    const hasLoggedIn = !!auth.token || !!auth.displayName;
+    const hasLoggedIn = !!auth.session || !!auth.displayName;
     if (hasLoggedIn) {
       throw redirect({ to: DEFAULT_AUTHENTICATED_ROUTE });
     }

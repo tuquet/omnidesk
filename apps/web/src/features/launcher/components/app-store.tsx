@@ -1,7 +1,7 @@
 import { useState, useMemo, useCallback, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/features/auth/stores/use-auth-store';
-import { APP_REGISTRY, type AppCategory } from '../config/registry';
+import { APP_REGISTRY } from '../config/registry';
 import { launcherActions, useLauncherStore } from '../stores/use-launcher-store';
 import {
   useMarketplaceApps,
@@ -10,37 +10,10 @@ import {
   useUninstallApp,
   type MarketplaceApp,
 } from '../api/queries';
-import {
-  Badge,
-  Button,
-  Input,
-  Skeleton,
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-  cn,
-} from '@omnidesk/ui';
-import {
-  Search,
-  Package,
-  StoreIcon,
-  Shield,
-  Loader2,
-  AlertCircle,
-  RefreshCw,
-  ChevronRight,
-} from 'lucide-react';
+import { Button, Input, Skeleton, cn } from '@omnidesk/ui';
+import { Search, Package, Shield, Loader2, AlertCircle, RefreshCw } from 'lucide-react';
 import { toast } from 'sonner';
 import { useNavigate } from '@tanstack/react-router';
-
-const ALL_CATEGORIES: AppCategory[] = [
-  'Core',
-  'Productivity',
-  'Analytics',
-  'Development',
-  'Utilities',
-];
 
 // ─── App Card Component (macOS Style) ────────────────────────────────────────
 
@@ -125,9 +98,21 @@ function AppCard({
   );
 }
 
-// ─── Featured Hero Banner ───────────────────────────────────────────────────
+interface FeaturedBannerProps {
+  app: MarketplaceApp;
+  isInstalled: boolean;
+  isInstalling: boolean;
+  onInstall: (e: React.MouseEvent) => void;
+  onClick: () => void;
+}
 
-function FeaturedBanner({ app, isInstalled, isInstalling, onInstall, onClick }: any) {
+function FeaturedBanner({
+  app,
+  isInstalled,
+  isInstalling,
+  onInstall,
+  onClick,
+}: FeaturedBannerProps) {
   const localApp = APP_REGISTRY[app.id];
   const Icon = localApp?.icon || Package;
 
@@ -237,7 +222,7 @@ export function AppStore() {
               title: `App Installed: ${appName}`,
               description: `You have successfully installed ${appName}. It is ready to use.`,
               type: 'success',
-              action_url: `/launcher/${appId}`,
+              action_url: `/app-store/${appId}`,
             });
           }
         },
@@ -392,7 +377,7 @@ export function AppStore() {
                     }
                     onInstall={() => handleInstall(app.id, app.name)}
                     onUninstall={() => handleUninstall(app.id, app.name)}
-                    onClick={() => navigate({ to: '/launcher/$appId', params: { appId: app.id } })}
+                    onClick={() => navigate({ to: '/app-store/$appId', params: { appId: app.id } })}
                   />
                 ))}
               </div>
@@ -419,7 +404,7 @@ export function AppStore() {
                     }
                     onInstall={() => {}}
                     onUninstall={() => handleUninstall(app.id, app.name)}
-                    onClick={() => navigate({ to: '/launcher/$appId', params: { appId: app.id } })}
+                    onClick={() => navigate({ to: '/app-store/$appId', params: { appId: app.id } })}
                   />
                 ))}
             </div>
@@ -437,7 +422,7 @@ export function AppStore() {
                 }
                 onInstall={() => handleInstall(featuredApp.id, featuredApp.name)}
                 onClick={() =>
-                  navigate({ to: '/launcher/$appId', params: { appId: featuredApp.id } })
+                  navigate({ to: '/app-store/$appId', params: { appId: featuredApp.id } })
                 }
               />
             )}
@@ -475,7 +460,7 @@ export function AppStore() {
                         onInstall={() => handleInstall(app.id, app.name)}
                         onUninstall={() => handleUninstall(app.id, app.name)}
                         onClick={() =>
-                          navigate({ to: '/launcher/$appId', params: { appId: app.id } })
+                          navigate({ to: '/app-store/$appId', params: { appId: app.id } })
                         }
                       />
                     ))}
@@ -499,7 +484,7 @@ export function AppStore() {
                     }
                     onInstall={() => handleInstall(app.id, app.name)}
                     onUninstall={() => handleUninstall(app.id, app.name)}
-                    onClick={() => navigate({ to: '/launcher/$appId', params: { appId: app.id } })}
+                    onClick={() => navigate({ to: '/app-store/$appId', params: { appId: app.id } })}
                   />
                 ))}
               </div>

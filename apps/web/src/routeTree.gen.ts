@@ -22,9 +22,12 @@ import { Route as R404RouteImport } from './routes/404'
 import { Route as R403RouteImport } from './routes/403'
 import { Route as R401RouteImport } from './routes/401'
 import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
-import { Route as AuthenticatedLauncherAppIdRouteImport } from './routes/_authenticated/launcher_.$appId'
+import { Route as AuthenticatedAppStoreAppIdRouteImport } from './routes/_authenticated/app-store_.$appId'
 
 const IndexLazyRouteImport = createFileRoute('/')()
+const AuthenticatedWordpressSyncLazyRouteImport = createFileRoute(
+  '/_authenticated/wordpress-sync',
+)()
 const AuthenticatedTeamLazyRouteImport = createFileRoute(
   '/_authenticated/team',
 )()
@@ -34,11 +37,11 @@ const AuthenticatedProjectsLazyRouteImport = createFileRoute(
 const AuthenticatedLifecycleLazyRouteImport = createFileRoute(
   '/_authenticated/lifecycle',
 )()
-const AuthenticatedLauncherLazyRouteImport = createFileRoute(
-  '/_authenticated/launcher',
-)()
 const AuthenticatedDashboardLazyRouteImport = createFileRoute(
   '/_authenticated/dashboard',
+)()
+const AuthenticatedAppStoreLazyRouteImport = createFileRoute(
+  '/_authenticated/app-store',
 )()
 const AuthenticatedAnalyticsLazyRouteImport = createFileRoute(
   '/_authenticated/analytics',
@@ -54,6 +57,9 @@ const AuthenticatedShowcaseCardsLazyRouteImport = createFileRoute(
 )()
 const AuthenticatedShowcaseButtonsLazyRouteImport = createFileRoute(
   '/_authenticated/showcase/buttons',
+)()
+const AuthenticatedProjectsProjectIdLazyRouteImport = createFileRoute(
+  '/_authenticated/projects_/$projectId',
 )()
 const AuthenticatedDocumentsWordAssistantLazyRouteImport = createFileRoute(
   '/_authenticated/documents/word-assistant',
@@ -119,6 +125,14 @@ const IndexLazyRoute = IndexLazyRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any).lazy(() => import('./routes/index.lazy').then((d) => d.Route))
+const AuthenticatedWordpressSyncLazyRoute =
+  AuthenticatedWordpressSyncLazyRouteImport.update({
+    id: '/wordpress-sync',
+    path: '/wordpress-sync',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any).lazy(() =>
+    import('./routes/_authenticated/wordpress-sync.lazy').then((d) => d.Route),
+  )
 const AuthenticatedTeamLazyRoute = AuthenticatedTeamLazyRouteImport.update({
   id: '/team',
   path: '/team',
@@ -142,14 +156,6 @@ const AuthenticatedLifecycleLazyRoute =
   } as any).lazy(() =>
     import('./routes/_authenticated/lifecycle.lazy').then((d) => d.Route),
   )
-const AuthenticatedLauncherLazyRoute =
-  AuthenticatedLauncherLazyRouteImport.update({
-    id: '/launcher',
-    path: '/launcher',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any).lazy(() =>
-    import('./routes/_authenticated/launcher.lazy').then((d) => d.Route),
-  )
 const AuthenticatedDashboardLazyRoute =
   AuthenticatedDashboardLazyRouteImport.update({
     id: '/dashboard',
@@ -157,6 +163,14 @@ const AuthenticatedDashboardLazyRoute =
     getParentRoute: () => AuthenticatedRoute,
   } as any).lazy(() =>
     import('./routes/_authenticated/dashboard.lazy').then((d) => d.Route),
+  )
+const AuthenticatedAppStoreLazyRoute =
+  AuthenticatedAppStoreLazyRouteImport.update({
+    id: '/app-store',
+    path: '/app-store',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any).lazy(() =>
+    import('./routes/_authenticated/app-store.lazy').then((d) => d.Route),
   )
 const AuthenticatedAnalyticsLazyRoute =
   AuthenticatedAnalyticsLazyRouteImport.update({
@@ -209,6 +223,16 @@ const AuthenticatedShowcaseButtonsLazyRoute =
       (d) => d.Route,
     ),
   )
+const AuthenticatedProjectsProjectIdLazyRoute =
+  AuthenticatedProjectsProjectIdLazyRouteImport.update({
+    id: '/projects_/$projectId',
+    path: '/projects/$projectId',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any).lazy(() =>
+    import('./routes/_authenticated/projects_.$projectId.lazy').then(
+      (d) => d.Route,
+    ),
+  )
 const AuthenticatedDocumentsWordAssistantLazyRoute =
   AuthenticatedDocumentsWordAssistantLazyRouteImport.update({
     id: '/documents/word-assistant',
@@ -239,10 +263,10 @@ const AuthenticatedDocumentsDataLibraryLazyRoute =
       (d) => d.Route,
     ),
   )
-const AuthenticatedLauncherAppIdRoute =
-  AuthenticatedLauncherAppIdRouteImport.update({
-    id: '/launcher_/$appId',
-    path: '/launcher/$appId',
+const AuthenticatedAppStoreAppIdRoute =
+  AuthenticatedAppStoreAppIdRouteImport.update({
+    id: '/app-store_/$appId',
+    path: '/app-store/$appId',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
 
@@ -259,15 +283,17 @@ export interface FileRoutesByFullPath {
   '/signup': typeof SignupRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/analytics': typeof AuthenticatedAnalyticsLazyRoute
+  '/app-store': typeof AuthenticatedAppStoreLazyRoute
   '/dashboard': typeof AuthenticatedDashboardLazyRoute
-  '/launcher': typeof AuthenticatedLauncherLazyRoute
   '/lifecycle': typeof AuthenticatedLifecycleLazyRoute
   '/projects': typeof AuthenticatedProjectsLazyRoute
   '/team': typeof AuthenticatedTeamLazyRoute
-  '/launcher/$appId': typeof AuthenticatedLauncherAppIdRoute
+  '/wordpress-sync': typeof AuthenticatedWordpressSyncLazyRoute
+  '/app-store/$appId': typeof AuthenticatedAppStoreAppIdRoute
   '/documents/data-library': typeof AuthenticatedDocumentsDataLibraryLazyRoute
   '/documents/reports': typeof AuthenticatedDocumentsReportsLazyRoute
   '/documents/word-assistant': typeof AuthenticatedDocumentsWordAssistantLazyRoute
+  '/projects/$projectId': typeof AuthenticatedProjectsProjectIdLazyRoute
   '/showcase/buttons': typeof AuthenticatedShowcaseButtonsLazyRoute
   '/showcase/cards': typeof AuthenticatedShowcaseCardsLazyRoute
   '/showcase/feedback': typeof AuthenticatedShowcaseFeedbackLazyRoute
@@ -286,15 +312,17 @@ export interface FileRoutesByTo {
   '/signup': typeof SignupRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/analytics': typeof AuthenticatedAnalyticsLazyRoute
+  '/app-store': typeof AuthenticatedAppStoreLazyRoute
   '/dashboard': typeof AuthenticatedDashboardLazyRoute
-  '/launcher': typeof AuthenticatedLauncherLazyRoute
   '/lifecycle': typeof AuthenticatedLifecycleLazyRoute
   '/projects': typeof AuthenticatedProjectsLazyRoute
   '/team': typeof AuthenticatedTeamLazyRoute
-  '/launcher/$appId': typeof AuthenticatedLauncherAppIdRoute
+  '/wordpress-sync': typeof AuthenticatedWordpressSyncLazyRoute
+  '/app-store/$appId': typeof AuthenticatedAppStoreAppIdRoute
   '/documents/data-library': typeof AuthenticatedDocumentsDataLibraryLazyRoute
   '/documents/reports': typeof AuthenticatedDocumentsReportsLazyRoute
   '/documents/word-assistant': typeof AuthenticatedDocumentsWordAssistantLazyRoute
+  '/projects/$projectId': typeof AuthenticatedProjectsProjectIdLazyRoute
   '/showcase/buttons': typeof AuthenticatedShowcaseButtonsLazyRoute
   '/showcase/cards': typeof AuthenticatedShowcaseCardsLazyRoute
   '/showcase/feedback': typeof AuthenticatedShowcaseFeedbackLazyRoute
@@ -315,15 +343,17 @@ export interface FileRoutesById {
   '/signup': typeof SignupRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/_authenticated/analytics': typeof AuthenticatedAnalyticsLazyRoute
+  '/_authenticated/app-store': typeof AuthenticatedAppStoreLazyRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardLazyRoute
-  '/_authenticated/launcher': typeof AuthenticatedLauncherLazyRoute
   '/_authenticated/lifecycle': typeof AuthenticatedLifecycleLazyRoute
   '/_authenticated/projects': typeof AuthenticatedProjectsLazyRoute
   '/_authenticated/team': typeof AuthenticatedTeamLazyRoute
-  '/_authenticated/launcher_/$appId': typeof AuthenticatedLauncherAppIdRoute
+  '/_authenticated/wordpress-sync': typeof AuthenticatedWordpressSyncLazyRoute
+  '/_authenticated/app-store_/$appId': typeof AuthenticatedAppStoreAppIdRoute
   '/_authenticated/documents/data-library': typeof AuthenticatedDocumentsDataLibraryLazyRoute
   '/_authenticated/documents/reports': typeof AuthenticatedDocumentsReportsLazyRoute
   '/_authenticated/documents/word-assistant': typeof AuthenticatedDocumentsWordAssistantLazyRoute
+  '/_authenticated/projects_/$projectId': typeof AuthenticatedProjectsProjectIdLazyRoute
   '/_authenticated/showcase/buttons': typeof AuthenticatedShowcaseButtonsLazyRoute
   '/_authenticated/showcase/cards': typeof AuthenticatedShowcaseCardsLazyRoute
   '/_authenticated/showcase/feedback': typeof AuthenticatedShowcaseFeedbackLazyRoute
@@ -344,15 +374,17 @@ export interface FileRouteTypes {
     | '/signup'
     | '/auth/callback'
     | '/analytics'
+    | '/app-store'
     | '/dashboard'
-    | '/launcher'
     | '/lifecycle'
     | '/projects'
     | '/team'
-    | '/launcher/$appId'
+    | '/wordpress-sync'
+    | '/app-store/$appId'
     | '/documents/data-library'
     | '/documents/reports'
     | '/documents/word-assistant'
+    | '/projects/$projectId'
     | '/showcase/buttons'
     | '/showcase/cards'
     | '/showcase/feedback'
@@ -371,15 +403,17 @@ export interface FileRouteTypes {
     | '/signup'
     | '/auth/callback'
     | '/analytics'
+    | '/app-store'
     | '/dashboard'
-    | '/launcher'
     | '/lifecycle'
     | '/projects'
     | '/team'
-    | '/launcher/$appId'
+    | '/wordpress-sync'
+    | '/app-store/$appId'
     | '/documents/data-library'
     | '/documents/reports'
     | '/documents/word-assistant'
+    | '/projects/$projectId'
     | '/showcase/buttons'
     | '/showcase/cards'
     | '/showcase/feedback'
@@ -399,15 +433,17 @@ export interface FileRouteTypes {
     | '/signup'
     | '/auth/callback'
     | '/_authenticated/analytics'
+    | '/_authenticated/app-store'
     | '/_authenticated/dashboard'
-    | '/_authenticated/launcher'
     | '/_authenticated/lifecycle'
     | '/_authenticated/projects'
     | '/_authenticated/team'
-    | '/_authenticated/launcher_/$appId'
+    | '/_authenticated/wordpress-sync'
+    | '/_authenticated/app-store_/$appId'
     | '/_authenticated/documents/data-library'
     | '/_authenticated/documents/reports'
     | '/_authenticated/documents/word-assistant'
+    | '/_authenticated/projects_/$projectId'
     | '/_authenticated/showcase/buttons'
     | '/_authenticated/showcase/cards'
     | '/_authenticated/showcase/feedback'
@@ -508,6 +544,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexLazyRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/wordpress-sync': {
+      id: '/_authenticated/wordpress-sync'
+      path: '/wordpress-sync'
+      fullPath: '/wordpress-sync'
+      preLoaderRoute: typeof AuthenticatedWordpressSyncLazyRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/team': {
       id: '/_authenticated/team'
       path: '/team'
@@ -529,18 +572,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedLifecycleLazyRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
-    '/_authenticated/launcher': {
-      id: '/_authenticated/launcher'
-      path: '/launcher'
-      fullPath: '/launcher'
-      preLoaderRoute: typeof AuthenticatedLauncherLazyRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
     '/_authenticated/dashboard': {
       id: '/_authenticated/dashboard'
       path: '/dashboard'
       fullPath: '/dashboard'
       preLoaderRoute: typeof AuthenticatedDashboardLazyRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/app-store': {
+      id: '/_authenticated/app-store'
+      path: '/app-store'
+      fullPath: '/app-store'
+      preLoaderRoute: typeof AuthenticatedAppStoreLazyRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/analytics': {
@@ -585,6 +628,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedShowcaseButtonsLazyRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/projects_/$projectId': {
+      id: '/_authenticated/projects_/$projectId'
+      path: '/projects/$projectId'
+      fullPath: '/projects/$projectId'
+      preLoaderRoute: typeof AuthenticatedProjectsProjectIdLazyRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/documents/word-assistant': {
       id: '/_authenticated/documents/word-assistant'
       path: '/documents/word-assistant'
@@ -606,11 +656,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDocumentsDataLibraryLazyRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
-    '/_authenticated/launcher_/$appId': {
-      id: '/_authenticated/launcher_/$appId'
-      path: '/launcher/$appId'
-      fullPath: '/launcher/$appId'
-      preLoaderRoute: typeof AuthenticatedLauncherAppIdRouteImport
+    '/_authenticated/app-store_/$appId': {
+      id: '/_authenticated/app-store_/$appId'
+      path: '/app-store/$appId'
+      fullPath: '/app-store/$appId'
+      preLoaderRoute: typeof AuthenticatedAppStoreAppIdRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
   }
@@ -618,15 +668,17 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteChildren {
   AuthenticatedAnalyticsLazyRoute: typeof AuthenticatedAnalyticsLazyRoute
+  AuthenticatedAppStoreLazyRoute: typeof AuthenticatedAppStoreLazyRoute
   AuthenticatedDashboardLazyRoute: typeof AuthenticatedDashboardLazyRoute
-  AuthenticatedLauncherLazyRoute: typeof AuthenticatedLauncherLazyRoute
   AuthenticatedLifecycleLazyRoute: typeof AuthenticatedLifecycleLazyRoute
   AuthenticatedProjectsLazyRoute: typeof AuthenticatedProjectsLazyRoute
   AuthenticatedTeamLazyRoute: typeof AuthenticatedTeamLazyRoute
-  AuthenticatedLauncherAppIdRoute: typeof AuthenticatedLauncherAppIdRoute
+  AuthenticatedWordpressSyncLazyRoute: typeof AuthenticatedWordpressSyncLazyRoute
+  AuthenticatedAppStoreAppIdRoute: typeof AuthenticatedAppStoreAppIdRoute
   AuthenticatedDocumentsDataLibraryLazyRoute: typeof AuthenticatedDocumentsDataLibraryLazyRoute
   AuthenticatedDocumentsReportsLazyRoute: typeof AuthenticatedDocumentsReportsLazyRoute
   AuthenticatedDocumentsWordAssistantLazyRoute: typeof AuthenticatedDocumentsWordAssistantLazyRoute
+  AuthenticatedProjectsProjectIdLazyRoute: typeof AuthenticatedProjectsProjectIdLazyRoute
   AuthenticatedShowcaseButtonsLazyRoute: typeof AuthenticatedShowcaseButtonsLazyRoute
   AuthenticatedShowcaseCardsLazyRoute: typeof AuthenticatedShowcaseCardsLazyRoute
   AuthenticatedShowcaseFeedbackLazyRoute: typeof AuthenticatedShowcaseFeedbackLazyRoute
@@ -635,18 +687,21 @@ interface AuthenticatedRouteChildren {
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedAnalyticsLazyRoute: AuthenticatedAnalyticsLazyRoute,
+  AuthenticatedAppStoreLazyRoute: AuthenticatedAppStoreLazyRoute,
   AuthenticatedDashboardLazyRoute: AuthenticatedDashboardLazyRoute,
-  AuthenticatedLauncherLazyRoute: AuthenticatedLauncherLazyRoute,
   AuthenticatedLifecycleLazyRoute: AuthenticatedLifecycleLazyRoute,
   AuthenticatedProjectsLazyRoute: AuthenticatedProjectsLazyRoute,
   AuthenticatedTeamLazyRoute: AuthenticatedTeamLazyRoute,
-  AuthenticatedLauncherAppIdRoute: AuthenticatedLauncherAppIdRoute,
+  AuthenticatedWordpressSyncLazyRoute: AuthenticatedWordpressSyncLazyRoute,
+  AuthenticatedAppStoreAppIdRoute: AuthenticatedAppStoreAppIdRoute,
   AuthenticatedDocumentsDataLibraryLazyRoute:
     AuthenticatedDocumentsDataLibraryLazyRoute,
   AuthenticatedDocumentsReportsLazyRoute:
     AuthenticatedDocumentsReportsLazyRoute,
   AuthenticatedDocumentsWordAssistantLazyRoute:
     AuthenticatedDocumentsWordAssistantLazyRoute,
+  AuthenticatedProjectsProjectIdLazyRoute:
+    AuthenticatedProjectsProjectIdLazyRoute,
   AuthenticatedShowcaseButtonsLazyRoute: AuthenticatedShowcaseButtonsLazyRoute,
   AuthenticatedShowcaseCardsLazyRoute: AuthenticatedShowcaseCardsLazyRoute,
   AuthenticatedShowcaseFeedbackLazyRoute:

@@ -1,4 +1,14 @@
-import { LucideIcon, ListIcon, ChartBarIcon, FolderIcon, UsersIcon, CompassIcon, DatabaseIcon, AlertTriangleIcon } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
+import {
+  ListIcon,
+  ChartBarIcon,
+  FolderIcon,
+  UsersIcon,
+  CompassIcon,
+  DatabaseIcon,
+  AlertTriangleIcon,
+  RefreshCw,
+} from 'lucide-react';
 
 export type AppCategory = 'Core' | 'Productivity' | 'Analytics' | 'Development' | 'Utilities';
 
@@ -10,10 +20,18 @@ export interface AppDefinition {
   category: AppCategory;
   /** Whether the app is a core system app that cannot be uninstalled */
   isCore?: boolean;
+  href?: string;
 }
 
 export const APP_REGISTRY: Record<string, AppDefinition> = {
-  'dashboard': {
+  'wordpress-sync': {
+    id: 'wordpress-sync',
+    name: 'WordPress Sync',
+    description: 'WordPress GitOps content & media synchronization workspace.',
+    icon: RefreshCw,
+    category: 'Development',
+  },
+  dashboard: {
     id: 'dashboard',
     name: 'Dashboard',
     description: 'Central overview and control panel.',
@@ -21,47 +39,49 @@ export const APP_REGISTRY: Record<string, AppDefinition> = {
     category: 'Core',
     isCore: true,
   },
-  'lifecycle': {
+  lifecycle: {
     id: 'lifecycle',
     name: 'Lifecycle',
     description: 'Track software development lifecycle stages.',
     icon: ListIcon,
     category: 'Productivity',
   },
-  'analytics': {
+  analytics: {
     id: 'analytics',
     name: 'Analytics',
     description: 'Data analytics and reporting tools.',
     icon: ChartBarIcon,
     category: 'Analytics',
   },
-  'projects': {
+  projects: {
     id: 'projects',
     name: 'Projects',
     description: 'Manage and track ongoing projects.',
     icon: FolderIcon,
     category: 'Productivity',
   },
-  'team': {
+  team: {
     id: 'team',
     name: 'Team',
     description: 'Manage team members and permissions.',
     icon: UsersIcon,
     category: 'Core',
   },
-  'documents': {
+  documents: {
     id: 'documents',
     name: 'Documents',
     description: 'Data library, reports, and document management.',
     icon: DatabaseIcon,
     category: 'Productivity',
+    href: '/documents/data-library',
   },
-  'showcase': {
+  showcase: {
     id: 'showcase',
     name: 'UI Showcase',
     description: 'Component library showcase for developers.',
     icon: CompassIcon,
     category: 'Development',
+    href: '/showcase/buttons',
   },
   'error-pages': {
     id: 'error-pages',
@@ -69,5 +89,6 @@ export const APP_REGISTRY: Record<string, AppDefinition> = {
     description: 'Test environment for various HTTP error states.',
     icon: AlertTriangleIcon,
     category: 'Development',
-  }
+    href: '/401',
+  },
 };

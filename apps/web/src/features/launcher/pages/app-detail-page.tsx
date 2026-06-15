@@ -5,28 +5,18 @@ import {
   useInstallApp,
   useUninstallApp,
   type MarketplaceApp,
+  useInstalledAppsDetails,
 } from '../api/queries';
 import { APP_REGISTRY } from '../config/registry';
-import { Button, Skeleton, cn } from '@omnidesk/ui';
-import {
-  ChevronLeft,
-  Loader2,
-  Share,
-  Star,
-  AlertCircle,
-  Package,
-  Shield,
-  Download,
-  Calendar,
-  Layers,
-  Smartphone,
-} from 'lucide-react';
+import { Button, Skeleton } from '@omnidesk/ui';
+import { ChevronLeft, Loader2, Share, Star, AlertCircle, Package, Shield } from 'lucide-react';
 import { toast } from 'sonner';
 
 export function AppDetailPage() {
-  const { appId } = useParams({ from: '/_authenticated/launcher_/$appId' });
+  const { appId } = useParams({ from: '/_authenticated/app-store_/$appId' });
   const navigate = useNavigate();
   const { installedApps } = useLauncherStore();
+  const { data: installedDetails } = useInstalledAppsDetails();
 
   const { data: marketplaceApps, isLoading, error } = useMarketplaceApps();
   const installMutation = useInstallApp();
@@ -48,10 +38,16 @@ export function AppDetailPage() {
           is_core: localRegistryApp.isCore ?? false,
           sort_order: 0,
           created_at: new Date().toISOString(),
+          current_version: '1.0.0',
         }
       : undefined);
 
   const isInstalled = installedApps.includes(appId);
+  const installedAppInfo = installedDetails?.find((d) => d.app_id === appId);
+  const installedVersion = installedAppInfo?.version || '1.0.0';
+  const latestVersion = app?.current_version || '1.0.0';
+  const hasUpdate = isInstalled && latestVersion !== installedVersion;
+
   const isInstalling = installMutation.isPending && installMutation.variables === appId;
   const isUninstalling = uninstallMutation.isPending && uninstallMutation.variables === appId;
 
@@ -121,7 +117,7 @@ export function AppDetailPage() {
             The application you are looking for does not exist or cannot be loaded.
           </p>
         </div>
-        <Button className="rounded-full px-8 mt-4" onClick={() => navigate({ to: '/launcher' })}>
+        <Button className="rounded-full px-8 mt-4" onClick={() => navigate({ to: '/app-store' })}>
           <ChevronLeft className="mr-2 h-4 w-4" />
           Back to Store
         </Button>
@@ -139,7 +135,7 @@ export function AppDetailPage() {
         <Button
           variant="ghost"
           className="gap-2 text-muted-foreground hover:text-foreground"
-          onClick={() => navigate({ to: '/launcher' })}
+          onClick={() => navigate({ to: '/app-store' })}
         >
           <ChevronLeft className="h-4 w-4" />
           App Store
@@ -163,6 +159,21 @@ export function AppDetailPage() {
             </p>
 
             <div className="flex flex-wrap items-center gap-4 mt-6">
+              {hasUpdate && (
+                <Button
+                  variant="secondary"
+                  className="rounded-full px-8 font-bold bg-blue-600 hover:bg-blue-700 text-white transition-colors"
+                  disabled={isInstalling}
+                  onClick={handleInstall}
+                >
+                  {isInstalling ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    `UPDATE (v${latestVersion})`
+                  )}
+                </Button>
+              )}
+
               {isInstalled ? (
                 <Button
                   variant="secondary"
@@ -182,14 +193,16 @@ export function AppDetailPage() {
                   )}
                 </Button>
               ) : (
-                <Button
-                  variant="secondary"
-                  className="rounded-full px-8 font-bold bg-primary/10 text-primary hover:bg-primary/20"
-                  disabled={isInstalling}
-                  onClick={handleInstall}
-                >
-                  {isInstalling ? <Loader2 className="h-4 w-4 animate-spin" /> : 'GET'}
-                </Button>
+                !hasUpdate && (
+                  <Button
+                    variant="secondary"
+                    className="rounded-full px-8 font-bold bg-primary/10 text-primary hover:bg-primary/20"
+                    disabled={isInstalling}
+                    onClick={handleInstall}
+                  >
+                    {isInstalling ? <Loader2 className="h-4 w-4 animate-spin" /> : 'GET'}
+                  </Button>
+                )
               )}
 
               <Button

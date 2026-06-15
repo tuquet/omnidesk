@@ -28,9 +28,21 @@ pub async fn get_marketplace_apps() -> Result<Vec<Value>, AppError> {
         return Err(AppError::Internal(format!("Supabase API error: {}", res.status())));
     }
     
-    let apps: Vec<Value> = res.json()
+    let mut apps: Vec<Value> = res.json()
         .await
         .map_err(|e| AppError::Internal(format!("Failed to parse apps: {}", e)))?;
+        
+    // Inject local WordPress Sync App definition
+    apps.push(serde_json::json!({
+        "id": "wordpress-sync",
+        "name": "WordPress Sync",
+        "description": "WordPress GitOps content & media synchronization workspace.",
+        "icon_name": "RefreshCw",
+        "category": "Development",
+        "is_core": false,
+        "sort_order": 100,
+        "created_at": chrono::Utc::now().to_rfc3339()
+    }));
         
     Ok(apps)
 }
@@ -53,17 +65,127 @@ pub async fn get_installed_apps(pool: &SqlitePool, user_id: &str) -> Result<Vec<
     Ok(app_ids)
 }
 
-pub async fn install_app_impl(pool: &SqlitePool, user_id: &str, app_id: &str, _jwt: &str) -> Result<(), AppError> {
-    // 1. Insert locally into SQLite
+#[derive(serde::Serialize)]
+pub struct InstalledAppDetails {
+    pub app_id: String,
+    pub version: String,
+}
+
+pub async fn get_installed_details(pool: &SqlitePool, user_id: &str) -> Result<Vec<InstalledAppDetails>, AppError> {
+    // Read from local SQLite
+    let rows = sqlx::query(
+        "SELECT app_id, version FROM user_installed_apps WHERE user_id = ?"
+    )
+    .bind(user_id)
+    .fetch_all(pool)
+    .await?;
+    
+    let details = rows.into_iter()
+        .map(|row| {
+            use sqlx::Row;
+            InstalledAppDetails {
+                app_id: row.get::<String, _>("app_id"),
+                version: row.get::<String, _>("version"),
+            }
+        })
+        .collect();
+    Ok(details)
+}
+
+#[derive(serde::Deserialize)]
+struct AppMetadata {
+    current_version: String,
+    download_url: Option<String>,
+}
+
+async fn fetch_app_metadata_from_supabase(app_id: &str) -> Result<AppMetadata, AppError> {
+    let (url, anon_key) = get_supabase_config()?;
+    let client = Client::new();
+    let res = client.get(&format!("{}/rest/v1/marketplace_apps?id=eq.{}&select=current_version,download_url", url, app_id))
+        .header("apikey", &anon_key)
+        .header("Authorization", format!("Bearer {}", anon_key))
+        .send()
+        .await
+        .map_err(|e| AppError::Internal(format!("Failed to fetch app metadata: {}", e)))?;
+
+    if !res.status().is_success() {
+        return Err(AppError::Internal(format!("Supabase API error: {}", res.status())));
+    }
+
+    let list: Vec<AppMetadata> = res.json()
+        .await
+        .map_err(|e| AppError::Internal(format!("Failed to parse app metadata: {}", e)))?;
+
+    list.into_iter().next().ok_or_else(|| AppError::Internal(format!("App {} not found in marketplace", app_id)))
+}
+
+pub async fn install_app_impl(
+    pool: &SqlitePool,
+    app_dir: &std::path::Path,
+    user_id: &str,
+    app_id: &str,
+    _jwt: &str,
+) -> Result<(), AppError> {
+    let mut download_url = None;
+    let mut version = "1.0.0".to_string();
+
+    // Fetch app metadata from Supabase
+    if let Ok(meta) = fetch_app_metadata_from_supabase(app_id).await {
+        version = meta.current_version;
+        download_url = meta.download_url;
+    } else {
+        println!("[Marketplace] Warning: Failed to fetch metadata from Supabase for app '{}', using default version '1.0.0' and local package fallback", app_id);
+    }
+
+    // 1. Clean and recreate sandbox directory
+    let sandbox_dir = app_dir.join("apps").join(app_id);
+    if sandbox_dir.exists() {
+        std::fs::remove_dir_all(&sandbox_dir)
+            .map_err(|e| AppError::Internal(format!("Failed to clean existing sandbox: {}", e)))?;
+    }
+    std::fs::create_dir_all(&sandbox_dir)
+        .map_err(|e| AppError::Internal(format!("Failed to create sandbox directory: {}", e)))?;
+
+    // 2. Obtain ZIP bytes and extract
+    if let Some(url) = download_url {
+        println!("[Marketplace] Downloading package for '{}' (v{}) from {}", app_id, version, url);
+        let client = Client::new();
+        let res = client.get(&url)
+            .send()
+            .await
+            .map_err(|e| AppError::Internal(format!("Failed to send download request: {}", e)))?;
+            
+        if !res.status().is_success() {
+            return Err(AppError::Internal(format!("Supabase storage returned error code: {}", res.status())));
+        }
+        
+        let bytes = res.bytes()
+            .await
+            .map_err(|e| AppError::Internal(format!("Failed to read package bytes: {}", e)))?;
+            
+        let reader = std::io::Cursor::new(bytes);
+        extract_zip(reader, &sandbox_dir)?;
+    } else {
+        // Fallback: Look for local resources zip package
+        println!("[Marketplace] Using local package fallback for '{}' (v{})", app_id, version);
+        let zip_path = find_zip_package(app_id)?;
+        let zip_file = std::fs::File::open(&zip_path)
+            .map_err(|e| AppError::Internal(format!("Failed to open local package zip: {}", e)))?;
+        extract_zip(zip_file, &sandbox_dir)?;
+    }
+
+    // 3. Insert/update locally in SQLite with version
     sqlx::query(
-        "INSERT INTO user_installed_apps (user_id, app_id) VALUES (?, ?) ON CONFLICT DO NOTHING"
+        "INSERT INTO user_installed_apps (user_id, app_id, version) VALUES (?, ?, ?) \
+         ON CONFLICT(user_id, app_id) DO UPDATE SET version = excluded.version"
     )
     .bind(user_id)
     .bind(app_id)
+    .bind(&version)
     .execute(pool)
     .await?;
     
-    // 2. Queue for Cloud Sync (Encrypted)
+    // 4. Queue for Cloud Sync (Encrypted)
     let job_id = uuid::Uuid::now_v7().to_string();
     let payload = serde_json::json!({
         "user_id": user_id,
@@ -87,7 +209,13 @@ pub async fn install_app_impl(pool: &SqlitePool, user_id: &str, app_id: &str, _j
     Ok(())
 }
 
-pub async fn uninstall_app_impl(pool: &SqlitePool, user_id: &str, app_id: &str, _jwt: &str) -> Result<(), AppError> {
+pub async fn uninstall_app_impl(
+    pool: &SqlitePool,
+    app_dir: &std::path::Path,
+    user_id: &str,
+    app_id: &str,
+    _jwt: &str,
+) -> Result<(), AppError> {
     // 1. Delete locally from SQLite
     sqlx::query(
         "DELETE FROM user_installed_apps WHERE user_id = ? AND app_id = ?"
@@ -97,8 +225,17 @@ pub async fn uninstall_app_impl(pool: &SqlitePool, user_id: &str, app_id: &str, 
     .execute(pool)
     .await?;
 
+    // 2. Remove sandbox folder if wordpress-sync
+    if app_id == "wordpress-sync" {
+        let sandbox_dir = app_dir.join("apps").join(app_id);
+        if sandbox_dir.exists() {
+            std::fs::remove_dir_all(&sandbox_dir)
+                .map_err(|e| AppError::Internal(format!("Failed to delete sandbox directory: {}", e)))?;
+            println!("Deleted sandbox directory at {:?}", sandbox_dir);
+        }
+    }
     
-    // 2. Queue for Cloud Sync (Encrypted)
+    // 3. Queue for Cloud Sync (Encrypted)
     let job_id = uuid::Uuid::now_v7().to_string();
     let payload = serde_json::json!({
         "user_id": user_id,
@@ -119,5 +256,64 @@ pub async fn uninstall_app_impl(pool: &SqlitePool, user_id: &str, app_id: &str, 
     .execute(pool)
     .await?;
 
+    Ok(())
+}
+
+fn find_zip_package(app_id: &str) -> Result<std::path::PathBuf, AppError> {
+    let mut current = std::env::current_dir().unwrap_or_else(|_| std::path::PathBuf::from("."));
+    for _ in 0..10 {
+        let test_paths = vec![
+            current.join("apps/desktop/src-tauri/resources").join(format!("{}.zip", app_id)),
+            current.join("src-tauri/resources").join(format!("{}.zip", app_id)),
+            current.join("resources").join(format!("{}.zip", app_id)),
+        ];
+        for path in test_paths {
+            if path.exists() {
+                return Ok(path);
+            }
+        }
+        if let Some(parent) = current.parent() {
+            current = parent.to_path_buf();
+        } else {
+            break;
+        }
+    }
+    Err(AppError::Internal(format!("Package {}.zip not found in workspace resources directory", app_id)))
+}
+
+fn extract_zip<R: std::io::Read + std::io::Seek>(
+    reader: R,
+    out_dir: &std::path::Path,
+) -> Result<(), AppError> {
+    let mut archive = zip::ZipArchive::new(reader)
+        .map_err(|e| AppError::Internal(format!("Failed to parse zip archive: {}", e)))?;
+
+    for i in 0..archive.len() {
+        let mut file = archive.by_index(i)
+            .map_err(|e| AppError::Internal(format!("Failed to read file from zip: {}", e)))?;
+        
+        let normalized_name = file.name().replace('\\', "/");
+        if normalized_name.contains("..") {
+            continue;
+        }
+
+        let outpath = out_dir.join(&normalized_name);
+
+        if file.is_dir() || normalized_name.ends_with('/') {
+            std::fs::create_dir_all(&outpath)
+                .map_err(|e| AppError::Internal(format!("Failed to create folder in sandbox: {} (path: {:?})", e, outpath)))?;
+        } else {
+            if let Some(p) = outpath.parent() {
+                if !p.exists() {
+                    std::fs::create_dir_all(p)
+                        .map_err(|e| AppError::Internal(format!("Failed to create parent folder in sandbox: {} (path: {:?})", e, p)))?;
+                }
+            }
+            let mut outfile = std::fs::File::create(&outpath)
+                .map_err(|e| AppError::Internal(format!("Failed to create file in sandbox: {} (path: {:?})", e, outpath)))?;
+            std::io::copy(&mut file, &mut outfile)
+                .map_err(|e| AppError::Internal(format!("Failed to copy file to sandbox: {} (path: {:?})", e, outpath)))?;
+        }
+    }
     Ok(())
 }

@@ -84,8 +84,8 @@ export function NavMain({
                             <SidebarMenuSubButton asChild>
                               <Link
                                 to={subItem.url}
-                                activeProps={{ 'data-active': true } as any}
-                                exact
+                                activeProps={{ 'data-active': 'true' } as Record<string, string>}
+                                activeOptions={{ exact: true }}
                               >
                                 <span>{t(`nav.${subItem.title}`, subItem.title)}</span>
                               </Link>

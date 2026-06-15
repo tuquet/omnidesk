@@ -9,6 +9,12 @@ export const baseConfig = [
   js.configs.recommended,
   ...tseslint.configs.strict,
   {
+    languageOptions: {
+      parser: tseslint.parser,
+      parserOptions: {
+        projectService: true,
+      },
+    },
     rules: {
       // No any policy
       '@typescript-eslint/no-explicit-any': 'error',
