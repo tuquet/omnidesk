@@ -9,46 +9,46 @@ Tài liệu này phác họa **Bản đồ tư duy (Mindmap)** và **Lộ trình
 ```mermaid
 mindmap
   root((OmniDesk Virtualization Engine))
-    "Cô lập & Bảo mật (Isolation & Security)"
-      "Cô lập File System"
-        "Sandbox AppData"
-        "Chặn Path Traversal"
-      "Cô lập Storage"
-        "Cô lập LocalStorage / Cookies"
-        "IndexedDB phân vùng"
-      "Chính sách CSP"
-        "Iframe Sandbox Attribute"
-        "Chặn Script độc hại"
-      "Ký số Package (Code Signing)"
-        "Verify Hash SHA-256"
-        "Ký số PKI khóa công khai"
-    "Giao tiếp & Tích hợp (IPC & Integration Bridge)"
-      "OmniBridge JS SDK"
-        "Gọi Tauri Native Commands"
-        "Đăng ký Notifications"
-      "Quản lý Auth"
-        "Token Proxying (JWT sharing)"
-        "RBAC UI Wrapper"
-      "AI & MCP Integration"
-        "Sandbox MCP Tools"
-        "AI Agent Context Sharing"
-    "Quản lý Vòng đời (Lifecycle Management)"
-      "Quản lý Gói (Package Manager)"
-        "Tải luồng song song (S3)"
-        "Giải nén In-Memory"
-      "Cập nhật Động (Hot-Reload)"
-        "Background Update"
-        "Silent Install / Rollback"
-      "Dọn dẹp Tài nguyên"
-        "Cache eviction"
-        "State migration khi nâng cấp"
-    "Phân phối & Vận hành (Enterprise Distribution)"
-      "Private Store (B2B Tenant)"
-        "Store riêng của doanh nghiệp"
-        "Tự deploy S3 riêng"
-      "Chỉ số Performance"
-        "Giới hạn CPU / RAM Iframe"
-        "Lazy loading Iframe"
+    sec["Cô lập & Bảo mật (Isolation & Security)"]
+      sec_fs["Cô lập File System"]
+        sec_fs_app["Sandbox AppData"]
+        sec_fs_path["Chặn Path Traversal"]
+      sec_st["Cô lập Storage"]
+        sec_st_local["Cô lập LocalStorage / Cookies"]
+        sec_st_db["IndexedDB phân vùng"]
+      sec_csp["Chính sách CSP"]
+        sec_csp_attr["Iframe Sandbox Attribute"]
+        sec_csp_script["Chặn Script độc hại"]
+      sec_sign["Ký số Package (Code Signing)"]
+        sec_sign_hash["Verify Hash SHA-256"]
+        sec_sign_pki["Ký số PKI khóa công khai"]
+    ipc["Giao tiếp & Tích hợp (IPC & Integration Bridge)"]
+      ipc_sdk["OmniBridge JS SDK"]
+        ipc_sdk_cmd["Gọi Tauri Native Commands"]
+        ipc_sdk_notif["Đăng ký Notifications"]
+      ipc_auth["Quản lý Auth"]
+        ipc_auth_tok["Token Proxying (JWT sharing)"]
+        ipc_auth_rbac["RBAC UI Wrapper"]
+      ipc_ai["AI & MCP Integration"]
+        ipc_ai_mcp["Sandbox MCP Tools"]
+        ipc_ai_ctx["AI Agent Context Sharing"]
+    life["Quản lý Vòng đời (Lifecycle Management)"]
+      life_pkg["Quản lý Gói (Package Manager)"]
+        life_pkg_para["Tải luồng song song (S3)"]
+        life_pkg_mem["Giải nén In-Memory"]
+      life_upd["Cập nhật Động (Hot-Reload)"]
+        life_upd_bg["Background Update"]
+        life_upd_silent["Silent Install / Rollback"]
+      life_clean["Dọn dẹp Tài nguyên"]
+        life_clean_evict["Cache eviction"]
+        life_clean_mig["State migration khi nâng cấp"]
+    dist["Phân phối & Vận hành (Enterprise Distribution)"]
+      dist_store["Private Store (B2B Tenant)"]
+        dist_store_ent["Store riêng của doanh nghiệp"]
+        dist_store_s3["Tự deploy S3 riêng"]
+      dist_perf["Chỉ số Performance"]
+        dist_perf_res["Giới hạn CPU / RAM Iframe"]
+        dist_perf_lazy["Lazy loading Iframe"]
 ```
 
 ---
