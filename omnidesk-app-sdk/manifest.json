@@ -1,0 +1,10 @@
+{
+  "id": "app-third-party-demo",
+  "name": "Demo App",
+  "description": "A demo third-party application",
+  "version": "1.0.0",
+  "entry": "dist/index.js",
+  "icon": "BoxIcon",
+  "category": "productivity",
+  "permissions": []
+}

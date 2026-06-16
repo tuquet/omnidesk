@@ -1,0 +1,94 @@
+import { memo } from 'react';
+import {
+  Separator,
+  Button,
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuLabel,
+} from '@omnidesk/ui';
+import { SidebarTrigger } from '@omnidesk/ui';
+import { WrenchIcon, TrashIcon, BugIcon, LogOutIcon, FolderOpenIcon } from 'lucide-react';
+import { ThemeToggle } from '@omnidesk/app-core';
+import { Platform } from '@/lib/platform';
+import { LanguageSwitcher } from '@omnidesk/app-core';
+import { NotificationButton } from '@omnidesk/app-core';
+import { ConsoleLoggerButton } from '@omnidesk/app-core';
+import { SmartBreadcrumb } from '@omnidesk/app-core';
+import { GlobalSearch } from '@omnidesk/app-core';
+import { useDevStore } from '@/stores/use-dev-store';
+
+export const SiteHeader = memo(function SiteHeader() {
+  const { isDevMode, setDevMode } = useDevStore();
+
+  return (
+    <header className="flex h-(--header-height) shrink-0 items-center gap-2 border-b">
+      <div className="flex w-full items-center gap-1 px-4 lg:gap-2 lg:px-6">
+        <SidebarTrigger className="-ms-1" />
+        <Separator orientation="vertical" className="mx-2 h-4 !self-center" />
+        <SmartBreadcrumb />
+        <div className="flex-1" />
+        <div className="flex items-center gap-1">
+          <GlobalSearch />
+          {isDevMode && (
+            <>
+              <ConsoleLoggerButton />
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" size="icon" className="h-9 w-9">
+                    <WrenchIcon className="h-4 w-4" />
+                    <span className="sr-only">Developer Tools</span>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56">
+                  <DropdownMenuLabel>Developer Tools</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    onClick={() => {
+                      localStorage.clear();
+                      window.location.reload();
+                    }}
+                  >
+                    <TrashIcon className="mr-2 h-4 w-4" />
+                    Clear Local Storage
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => {
+                      throw new Error('Simulated application crash for testing');
+                    }}
+                  >
+                    <BugIcon className="mr-2 h-4 w-4" />
+                    Simulate Error
+                  </DropdownMenuItem>
+                  {Platform.isDesktop && (
+                    <DropdownMenuItem
+                      onClick={async () => {
+                        await Platform.openLogsFolder();
+                      }}
+                    >
+                      <FolderOpenIcon className="mr-2 h-4 w-4" />
+                      Open Logs Folder
+                    </DropdownMenuItem>
+                  )}
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    onClick={() => setDevMode(false)}
+                    className="text-destructive focus:text-destructive focus:bg-destructive/10"
+                  >
+                    <LogOutIcon className="mr-2 h-4 w-4" />
+                    Exit Dev Mode
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </>
+          )}
+          <NotificationButton />
+          <LanguageSwitcher />
+          <ThemeToggle />
+        </div>
+      </div>
+    </header>
+  );
+});
