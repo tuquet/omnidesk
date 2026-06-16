@@ -32,17 +32,26 @@ pub async fn get_marketplace_apps() -> Result<Vec<Value>, AppError> {
         .await
         .map_err(|e| AppError::Internal(format!("Failed to parse apps: {}", e)))?;
         
-    // Inject local WordPress Sync App definition
-    apps.push(serde_json::json!({
-        "id": "wordpress-sync",
-        "name": "WordPress Sync",
-        "description": "WordPress GitOps content & media synchronization workspace.",
-        "icon_name": "RefreshCw",
-        "category": "Development",
-        "is_core": false,
-        "sort_order": 100,
-        "created_at": chrono::Utc::now().to_rfc3339()
-    }));
+    // Inject local WordPress Sync App definition if not already present
+    let has_wordpress_sync = apps.iter().any(|app| {
+        app.get("id")
+            .and_then(|id| id.as_str())
+            .map(|id_str| id_str == "wordpress-sync")
+            .unwrap_or(false)
+    });
+    
+    if !has_wordpress_sync {
+        apps.push(serde_json::json!({
+            "id": "wordpress-sync",
+            "name": "WordPress Sync",
+            "description": "WordPress GitOps content & media synchronization workspace.",
+            "icon_name": "RefreshCw",
+            "category": "Development",
+            "is_core": false,
+            "sort_order": 100,
+            "created_at": chrono::Utc::now().to_rfc3339()
+        }));
+    }
         
     Ok(apps)
 }
