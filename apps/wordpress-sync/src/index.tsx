@@ -1,6 +1,6 @@
 import { Card, CardContent } from '@omnidesk/ui';
 
-export function WordPressSyncAppPage() {
+export default function WordPressSyncAppPage() {
   const iframeUrl = 'http://localhost:1421/apps/wordpress-sync/index.html';
 
   return (

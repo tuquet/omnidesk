@@ -16,7 +16,7 @@ import { Link } from '@tanstack/react-router';
 
 import { projects, getStatusVariant } from './api/mock-projects';
 
-export function ProjectsPage() {
+export default function ProjectsPage() {
   return (
     <div className="flex flex-1 flex-col gap-6 p-6">
       <div className="flex items-start justify-between">

@@ -13,6 +13,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from '@omnidesk/ui';
+import * as LucideIcons from 'lucide-react';
 import { CommandIcon, CompassIcon, AlertTriangleIcon, DatabaseIcon } from 'lucide-react';
 import {
   APP_NAME,
@@ -47,80 +48,27 @@ const AppSidebarInner = ({ ...props }: React.ComponentProps<typeof Sidebar>) => 
     staleTime: 5000,
   });
 
-  // Filter NAV_MAIN by launcher installed apps first
-  const launcherFilteredMainNav = NAV_MAIN.filter((item) => {
-    const appId = item.url.replace('/', '');
-    return installedApps.includes(appId);
-  });
-  
-  // Inject local apps
+  const mainItems: any[] = [];
+
+  // Inject local apps dynamically
   if (localApps) {
     for (const app of localApps) {
-      if (!launcherFilteredMainNav.some(n => n.url === `/app/${app.id}`)) {
-        launcherFilteredMainNav.push({
-          title: app.name || app.id,
-          url: `/app/${app.id}`,
-          icon: CommandIcon, // Fallback icon
-          items: [],
-          requiredPermission: 'view_dashboard',
-        } as any);
+      // Map icon from manifest if available
+      let IconComponent = CommandIcon;
+      if (app.icon?.displayName && (LucideIcons as any)[app.icon.displayName]) {
+        IconComponent = (LucideIcons as any)[app.icon.displayName];
       }
+
+      mainItems.push({
+        title: app.name || app.id,
+        url: `/app/${app.id}`,
+        icon: IconComponent,
+        items: [],
+      });
     }
   }
 
-  const mainItems = filterNav(launcherFilteredMainNav);
-  const showcaseItems = filterNav(NAV_SHOWCASE.items);
-  const errorItems = filterNav(NAV_ERROR_PAGES.items);
-
   const secondaryItems = filterNav(NAV_SECONDARY);
-
-  const documentItems = filterNav(NAV_DOCUMENTS);
-
-  const hasShowcase = installedApps.includes('showcase');
-  const hasErrorPages = installedApps.includes('error-pages');
-  const hasDocuments = installedApps.includes('documents');
-
-  const combinedMainItems = [...mainItems];
-
-  if (
-    hasShowcase &&
-    isDevMode &&
-    can(NAV_SHOWCASE.requiredPermission) &&
-    showcaseItems.length > 0
-  ) {
-    const firstShowcaseUrl = showcaseItems[0]?.url ?? '';
-    combinedMainItems.push({
-      title: NAV_SHOWCASE.label,
-      url: firstShowcaseUrl,
-      icon: CompassIcon,
-      items: showcaseItems,
-    } as unknown as (typeof mainItems)[number]);
-  }
-
-  if (
-    hasErrorPages &&
-    isDevMode &&
-    can(NAV_ERROR_PAGES.requiredPermission) &&
-    errorItems.length > 0
-  ) {
-    const firstErrorUrl = errorItems[0]?.url ?? '';
-    combinedMainItems.push({
-      title: NAV_ERROR_PAGES.label,
-      url: firstErrorUrl,
-      icon: AlertTriangleIcon,
-      items: errorItems,
-    } as unknown as (typeof mainItems)[number]);
-  }
-
-  if (hasDocuments && documentItems.length > 0) {
-    const firstDocUrl = documentItems[0]?.url ?? '';
-    combinedMainItems.push({
-      title: 'Documents',
-      url: firstDocUrl,
-      icon: DatabaseIcon,
-      items: documentItems.map((d) => ({ title: d.name, url: d.url })),
-    } as unknown as (typeof mainItems)[number]);
-  }
 
   return (
     <Sidebar collapsible="offcanvas" {...props}>
@@ -128,7 +76,7 @@ const AppSidebarInner = ({ ...props }: React.ComponentProps<typeof Sidebar>) => 
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton asChild className="data-[slot=sidebar-menu-button]:p-1.5!">
-              <Link to="/dashboard">
+              <Link to="/app/$appId" params={{ appId: "dashboard" }}>
                 <CommandIcon className="size-5!" />
                 <span className="text-base font-semibold">{APP_NAME}</span>
               </Link>
@@ -138,9 +86,9 @@ const AppSidebarInner = ({ ...props }: React.ComponentProps<typeof Sidebar>) => 
       </SidebarHeader>
       <SidebarContent>
         <NavMain
-          items={combinedMainItems.map((item) => ({
+          items={mainItems.map((item) => ({
             title: item.title,
-            url: item.url,
+            url: item.url as any,
             icon: <item.icon />,
             items: item.items,
           }))}

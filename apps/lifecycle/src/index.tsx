@@ -67,7 +67,7 @@ function TaskColumn({ tasks }: { tasks: Task[] }) {
   );
 }
 
-export function LifecyclePage() {
+export default function LifecyclePage() {
   const totalTasks =
     backlogTasks.length + inProgressTasks.length + reviewTasks.length + doneTasks.length;
 

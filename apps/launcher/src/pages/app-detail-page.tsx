@@ -13,7 +13,7 @@ import { ChevronLeft, Loader2, Share, Star, AlertCircle, Package, Shield } from 
 import { toast } from 'sonner';
 
 export function AppDetailPage() {
-  const { appId } = useParams({ from: '/_authenticated/app-store_/$appId' });
+  const { appId } = useParams({ strict: false }) as any;
   const navigate = useNavigate();
   const { installedApps } = useLauncherStore();
   const { data: installedDetails } = useInstalledAppsDetails();
@@ -111,7 +111,7 @@ export function AppDetailPage() {
             The application you are looking for does not exist or cannot be loaded.
           </p>
         </div>
-        <Button className="rounded-full px-8 mt-4" onClick={() => navigate({ to: '/app-store' })}>
+        <Button className="rounded-full px-8 mt-4" onClick={() => navigate({ to: '/app/$appId', params: { appId: 'launcher' } as any })}>
           <ChevronLeft className="mr-2 h-4 w-4" />
           Back to Store
         </Button>
@@ -129,7 +129,7 @@ export function AppDetailPage() {
         <Button
           variant="ghost"
           className="gap-2 text-muted-foreground hover:text-foreground"
-          onClick={() => navigate({ to: '/app-store' })}
+          onClick={() => navigate({ to: '/app/$appId', params: { appId: 'launcher' } as any })}
         >
           <ChevronLeft className="h-4 w-4" />
           App Store

@@ -2,7 +2,7 @@ import * as React from 'react';
 import { useState, useRef } from 'react';
 import { useListFiles, useUploadFile, useDeleteFile } from '../api/storage-queries';
 import { FileRow } from './file-row';
-import { Button } from '@/components/ui/button';
+import { Button } from '@omnidesk/ui';
 import {
   Table,
   TableBody,
@@ -10,8 +10,8 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
-import { Input } from '@/components/ui/input';
+} from '@omnidesk/ui';
+import { Input } from '@omnidesk/ui';
 import { CloudUpload, Search, FolderPlus, RefreshCw } from 'lucide-react';
 
 export function FileBrowserApp() {

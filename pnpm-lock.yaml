@@ -123,10 +123,10 @@ importers:
         specifier: ^1.5.0
         version: 1.5.0(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       react:
-        specifier: ^19.1.0
+        specifier: ^18.0.0 || ^19.0.0
         version: 19.2.7
       react-dom:
-        specifier: ^19.1.0
+        specifier: ^18.0.0 || ^19.0.0
         version: 19.2.7(react@19.2.7)
       react-i18next:
         specifier: ^17.0.8
@@ -159,6 +159,12 @@ importers:
       '@typescript/native-preview':
         specifier: 7.0.0-dev.20260421.2
         version: 7.0.0-dev.20260421.2
+      '@vitejs/plugin-react':
+        specifier: ^4.2.1
+        version: 4.7.0(vite@5.4.21(@types/node@24.13.1)(lightningcss@1.32.0))
+      vite:
+        specifier: ^5.1.0
+        version: 5.4.21(@types/node@24.13.1)(lightningcss@1.32.0)
 
   apps/auth:
     dependencies:
@@ -435,10 +441,10 @@ importers:
         specifier: ^1.5.0
         version: 1.5.0(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       react:
-        specifier: ^19.1.0
+        specifier: ^18.0.0 || ^19.0.0
         version: 19.2.7
       react-dom:
-        specifier: ^19.1.0
+        specifier: ^18.0.0 || ^19.0.0
         version: 19.2.7(react@19.2.7)
       react-i18next:
         specifier: ^17.0.8
@@ -471,6 +477,12 @@ importers:
       '@typescript/native-preview':
         specifier: 7.0.0-dev.20260421.2
         version: 7.0.0-dev.20260421.2
+      '@vitejs/plugin-react':
+        specifier: ^4.2.1
+        version: 4.7.0(vite@5.4.21(@types/node@24.13.1)(lightningcss@1.32.0))
+      vite:
+        specifier: ^5.1.0
+        version: 5.4.21(@types/node@24.13.1)(lightningcss@1.32.0)
 
   apps/documents:
     dependencies:
@@ -535,10 +547,10 @@ importers:
         specifier: ^1.5.0
         version: 1.5.0(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       react:
-        specifier: ^19.1.0
+        specifier: ^18.0.0 || ^19.0.0
         version: 19.2.7
       react-dom:
-        specifier: ^19.1.0
+        specifier: ^18.0.0 || ^19.0.0
         version: 19.2.7(react@19.2.7)
       react-i18next:
         specifier: ^17.0.8
@@ -571,6 +583,12 @@ importers:
       '@typescript/native-preview':
         specifier: 7.0.0-dev.20260421.2
         version: 7.0.0-dev.20260421.2
+      '@vitejs/plugin-react':
+        specifier: ^4.2.1
+        version: 4.7.0(vite@5.4.21(@types/node@24.13.1)(lightningcss@1.32.0))
+      vite:
+        specifier: ^5.1.0
+        version: 5.4.21(@types/node@24.13.1)(lightningcss@1.32.0)
 
   apps/file-browser:
     dependencies:
@@ -635,10 +653,10 @@ importers:
         specifier: ^1.5.0
         version: 1.5.0(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       react:
-        specifier: ^19.1.0
+        specifier: ^18.0.0 || ^19.0.0
         version: 19.2.7
       react-dom:
-        specifier: ^19.1.0
+        specifier: ^18.0.0 || ^19.0.0
         version: 19.2.7(react@19.2.7)
       react-i18next:
         specifier: ^17.0.8
@@ -671,6 +689,12 @@ importers:
       '@typescript/native-preview':
         specifier: 7.0.0-dev.20260421.2
         version: 7.0.0-dev.20260421.2
+      '@vitejs/plugin-react':
+        specifier: ^4.2.1
+        version: 4.7.0(vite@5.4.21(@types/node@24.13.1)(lightningcss@1.32.0))
+      vite:
+        specifier: ^5.1.0
+        version: 5.4.21(@types/node@24.13.1)(lightningcss@1.32.0)
 
   apps/launcher:
     dependencies:
@@ -738,10 +762,10 @@ importers:
         specifier: ^1.5.0
         version: 1.5.0(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       react:
-        specifier: ^19.1.0
+        specifier: ^18.0.0 || ^19.0.0
         version: 19.2.7
       react-dom:
-        specifier: ^19.1.0
+        specifier: ^18.0.0 || ^19.0.0
         version: 19.2.7(react@19.2.7)
       react-i18next:
         specifier: ^17.0.8
@@ -774,6 +798,12 @@ importers:
       '@typescript/native-preview':
         specifier: 7.0.0-dev.20260421.2
         version: 7.0.0-dev.20260421.2
+      '@vitejs/plugin-react':
+        specifier: ^4.2.1
+        version: 4.7.0(vite@5.4.21(@types/node@24.13.1)(lightningcss@1.32.0))
+      vite:
+        specifier: ^5.1.0
+        version: 5.4.21(@types/node@24.13.1)(lightningcss@1.32.0)
 
   apps/lifecycle:
     dependencies:
@@ -838,10 +868,10 @@ importers:
         specifier: ^1.5.0
         version: 1.5.0(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       react:
-        specifier: ^19.1.0
+        specifier: ^18.0.0 || ^19.0.0
         version: 19.2.7
       react-dom:
-        specifier: ^19.1.0
+        specifier: ^18.0.0 || ^19.0.0
         version: 19.2.7(react@19.2.7)
       react-i18next:
         specifier: ^17.0.8
@@ -874,6 +904,12 @@ importers:
       '@typescript/native-preview':
         specifier: 7.0.0-dev.20260421.2
         version: 7.0.0-dev.20260421.2
+      '@vitejs/plugin-react':
+        specifier: ^4.2.1
+        version: 4.7.0(vite@5.4.21(@types/node@24.13.1)(lightningcss@1.32.0))
+      vite:
+        specifier: ^5.1.0
+        version: 5.4.21(@types/node@24.13.1)(lightningcss@1.32.0)
 
   apps/notifications:
     dependencies:
@@ -1038,10 +1074,10 @@ importers:
         specifier: ^1.5.0
         version: 1.5.0(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       react:
-        specifier: ^19.1.0
+        specifier: ^18.0.0 || ^19.0.0
         version: 19.2.7
       react-dom:
-        specifier: ^19.1.0
+        specifier: ^18.0.0 || ^19.0.0
         version: 19.2.7(react@19.2.7)
       react-i18next:
         specifier: ^17.0.8
@@ -1074,6 +1110,12 @@ importers:
       '@typescript/native-preview':
         specifier: 7.0.0-dev.20260421.2
         version: 7.0.0-dev.20260421.2
+      '@vitejs/plugin-react':
+        specifier: ^4.2.1
+        version: 4.7.0(vite@5.4.21(@types/node@24.13.1)(lightningcss@1.32.0))
+      vite:
+        specifier: ^5.1.0
+        version: 5.4.21(@types/node@24.13.1)(lightningcss@1.32.0)
 
   apps/showcase:
     dependencies:
@@ -1138,10 +1180,10 @@ importers:
         specifier: ^1.5.0
         version: 1.5.0(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       react:
-        specifier: ^19.1.0
+        specifier: ^18.0.0 || ^19.0.0
         version: 19.2.7
       react-dom:
-        specifier: ^19.1.0
+        specifier: ^18.0.0 || ^19.0.0
         version: 19.2.7(react@19.2.7)
       react-i18next:
         specifier: ^17.0.8
@@ -1174,6 +1216,12 @@ importers:
       '@typescript/native-preview':
         specifier: 7.0.0-dev.20260421.2
         version: 7.0.0-dev.20260421.2
+      '@vitejs/plugin-react':
+        specifier: ^4.2.1
+        version: 4.7.0(vite@5.4.21(@types/node@24.13.1)(lightningcss@1.32.0))
+      vite:
+        specifier: ^5.1.0
+        version: 5.4.21(@types/node@24.13.1)(lightningcss@1.32.0)
 
   apps/team:
     dependencies:
@@ -1238,10 +1286,10 @@ importers:
         specifier: ^1.5.0
         version: 1.5.0(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       react:
-        specifier: ^19.1.0
+        specifier: ^18.0.0 || ^19.0.0
         version: 19.2.7
       react-dom:
-        specifier: ^19.1.0
+        specifier: ^18.0.0 || ^19.0.0
         version: 19.2.7(react@19.2.7)
       react-i18next:
         specifier: ^17.0.8
@@ -1274,6 +1322,12 @@ importers:
       '@typescript/native-preview':
         specifier: 7.0.0-dev.20260421.2
         version: 7.0.0-dev.20260421.2
+      '@vitejs/plugin-react':
+        specifier: ^4.2.1
+        version: 4.7.0(vite@5.4.21(@types/node@24.13.1)(lightningcss@1.32.0))
+      vite:
+        specifier: ^5.1.0
+        version: 5.4.21(@types/node@24.13.1)(lightningcss@1.32.0)
 
   apps/wordpress-sync:
     dependencies:
@@ -1338,10 +1392,10 @@ importers:
         specifier: ^1.5.0
         version: 1.5.0(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       react:
-        specifier: ^19.1.0
+        specifier: ^18.0.0 || ^19.0.0
         version: 19.2.7
       react-dom:
-        specifier: ^19.1.0
+        specifier: ^18.0.0 || ^19.0.0
         version: 19.2.7(react@19.2.7)
       react-i18next:
         specifier: ^17.0.8
@@ -1374,6 +1428,12 @@ importers:
       '@typescript/native-preview':
         specifier: 7.0.0-dev.20260421.2
         version: 7.0.0-dev.20260421.2
+      '@vitejs/plugin-react':
+        specifier: ^4.2.1
+        version: 4.7.0(vite@5.4.21(@types/node@24.13.1)(lightningcss@1.32.0))
+      vite:
+        specifier: ^5.1.0
+        version: 5.4.21(@types/node@24.13.1)(lightningcss@1.32.0)
 
   packages/config:
     devDependencies:
@@ -1500,45 +1560,15 @@ importers:
       '@hey-api/client-fetch':
         specifier: ^0.13.1
         version: 0.13.1(@hey-api/openapi-ts@0.98.2(magicast@0.5.3)(typescript@6.0.3))
-      '@omnidesk/app-analytics':
-        specifier: workspace:*
-        version: link:../../apps/analytics
       '@omnidesk/app-auth':
         specifier: workspace:*
         version: link:../../apps/auth
       '@omnidesk/app-core':
         specifier: workspace:*
         version: link:../../apps/core
-      '@omnidesk/app-dashboard':
-        specifier: workspace:*
-        version: link:../../apps/dashboard
-      '@omnidesk/app-documents':
-        specifier: workspace:*
-        version: link:../../apps/documents
-      '@omnidesk/app-file-browser':
-        specifier: workspace:*
-        version: link:../../apps/file-browser
-      '@omnidesk/app-launcher':
-        specifier: workspace:*
-        version: link:../../apps/launcher
-      '@omnidesk/app-lifecycle':
-        specifier: workspace:*
-        version: link:../../apps/lifecycle
       '@omnidesk/app-notifications':
         specifier: workspace:*
         version: link:../../apps/notifications
-      '@omnidesk/app-projects':
-        specifier: workspace:*
-        version: link:../../apps/projects
-      '@omnidesk/app-showcase':
-        specifier: workspace:*
-        version: link:../../apps/showcase
-      '@omnidesk/app-team':
-        specifier: workspace:*
-        version: link:../../apps/team
-      '@omnidesk/app-wordpress-sync':
-        specifier: workspace:*
-        version: link:../../apps/wordpress-sync
       '@omnidesk/types':
         specifier: workspace:*
         version: link:../../packages/types
@@ -9924,6 +9954,18 @@ snapshots:
       '@typescript/native-preview-win32-x64': 7.0.0-dev.20260421.2
 
   '@ungap/structured-clone@1.3.1': {}
+
+  '@vitejs/plugin-react@4.7.0(vite@5.4.21(@types/node@24.13.1)(lightningcss@1.32.0))':
+    dependencies:
+      '@babel/core': 7.29.7
+      '@babel/plugin-transform-react-jsx-self': 7.29.7(@babel/core@7.29.7)
+      '@babel/plugin-transform-react-jsx-source': 7.29.7(@babel/core@7.29.7)
+      '@rolldown/pluginutils': 1.0.0-beta.27
+      '@types/babel__core': 7.20.5
+      react-refresh: 0.17.0
+      vite: 5.4.21(@types/node@24.13.1)(lightningcss@1.32.0)
+    transitivePeerDependencies:
+      - supports-color
 
   '@vitejs/plugin-react@4.7.0(vite@6.4.3(@types/node@24.13.1)(jiti@2.7.0)(lightningcss@1.32.0)(yaml@2.9.0))':
     dependencies:

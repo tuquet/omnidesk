@@ -1,0 +1,11 @@
+{
+  "id": "launcher",
+  "name": "Launcher",
+  "description": "The @omnidesk/app-launcher application for OmniDesk.",
+  "icon": {
+    "type": "lucide",
+    "displayName": "Box"
+  },
+  "category": "Productivity",
+  "isCore": true
+}

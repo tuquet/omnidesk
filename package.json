@@ -4,7 +4,7 @@
   "version": "0.1.0",
   "description": "Tauri + React + Axum monorepo boilerplate",
   "scripts": {
-    "dev": "pnpm --filter @omnidesk/web dev",
+    "dev": "turbo run dev --filter=@omnidesk/web --filter=@omnidesk/app-*",
     "build": "turbo run build",
     "lint": "turbo run lint",
     "typecheck": "turbo run typecheck",

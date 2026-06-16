@@ -20,7 +20,7 @@ import { UserPlusIcon, SearchIcon } from 'lucide-react';
 import { stats, teamMembers } from './config/constants';
 import { StatusDot } from './components/status-dot';
 
-export function TeamPage() {
+export default function TeamPage() {
   return (
     <div className="flex flex-1 flex-col gap-6 p-6">
       {/* Header */}

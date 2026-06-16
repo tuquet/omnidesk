@@ -1,0 +1,11 @@
+{
+  "id": "documents",
+  "name": "Documents",
+  "description": "The @omnidesk/app-documents application for OmniDesk.",
+  "icon": {
+    "type": "lucide",
+    "displayName": "Box"
+  },
+  "category": "Productivity",
+  "isCore": true
+}

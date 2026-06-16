@@ -1,0 +1,11 @@
+{
+  "id": "dashboard",
+  "name": "Dashboard",
+  "description": "The @omnidesk/app-dashboard application for OmniDesk.",
+  "icon": {
+    "type": "lucide",
+    "displayName": "Box"
+  },
+  "category": "Productivity",
+  "isCore": true
+}

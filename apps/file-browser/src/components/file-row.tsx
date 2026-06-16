@@ -1,13 +1,13 @@
 import { FileObject, getPublicUrl } from '../api/storage-queries';
 import { FileIcon, FolderIcon, DownloadIcon, TrashIcon, ShareIcon, Image as ImageIcon, FileTextIcon, FileSpreadsheetIcon } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { TableCell, TableRow } from '@/components/ui/table';
+import { Button } from '@omnidesk/ui';
+import { TableCell, TableRow } from '@omnidesk/ui';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+} from '@omnidesk/ui';
 import { MoreHorizontal } from 'lucide-react';
 import { toast } from 'sonner';
 

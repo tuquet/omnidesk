@@ -34,7 +34,7 @@ import {
   sourceBadgeVariant,
 } from './api/mock-data';
 
-export function AnalyticsPage() {
+export default function AnalyticsPage() {
   const [dateRange, setDateRange] = useState('30d');
 
   return (

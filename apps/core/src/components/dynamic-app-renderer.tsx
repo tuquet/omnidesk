@@ -25,14 +25,24 @@ export function DynamicAppRenderer({ appId }: DynamicAppRendererProps) {
 
     async function loadApp() {
       try {
-        const { convertFileSrc } = await import('@tauri-apps/api/core');
+        const { convertFileSrc, invoke } = await import('@tauri-apps/api/core');
         const { appDataDir } = await import('@tauri-apps/api/path');
+
+        // Fetch installed apps to check if there is a devPath
+        const apps: any[] = await invoke('list_local_apps');
+        const appMetadata = apps.find(a => a.id === appId);
 
         // Get the app data dir path
         const dataDir = await appDataDir();
-        // Construct path: InstalledApps/{appId}/dist/index.js
         const pathSep = navigator.userAgent.includes('Windows') ? '\\' : '/';
-        const scriptPath = `${dataDir}InstalledApps${pathSep}${appId}${pathSep}dist${pathSep}index.js`;
+
+        let scriptPath = '';
+        if (appMetadata?.devPath) {
+          scriptPath = `${appMetadata.devPath}${pathSep}dist${pathSep}index.js`;
+        } else {
+          // Construct path: InstalledApps/{appId}/dist/index.js
+          scriptPath = `${dataDir}InstalledApps${pathSep}${appId}${pathSep}dist${pathSep}index.js`;
+        }
 
         // Convert to asset URL
         const assetUrl = convertFileSrc(scriptPath);

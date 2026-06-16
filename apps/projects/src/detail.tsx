@@ -15,7 +15,7 @@ import { PROJECT_DATA, PROJECT_ACTIONS } from './config/constants';
 import { useProjectRunner } from './hooks/use-project-runner';
 
 export function ProjectDetailPage() {
-  const { projectId } = useParams({ from: '/_authenticated/projects_/$projectId' });
+  const { projectId } = useParams({ strict: false }) as any;
   const navigate = useNavigate();
   
   const project = projectId ? PROJECT_DATA[projectId] : null;
@@ -35,7 +35,7 @@ export function ProjectDetailPage() {
     return (
       <div className="flex flex-col items-center justify-center flex-1 gap-4 p-6">
         <h2 className="text-xl font-semibold">Project not found</h2>
-        <Button onClick={() => navigate({ to: '/projects' })}>
+        <Button onClick={() => navigate({ to: '/app/$appId', params: { appId: 'projects' } as any })}>
           <ChevronLeft className="mr-2 h-4 w-4" />
           Back to Projects
         </Button>
@@ -51,7 +51,7 @@ export function ProjectDetailPage() {
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => navigate({ to: '/projects' })}
+            onClick={() => navigate({ to: '/app/$appId', params: { appId: 'projects' } as any })}
             className="-ml-3 text-muted-foreground hover:text-foreground"
           >
             <ChevronLeft className="mr-1 h-4 w-4" />
