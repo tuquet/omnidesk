@@ -105,12 +105,13 @@ pub async fn get_installed_details(pool: &SqlitePool, user_id: &str) -> Result<V
 struct AppMetadata {
     current_version: String,
     download_url: Option<String>,
+    package_hash: Option<String>,
 }
 
 async fn fetch_app_metadata_from_supabase(app_id: &str) -> Result<AppMetadata, AppError> {
     let (url, anon_key) = get_supabase_config()?;
     let client = Client::new();
-    let res = client.get(&format!("{}/rest/v1/marketplace_apps?id=eq.{}&select=current_version,download_url", url, app_id))
+    let res = client.get(&format!("{}/rest/v1/marketplace_apps?id=eq.{}&select=current_version,download_url,package_hash", url, app_id))
         .header("apikey", &anon_key)
         .header("Authorization", format!("Bearer {}", anon_key))
         .send()
@@ -137,11 +138,13 @@ pub async fn install_app_impl(
 ) -> Result<(), AppError> {
     let mut download_url = None;
     let mut version = "1.0.0".to_string();
+    let mut expected_hash = None;
 
     // Fetch app metadata from Supabase
     if let Ok(meta) = fetch_app_metadata_from_supabase(app_id).await {
         version = meta.current_version;
         download_url = meta.download_url;
+        expected_hash = meta.package_hash;
     } else {
         println!("[Marketplace] Warning: Failed to fetch metadata from Supabase for app '{}', using default version '1.0.0' and local package fallback", app_id);
     }
@@ -164,20 +167,39 @@ pub async fn install_app_impl(
             .await
             .map_err(|e| AppError::Internal(format!("Failed to send download request: {}", e)))?;
             
-        if !res.status().is_success() {
-            return Err(AppError::Internal(format!("Supabase storage returned error code: {}", res.status())));
-        }
-        
-        let bytes = res.bytes()
-            .await
-            .map_err(|e| AppError::Internal(format!("Failed to read package bytes: {}", e)))?;
-            
-        let reader = std::io::Cursor::new(bytes);
-        extract_zip(reader, &sandbox_dir)?;
-    } else {
-        // Fallback: Look for local resources zip package
-        println!("[Marketplace] Using local package fallback for '{}' (v{})", app_id, version);
-        let zip_path = find_zip_package(app_id)?;
+          if !res.status().is_success() {
+              return Err(AppError::Internal(format!("Supabase storage returned error code: {}", res.status())));
+          }
+          
+          let bytes = res.bytes()
+              .await
+              .map_err(|e| AppError::Internal(format!("Failed to read package bytes: {}", e)))?;
+
+          // Verify hash if present
+          if let Some(ref hash) = expected_hash {
+              use sha2::{Sha256, Digest};
+              let mut hasher = Sha256::new();
+              hasher.update(&bytes);
+              let hash_result = hasher.finalize();
+              let actual_hash = format!("{:x}", hash_result);
+              
+              if actual_hash != *hash {
+                  return Err(AppError::Internal(format!(
+                      "Package integrity verification failed for app '{}'! Expected hash: {}, Got: {}",
+                      app_id, hash, actual_hash
+                  )));
+              }
+              println!("[Marketplace] Package integrity verified successfully for '{}' (v{})", app_id, version);
+          } else {
+              println!("[Marketplace] Warning: No package hash found for app '{}', skipping verification", app_id);
+          }
+              
+          let reader = std::io::Cursor::new(bytes);
+          extract_zip(reader, &sandbox_dir)?;
+      } else {
+          // Fallback: Look for local resources zip package
+          println!("[Marketplace] Using local package fallback for '{}' (v{})", app_id, version);
+          let zip_path = find_zip_package(app_id)?;
         let zip_file = std::fs::File::open(&zip_path)
             .map_err(|e| AppError::Internal(format!("Failed to open local package zip: {}", e)))?;
         extract_zip(zip_file, &sandbox_dir)?;

@@ -97,7 +97,7 @@ create policy "Allow owners and admins to upload packages"
       public.is_admin() or exists (
         -- Extract the root folder name from the storage path (which is the app_id)
         select 1 from public.marketplace_apps
-        where id = (storage.foldername(name))[1] and owner_id = auth.uid()
+        where id = (storage.foldername(storage.objects.name))[1] and owner_id = auth.uid()
       )
     )
   );
@@ -109,7 +109,7 @@ create policy "Allow owners and admins to delete packages"
     bucket_id = 'app-packages' and (
       public.is_admin() or exists (
         select 1 from public.marketplace_apps
-        where id = (storage.foldername(name))[1] and owner_id = auth.uid()
+        where id = (storage.foldername(storage.objects.name))[1] and owner_id = auth.uid()
       )
     )
   );
