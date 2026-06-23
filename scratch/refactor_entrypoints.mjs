@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 
-const appsDir = 'c:\\Users\\pn.tund2\\Documents\\Repository\\kill-bug-machine\\apps';
+const appsDir = 'c:\\Users\\pn.tund2\\Documents\\Repository\\omnidesk\\apps';
 
 // Simple apps that just need their export changed to default
 const simpleApps = ['analytics', 'dashboard', 'file-browser', 'lifecycle', 'team', 'wordpress-sync'];
