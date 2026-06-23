@@ -30,7 +30,7 @@ export const SiteHeader = memo(function SiteHeader() {
         <Separator orientation="vertical" className="mx-2 h-4 !self-center" />
         <SmartBreadcrumb />
         <div className="flex-1" />
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-1 shrink-0">
           <GlobalSearch />
           {isDevMode && (
             <>
