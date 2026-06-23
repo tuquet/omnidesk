@@ -17,7 +17,7 @@ When tasked with implementing a new UI feature, page, or function (e.g., login, 
 - **Always consider Shadcn Blocks:** Use the command `npx shadcn@latest add <block-name>` (e.g., `login-02`, `signup-02`) to scaffold the UI quickly.
 - Shadcn Blocks provide complete, responsive page layouts that follow the project's design system.
 
-## OmniDesk (kill-bug-machine) Architecture Rules
+## OmniDesk Architecture Rules
 
 When working on this workspace, strictly follow these core philosophies:
 
@@ -32,11 +32,10 @@ When working on this workspace, strictly follow these core philosophies:
    - CLI: `C:\Users\Admin\scoop\persist\uv\tools\shims\mempalace.exe`
    - MCP: `C:\Users\Admin\scoop\persist\uv\tools\shims\mempalace-mcp.exe`
    - Do NOT run or install it from the local source git repository.
-2. **Handling `exit status 0xffffffff`**: 
+2. **Handling `exit status 0xffffffff`**:
    - If you see `exit status 0xffffffff` when running `mempalace`, it means a legacy Scoop shim (in `C:\Users\Admin\scoop\shims\`) is broken and trying to resolve to a deleted path.
    - Clean up old shims using: `Remove-Item C:\Users\Admin\scoop\shims\mempalace* -Force`
    - Always restart the terminal or IDE to clear cached PATH paths after cleaning up shims.
 3. **Process Lock / Access Denied**:
    - If `Access is denied` occurs when renaming/moving MemPalace folders, terminate the active MCP processes first:
      `Stop-Process -Id <pid> -Force` (specifically searching for `mempalace-mcp` or `python` instances in the venv).
-

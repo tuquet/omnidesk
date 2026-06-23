@@ -25,7 +25,7 @@ export default defineConfig({
       }
     ],
     socialLinks: [
-      { icon: 'github', link: 'https://github.com/tuquet/kill-bug-machine' }
+      { icon: 'github', link: 'https://github.com/tuquet/omnidesk' }
     ]
   }
 })

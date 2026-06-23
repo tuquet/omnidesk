@@ -51,7 +51,13 @@ OAuth and external login flows are routed to the user's default OS browser. Upon
 ### Prerequisites
 
 - Node.js >= 20 & `pnpm`
-- Rust >= 1.80 & Cargo
+- **Rust toolchain (GNU target)**:
+  - Do cấu hình cargo yêu cầu target `x86_64-pc-windows-gnu` và linker `gcc`, lập trình viên Windows nên cài đặt Rust GNU Toolchain cùng GCC (MinGW).
+  - Cách cài đặt nhanh qua Scoop:
+    ```powershell
+    scoop install rustup-gnu mingw
+    rustup target add x86_64-pc-windows-gnu
+    ```
 - Tauri CLI dependencies installed
 
 ### Installation
@@ -61,10 +67,13 @@ OAuth and external login flows are routed to the user's default OS browser. Upon
 git clone https://github.com/tuquet/omnidesk.git
 cd omnidesk
 
-# 2. Install dependencies
+# 2. Cài đặt các file môi trường
+cp .env.example .env
+
+# 3. Install dependencies
 pnpm install
 
-# 3. Start the Local-First OS (Development)
+# 4. Start the Local-First OS (Development)
 pnpm --filter @omnidesk/desktop tauri dev
 ```
 
