@@ -2,3 +2,4 @@ packages:
   - "platform/*"
   - "apps/*"
   - "packages/*"
+  - "apps/e2e-orchestrator"
