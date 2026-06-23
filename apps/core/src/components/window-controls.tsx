@@ -31,7 +31,7 @@ export function WindowControls() {
         className="inline-flex h-8 w-10 items-center justify-center text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
         aria-label="Minimize"
       >
-        <Minus className="h-3.5 w-3.5" />
+        <Minus className="h-3.5 w-3.5" strokeWidth={1.5} />
       </button>
       <button
         type="button"
@@ -40,9 +40,9 @@ export function WindowControls() {
         aria-label="Maximize"
       >
         {isMaximized ? (
-          <Copy className="h-3 w-3 -scale-x-100" />
+          <Copy className="h-3 w-3 -scale-x-100" strokeWidth={1.5} />
         ) : (
-          <Square className="h-3 w-3" />
+          <Square className="h-3 w-3" strokeWidth={1.5} />
         )}
       </button>
       <button
@@ -51,7 +51,7 @@ export function WindowControls() {
         className="inline-flex h-8 w-10 items-center justify-center text-muted-foreground transition-colors hover:bg-destructive hover:text-destructive-foreground"
         aria-label="Close"
       >
-        <X className="h-3.5 w-3.5" />
+        <X className="h-3.5 w-3.5" strokeWidth={1.5} />
       </button>
     </div>
   );
