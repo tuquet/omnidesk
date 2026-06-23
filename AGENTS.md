@@ -16,3 +16,27 @@ When tasked with implementing a new UI feature, page, or function (e.g., login, 
 
 - **Always consider Shadcn Blocks:** Use the command `npx shadcn@latest add <block-name>` (e.g., `login-02`, `signup-02`) to scaffold the UI quickly.
 - Shadcn Blocks provide complete, responsive page layouts that follow the project's design system.
+
+## OmniDesk (kill-bug-machine) Architecture Rules
+
+When working on this workspace, strictly follow these core philosophies:
+
+1. **Micro-App Isolation**: Each feature/app lives in isolation (e.g. under `apps/` or `packages/`). They must not import code directly from each other. Communication must go through the Rust API Gateway or Event Bus.
+2. **Backend is the Real API Gateway**: The React frontend is just a view. Absolute power belongs to the Rust Backend (Tauri v2 + Axum gateway). Files, DB, and system integrations must route through HTTP `localhost:1421/api/...`.
+3. **Local-First, Cloud-Second**: Actions must write immediately to local SQLite (via SQLx). Supabase acts only as a background 2-way sync layer.
+4. **Zero-Trust Web**: No internal WebViews for external auth. OAuth flows must open the user's system browser and capture tokens via the `omnidesk://` deep link.
+
+## MemPalace Tooling & Troubleshooting
+
+1. **Global Installation**: MemPalace must be run globally via `uv` shims:
+   - CLI: `C:\Users\Admin\scoop\persist\uv\tools\shims\mempalace.exe`
+   - MCP: `C:\Users\Admin\scoop\persist\uv\tools\shims\mempalace-mcp.exe`
+   - Do NOT run or install it from the local source git repository.
+2. **Handling `exit status 0xffffffff`**: 
+   - If you see `exit status 0xffffffff` when running `mempalace`, it means a legacy Scoop shim (in `C:\Users\Admin\scoop\shims\`) is broken and trying to resolve to a deleted path.
+   - Clean up old shims using: `Remove-Item C:\Users\Admin\scoop\shims\mempalace* -Force`
+   - Always restart the terminal or IDE to clear cached PATH paths after cleaning up shims.
+3. **Process Lock / Access Denied**:
+   - If `Access is denied` occurs when renaming/moving MemPalace folders, terminate the active MCP processes first:
+     `Stop-Process -Id <pid> -Force` (specifically searching for `mempalace-mcp` or `python` instances in the venv).
+
