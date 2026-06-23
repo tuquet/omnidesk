@@ -59,7 +59,7 @@
     "zod": "^4.4.3",
     "@omnidesk/app-auth": "workspace:*",
     "@omnidesk/app-core": "workspace:*",
-    "@omnidesk/app-notifications": "workspace:*"
+    "@omnidesk/app-launcher": "workspace:*"
   },
   "devDependencies": {
     "@eslint/js": "^9.21.0",

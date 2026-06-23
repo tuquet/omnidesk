@@ -25,7 +25,6 @@ import {
 } from '@/config';
 import { useRBAC } from '@/hooks/use-rbac';
 import { useDevStore } from '@/stores/use-dev-store';
-import { useLauncherStore } from '@omnidesk/app-launcher';
 import { useAuth } from '@omnidesk/app-auth';
 import { useQuery } from '@tanstack/react-query';
 
@@ -34,7 +33,6 @@ const AppSidebarInner = ({ ...props }: React.ComponentProps<typeof Sidebar>) => 
   const { isDevMode } = useDevStore();
   const { displayName, user } = useAuth();
 
-  const { installedApps } = useLauncherStore();
   const { data: localApps } = useQuery({
     queryKey: ['launcher', 'local-installed-apps'],
     queryFn: async () => {

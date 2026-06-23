@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { z } from 'zod';
-import { client } from '@/lib/api-client';
+import { client } from '../lib/api-client';
 
 // ─── Zod Schemas ────────────────────────────────────────────────────────────
 

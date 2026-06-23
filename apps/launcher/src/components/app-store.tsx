@@ -14,7 +14,6 @@ import { Button, Input, Skeleton, cn } from '@omnidesk/ui';
 import { Search, AlertCircle, RefreshCw, CloudUpload } from 'lucide-react';
 import { toast } from 'sonner';
 import { useNavigate } from '@tanstack/react-router';
-import { useInsertNotification } from '@omnidesk/app-notifications';
 import { APP_STORE_CATEGORIES } from '../config/constants';
 import { AppCard } from './app-card';
 import { FeaturedBanner } from './featured-banner';
@@ -27,7 +26,6 @@ export function AppStore() {
   const { installedApps } = useLauncherStore();
   const { user } = useAuth();
   const navigate = useNavigate();
-  const { insert: insertNotification } = useInsertNotification();
 
   const {
     data: marketplaceApps,
@@ -89,21 +87,13 @@ export function AppStore() {
           toast.success(`Installed ${appName}!`, {
             description: 'The app is now available in your sidebar.',
           });
-          if (user) {
-            await insertNotification({
-              title: `App Installed: ${appName}`,
-              description: `You have successfully installed ${appName}. It is ready to use.`,
-              type: 'success',
-              action_url: `/app-store/${appId}`,
-            });
-          }
         },
         onError: () => {
           launcherActions.uninstallApp(appId);
         },
       });
     },
-    [installMutation, insertNotification, user],
+    [installMutation],
   );
 
   const handleUninstall = useCallback(

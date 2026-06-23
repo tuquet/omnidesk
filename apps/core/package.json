@@ -8,6 +8,8 @@
     "./*": "./src/*"
   },
   "dependencies": {
+    "@omnidesk/app-auth": "workspace:*",
+    "@omnidesk/app-launcher": "workspace:*",
     "@omnidesk/types": "workspace:*",
     "@omnidesk/ui": "workspace:*",
     "@radix-ui/react-slot": "^1.2.5",
