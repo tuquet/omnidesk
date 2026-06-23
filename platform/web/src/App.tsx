@@ -34,6 +34,7 @@ import { TanStackRouterDevtools } from '@tanstack/react-router-devtools';
 
 import { isSupabaseConfigured } from './lib/supabase';
 import { EnvSetupWarning } from '@/components/env-setup-warning';
+import { Platform } from '@/lib/platform';
 
 export default function App() {
   const auth = useStore(authStore);
@@ -62,8 +63,8 @@ export default function App() {
             <Toaster richColors position="bottom-right" />
           </TooltipProvider>
         </ThemeProvider>
-        <ReactQueryDevtools initialIsOpen={false} />
-        <TanStackRouterDevtools router={router} position="bottom-right" />
+        {Platform.isWeb && <ReactQueryDevtools initialIsOpen={false} />}
+        {Platform.isWeb && <TanStackRouterDevtools router={router} position="bottom-right" />}
       </QueryClientProvider>
     </ErrorBoundary>
   );
