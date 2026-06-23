@@ -9,7 +9,6 @@ import {
 } from '@omnidesk/ui';
 import { CloudUpload, FileArchive } from 'lucide-react';
 import { toast } from 'sonner';
-import { invoke } from '@tauri-apps/api/core';
 
 interface UploadAppDialogProps {
   open: boolean;
@@ -38,7 +37,8 @@ export function UploadAppDialog({ open, onOpenChange }: UploadAppDialogProps) {
 
       toast.loading('Installing App...', { id: 'installing' });
 
-      // Call the Rust command
+      // Call the Rust command dynamically to avoid loading it on web browser
+      const { invoke } = await import('@tauri-apps/api/core');
       const response = await invoke<{ success: boolean; message: string; app_id: string }>('install_local_app', {
         zipPath: selectedPath
       });
