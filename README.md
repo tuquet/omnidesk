@@ -58,6 +58,8 @@ OAuth and external login flows are routed to the user's default OS browser. Upon
     scoop install rustup-gnu mingw
     rustup target add x86_64-pc-windows-gnu
     ```
+    > [!IMPORTANT]
+    > Sau khi chạy lệnh cài đặt qua Scoop trên Windows, bạn **bắt buộc phải khởi động lại VS Code** (hoặc Terminal đang dùng) để hệ thống nạp lại biến môi trường `PATH` mới cho `cargo` và `gcc`. Nếu không, lệnh build sẽ báo lỗi `cargo metadata: program not found`.
 - Tauri CLI dependencies installed
 
 ### Installation

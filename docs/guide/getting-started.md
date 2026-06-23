@@ -10,6 +10,8 @@
     1. Cài đặt **Scoop** (nếu chưa có).
     2. Chạy lệnh: `scoop install rustup-gnu mingw`
     3. Thêm target GNU (nếu chưa tự động thêm): `rustup target add x86_64-pc-windows-gnu`
+       > [!IMPORTANT]
+       > Sau khi cài đặt qua Scoop trên Windows, bạn **bắt buộc phải khởi động lại VS Code** (hoặc Terminal) để hệ thống nhận diện PATH mới của `cargo` và `gcc`.
   - Trên macOS/Linux: Cài đặt Rust toolchain tiêu chuẩn qua `curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh`.
 - Platform-specific [Tauri prerequisites](https://v2.tauri.app/start/prerequisites/)
 
