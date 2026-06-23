@@ -4,14 +4,33 @@ import type { Session, User } from '@supabase/supabase-js';
 const supabaseUrl = (import.meta.env.VITE_SUPABASE_URL as string) || '';
 const supabaseAnonKey = (import.meta.env.VITE_SUPABASE_ANON_KEY as string) || '';
 
-if (!supabaseUrl || !supabaseAnonKey) {
+export const isSupabaseConfigured = !!supabaseUrl && !!supabaseAnonKey;
+
+// Mock client to prevent crashes during startup when ENV vars are missing
+const mockSupabase = {
+  auth: {
+    getSession: async () => ({ data: { session: null }, error: null }),
+    getUser: async () => ({ data: { user: null }, error: null }),
+    onAuthStateChange: () => ({
+      data: {
+        subscription: {
+          unsubscribe: () => {},
+        },
+      },
+    }),
+  },
+} as any;
+
+if (!isSupabaseConfigured) {
   console.warn(
-    '[Supabase] URL or Anon Key is missing. Check your .env file.\n' +
+    '[Environment] Connection variables are missing. Check your .env file.\n' +
     'Required: VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY'
   );
 }
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+export const supabase = isSupabaseConfigured
+  ? createClient(supabaseUrl, supabaseAnonKey)
+  : mockSupabase;
 
 /**
  * Get the current Supabase session (cached, no network call).
