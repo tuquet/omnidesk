@@ -181,7 +181,7 @@ pub async fn install_app_impl(
               let mut hasher = Sha256::new();
               hasher.update(&bytes);
               let hash_result = hasher.finalize();
-              let actual_hash = format!("{:x}", hash_result);
+              let actual_hash = hash_result.iter().map(|b| format!("{:02x}", b)).collect::<String>();
               
               if actual_hash != *hash {
                   return Err(AppError::Internal(format!(
