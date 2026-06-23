@@ -25,9 +25,6 @@ import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
 import { Route as AuthenticatedAppStoreAppIdRouteImport } from './routes/_authenticated/app-store_.$appId'
 
 const IndexLazyRouteImport = createFileRoute('/')()
-const AuthenticatedProjectsProjectIdLazyRouteImport = createFileRoute(
-  '/_authenticated/projects_/$projectId',
-)()
 const AuthenticatedAppAppIdLazyRouteImport = createFileRoute(
   '/_authenticated/app/$appId',
 )()
@@ -91,16 +88,6 @@ const AuthCallbackRoute = AuthCallbackRouteImport.update({
   path: '/auth/callback',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedProjectsProjectIdLazyRoute =
-  AuthenticatedProjectsProjectIdLazyRouteImport.update({
-    id: '/projects_/$projectId',
-    path: '/projects/$projectId',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any).lazy(() =>
-    import('./routes/_authenticated/projects_.$projectId.lazy').then(
-      (d) => d.Route,
-    ),
-  )
 const AuthenticatedAppAppIdLazyRoute =
   AuthenticatedAppAppIdLazyRouteImport.update({
     id: '/app/$appId',
@@ -130,7 +117,6 @@ export interface FileRoutesByFullPath {
   '/auth/callback': typeof AuthCallbackRoute
   '/app-store/$appId': typeof AuthenticatedAppStoreAppIdRoute
   '/app/$appId': typeof AuthenticatedAppAppIdLazyRoute
-  '/projects/$projectId': typeof AuthenticatedProjectsProjectIdLazyRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexLazyRoute
@@ -146,7 +132,6 @@ export interface FileRoutesByTo {
   '/auth/callback': typeof AuthCallbackRoute
   '/app-store/$appId': typeof AuthenticatedAppStoreAppIdRoute
   '/app/$appId': typeof AuthenticatedAppAppIdLazyRoute
-  '/projects/$projectId': typeof AuthenticatedProjectsProjectIdLazyRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -164,7 +149,6 @@ export interface FileRoutesById {
   '/auth/callback': typeof AuthCallbackRoute
   '/_authenticated/app-store_/$appId': typeof AuthenticatedAppStoreAppIdRoute
   '/_authenticated/app/$appId': typeof AuthenticatedAppAppIdLazyRoute
-  '/_authenticated/projects_/$projectId': typeof AuthenticatedProjectsProjectIdLazyRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -182,7 +166,6 @@ export interface FileRouteTypes {
     | '/auth/callback'
     | '/app-store/$appId'
     | '/app/$appId'
-    | '/projects/$projectId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -198,7 +181,6 @@ export interface FileRouteTypes {
     | '/auth/callback'
     | '/app-store/$appId'
     | '/app/$appId'
-    | '/projects/$projectId'
   id:
     | '__root__'
     | '/'
@@ -215,7 +197,6 @@ export interface FileRouteTypes {
     | '/auth/callback'
     | '/_authenticated/app-store_/$appId'
     | '/_authenticated/app/$appId'
-    | '/_authenticated/projects_/$projectId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -319,13 +300,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthCallbackRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_authenticated/projects_/$projectId': {
-      id: '/_authenticated/projects_/$projectId'
-      path: '/projects/$projectId'
-      fullPath: '/projects/$projectId'
-      preLoaderRoute: typeof AuthenticatedProjectsProjectIdLazyRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
     '/_authenticated/app/$appId': {
       id: '/_authenticated/app/$appId'
       path: '/app/$appId'
@@ -346,14 +320,11 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedRouteChildren {
   AuthenticatedAppStoreAppIdRoute: typeof AuthenticatedAppStoreAppIdRoute
   AuthenticatedAppAppIdLazyRoute: typeof AuthenticatedAppAppIdLazyRoute
-  AuthenticatedProjectsProjectIdLazyRoute: typeof AuthenticatedProjectsProjectIdLazyRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedAppStoreAppIdRoute: AuthenticatedAppStoreAppIdRoute,
   AuthenticatedAppAppIdLazyRoute: AuthenticatedAppAppIdLazyRoute,
-  AuthenticatedProjectsProjectIdLazyRoute:
-    AuthenticatedProjectsProjectIdLazyRoute,
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(

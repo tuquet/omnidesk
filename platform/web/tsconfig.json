@@ -6,13 +6,6 @@
       "@/*": [
         "./src/*"
       ],
-      "@omnidesk/app-analytics": [
-        "../../apps/analytics/src",
-        "../../apps/analytics/src/index.ts"
-      ],
-      "@omnidesk/app-analytics/*": [
-        "../../apps/analytics/src/*"
-      ],
       "@omnidesk/app-auth": [
         "../../apps/auth/src",
         "../../apps/auth/src/index.ts"
@@ -27,20 +20,6 @@
       "@omnidesk/app-core/*": [
         "../../apps/core/src/*"
       ],
-      "@omnidesk/app-dashboard": [
-        "../../apps/dashboard/src",
-        "../../apps/dashboard/src/index.ts"
-      ],
-      "@omnidesk/app-dashboard/*": [
-        "../../apps/dashboard/src/*"
-      ],
-      "@omnidesk/app-documents": [
-        "../../apps/documents/src",
-        "../../apps/documents/src/index.ts"
-      ],
-      "@omnidesk/app-documents/*": [
-        "../../apps/documents/src/*"
-      ],
       "@omnidesk/app-file-browser": [
         "../../apps/file-browser/src",
         "../../apps/file-browser/src/index.ts"
@@ -54,48 +33,6 @@
       ],
       "@omnidesk/app-launcher/*": [
         "../../apps/launcher/src/*"
-      ],
-      "@omnidesk/app-lifecycle": [
-        "../../apps/lifecycle/src",
-        "../../apps/lifecycle/src/index.ts"
-      ],
-      "@omnidesk/app-lifecycle/*": [
-        "../../apps/lifecycle/src/*"
-      ],
-      "@omnidesk/app-notifications": [
-        "../../apps/notifications/src",
-        "../../apps/notifications/src/index.ts"
-      ],
-      "@omnidesk/app-notifications/*": [
-        "../../apps/notifications/src/*"
-      ],
-      "@omnidesk/app-projects": [
-        "../../apps/projects/src",
-        "../../apps/projects/src/index.ts"
-      ],
-      "@omnidesk/app-projects/*": [
-        "../../apps/projects/src/*"
-      ],
-      "@omnidesk/app-showcase": [
-        "../../apps/showcase/src",
-        "../../apps/showcase/src/index.ts"
-      ],
-      "@omnidesk/app-showcase/*": [
-        "../../apps/showcase/src/*"
-      ],
-      "@omnidesk/app-team": [
-        "../../apps/team/src",
-        "../../apps/team/src/index.ts"
-      ],
-      "@omnidesk/app-team/*": [
-        "../../apps/team/src/*"
-      ],
-      "@omnidesk/app-wordpress-sync": [
-        "../../apps/wordpress-sync/src",
-        "../../apps/wordpress-sync/src/index.ts"
-      ],
-      "@omnidesk/app-wordpress-sync/*": [
-        "../../apps/wordpress-sync/src/*"
       ],
       "@omnidesk/ui/*": [
         "../../packages/ui/src/*"

@@ -58,42 +58,7 @@ export interface DocumentItem {
 
 // ─── Navigation Groups ──────────────────────────────────────────────────────
 
-export const NAV_MAIN: NavItem[] = [
-  {
-    title: 'WordPress Sync',
-    url: '/wordpress-sync',
-    icon: RefreshCw,
-  },
-  {
-    title: 'Dashboard',
-    url: '/dashboard',
-    icon: LayoutDashboardIcon,
-    requiredPermission: 'dashboard:view',
-  },
-  {
-    title: 'Lifecycle',
-    url: '/lifecycle',
-    icon: ListIcon,
-  },
-  {
-    title: 'Analytics',
-    url: '/analytics',
-    icon: ChartBarIcon,
-    requiredPermission: 'analytics:view',
-  },
-  {
-    title: 'Projects',
-    url: '/projects',
-    icon: FolderIcon,
-    requiredPermission: 'projects:view',
-  },
-  {
-    title: 'Team',
-    url: '/team',
-    icon: UsersIcon,
-    requiredPermission: 'team:view',
-  },
-];
+export const NAV_MAIN: NavItem[] = [];
 
 export const NAV_SHOWCASE: NavGroup = {
   label: 'Component Showcase',
@@ -129,26 +94,7 @@ export const NAV_SECONDARY: NavItem[] = [
   { title: 'App Store', url: '/app-store', icon: StoreIcon },
 ];
 
-export const NAV_DOCUMENTS: DocumentItem[] = [
-  {
-    name: 'Data Library',
-    url: '/documents/data-library',
-    icon: DatabaseIcon,
-    requiredPermission: 'documents:view',
-  },
-  {
-    name: 'Reports',
-    url: '/documents/reports',
-    icon: FileChartColumnIcon,
-    requiredPermission: 'documents:view',
-  },
-  {
-    name: 'Word Assistant',
-    url: '/documents/word-assistant',
-    icon: FileIcon,
-    requiredPermission: 'documents:view',
-  },
-];
+export const NAV_DOCUMENTS: DocumentItem[] = [];
 
 // ─── Breadcrumb Route Map ───────────────────────────────────────────────────
 
