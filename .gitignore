@@ -46,3 +46,5 @@ entities.json
 
 # Playwright profiles
 .playwright-profile/
+
+scratch/
