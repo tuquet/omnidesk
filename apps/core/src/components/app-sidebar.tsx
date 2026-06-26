@@ -24,6 +24,7 @@ import {
   NAV_DOCUMENTS,
 } from '@/config';
 import { useRBAC } from '@/hooks/use-rbac';
+import { useDevStore } from '@/stores/use-dev-store';
 import { useAuth } from '@omnidesk/app-auth';
 import { supabase } from '@/lib/supabase';
 import { useQuery } from '@tanstack/react-query';
