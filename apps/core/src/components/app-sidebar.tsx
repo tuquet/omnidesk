@@ -14,7 +14,7 @@ import {
   SidebarMenuItem,
 } from '@omnidesk/ui';
 import * as LucideIcons from 'lucide-react';
-import { CommandIcon, CompassIcon, AlertTriangleIcon, DatabaseIcon } from 'lucide-react';
+import { CommandIcon, CompassIcon, AlertTriangleIcon, DatabaseIcon, LayoutDashboardIcon, PackageOpen } from 'lucide-react';
 import {
   APP_NAME,
   NAV_MAIN,
@@ -22,7 +22,6 @@ import {
   NAV_ERROR_PAGES,
   NAV_SECONDARY,
   NAV_DOCUMENTS,
-  APP_REGISTRY,
 } from '@/config';
 import { useRBAC } from '@/hooks/use-rbac';
 import { useDevStore } from '@/stores/use-dev-store';
@@ -36,14 +35,14 @@ const AppSidebarInner = ({ ...props }: React.ComponentProps<typeof Sidebar>) => 
   const { displayName, user, role } = useAuth();
   const currentUserRole = role || 'GUEST';
 
-  const { data: installedAppIds } = useQuery({
-    queryKey: ['sidebar', 'user-installed-apps', user?.id],
+  const { data: installedApps } = useQuery({
+    queryKey: ['sidebar', 'dynamic-apps', user?.id],
     queryFn: async () => {
       if (Platform.isDesktop) {
         try {
           const { invoke } = await import('@tauri-apps/api/core');
           const localApps = await invoke<any[]>('list_local_apps');
-          return localApps.map((a) => a.id);
+          return localApps.map((a) => ({ id: a.id, name: a.name || a.id }));
         } catch (e) {
           return [];
         }
@@ -51,34 +50,38 @@ const AppSidebarInner = ({ ...props }: React.ComponentProps<typeof Sidebar>) => 
         if (!user?.id) return [];
         const { data, error } = await supabase
           .from('user_installed_apps')
-          .select('app_id');
+          .select('app_id, marketplace_apps(id, name)');
         if (error || !data) return [];
-        return data.map((item) => item.app_id);
+        return data
+          .filter((item: any) => item.marketplace_apps)
+          .map((item: any) => ({
+            id: item.marketplace_apps.id,
+            name: item.marketplace_apps.name,
+          }));
       }
     },
     enabled: !!user?.id,
     staleTime: 30000,
   });
 
-  const mainItems: any[] = [];
-  const activeInstalledIds = new Set(installedAppIds || []);
-
-  for (const app of APP_REGISTRY) {
-    // 1. Kiểm tra User Role
-    if (app.requiredUserRoles && !app.requiredUserRoles.includes(currentUserRole)) {
-      continue;
-    }
-    // 2. Kiểm tra App Role (Kernel vs Marketplace)
-    if (app.appRole === 'marketplace' && !activeInstalledIds.has(app.id)) {
-      continue;
-    }
-
-    mainItems.push({
-      title: app.name,
-      url: `/app/${app.id}`,
-      icon: app.icon,
+  const mainItems: any[] = [
+    {
+      title: 'Command Center',
+      url: '/app/dashboard',
+      icon: LayoutDashboardIcon,
       items: [],
-    });
+    }
+  ];
+
+  if (installedApps) {
+    for (const app of installedApps) {
+      mainItems.push({
+        title: app.name || app.id,
+        url: `/app/${app.id}`,
+        icon: PackageOpen,
+        items: [],
+      });
+    }
   }
 
   const secondaryItems = filterNav(NAV_SECONDARY);

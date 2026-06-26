@@ -1,14 +1,5 @@
 import type { LucideIcon } from 'lucide-react';
 import type { Permission } from './rbac';
-export type AppRole = 'kernel' | 'marketplace';
-
-export interface AppRegistryItem {
-  id: string;
-  name: string;
-  icon: LucideIcon;
-  appRole: AppRole;
-  requiredUserRoles?: string[];
-}
 import {
   LayoutDashboardIcon,
   ListIcon,
@@ -64,30 +55,6 @@ export interface DocumentItem {
   icon: LucideIcon;
   requiredPermission?: Permission;
 }
-
-export const APP_REGISTRY: AppRegistryItem[] = [
-  {
-    id: 'dashboard',
-    name: 'Command Center',
-    icon: LayoutDashboardIcon,
-    appRole: 'kernel',
-    requiredUserRoles: ['ADMIN', 'USER'],
-  },
-  {
-    id: 'automa',
-    name: 'Automa E2E',
-    icon: ServerCrashIcon,
-    appRole: 'marketplace',
-    requiredUserRoles: ['ADMIN', 'USER'],
-  },
-  {
-    id: 'crm',
-    name: 'CRM Portal',
-    icon: ActivityIcon,
-    appRole: 'marketplace',
-    requiredUserRoles: ['ADMIN', 'USER'],
-  }
-];
 
 // ─── Navigation Groups ──────────────────────────────────────────────────────
 
