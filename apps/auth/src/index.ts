@@ -6,4 +6,3 @@ export * from './components/login-form';
 export * from './components/signup-form';
 export * from './hooks/use-deep-link-auth';
 export * from './stores/use-auth-store';
-export * from './lib/supabase';
