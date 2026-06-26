@@ -1,7 +1,7 @@
 import { createClient } from '@hey-api/client-fetch';
 import { toast } from 'sonner';
 import i18n from '@/lib/i18n';
-import { authActions, authStore } from '@omnidesk/app-auth';
+import { authActions, authStore } from '@omnidesk/auth';
 import type { ApiResponse, ApiError } from '@omnidesk/types';
 import { ERROR_CODES } from '@omnidesk/types';
 import { Platform } from '@/lib/platform';

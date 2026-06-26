@@ -1,5 +1,5 @@
 import { useState, useMemo, useCallback, useEffect } from 'react';
-import { useAuth } from '@omnidesk/app-auth';
+import { useAuth } from '@omnidesk/auth';
 import { APP_REGISTRY } from '../config/registry';
 import { launcherActions, useLauncherStore, useNonCoreInstalledApps } from '../stores/use-launcher-store';
 import {

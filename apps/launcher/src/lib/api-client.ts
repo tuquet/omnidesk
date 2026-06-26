@@ -1,4 +1,4 @@
-import { authStore } from '@omnidesk/app-auth';
+import { authStore } from '@omnidesk/auth';
 
 const BASE_URL = 'http://localhost:1421';
 

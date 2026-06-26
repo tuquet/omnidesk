@@ -1,11 +1,11 @@
 import { createRootRouteWithContext, Link, Outlet } from '@tanstack/react-router';
 import { useEffect } from 'react';
 import { useDevStore } from '@/stores/use-dev-store';
-import type { AuthState } from '@omnidesk/app-auth';
+import type { AuthState } from '@omnidesk/auth';
 import { Button } from '@omnidesk/ui';
 import { ArrowLeft, Ghost } from 'lucide-react';
-import { TitleBar } from '@omnidesk/app-core';
-import { ResizeHandles } from '@omnidesk/app-core';
+import { TitleBar } from '@omnidesk/core';
+import { ResizeHandles } from '@omnidesk/core';
 
 interface MyRouterContext {
   auth: AuthState;
@@ -61,7 +61,7 @@ function NotFound() {
   );
 }
 
-import { useDeepLinkAuth } from '@omnidesk/app-auth';
+import { useDeepLinkAuth } from '@omnidesk/auth';
 import { AppLayout } from '@/app/layout';
 
 function RootComponent() {

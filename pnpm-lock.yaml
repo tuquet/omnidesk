@@ -73,114 +73,14 @@ importers:
         specifier: ^3.5.35
         version: 3.5.35(typescript@6.0.3)
 
-  apps/auth:
+  apps/automa/dashboard:
     dependencies:
       '@omnidesk/types':
         specifier: workspace:*
-        version: link:../../packages/types
+        version: link:../../../packages/types
       '@omnidesk/ui':
         specifier: workspace:*
-        version: link:../../packages/ui
-      '@radix-ui/react-slot':
-        specifier: ^1.2.5
-        version: 1.2.5(@types/react@19.2.17)(react@19.2.7)
-      '@supabase/supabase-js':
-        specifier: ^2.108.1
-        version: 2.108.1
-      '@tabler/icons-react':
-        specifier: ^3.44.0
-        version: 3.44.0(react@19.2.7)
-      '@tanstack/react-form':
-        specifier: ^1.33.0
-        version: 1.33.0(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
-      '@tanstack/react-query':
-        specifier: ^5.62.0
-        version: 5.101.0(react@19.2.7)
-      '@tanstack/react-router':
-        specifier: ^1.170.15
-        version: 1.170.15(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
-      '@tanstack/react-store':
-        specifier: ^0.11.0
-        version: 0.11.0(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
-      '@tanstack/react-table':
-        specifier: ^8.21.3
-        version: 8.21.3(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
-      '@tanstack/react-virtual':
-        specifier: ^3.14.2
-        version: 3.14.2(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
-      '@tanstack/store':
-        specifier: ^0.11.0
-        version: 0.11.0
-      '@tanstack/zod-form-adapter':
-        specifier: ^0.42.1
-        version: 0.42.1(zod@4.4.3)
-      '@tauri-apps/api':
-        specifier: ^2.5.0
-        version: 2.11.0
-      '@tauri-apps/plugin-log':
-        specifier: '2'
-        version: 2.8.0
-      clsx:
-        specifier: ^2.1.1
-        version: 2.1.1
-      i18next:
-        specifier: ^26.3.1
-        version: 26.3.1(typescript@6.0.3)
-      lucide-react:
-        specifier: ^0.475.0
-        version: 0.475.0(react@19.2.7)
-      next-themes:
-        specifier: ^0.4.6
-        version: 0.4.6(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
-      radix-ui:
-        specifier: ^1.5.0
-        version: 1.5.0(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
-      react:
-        specifier: ^19.1.0
-        version: 19.2.7
-      react-dom:
-        specifier: ^19.1.0
-        version: 19.2.7(react@19.2.7)
-      react-i18next:
-        specifier: ^17.0.8
-        version: 17.0.8(i18next@26.3.1(typescript@6.0.3))(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(typescript@6.0.3)
-      recharts:
-        specifier: 3.8.0
-        version: 3.8.0(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react-is@19.2.7)(react@19.2.7)(redux@5.0.1)
-      sonner:
-        specifier: ^2.0.7
-        version: 2.0.7(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
-      tailwind-merge:
-        specifier: ^3.6.0
-        version: 3.6.0
-      vaul:
-        specifier: ^1.1.2
-        version: 1.1.2(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
-      zod:
-        specifier: ^4.4.3
-        version: 4.4.3
-    devDependencies:
-      '@omnidesk/config':
-        specifier: workspace:*
-        version: link:../../packages/config
-      '@types/react':
-        specifier: ^19.1.0
-        version: 19.2.17
-      '@types/react-dom':
-        specifier: ^19.1.0
-        version: 19.2.3(@types/react@19.2.17)
-      '@typescript/native-preview':
-        specifier: 7.0.0-dev.20260421.2
-        version: 7.0.0-dev.20260421.2
-
-  apps/automa:
-    dependencies:
-      '@omnidesk/types':
-        specifier: workspace:*
-        version: link:../../packages/types
-      '@omnidesk/ui':
-        specifier: workspace:*
-        version: link:../../packages/ui
+        version: link:../../../packages/ui
       '@radix-ui/react-slot':
         specifier: ^1.2.5
         version: 1.2.5(@types/react@19.2.17)(react@19.2.7)
@@ -262,7 +162,7 @@ importers:
     devDependencies:
       '@omnidesk/config':
         specifier: workspace:*
-        version: link:../../packages/config
+        version: link:../../../packages/config
       '@types/react':
         specifier: ^19.1.0
         version: 19.2.17
@@ -279,351 +179,7 @@ importers:
         specifier: ^5.1.0
         version: 5.4.21(@types/node@24.13.1)(lightningcss@1.32.0)(terser@5.48.0)
 
-  apps/core:
-    dependencies:
-      '@dnd-kit/core':
-        specifier: ^6.3.1
-        version: 6.3.1(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
-      '@dnd-kit/sortable':
-        specifier: ^10.0.0
-        version: 10.0.0(@dnd-kit/core@6.3.1(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(react@19.2.7)
-      '@dnd-kit/utilities':
-        specifier: ^3.2.2
-        version: 3.2.2(react@19.2.7)
-      '@omnidesk/app-auth':
-        specifier: workspace:*
-        version: link:../auth
-      '@omnidesk/app-launcher':
-        specifier: workspace:*
-        version: link:../launcher
-      '@omnidesk/types':
-        specifier: workspace:*
-        version: link:../../packages/types
-      '@omnidesk/ui':
-        specifier: workspace:*
-        version: link:../../packages/ui
-      '@radix-ui/react-slot':
-        specifier: ^1.2.5
-        version: 1.2.5(@types/react@19.2.17)(react@19.2.7)
-      '@supabase/supabase-js':
-        specifier: ^2.108.1
-        version: 2.108.1
-      '@tabler/icons-react':
-        specifier: ^3.44.0
-        version: 3.44.0(react@19.2.7)
-      '@tanstack/react-form':
-        specifier: ^1.33.0
-        version: 1.33.0(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
-      '@tanstack/react-query':
-        specifier: ^5.62.0
-        version: 5.101.0(react@19.2.7)
-      '@tanstack/react-router':
-        specifier: ^1.170.15
-        version: 1.170.15(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
-      '@tanstack/react-store':
-        specifier: ^0.11.0
-        version: 0.11.0(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
-      '@tanstack/react-table':
-        specifier: ^8.21.3
-        version: 8.21.3(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
-      '@tanstack/react-virtual':
-        specifier: ^3.14.2
-        version: 3.14.2(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
-      '@tanstack/store':
-        specifier: ^0.11.0
-        version: 0.11.0
-      '@tanstack/zod-form-adapter':
-        specifier: ^0.42.1
-        version: 0.42.1(zod@4.4.3)
-      '@tauri-apps/api':
-        specifier: ^2.5.0
-        version: 2.11.0
-      '@tauri-apps/plugin-log':
-        specifier: '2'
-        version: 2.8.0
-      clsx:
-        specifier: ^2.1.1
-        version: 2.1.1
-      i18next:
-        specifier: ^26.3.1
-        version: 26.3.1(typescript@6.0.3)
-      lucide-react:
-        specifier: ^0.475.0
-        version: 0.475.0(react@19.2.7)
-      next-themes:
-        specifier: ^0.4.6
-        version: 0.4.6(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
-      radix-ui:
-        specifier: ^1.5.0
-        version: 1.5.0(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
-      react:
-        specifier: ^19.1.0
-        version: 19.2.7
-      react-dom:
-        specifier: ^19.1.0
-        version: 19.2.7(react@19.2.7)
-      react-i18next:
-        specifier: ^17.0.8
-        version: 17.0.8(i18next@26.3.1(typescript@6.0.3))(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(typescript@6.0.3)
-      recharts:
-        specifier: 3.8.0
-        version: 3.8.0(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react-is@19.2.7)(react@19.2.7)(redux@5.0.1)
-      sonner:
-        specifier: ^2.0.7
-        version: 2.0.7(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
-      tailwind-merge:
-        specifier: ^3.6.0
-        version: 3.6.0
-      vaul:
-        specifier: ^1.1.2
-        version: 1.1.2(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
-      zod:
-        specifier: ^4.4.3
-        version: 4.4.3
-    devDependencies:
-      '@omnidesk/config':
-        specifier: workspace:*
-        version: link:../../packages/config
-      '@types/react':
-        specifier: ^19.1.0
-        version: 19.2.17
-      '@types/react-dom':
-        specifier: ^19.1.0
-        version: 19.2.3(@types/react@19.2.17)
-      '@typescript/native-preview':
-        specifier: 7.0.0-dev.20260421.2
-        version: 7.0.0-dev.20260421.2
-
-  apps/e2e-orchestrator:
-    dependencies:
-      '@supabase/supabase-js':
-        specifier: ^2.43.0
-        version: 2.108.1
-      dotenv:
-        specifier: ^16.4.5
-        version: 16.6.1
-    devDependencies:
-      '@omnidesk/config':
-        specifier: workspace:*
-        version: link:../../packages/config
-      playwright:
-        specifier: ^1.44.0
-        version: 1.61.0
-      ts-node:
-        specifier: ^10.9.2
-        version: 10.9.2(@types/node@24.13.1)(typescript@5.9.3)
-      typescript:
-        specifier: ^5.4.5
-        version: 5.9.3
-
-  apps/launcher:
-    dependencies:
-      '@omnidesk/app-auth':
-        specifier: workspace:*
-        version: link:../auth
-      '@omnidesk/app-automa':
-        specifier: workspace:*
-        version: link:../automa
-      '@omnidesk/types':
-        specifier: workspace:*
-        version: link:../../packages/types
-      '@omnidesk/ui':
-        specifier: workspace:*
-        version: link:../../packages/ui
-      '@radix-ui/react-slot':
-        specifier: ^1.2.5
-        version: 1.2.5(@types/react@19.2.17)(react@19.2.7)
-      '@supabase/supabase-js':
-        specifier: ^2.108.1
-        version: 2.108.1
-      '@tabler/icons-react':
-        specifier: ^3.44.0
-        version: 3.44.0(react@19.2.7)
-      '@tanstack/react-form':
-        specifier: ^1.33.0
-        version: 1.33.0(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
-      '@tanstack/react-query':
-        specifier: ^5.62.0
-        version: 5.101.0(react@19.2.7)
-      '@tanstack/react-router':
-        specifier: ^1.170.15
-        version: 1.170.15(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
-      '@tanstack/react-store':
-        specifier: ^0.11.0
-        version: 0.11.0(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
-      '@tanstack/react-table':
-        specifier: ^8.21.3
-        version: 8.21.3(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
-      '@tanstack/react-virtual':
-        specifier: ^3.14.2
-        version: 3.14.2(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
-      '@tanstack/store':
-        specifier: ^0.11.0
-        version: 0.11.0
-      '@tanstack/zod-form-adapter':
-        specifier: ^0.42.1
-        version: 0.42.1(zod@4.4.3)
-      '@tauri-apps/api':
-        specifier: ^2.5.0
-        version: 2.11.0
-      '@tauri-apps/plugin-dialog':
-        specifier: '2'
-        version: 2.7.1
-      '@tauri-apps/plugin-log':
-        specifier: '2'
-        version: 2.8.0
-      clsx:
-        specifier: ^2.1.1
-        version: 2.1.1
-      i18next:
-        specifier: ^26.3.1
-        version: 26.3.1(typescript@6.0.3)
-      lucide-react:
-        specifier: ^0.475.0
-        version: 0.475.0(react@19.2.7)
-      next-themes:
-        specifier: ^0.4.6
-        version: 0.4.6(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
-      radix-ui:
-        specifier: ^1.5.0
-        version: 1.5.0(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
-      react:
-        specifier: ^18.0.0 || ^19.0.0
-        version: 19.2.7
-      react-dom:
-        specifier: ^18.0.0 || ^19.0.0
-        version: 19.2.7(react@19.2.7)
-      react-i18next:
-        specifier: ^17.0.8
-        version: 17.0.8(i18next@26.3.1(typescript@6.0.3))(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(typescript@6.0.3)
-      recharts:
-        specifier: 3.8.0
-        version: 3.8.0(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react-is@19.2.7)(react@19.2.7)(redux@5.0.1)
-      sonner:
-        specifier: ^2.0.7
-        version: 2.0.7(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
-      tailwind-merge:
-        specifier: ^3.6.0
-        version: 3.6.0
-      vaul:
-        specifier: ^1.1.2
-        version: 1.1.2(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
-      zod:
-        specifier: ^4.4.3
-        version: 4.4.3
-    devDependencies:
-      '@omnidesk/config':
-        specifier: workspace:*
-        version: link:../../packages/config
-      '@types/react':
-        specifier: ^19.1.0
-        version: 19.2.17
-      '@types/react-dom':
-        specifier: ^19.1.0
-        version: 19.2.3(@types/react@19.2.17)
-      '@typescript/native-preview':
-        specifier: 7.0.0-dev.20260421.2
-        version: 7.0.0-dev.20260421.2
-      '@vitejs/plugin-react':
-        specifier: ^4.2.1
-        version: 4.7.0(vite@5.4.21(@types/node@24.13.1)(lightningcss@1.32.0)(terser@5.48.0))
-      vite:
-        specifier: ^5.1.0
-        version: 5.4.21(@types/node@24.13.1)(lightningcss@1.32.0)(terser@5.48.0)
-
-  packages/config:
-    devDependencies:
-      '@typescript/native-preview':
-        specifier: 7.0.0-dev.20260421.2
-        version: 7.0.0-dev.20260421.2
-
-  packages/types:
-    dependencies:
-      zod:
-        specifier: ^3.24.0
-        version: 3.25.76
-    devDependencies:
-      '@typescript/native-preview':
-        specifier: 7.0.0-dev.20260421.2
-        version: 7.0.0-dev.20260421.2
-
-  packages/ui:
-    dependencies:
-      '@dnd-kit/core':
-        specifier: ^6.3.1
-        version: 6.3.1(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
-      '@dnd-kit/modifiers':
-        specifier: ^9.0.0
-        version: 9.0.0(@dnd-kit/core@6.3.1(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(react@19.2.7)
-      '@dnd-kit/sortable':
-        specifier: ^10.0.0
-        version: 10.0.0(@dnd-kit/core@6.3.1(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(react@19.2.7)
-      '@dnd-kit/utilities':
-        specifier: ^3.2.2
-        version: 3.2.2(react@19.2.7)
-      '@radix-ui/react-slot':
-        specifier: ^1.2.5
-        version: 1.2.5(@types/react@19.2.17)(react@19.2.7)
-      '@tanstack/react-form':
-        specifier: ^1.33.0
-        version: 1.33.0(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
-      '@tanstack/react-table':
-        specifier: ^8.21.3
-        version: 8.21.3(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
-      class-variance-authority:
-        specifier: ^0.7.1
-        version: 0.7.1
-      clsx:
-        specifier: ^2.1.1
-        version: 2.1.1
-      cmdk:
-        specifier: ^1.1.1
-        version: 1.1.1(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
-      lucide-react:
-        specifier: ^0.475.0
-        version: 0.475.0(react@19.2.7)
-      next-themes:
-        specifier: ^0.4.6
-        version: 0.4.6(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
-      radix-ui:
-        specifier: ^1.5.0
-        version: 1.5.0(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
-      react:
-        specifier: ^19.1.0
-        version: 19.2.7
-      react-dom:
-        specifier: ^19.1.0
-        version: 19.2.7(react@19.2.7)
-      recharts:
-        specifier: 3.8.0
-        version: 3.8.0(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react-is@19.2.7)(react@19.2.7)(redux@5.0.1)
-      sonner:
-        specifier: ^2.0.7
-        version: 2.0.7(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
-      tailwind-merge:
-        specifier: ^3.6.0
-        version: 3.6.0
-      vaul:
-        specifier: ^1.1.2
-        version: 1.1.2(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
-      zod:
-        specifier: ^4.4.3
-        version: 4.4.3
-    devDependencies:
-      '@omnidesk/config':
-        specifier: workspace:*
-        version: link:../config
-      '@types/react':
-        specifier: ^19.1.0
-        version: 19.2.17
-      '@types/react-dom':
-        specifier: ^19.1.0
-        version: 19.2.3(@types/react@19.2.17)
-      '@typescript/native-preview':
-        specifier: 7.0.0-dev.20260421.2
-        version: 7.0.0-dev.20260421.2
-
-  platform/automa:
+  apps/automa/extension:
     dependencies:
       '@codemirror/autocomplete':
         specifier: ^6.9.0
@@ -972,6 +528,444 @@ importers:
         specifier: ^4.11.1
         version: 4.15.2(webpack-cli@5.1.4)(webpack@5.76.0)
 
+  apps/automa/orchestrator:
+    dependencies:
+      '@supabase/supabase-js':
+        specifier: ^2.43.0
+        version: 2.108.1
+      dotenv:
+        specifier: ^16.4.5
+        version: 16.6.1
+    devDependencies:
+      '@omnidesk/config':
+        specifier: workspace:*
+        version: link:../../../packages/config
+      playwright:
+        specifier: ^1.44.0
+        version: 1.61.0
+      ts-node:
+        specifier: ^10.9.2
+        version: 10.9.2(@types/node@24.13.1)(typescript@5.9.3)
+      typescript:
+        specifier: ^5.4.5
+        version: 5.9.3
+
+  apps/launcher:
+    dependencies:
+      '@omnidesk/app-automa':
+        specifier: workspace:*
+        version: link:../automa/dashboard
+      '@omnidesk/auth':
+        specifier: workspace:*
+        version: link:../../packages/auth
+      '@omnidesk/types':
+        specifier: workspace:*
+        version: link:../../packages/types
+      '@omnidesk/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
+      '@radix-ui/react-slot':
+        specifier: ^1.2.5
+        version: 1.2.5(@types/react@19.2.17)(react@19.2.7)
+      '@supabase/supabase-js':
+        specifier: ^2.108.1
+        version: 2.108.1
+      '@tabler/icons-react':
+        specifier: ^3.44.0
+        version: 3.44.0(react@19.2.7)
+      '@tanstack/react-form':
+        specifier: ^1.33.0
+        version: 1.33.0(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      '@tanstack/react-query':
+        specifier: ^5.62.0
+        version: 5.101.0(react@19.2.7)
+      '@tanstack/react-router':
+        specifier: ^1.170.15
+        version: 1.170.15(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      '@tanstack/react-store':
+        specifier: ^0.11.0
+        version: 0.11.0(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      '@tanstack/react-table':
+        specifier: ^8.21.3
+        version: 8.21.3(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      '@tanstack/react-virtual':
+        specifier: ^3.14.2
+        version: 3.14.2(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      '@tanstack/store':
+        specifier: ^0.11.0
+        version: 0.11.0
+      '@tanstack/zod-form-adapter':
+        specifier: ^0.42.1
+        version: 0.42.1(zod@4.4.3)
+      '@tauri-apps/api':
+        specifier: ^2.5.0
+        version: 2.11.0
+      '@tauri-apps/plugin-dialog':
+        specifier: '2'
+        version: 2.7.1
+      '@tauri-apps/plugin-log':
+        specifier: '2'
+        version: 2.8.0
+      clsx:
+        specifier: ^2.1.1
+        version: 2.1.1
+      i18next:
+        specifier: ^26.3.1
+        version: 26.3.1(typescript@6.0.3)
+      lucide-react:
+        specifier: ^0.475.0
+        version: 0.475.0(react@19.2.7)
+      next-themes:
+        specifier: ^0.4.6
+        version: 0.4.6(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      radix-ui:
+        specifier: ^1.5.0
+        version: 1.5.0(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      react:
+        specifier: ^18.0.0 || ^19.0.0
+        version: 19.2.7
+      react-dom:
+        specifier: ^18.0.0 || ^19.0.0
+        version: 19.2.7(react@19.2.7)
+      react-i18next:
+        specifier: ^17.0.8
+        version: 17.0.8(i18next@26.3.1(typescript@6.0.3))(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(typescript@6.0.3)
+      recharts:
+        specifier: 3.8.0
+        version: 3.8.0(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react-is@19.2.7)(react@19.2.7)(redux@5.0.1)
+      sonner:
+        specifier: ^2.0.7
+        version: 2.0.7(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      tailwind-merge:
+        specifier: ^3.6.0
+        version: 3.6.0
+      vaul:
+        specifier: ^1.1.2
+        version: 1.1.2(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      zod:
+        specifier: ^4.4.3
+        version: 4.4.3
+    devDependencies:
+      '@omnidesk/config':
+        specifier: workspace:*
+        version: link:../../packages/config
+      '@types/react':
+        specifier: ^19.1.0
+        version: 19.2.17
+      '@types/react-dom':
+        specifier: ^19.1.0
+        version: 19.2.3(@types/react@19.2.17)
+      '@typescript/native-preview':
+        specifier: 7.0.0-dev.20260421.2
+        version: 7.0.0-dev.20260421.2
+      '@vitejs/plugin-react':
+        specifier: ^4.2.1
+        version: 4.7.0(vite@5.4.21(@types/node@24.13.1)(lightningcss@1.32.0)(terser@5.48.0))
+      vite:
+        specifier: ^5.1.0
+        version: 5.4.21(@types/node@24.13.1)(lightningcss@1.32.0)(terser@5.48.0)
+
+  packages/auth:
+    dependencies:
+      '@omnidesk/types':
+        specifier: workspace:*
+        version: link:../types
+      '@omnidesk/ui':
+        specifier: workspace:*
+        version: link:../ui
+      '@radix-ui/react-slot':
+        specifier: ^1.2.5
+        version: 1.2.5(@types/react@19.2.17)(react@19.2.7)
+      '@supabase/supabase-js':
+        specifier: ^2.108.1
+        version: 2.108.1
+      '@tabler/icons-react':
+        specifier: ^3.44.0
+        version: 3.44.0(react@19.2.7)
+      '@tanstack/react-form':
+        specifier: ^1.33.0
+        version: 1.33.0(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      '@tanstack/react-query':
+        specifier: ^5.62.0
+        version: 5.101.0(react@19.2.7)
+      '@tanstack/react-router':
+        specifier: ^1.170.15
+        version: 1.170.15(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      '@tanstack/react-store':
+        specifier: ^0.11.0
+        version: 0.11.0(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      '@tanstack/react-table':
+        specifier: ^8.21.3
+        version: 8.21.3(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      '@tanstack/react-virtual':
+        specifier: ^3.14.2
+        version: 3.14.2(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      '@tanstack/store':
+        specifier: ^0.11.0
+        version: 0.11.0
+      '@tanstack/zod-form-adapter':
+        specifier: ^0.42.1
+        version: 0.42.1(zod@4.4.3)
+      '@tauri-apps/api':
+        specifier: ^2.5.0
+        version: 2.11.0
+      '@tauri-apps/plugin-log':
+        specifier: '2'
+        version: 2.8.0
+      clsx:
+        specifier: ^2.1.1
+        version: 2.1.1
+      i18next:
+        specifier: ^26.3.1
+        version: 26.3.1(typescript@6.0.3)
+      lucide-react:
+        specifier: ^0.475.0
+        version: 0.475.0(react@19.2.7)
+      next-themes:
+        specifier: ^0.4.6
+        version: 0.4.6(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      radix-ui:
+        specifier: ^1.5.0
+        version: 1.5.0(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      react:
+        specifier: ^19.1.0
+        version: 19.2.7
+      react-dom:
+        specifier: ^19.1.0
+        version: 19.2.7(react@19.2.7)
+      react-i18next:
+        specifier: ^17.0.8
+        version: 17.0.8(i18next@26.3.1(typescript@6.0.3))(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(typescript@6.0.3)
+      recharts:
+        specifier: 3.8.0
+        version: 3.8.0(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react-is@19.2.7)(react@19.2.7)(redux@5.0.1)
+      sonner:
+        specifier: ^2.0.7
+        version: 2.0.7(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      tailwind-merge:
+        specifier: ^3.6.0
+        version: 3.6.0
+      vaul:
+        specifier: ^1.1.2
+        version: 1.1.2(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      zod:
+        specifier: ^4.4.3
+        version: 4.4.3
+    devDependencies:
+      '@types/react':
+        specifier: ^19.1.0
+        version: 19.2.17
+      '@types/react-dom':
+        specifier: ^19.1.0
+        version: 19.2.3(@types/react@19.2.17)
+      '@typescript/native-preview':
+        specifier: 7.0.0-dev.20260421.2
+        version: 7.0.0-dev.20260421.2
+
+  packages/config:
+    devDependencies:
+      '@typescript/native-preview':
+        specifier: 7.0.0-dev.20260421.2
+        version: 7.0.0-dev.20260421.2
+
+  packages/core:
+    dependencies:
+      '@dnd-kit/core':
+        specifier: ^6.3.1
+        version: 6.3.1(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      '@dnd-kit/sortable':
+        specifier: ^10.0.0
+        version: 10.0.0(@dnd-kit/core@6.3.1(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(react@19.2.7)
+      '@dnd-kit/utilities':
+        specifier: ^3.2.2
+        version: 3.2.2(react@19.2.7)
+      '@omnidesk/app-launcher':
+        specifier: workspace:*
+        version: link:../../apps/launcher
+      '@omnidesk/auth':
+        specifier: workspace:*
+        version: link:../auth
+      '@omnidesk/types':
+        specifier: workspace:*
+        version: link:../types
+      '@omnidesk/ui':
+        specifier: workspace:*
+        version: link:../ui
+      '@radix-ui/react-slot':
+        specifier: ^1.2.5
+        version: 1.2.5(@types/react@19.2.17)(react@19.2.7)
+      '@supabase/supabase-js':
+        specifier: ^2.108.1
+        version: 2.108.1
+      '@tabler/icons-react':
+        specifier: ^3.44.0
+        version: 3.44.0(react@19.2.7)
+      '@tanstack/react-form':
+        specifier: ^1.33.0
+        version: 1.33.0(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      '@tanstack/react-query':
+        specifier: ^5.62.0
+        version: 5.101.0(react@19.2.7)
+      '@tanstack/react-router':
+        specifier: ^1.170.15
+        version: 1.170.15(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      '@tanstack/react-store':
+        specifier: ^0.11.0
+        version: 0.11.0(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      '@tanstack/react-table':
+        specifier: ^8.21.3
+        version: 8.21.3(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      '@tanstack/react-virtual':
+        specifier: ^3.14.2
+        version: 3.14.2(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      '@tanstack/store':
+        specifier: ^0.11.0
+        version: 0.11.0
+      '@tanstack/zod-form-adapter':
+        specifier: ^0.42.1
+        version: 0.42.1(zod@4.4.3)
+      '@tauri-apps/api':
+        specifier: ^2.5.0
+        version: 2.11.0
+      '@tauri-apps/plugin-log':
+        specifier: '2'
+        version: 2.8.0
+      clsx:
+        specifier: ^2.1.1
+        version: 2.1.1
+      i18next:
+        specifier: ^26.3.1
+        version: 26.3.1(typescript@6.0.3)
+      lucide-react:
+        specifier: ^0.475.0
+        version: 0.475.0(react@19.2.7)
+      next-themes:
+        specifier: ^0.4.6
+        version: 0.4.6(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      radix-ui:
+        specifier: ^1.5.0
+        version: 1.5.0(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      react:
+        specifier: ^19.1.0
+        version: 19.2.7
+      react-dom:
+        specifier: ^19.1.0
+        version: 19.2.7(react@19.2.7)
+      react-i18next:
+        specifier: ^17.0.8
+        version: 17.0.8(i18next@26.3.1(typescript@6.0.3))(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(typescript@6.0.3)
+      recharts:
+        specifier: 3.8.0
+        version: 3.8.0(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react-is@19.2.7)(react@19.2.7)(redux@5.0.1)
+      sonner:
+        specifier: ^2.0.7
+        version: 2.0.7(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      tailwind-merge:
+        specifier: ^3.6.0
+        version: 3.6.0
+      vaul:
+        specifier: ^1.1.2
+        version: 1.1.2(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      zod:
+        specifier: ^4.4.3
+        version: 4.4.3
+    devDependencies:
+      '@types/react':
+        specifier: ^19.1.0
+        version: 19.2.17
+      '@types/react-dom':
+        specifier: ^19.1.0
+        version: 19.2.3(@types/react@19.2.17)
+      '@typescript/native-preview':
+        specifier: 7.0.0-dev.20260421.2
+        version: 7.0.0-dev.20260421.2
+
+  packages/types:
+    dependencies:
+      zod:
+        specifier: ^3.24.0
+        version: 3.25.76
+    devDependencies:
+      '@typescript/native-preview':
+        specifier: 7.0.0-dev.20260421.2
+        version: 7.0.0-dev.20260421.2
+
+  packages/ui:
+    dependencies:
+      '@dnd-kit/core':
+        specifier: ^6.3.1
+        version: 6.3.1(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      '@dnd-kit/modifiers':
+        specifier: ^9.0.0
+        version: 9.0.0(@dnd-kit/core@6.3.1(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(react@19.2.7)
+      '@dnd-kit/sortable':
+        specifier: ^10.0.0
+        version: 10.0.0(@dnd-kit/core@6.3.1(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(react@19.2.7)
+      '@dnd-kit/utilities':
+        specifier: ^3.2.2
+        version: 3.2.2(react@19.2.7)
+      '@radix-ui/react-slot':
+        specifier: ^1.2.5
+        version: 1.2.5(@types/react@19.2.17)(react@19.2.7)
+      '@tanstack/react-form':
+        specifier: ^1.33.0
+        version: 1.33.0(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      '@tanstack/react-table':
+        specifier: ^8.21.3
+        version: 8.21.3(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      class-variance-authority:
+        specifier: ^0.7.1
+        version: 0.7.1
+      clsx:
+        specifier: ^2.1.1
+        version: 2.1.1
+      cmdk:
+        specifier: ^1.1.1
+        version: 1.1.1(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      lucide-react:
+        specifier: ^0.475.0
+        version: 0.475.0(react@19.2.7)
+      next-themes:
+        specifier: ^0.4.6
+        version: 0.4.6(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      radix-ui:
+        specifier: ^1.5.0
+        version: 1.5.0(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      react:
+        specifier: ^19.1.0
+        version: 19.2.7
+      react-dom:
+        specifier: ^19.1.0
+        version: 19.2.7(react@19.2.7)
+      recharts:
+        specifier: 3.8.0
+        version: 3.8.0(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react-is@19.2.7)(react@19.2.7)(redux@5.0.1)
+      sonner:
+        specifier: ^2.0.7
+        version: 2.0.7(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      tailwind-merge:
+        specifier: ^3.6.0
+        version: 3.6.0
+      vaul:
+        specifier: ^1.1.2
+        version: 1.1.2(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      zod:
+        specifier: ^4.4.3
+        version: 4.4.3
+    devDependencies:
+      '@omnidesk/config':
+        specifier: workspace:*
+        version: link:../config
+      '@types/react':
+        specifier: ^19.1.0
+        version: 19.2.17
+      '@types/react-dom':
+        specifier: ^19.1.0
+        version: 19.2.3(@types/react@19.2.17)
+      '@typescript/native-preview':
+        specifier: 7.0.0-dev.20260421.2
+        version: 7.0.0-dev.20260421.2
+
   platform/desktop:
     dependencies:
       '@omnidesk/web':
@@ -1005,18 +999,18 @@ importers:
       '@hey-api/client-fetch':
         specifier: ^0.13.1
         version: 0.13.1(@hey-api/openapi-ts@0.98.2(magicast@0.5.3)(typescript@6.0.3))
-      '@omnidesk/app-auth':
-        specifier: workspace:*
-        version: link:../../apps/auth
       '@omnidesk/app-automa':
         specifier: workspace:*
-        version: link:../../apps/automa
-      '@omnidesk/app-core':
-        specifier: workspace:*
-        version: link:../../apps/core
+        version: link:../../apps/automa/dashboard
       '@omnidesk/app-launcher':
         specifier: workspace:*
         version: link:../../apps/launcher
+      '@omnidesk/auth':
+        specifier: workspace:*
+        version: link:../../packages/auth
+      '@omnidesk/core':
+        specifier: workspace:*
+        version: link:../../packages/core
       '@omnidesk/types':
         specifier: workspace:*
         version: link:../../packages/types
@@ -1132,9 +1126,6 @@ importers:
       '@hey-api/openapi-ts':
         specifier: ^0.98.2
         version: 0.98.2(magicast@0.5.3)(typescript@6.0.3)
-      '@omnidesk/config':
-        specifier: workspace:*
-        version: link:../../packages/config
       '@tailwindcss/vite':
         specifier: ^4.0.0
         version: 4.3.1(vite@6.4.3(@types/node@24.13.1)(jiti@2.7.0)(lightningcss@1.32.0)(terser@5.48.0)(yaml@2.9.0))
@@ -4308,9 +4299,6 @@ packages:
 
   '@types/node@12.20.55':
     resolution: {integrity: sha512-J8xLz7q2OFulZ2cyGTLE1TbbZcjpno7FaN6zdJNrgAdrJ+DZzh/uFR6YrTb4C+nXakvud8Q4+rbhoIWlYQbUFQ==}
-
-  '@types/node@20.19.43':
-    resolution: {integrity: sha512-6oYBAi5ikg4Pl+kGsoYtawUMBT2zZMCvPNF7pVLnHZfd1zf38DRiWn/gT01RYCdUqkv7Fhr+C9ot4/tb+2sVvA==}
 
   '@types/node@24.13.1':
     resolution: {integrity: sha512-RSpUJGmvsJ1ZeBehQZFhIdpsz+bIpES0nIQXko4Ybq+N+kX6XvOq3Jo+iJ82FWLdblFq85AsMikd3m35jgezYg==}
@@ -9221,9 +9209,6 @@ packages:
   underscore@1.13.6:
     resolution: {integrity: sha512-+A5Sja4HP1M08MaXya7p5LvjuM7K6q/2EaC0+iovj/wOcMsTzMvDFbasi/oSapiwOlt252IqsKqPjCl7huKS0A==}
 
-  undici-types@6.21.0:
-    resolution: {integrity: sha512-iwDZqg0QAGrg9Rav5H4n0M64c3mkR59cJ6wQp+7C4nI0gsmExaedaYLNO44eT4AtBBwjbTiGPMlt2Md0T9H9JQ==}
-
   undici-types@7.18.2:
     resolution: {integrity: sha512-AsuCzffGHJybSaRrmr5eHr81mwJU3kjw6M+uprWvCXiNeN9SOGwQ3Jn8jb8m3Z6izVgknn1R0FTCEAP2QrLY/w==}
 
@@ -13084,11 +13069,11 @@ snapshots:
   '@types/body-parser@1.19.6':
     dependencies:
       '@types/connect': 3.4.38
-      '@types/node': 20.19.43
+      '@types/node': 24.13.1
 
   '@types/bonjour@3.5.13':
     dependencies:
-      '@types/node': 20.19.43
+      '@types/node': 24.13.1
 
   '@types/chai@5.2.3':
     dependencies:
@@ -13103,11 +13088,11 @@ snapshots:
   '@types/connect-history-api-fallback@1.5.4':
     dependencies:
       '@types/express-serve-static-core': 5.1.1
-      '@types/node': 20.19.43
+      '@types/node': 24.13.1
 
   '@types/connect@3.4.38':
     dependencies:
-      '@types/node': 20.19.43
+      '@types/node': 24.13.1
 
   '@types/d3-array@3.2.2': {}
 
@@ -13151,14 +13136,14 @@ snapshots:
 
   '@types/express-serve-static-core@4.19.8':
     dependencies:
-      '@types/node': 20.19.43
+      '@types/node': 24.13.1
       '@types/qs': 6.15.1
       '@types/range-parser': 1.2.7
       '@types/send': 1.2.1
 
   '@types/express-serve-static-core@5.1.1':
     dependencies:
-      '@types/node': 20.19.43
+      '@types/node': 24.13.1
       '@types/qs': 6.15.1
       '@types/range-parser': 1.2.7
       '@types/send': 1.2.1
@@ -13179,7 +13164,7 @@ snapshots:
   '@types/glob@7.2.0':
     dependencies:
       '@types/minimatch': 6.0.0
-      '@types/node': 20.19.43
+      '@types/node': 24.13.1
 
   '@types/har-format@1.2.16': {}
 
@@ -13193,7 +13178,7 @@ snapshots:
 
   '@types/http-proxy@1.17.17':
     dependencies:
-      '@types/node': 20.19.43
+      '@types/node': 24.13.1
 
   '@types/json-schema@7.0.15': {}
 
@@ -13220,13 +13205,9 @@ snapshots:
 
   '@types/node-forge@1.3.14':
     dependencies:
-      '@types/node': 20.19.43
+      '@types/node': 24.13.1
 
   '@types/node@12.20.55': {}
-
-  '@types/node@20.19.43':
-    dependencies:
-      undici-types: 6.21.0
 
   '@types/node@24.13.1':
     dependencies:
@@ -13252,11 +13233,11 @@ snapshots:
   '@types/send@0.17.6':
     dependencies:
       '@types/mime': 1.3.5
-      '@types/node': 20.19.43
+      '@types/node': 24.13.1
 
   '@types/send@1.2.1':
     dependencies:
-      '@types/node': 20.19.43
+      '@types/node': 24.13.1
 
   '@types/serve-index@1.9.4':
     dependencies:
@@ -13265,12 +13246,12 @@ snapshots:
   '@types/serve-static@1.15.10':
     dependencies:
       '@types/http-errors': 2.0.5
-      '@types/node': 20.19.43
+      '@types/node': 24.13.1
       '@types/send': 0.17.6
 
   '@types/sockjs@0.3.36':
     dependencies:
-      '@types/node': 20.19.43
+      '@types/node': 24.13.1
 
   '@types/unist@3.0.3': {}
 
@@ -13284,7 +13265,7 @@ snapshots:
 
   '@types/ws@8.18.1':
     dependencies:
-      '@types/node': 20.19.43
+      '@types/node': 24.13.1
 
   '@typescript-eslint/eslint-plugin@8.61.0(@typescript-eslint/parser@8.61.0(eslint@9.39.4(jiti@2.7.0))(typescript@6.0.3))(eslint@9.39.4(jiti@2.7.0))(typescript@6.0.3)':
     dependencies:
@@ -16483,7 +16464,7 @@ snapshots:
 
   jest-worker@27.5.1:
     dependencies:
-      '@types/node': 20.19.43
+      '@types/node': 24.13.1
       merge-stream: 2.0.0
       supports-color: 8.1.1
 
@@ -18847,8 +18828,6 @@ snapshots:
       which-boxed-primitive: 1.1.1
 
   underscore@1.13.6: {}
-
-  undici-types@6.21.0: {}
 
   undici-types@7.18.2: {}
 

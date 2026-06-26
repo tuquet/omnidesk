@@ -1,4 +1,4 @@
-import { useAuth } from '@omnidesk/app-auth';
+import { useAuth } from '@omnidesk/auth';
 import { hasPermission, RBAC_ENABLED, type Permission } from '@/config/rbac';
 
 /**

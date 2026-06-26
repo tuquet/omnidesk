@@ -12,14 +12,14 @@ export default defineConfig({
       fileName: () => 'index.js',
     },
     rollupOptions: {
-      external: ['react', 'react-dom', 'lucide-react', '@omnidesk/ui', '@omnidesk/app-auth'],
+      external: ['react', 'react-dom', 'lucide-react', '@omnidesk/ui', '@omnidesk/auth'],
       output: {
         globals: {
           react: 'React',
           'react-dom': 'ReactDOM',
           'lucide-react': 'LucideReact',
           '@omnidesk/ui': 'OmnideskUI',
-          '@omnidesk/app-auth': 'OmnideskAuth'
+          '@omnidesk/auth': 'OmnideskAuth'
         }
       }
     },

@@ -1,6 +1,6 @@
 import { createFileRoute, redirect } from '@tanstack/react-router';
-import { SignupForm } from '@omnidesk/app-auth';
-import { authStore } from '@omnidesk/app-auth';
+import { SignupForm } from '@omnidesk/auth';
+import { authStore } from '@omnidesk/auth';
 import { DEFAULT_AUTHENTICATED_ROUTE } from '@/config/route-config';
 
 export const Route = createFileRoute('/signup')({

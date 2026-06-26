@@ -1,8 +1,8 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
-import { authStore } from '@omnidesk/app-auth';
-import { LoginForm } from '@omnidesk/app-auth';
+import { authStore } from '@omnidesk/auth';
+import { LoginForm } from '@omnidesk/auth';
 import { CheckCircle2, Loader2, Puzzle } from 'lucide-react';
 
 export const Route = createFileRoute('/automa/auth')({

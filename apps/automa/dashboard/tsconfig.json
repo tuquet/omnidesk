@@ -1,0 +1,46 @@
+{
+  "extends": "../../../packages/config/tsconfig/react.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "jsx": "react-jsx",
+    "paths": {
+      "@omnidesk/app-auth": [
+        "../../../apps/auth/src",
+        "../../../apps/auth/src/index.ts"
+      ],
+      "@omnidesk/app-auth/*": [
+        "../../../apps/auth/src/*"
+      ],
+      "@omnidesk/app-core": [
+        "../../../apps/core/src",
+        "../../../apps/core/src/index.ts"
+      ],
+      "@omnidesk/app-core/*": [
+        "../../../apps/core/src/*"
+      ],
+      "@omnidesk/app-launcher": [
+        "../../../apps/launcher/src",
+        "../../../apps/launcher/src/index.ts"
+      ],
+      "@omnidesk/app-launcher/*": [
+        "../../../apps/launcher/src/*"
+      ],
+      "@omnidesk/ui/*": [
+        "../../../packages/ui/src/*"
+      ],
+      "@omnidesk/ui": [
+        "../../../packages/ui/src"
+      ],
+      "@/*": [
+        "../../../packages/ui/src/*"
+      ]
+    }
+  },
+  "include": [
+    "src/**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist"
+  ]
+}

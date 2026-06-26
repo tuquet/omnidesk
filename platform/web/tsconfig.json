@@ -6,19 +6,19 @@
       "@/*": [
         "./src/*"
       ],
-      "@omnidesk/app-auth": [
-        "../../apps/auth/src",
-        "../../apps/auth/src/index.ts"
+      "@omnidesk/auth": [
+        "../../packages/auth/src",
+        "../../packages/auth/src/index.ts"
       ],
-      "@omnidesk/app-auth/*": [
-        "../../apps/auth/src/*"
+      "@omnidesk/auth/*": [
+        "../../packages/auth/src/*"
       ],
-      "@omnidesk/app-core": [
-        "../../apps/core/src",
-        "../../apps/core/src/index.ts"
+      "@omnidesk/core": [
+        "../../packages/core/src",
+        "../../packages/core/src/index.ts"
       ],
-      "@omnidesk/app-core/*": [
-        "../../apps/core/src/*"
+      "@omnidesk/core/*": [
+        "../../packages/core/src/*"
       ],
       "@omnidesk/app-launcher": [
         "../../apps/launcher/src",

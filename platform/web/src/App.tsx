@@ -12,7 +12,7 @@ import './app/globals.css';
 
 // Create a new router instance
 import { useStore } from '@tanstack/react-store';
-import { authStore, authActions } from '@omnidesk/app-auth';
+import { authStore, authActions } from '@omnidesk/auth';
 import { useEffect } from 'react';
 
 const router = createRouter({

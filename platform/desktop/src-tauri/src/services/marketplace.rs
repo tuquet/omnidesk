@@ -33,7 +33,7 @@ pub async fn get_marketplace_apps() -> Result<Vec<Value>, AppError> {
         .map_err(|e| AppError::Internal(format!("Failed to parse apps: {}", e)))?;
         
     // Filter out mock apps
-    let mock_ids = vec!["lifecycle", "analytics", "projects", "documents", "showcase", "error-pages"];
+    let mock_ids = vec!["lifecycle", "analytics", "projects", "documents", "showcase", "error-pages", "wordpress-sync", "file-browser"];
     apps.retain(|app| {
         app.get("id")
             .and_then(|id| id.as_str())

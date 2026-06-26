@@ -1,6 +1,6 @@
 import { Link } from '@tanstack/react-router';
 import { Button } from '@omnidesk/ui';
-import { useAuth } from '@omnidesk/app-auth';
+import { useAuth } from '@omnidesk/auth';
 import { ArrowRight, CloudOff, Database, Network } from 'lucide-react';
 
 export function DesktopLanding() {

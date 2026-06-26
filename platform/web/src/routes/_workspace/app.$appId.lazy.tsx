@@ -1,5 +1,5 @@
 import { createLazyFileRoute } from '@tanstack/react-router';
-import { DynamicAppRenderer } from '@omnidesk/app-core';
+import { DynamicAppRenderer } from '@omnidesk/core';
 import { ErrorBoundary } from '@/components/error-boundary';
 
 export const Route = createLazyFileRoute('/_workspace/app/$appId')({

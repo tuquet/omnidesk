@@ -5,7 +5,7 @@
  * filtering is active.  When **disabled** every menu item is
  * visible (guest/client mode – great for demos & boilerplate).
  */
-import type { Role } from '@omnidesk/app-auth';
+import type { Role } from '@omnidesk/auth';
 
 // ─── Feature Flags (from Vite env) ──────────────────────────────────────────
 

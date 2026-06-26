@@ -1,5 +1,5 @@
 packages:
   - "platform/*"
   - "apps/*"
+  - "apps/automa/*"
   - "packages/*"
-  - "apps/e2e-orchestrator"
