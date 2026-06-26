@@ -18,7 +18,7 @@ import { useEffect } from 'react';
 const router = createRouter({
   routeTree,
   context: {
-    auth: undefined!, // We'll provide it in the RouterProvider
+    auth: undefined,
   },
 });
 

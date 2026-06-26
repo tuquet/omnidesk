@@ -23,6 +23,7 @@
   "devDependencies": {
     "@changesets/cli": "^2.27.0",
     "@eslint/js": "^9.21.0",
+    "eslint": "^9.21.0",
     "@tauri-apps/cli": "^2.11.2",
     "@typescript/native-preview": "7.0.0-dev.20260421.2",
     "concurrently": "^9.0.0",

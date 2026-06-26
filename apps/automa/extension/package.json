@@ -16,7 +16,7 @@
     "dev": "node utils/webserver.js",
     "dev:firefox": "cross-env BROWSER=firefox npm run dev",
     "prettier": "prettier --write '**/*.{js,jsx,css,html}'",
-    "lint": "eslint --ext .js,.vue --ignore-path .gitignore ."
+    "lint": "eslint ."
   },
   "engines": {
     "node": ">=14.18.1"
@@ -119,7 +119,7 @@
     "core-js": "^3.27.2",
     "cross-env": "^7.0.3",
     "css-loader": "^6.7.3",
-    "eslint": "^8.34.0",
+    "eslint": "^9.21.0",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-config-prettier": "^8.6.0",
     "eslint-friendly-formatter": "^4.0.1",

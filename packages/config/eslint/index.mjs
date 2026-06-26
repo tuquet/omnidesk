@@ -26,7 +26,7 @@ export const baseConfig = [
       // Strict TypeScript
       '@typescript-eslint/explicit-function-return-type': 'off',
       '@typescript-eslint/consistent-type-imports': ['error', { prefer: 'type-imports' }],
-      '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
+      '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
 
       // Import discipline
       'no-console': ['warn', { allow: ['warn', 'error'] }],

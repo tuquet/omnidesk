@@ -1,9 +1,9 @@
-import { createFileRoute, useNavigate } from '@tanstack/react-router';
+import { createFileRoute } from '@tanstack/react-router';
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
-import { authStore } from '@omnidesk/auth';
 import { LoginForm } from '@omnidesk/auth';
 import { CheckCircle2, Loader2, Puzzle } from 'lucide-react';
+import type { Session } from '@supabase/supabase-js';
 
 export const Route = createFileRoute('/automa/auth')({
   component: AutomaAuthPage,
@@ -11,69 +11,60 @@ export const Route = createFileRoute('/automa/auth')({
 
 /**
  * Automa Extension Auth Bridge Page
- * 
+ *
  * Mục đích: Khi user truy cập trang này và đăng nhập,
  * token Supabase sẽ được lưu vào localStorage với key `supabase.auth.token`
  * để script webService.js của Extension Automa có thể đọc được.
- * 
+ *
  * Extension sẽ inject webService.js vào domain này (cấu hình trong manifest.json).
  */
 function AutomaAuthPage() {
-  const navigate = useNavigate();
   const [synced, setSynced] = useState(false);
   const [checking, setChecking] = useState(true);
 
   useEffect(() => {
+    function saveSessionToStorage(session: Session) {
+      // Ghi token vào localStorage theo đúng format mà webService.js của Automa cần đọc
+      const tokenPayload = {
+        access_token: session.access_token as string,
+        refresh_token: session.refresh_token as string,
+        expires_at: session.expires_at as number | undefined,
+        expires_in: session.expires_in as number | undefined,
+        token_type: session.token_type as string,
+        user: session.user,
+        provider_token: session.provider_token as string | null | undefined,
+        provider_refresh_token: session.provider_refresh_token as string | null | undefined,
+      };
+      localStorage.setItem('supabase.auth.token', JSON.stringify(tokenPayload));
+      window.dispatchEvent(new Event('app-mounted'));
+    }
+
     async function syncTokenForExtension() {
-      const { data: { session } } = await supabase.auth.getSession();
+      const { data } = await supabase.auth.getSession();
 
-      if (session) {
-        // Ghi token vào localStorage theo đúng format mà webService.js của Automa cần đọc
-        const tokenPayload = {
-          access_token: session.access_token,
-          refresh_token: session.refresh_token,
-          expires_at: session.expires_at,
-          expires_in: session.expires_in,
-          token_type: session.token_type,
-          user: session.user,
-          provider_token: session.provider_token,
-          provider_refresh_token: session.provider_refresh_token,
-        };
-        localStorage.setItem('supabase.auth.token', JSON.stringify(tokenPayload));
-
-        // Bắn event `app-mounted` để webService.js của Extension bắt được
-        window.dispatchEvent(new Event('app-mounted'));
-
+      if (data.session) {
+        saveSessionToStorage(data.session);
         setSynced(true);
       }
 
       setChecking(false);
     }
 
-    syncTokenForExtension();
+    syncTokenForExtension().catch(console.error);
 
     // Lắng nghe thay đổi auth state (sau khi user login xong)
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
-        if (session) {
-          const tokenPayload = {
-            access_token: session.access_token,
-            refresh_token: session.refresh_token,
-            expires_at: session.expires_at,
-            expires_in: session.expires_in,
-            token_type: session.token_type,
-            user: session.user,
-            provider_token: session.provider_token,
-            provider_refresh_token: session.provider_refresh_token,
-          };
-          localStorage.setItem('supabase.auth.token', JSON.stringify(tokenPayload));
-          window.dispatchEvent(new Event('app-mounted'));
-          setSynced(true);
-        }
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session) {
+        saveSessionToStorage(session);
+        setSynced(true);
       }
-    );
+    });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      subscription.unsubscribe();
+    };
   }, []);
 
   // Nếu đang kiểm tra session
@@ -103,12 +94,10 @@ function AutomaAuthPage() {
           </div>
 
           <div className="space-y-2">
-            <h1 className="text-2xl font-bold tracking-tight">
-              Kết nối Extension thành công!
-            </h1>
+            <h1 className="text-2xl font-bold tracking-tight">Kết nối Extension thành công!</h1>
             <p className="text-sm text-muted-foreground leading-relaxed">
-              Automa Extension đã nhận được phiên đăng nhập của bạn. 
-              Bạn có thể đóng tab này và quay lại sử dụng Extension.
+              Automa Extension đã nhận được phiên đăng nhập của bạn. Bạn có thể đóng tab này và quay
+              lại sử dụng Extension.
             </p>
           </div>
 
@@ -130,9 +119,7 @@ function AutomaAuthPage() {
             <Puzzle className="h-7 w-7 text-primary" />
           </div>
           <div className="space-y-1">
-            <h1 className="text-xl font-semibold tracking-tight">
-              Kết nối Automa Extension
-            </h1>
+            <h1 className="text-xl font-semibold tracking-tight">Kết nối Automa Extension</h1>
             <p className="text-sm text-muted-foreground">
               Đăng nhập để đồng bộ phiên làm việc với Extension
             </p>

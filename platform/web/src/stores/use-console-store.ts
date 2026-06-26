@@ -88,7 +88,7 @@ export const initConsoleHijacker = () => {
     originalConsole.log(...args);
     consoleActions.addLog('log', args);
   };
-  
+
   console.info = (...args) => {
     originalConsole.info(...args);
     consoleActions.addLog('info', args);
@@ -112,4 +112,3 @@ export const initConsoleHijacker = () => {
     consoleActions.addLog('error', ['Unhandled Promise Rejection:', event.reason]);
   });
 };
-

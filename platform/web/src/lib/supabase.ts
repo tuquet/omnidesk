@@ -6,6 +6,8 @@ const supabaseAnonKey = (import.meta.env.VITE_SUPABASE_ANON_KEY as string) || ''
 
 export const isSupabaseConfigured = !!supabaseUrl && !!supabaseAnonKey;
 
+import type { SupabaseClient } from '@supabase/supabase-js';
+
 // Mock client to prevent crashes during startup when ENV vars are missing
 const mockSupabase = {
   auth: {
@@ -19,16 +21,16 @@ const mockSupabase = {
       },
     }),
   },
-} as any;
+} as unknown as SupabaseClient;
 
 if (!isSupabaseConfigured) {
   console.warn(
     '[Environment] Connection variables are missing. Check your .env file.\n' +
-    'Required: VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY'
+      'Required: VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY',
   );
 }
 
-export const supabase = isSupabaseConfigured
+export const supabase: SupabaseClient = isSupabaseConfigured
   ? createClient(supabaseUrl, supabaseAnonKey)
   : mockSupabase;
 
@@ -37,7 +39,9 @@ export const supabase = isSupabaseConfigured
  * Returns null if not authenticated.
  */
 export async function getSession(): Promise<Session | null> {
-  const { data: { session } } = await supabase.auth.getSession();
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
   return session;
 }
 
@@ -46,6 +50,8 @@ export async function getSession(): Promise<Session | null> {
  * Use getSession() for cached reads, this for server-verified reads.
  */
 export async function getUser(): Promise<User | null> {
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   return user;
 }

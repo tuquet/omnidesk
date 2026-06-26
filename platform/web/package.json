@@ -63,6 +63,7 @@
     "@omnidesk/app-automa": "workspace:*"
   },
   "devDependencies": {
+    "@omnidesk/config": "workspace:*",
     "@eslint/js": "^9.21.0",
     "@hey-api/openapi-ts": "^0.98.2",
     "@tailwindcss/vite": "^4.0.0",
