@@ -2,6 +2,7 @@ import { Link, useLocation } from '@tanstack/react-router';
 import { Button } from '@omnidesk/ui';
 import {
   SidebarGroup,
+  SidebarGroupLabel,
   SidebarGroupContent,
   SidebarMenu,
   SidebarMenuButton,
@@ -18,6 +19,7 @@ import { useTranslation } from 'react-i18next';
 
 export function NavMain({
   items,
+  groupLabel,
 }: {
   items: {
     title: string;
@@ -29,12 +31,14 @@ export function NavMain({
       url: string;
     }[];
   }[];
+  groupLabel?: string;
 }) {
   const { t } = useTranslation();
   const location = useLocation();
 
   return (
     <SidebarGroup>
+      {groupLabel && <SidebarGroupLabel>{groupLabel}</SidebarGroupLabel>}
       <SidebarGroupContent className="flex flex-col gap-2">
         <SidebarMenu>
           {items.map((item) => {

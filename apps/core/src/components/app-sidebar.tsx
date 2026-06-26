@@ -24,8 +24,8 @@ import {
   NAV_DOCUMENTS,
 } from '@/config';
 import { useRBAC } from '@/hooks/use-rbac';
-import { useDevStore } from '@/stores/use-dev-store';
-import { useAuth, supabase } from '@omnidesk/app-auth';
+import { useAuth } from '@omnidesk/app-auth';
+import { supabase } from '@/lib/supabase';
 import { useQuery } from '@tanstack/react-query';
 import { Platform } from '@/lib/platform';
 
@@ -64,7 +64,7 @@ const AppSidebarInner = ({ ...props }: React.ComponentProps<typeof Sidebar>) => 
     staleTime: 30000,
   });
 
-  const mainItems: any[] = [
+  const systemItems: any[] = [
     {
       title: 'Command Center',
       url: '/app/dashboard',
@@ -73,9 +73,10 @@ const AppSidebarInner = ({ ...props }: React.ComponentProps<typeof Sidebar>) => 
     }
   ];
 
+  const dynamicItems: any[] = [];
   if (installedApps) {
     for (const app of installedApps) {
-      mainItems.push({
+      dynamicItems.push({
         title: app.name || app.id,
         url: `/app/${app.id}`,
         icon: PackageOpen,
@@ -83,6 +84,13 @@ const AppSidebarInner = ({ ...props }: React.ComponentProps<typeof Sidebar>) => 
       });
     }
   }
+
+  const devItems: any[] = NAV_SHOWCASE.items.map((item: any) => ({
+    title: item.title,
+    url: item.url,
+    icon: item.icon,
+    items: [],
+  }));
 
   const secondaryItems = filterNav(NAV_SECONDARY);
 
@@ -102,13 +110,36 @@ const AppSidebarInner = ({ ...props }: React.ComponentProps<typeof Sidebar>) => 
       </SidebarHeader>
       <SidebarContent>
         <NavMain
-          items={mainItems.map((item) => ({
+          groupLabel="System"
+          items={systemItems.map((item) => ({
             title: item.title,
             url: item.url as any,
             icon: <item.icon />,
             items: item.items,
           }))}
         />
+        {dynamicItems.length > 0 && (
+          <NavMain
+            groupLabel="My Apps"
+            items={dynamicItems.map((item) => ({
+              title: item.title,
+              url: item.url as any,
+              icon: <item.icon />,
+              items: item.items,
+            }))}
+          />
+        )}
+        {(isDevMode || currentUserRole === 'ADMIN') && devItems.length > 0 && (
+          <NavMain
+            groupLabel="Developer Tools"
+            items={devItems.map((item) => ({
+              title: item.title,
+              url: item.url as any,
+              icon: <item.icon />,
+              items: item.items,
+            }))}
+          />
+        )}
         <NavSecondary
           items={secondaryItems.map((item) => ({
             title: item.title,

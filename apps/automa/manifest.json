@@ -1,0 +1,12 @@
+{
+  "id": "automa",
+  "name": "Automa Dashboard",
+  "version": "0.1.0",
+  "description": "Publish and manage third-party apps for OmniDesk.",
+  "icon": {
+    "type": "lucide",
+    "displayName": "ServerCrash"
+  },
+  "category": "Development",
+  "isCore": true
+}
