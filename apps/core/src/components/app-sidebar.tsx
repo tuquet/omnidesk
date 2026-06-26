@@ -22,48 +22,63 @@ import {
   NAV_ERROR_PAGES,
   NAV_SECONDARY,
   NAV_DOCUMENTS,
+  APP_REGISTRY,
 } from '@/config';
 import { useRBAC } from '@/hooks/use-rbac';
 import { useDevStore } from '@/stores/use-dev-store';
-import { useAuth } from '@omnidesk/app-auth';
+import { useAuth, supabase } from '@omnidesk/app-auth';
 import { useQuery } from '@tanstack/react-query';
+import { Platform } from '@/lib/platform';
 
 const AppSidebarInner = ({ ...props }: React.ComponentProps<typeof Sidebar>) => {
   const { can, filterNav } = useRBAC();
   const { isDevMode } = useDevStore();
-  const { displayName, user } = useAuth();
+  const { displayName, user, role } = useAuth();
+  const currentUserRole = role || 'GUEST';
 
-  const { data: localApps } = useQuery({
-    queryKey: ['launcher', 'local-installed-apps'],
+  const { data: installedAppIds } = useQuery({
+    queryKey: ['sidebar', 'user-installed-apps', user?.id],
     queryFn: async () => {
-      try {
-        const { invoke } = await import('@tauri-apps/api/core');
-        return await invoke<any[]>('list_local_apps');
-      } catch (e) {
-        return [];
+      if (Platform.isDesktop) {
+        try {
+          const { invoke } = await import('@tauri-apps/api/core');
+          const localApps = await invoke<any[]>('list_local_apps');
+          return localApps.map((a) => a.id);
+        } catch (e) {
+          return [];
+        }
+      } else {
+        if (!user?.id) return [];
+        const { data, error } = await supabase
+          .from('user_installed_apps')
+          .select('app_id');
+        if (error || !data) return [];
+        return data.map((item) => item.app_id);
       }
     },
-    staleTime: 5000,
+    enabled: !!user?.id,
+    staleTime: 30000,
   });
 
   const mainItems: any[] = [];
+  const activeInstalledIds = new Set(installedAppIds || []);
 
-  // Inject local apps dynamically
-  if (localApps) {
-    for (const app of localApps) {
-      // Map icon from manifest if available
-      let IconComponent = CommandIcon;
-      if (app.icon?.displayName && (LucideIcons as any)[app.icon.displayName]) {
-        IconComponent = (LucideIcons as any)[app.icon.displayName];
-      }
-
-      mainItems.push({
-        title: app.name || app.id,
-        url: `/app/${app.id}`,
-        icon: IconComponent,
-        items: [],
-      });
+  for (const app of APP_REGISTRY) {
+    // 1. Kiểm tra User Role
+    if (app.requiredUserRoles && !app.requiredUserRoles.includes(currentUserRole)) {
+      continue;
     }
+    // 2. Kiểm tra App Role (Kernel vs Marketplace)
+    if (app.appRole === 'marketplace' && !activeInstalledIds.has(app.id)) {
+      continue;
+    }
+
+    mainItems.push({
+      title: app.name,
+      url: `/app/${app.id}`,
+      icon: app.icon,
+      items: [],
+    });
   }
 
   const secondaryItems = filterNav(NAV_SECONDARY);
