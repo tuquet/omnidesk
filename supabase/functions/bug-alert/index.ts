@@ -40,8 +40,9 @@ Deno.serve(async (req) => {
       });
 
       if (!response.ok) {
-        console.error('Failed to send Telegram message:', await response.text());
-        return new Response('Failed to send Telegram message', { status: 500 });
+        const errorText = await response.text();
+        console.error('Failed to send Telegram message:', errorText);
+        return new Response(`Failed to send Telegram message: ${errorText}`, { status: 500 });
       }
 
       return new Response('Alert sent successfully', { status: 200 });

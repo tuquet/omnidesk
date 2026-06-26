@@ -13,6 +13,7 @@ export const PUBLIC_ROUTES = [
   '/signup',
   '/forgot-password',
   '/auth/callback',
+  '/automa/auth',
   '/401',
   '/403',
   '/404',

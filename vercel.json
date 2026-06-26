@@ -1,0 +1,6 @@
+{
+  "version": 2,
+  "buildCommand": "pnpm --filter @omnidesk/web build",
+  "outputDirectory": "platform/web/dist",
+  "installCommand": "pnpm install"
+}

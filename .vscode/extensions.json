@@ -1,30 +1,5 @@
 {
   "recommendations": [
-    // TypeScript & JavaScript
-    "ms-vscode.vscode-typescript-next",
-    "dbaeumer.vscode-eslint",
-    "esbenp.prettier-vscode",
-
-    // TypeScript 7 Native
-    "ms-vscode.vscode-typescript-native-preview",
-
-    // Tailwind CSS (required by shadcn/ui)
-    "bradlc.vscode-tailwindcss",
-
-    // Rust
-    "rust-lang.rust-analyzer",
-    "vadimcn.vscode-lldb",
-
-    // Tauri
-    "tauri-apps.tauri-vscode",
-
-    // Git
-    "eamodio.gitlens",
-
-    // Utilities
-    "mikestead.dotenv",
-    "gruntfuggly.todo-tree",
-    "usernamehw.errorlens",
-    "streetsidesoftware.code-spell-checker"
+    "denoland.vscode-deno"
   ]
 }

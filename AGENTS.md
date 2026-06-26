@@ -39,3 +39,11 @@ When working on this workspace, strictly follow these core philosophies:
 3. **Process Lock / Access Denied**:
    - If `Access is denied` occurs when renaming/moving MemPalace folders, terminate the active MCP processes first:
      `Stop-Process -Id <pid> -Force` (specifically searching for `mempalace-mcp` or `python` instances in the venv).
+4. **WDAC (Application Control policy has blocked this file)**:
+   - Nếu gặp lỗi `An Application Control policy has blocked this file` khi chạy `mempalace-mcp.exe`, nguyên nhân là WDAC enforcement chặn binary cũ.
+   - Fix: `uv tool install mempalace --force --reinstall` để tạo lại binary mới với hash sạch.
+   - Luôn restart IDE/terminal sau khi reinstall.
+5. **Palace Data Path (v3.5.0+)**:
+   - Từ v3.5.0, dữ liệu ChromaDB (`chroma.sqlite3`) nằm trong subfolder `palace/`.
+   - Đường dẫn MCP `--palace` phải trỏ tới: `C:\Users\<youruser>\OneDrive\Documents\MemPalace\palace` (KHÔNG phải thư mục root `MemPalace`).
+   - Data OneDrive sync: 4915+ drawers, 7 wings — được đồng bộ qua OneDrive tự động.

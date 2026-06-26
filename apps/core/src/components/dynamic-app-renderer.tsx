@@ -4,6 +4,7 @@ import * as LucideIcons from 'lucide-react';
 import * as OmnideskUI from '@omnidesk/ui';
 // Import UI if needed, but we will pass it dynamically
 import { Skeleton } from '@omnidesk/ui';
+import { Platform } from '@/lib/platform';
 
 interface DynamicAppRendererProps {
   appId: string;
@@ -24,6 +25,27 @@ export function DynamicAppRenderer({ appId }: DynamicAppRendererProps) {
     let isMounted = true;
 
     async function loadApp() {
+      if (!Platform.isDesktop) {
+        if (appId === 'dashboard') {
+          const FallbackDashboard = () => (
+            <div className="flex flex-1 flex-col items-center justify-center p-8 text-center animate-in fade-in duration-500">
+              <div className="mb-6 rounded-full bg-primary/10 p-4 ring-1 ring-primary/20">
+                <LucideIcons.LayoutDashboard className="h-12 w-12 text-primary" />
+              </div>
+              <h2 className="text-3xl font-semibold mb-3 tracking-tight">Welcome to OmniDesk Web</h2>
+              <p className="text-muted-foreground max-w-md text-base leading-relaxed">
+                You are currently using the web preview. OmniDesk is primarily a desktop application. Please download the desktop app for full dynamic app functionality, or use the sidebar to navigate to web-enabled modules.
+              </p>
+            </div>
+          );
+          if (isMounted) setComponent(() => FallbackDashboard);
+          return;
+        }
+
+        if (isMounted) setError(`App "${appId}" cannot be dynamically loaded in the web browser. Please use the Desktop app.`);
+        return;
+      }
+
       try {
         const { convertFileSrc, invoke } = await import('@tauri-apps/api/core');
         const { appDataDir } = await import('@tauri-apps/api/path');

@@ -48,3 +48,4 @@ entities.json
 .playwright-profile/
 
 scratch/
+.vercel

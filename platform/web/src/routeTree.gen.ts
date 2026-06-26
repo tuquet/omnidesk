@@ -21,6 +21,7 @@ import { Route as R500RouteImport } from './routes/500'
 import { Route as R404RouteImport } from './routes/404'
 import { Route as R403RouteImport } from './routes/403'
 import { Route as R401RouteImport } from './routes/401'
+import { Route as AutomaAuthRouteImport } from './routes/automa.auth'
 import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
 import { Route as AuthenticatedAppStoreAppIdRouteImport } from './routes/_authenticated/app-store_.$appId'
 
@@ -83,6 +84,11 @@ const IndexLazyRoute = IndexLazyRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any).lazy(() => import('./routes/index.lazy').then((d) => d.Route))
+const AutomaAuthRoute = AutomaAuthRouteImport.update({
+  id: '/automa/auth',
+  path: '/automa/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthCallbackRoute = AuthCallbackRouteImport.update({
   id: '/auth/callback',
   path: '/auth/callback',
@@ -115,6 +121,7 @@ export interface FileRoutesByFullPath {
   '/maintenance': typeof MaintenanceRoute
   '/signup': typeof SignupRoute
   '/auth/callback': typeof AuthCallbackRoute
+  '/automa/auth': typeof AutomaAuthRoute
   '/app-store/$appId': typeof AuthenticatedAppStoreAppIdRoute
   '/app/$appId': typeof AuthenticatedAppAppIdLazyRoute
 }
@@ -130,6 +137,7 @@ export interface FileRoutesByTo {
   '/maintenance': typeof MaintenanceRoute
   '/signup': typeof SignupRoute
   '/auth/callback': typeof AuthCallbackRoute
+  '/automa/auth': typeof AutomaAuthRoute
   '/app-store/$appId': typeof AuthenticatedAppStoreAppIdRoute
   '/app/$appId': typeof AuthenticatedAppAppIdLazyRoute
 }
@@ -147,6 +155,7 @@ export interface FileRoutesById {
   '/maintenance': typeof MaintenanceRoute
   '/signup': typeof SignupRoute
   '/auth/callback': typeof AuthCallbackRoute
+  '/automa/auth': typeof AutomaAuthRoute
   '/_authenticated/app-store_/$appId': typeof AuthenticatedAppStoreAppIdRoute
   '/_authenticated/app/$appId': typeof AuthenticatedAppAppIdLazyRoute
 }
@@ -164,6 +173,7 @@ export interface FileRouteTypes {
     | '/maintenance'
     | '/signup'
     | '/auth/callback'
+    | '/automa/auth'
     | '/app-store/$appId'
     | '/app/$appId'
   fileRoutesByTo: FileRoutesByTo
@@ -179,6 +189,7 @@ export interface FileRouteTypes {
     | '/maintenance'
     | '/signup'
     | '/auth/callback'
+    | '/automa/auth'
     | '/app-store/$appId'
     | '/app/$appId'
   id:
@@ -195,6 +206,7 @@ export interface FileRouteTypes {
     | '/maintenance'
     | '/signup'
     | '/auth/callback'
+    | '/automa/auth'
     | '/_authenticated/app-store_/$appId'
     | '/_authenticated/app/$appId'
   fileRoutesById: FileRoutesById
@@ -212,6 +224,7 @@ export interface RootRouteChildren {
   MaintenanceRoute: typeof MaintenanceRoute
   SignupRoute: typeof SignupRoute
   AuthCallbackRoute: typeof AuthCallbackRoute
+  AutomaAuthRoute: typeof AutomaAuthRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -293,6 +306,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexLazyRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/automa/auth': {
+      id: '/automa/auth'
+      path: '/automa/auth'
+      fullPath: '/automa/auth'
+      preLoaderRoute: typeof AutomaAuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/auth/callback': {
       id: '/auth/callback'
       path: '/auth/callback'
@@ -344,6 +364,7 @@ const rootRouteChildren: RootRouteChildren = {
   MaintenanceRoute: MaintenanceRoute,
   SignupRoute: SignupRoute,
   AuthCallbackRoute: AuthCallbackRoute,
+  AutomaAuthRoute: AutomaAuthRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
