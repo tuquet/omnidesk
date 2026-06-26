@@ -13,18 +13,7 @@ export interface AppDefinition {
   href?: string;
 }
 
-import { appInfo as fileBrowserInfo } from '@omnidesk/app-file-browser';
 import { appInfo as automaInfo } from '@omnidesk/app-automa';
-import { CodeIcon } from 'lucide-react';
 export const APP_REGISTRY: Record<string, AppDefinition> = {
-  'developer-console': {
-    id: 'developer-console',
-    name: 'Developer Console',
-    description: 'Publish and manage third-party apps for OmniDesk.',
-    icon: CodeIcon,
-    category: 'Development',
-    isCore: true,
-  },
-  'file-browser': fileBrowserInfo,
   'automa': automaInfo,
 };
