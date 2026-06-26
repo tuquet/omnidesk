@@ -26,12 +26,12 @@ export function DynamicAppRenderer({ appId }: DynamicAppRendererProps) {
     let isMounted = true;
 
     async function loadApp() {
-      if (!Platform.isDesktop) {
-        if (appId === 'dashboard') {
-          if (isMounted) setComponent(() => CommandCenterDashboard);
-          return;
-        }
+      if (appId === 'home') {
+        if (isMounted) setComponent(() => CommandCenterDashboard);
+        return;
+      }
 
+      if (!Platform.isDesktop) {
         if (isMounted) setError(`App "${appId}" cannot be dynamically loaded in the web browser. Please use the Desktop app.`);
         return;
       }

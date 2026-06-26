@@ -1,0 +1,34 @@
+{
+  "mcpServers": {
+    "supabase-mcp-server": {
+      "$typeName": "exa.cascade_plugins_pb.CascadePluginCommandTemplate",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@supabase/mcp-server-supabase@latest",
+        "--access-token",
+        "sbp_YOUR_TOKEN_HERE"
+      ],
+      "env": {}
+    },
+    "mempalace": {
+      "$typeName": "exa.cascade_plugins_pb.CascadePluginCommandTemplate",
+      "command": "mempalace-mcp",
+      "args": [
+        "--palace",
+        "C:\\Users\\Admin\\OneDrive\\Documents\\MemPalace\\palace"
+      ],
+      "env": {}
+    },
+    "shadcn": {
+      "$typeName": "exa.cascade_plugins_pb.CascadePluginCommandTemplate",
+      "command": "npx",
+      "args": [
+        "-y",
+        "shadcn@latest",
+        "mcp"
+      ],
+      "env": {}
+    }
+  }
+}

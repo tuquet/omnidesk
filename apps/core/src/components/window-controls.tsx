@@ -23,12 +23,12 @@ export function WindowControls() {
   if (!Platform.isDesktop) return null;
 
   return (
-    <div className="flex items-center">
+    <div className="flex items-center gap-1 pr-2">
       {/* Minimize */}
       <button
         type="button"
         onClick={() => Platform.minimizeWindow()}
-        className="inline-flex h-8 w-10 items-center justify-center text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+        className="inline-flex h-7 w-10 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
         aria-label="Minimize"
       >
         <svg
@@ -45,7 +45,7 @@ export function WindowControls() {
       <button
         type="button"
         onClick={() => Platform.toggleMaximize()}
-        className="inline-flex h-8 w-10 items-center justify-center text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+        className="inline-flex h-7 w-10 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
         aria-label="Maximize"
       >
         {isMaximized ? (
@@ -74,7 +74,7 @@ export function WindowControls() {
       <button
         type="button"
         onClick={() => Platform.closeWindow()}
-        className="inline-flex h-8 w-10 items-center justify-center text-muted-foreground transition-colors hover:bg-destructive hover:text-destructive-foreground"
+        className="inline-flex h-7 w-10 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-[#e81123] hover:text-white"
         aria-label="Close"
       >
         <svg

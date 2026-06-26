@@ -5,7 +5,7 @@ pub mod system;
 pub mod error;
 pub mod services;
 
-use commands::{credentials, app_store};
+use commands::{credentials, app_store, preferences};
 use tauri::{
     menu::{Menu, MenuItem},
     tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent},
@@ -44,7 +44,7 @@ pub fn run() {
             let _tray = TrayIconBuilder::new()
                 .icon(app.default_window_icon().unwrap().clone())
                 .menu(&menu)
-                .menu_on_left_click(false)
+                .show_menu_on_left_click(false)
                 .on_menu_event(|app, event| match event.id.as_ref() {
                     "quit" => {
                         std::process::exit(0);
@@ -146,6 +146,8 @@ pub fn run() {
             credentials::delete_credential,
             app_store::install_local_app,
             app_store::list_local_apps,
+            preferences::get_user_preferences,
+            preferences::update_home_screen_order,
         ])
         .run(tauri::generate_context!())
         .expect("error while running OmniDesk");

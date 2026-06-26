@@ -2,7 +2,7 @@ import { createLazyFileRoute } from '@tanstack/react-router';
 import { DynamicAppRenderer } from '@omnidesk/app-core';
 import { ErrorBoundary } from '@/components/error-boundary';
 
-export const Route = createLazyFileRoute('/_authenticated/app/$appId')({
+export const Route = createLazyFileRoute('/_workspace/app/$appId')({
   component: DynamicAppContainer,
 });
 

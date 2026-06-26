@@ -57,26 +57,11 @@ export function GlobalSearch() {
     <>
       <Button
         variant="outline"
-        className="hidden md:flex h-9 rounded-[0.5rem] bg-muted/50 text-sm font-normal text-muted-foreground shadow-none w-48 justify-between px-3 xl:w-64 shrink-0"
-        onClick={() => setOpen(true)}
-      >
-        <div className="flex items-center gap-2 min-w-0 text-left">
-          <SearchIcon className="h-4 w-4 shrink-0" />
-          <span className="truncate">
-            {t('nav.Search everywhere...', 'Search everywhere...')}
-          </span>
-        </div>
-        <kbd className="pointer-events-none flex h-6 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium opacity-100 shrink-0">
-          <span className="text-xs">⌘</span>K
-        </kbd>
-      </Button>
-      <Button
-        variant="outline"
         size="icon"
-        className="md:hidden h-9 w-9 rounded-[0.5rem] bg-muted/50 text-muted-foreground shadow-none shrink-0"
+        className="relative h-9 w-9 shrink-0"
         onClick={() => setOpen(true)}
       >
-        <SearchIcon className="h-4 w-4 shrink-0" />
+        <SearchIcon className="h-4 w-4" />
         <span className="sr-only">Search</span>
       </Button>
       <CommandDialog open={open} onOpenChange={setOpen}>

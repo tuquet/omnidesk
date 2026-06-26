@@ -3,7 +3,7 @@ import { toast } from 'sonner';
 import { useNavigate } from '@tanstack/react-router';
 import { useTheme } from 'next-themes';
 import { useTranslation } from 'react-i18next';
-import { Bug } from 'lucide-react';
+
 import {
   Menubar,
   MenubarContent,
@@ -15,7 +15,6 @@ import {
 } from '@omnidesk/ui';
 import { WindowControls } from './window-controls';
 import { GITHUB_REPO, GITHUB_ISSUES, API_DOCS_URL } from '@/config';
-import { DEFAULT_AUTHENTICATED_ROUTE } from '@/config/route-config';
 
 export function TitleBar() {
   const navigate = useNavigate();
@@ -49,8 +48,8 @@ export function TitleBar() {
     <div className="flex h-8 shrink-0 items-center border-b bg-background select-none">
       {/* App icon + Menubar */}
       <div className="flex items-center">
-        <div className="flex h-8 w-10 items-center justify-center">
-          <Bug className="h-4 w-4 text-primary" />
+        <div className="flex h-8 w-10 items-center justify-center pointer-events-none">
+          <img src="/logo-gold.svg" alt="OmniDesk Logo" className="h-4 w-4" />
         </div>
 
         <Menubar className="h-8 rounded-none border-none bg-transparent shadow-none">
@@ -60,11 +59,6 @@ export function TitleBar() {
               File
             </MenubarTrigger>
             <MenubarContent>
-              <MenubarItem onClick={() => navigate({ to: DEFAULT_AUTHENTICATED_ROUTE })}>
-                New Bug Report
-                <MenubarShortcut>Ctrl+N</MenubarShortcut>
-              </MenubarItem>
-              <MenubarSeparator />
               <MenubarItem onClick={() => Platform.openUrl('file://')}>Open Data Folder</MenubarItem>
               <MenubarSeparator />
               <MenubarItem onClick={() => Platform.quitApp()}>
@@ -136,11 +130,6 @@ export function TitleBar() {
             <MenubarContent>
               <MenubarItem onClick={() => Platform.openUrl(API_DOCS_URL)}>
                 API Documentation
-              </MenubarItem>
-              <MenubarSeparator />
-              <MenubarItem>
-                Developer Console
-                <MenubarShortcut>Ctrl+Shift+I</MenubarShortcut>
               </MenubarItem>
             </MenubarContent>
           </MenubarMenu>

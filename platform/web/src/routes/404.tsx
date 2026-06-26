@@ -43,7 +43,7 @@ function NotFoundPage() {
 
         {/* Go Home button */}
         <Button asChild size="lg" className="gap-2 px-8">
-          <Link to="/">
+          <Link to="/app/home">
             <ArrowLeft className="h-4 w-4" />
             Go Home
           </Link>

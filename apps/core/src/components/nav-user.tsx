@@ -31,10 +31,15 @@ export function NavUser({
 }) {
   const { isMobile } = useSidebar();
   const navigate = useNavigate();
+  const isGuest = !user.email;
 
   const handleLogout = () => {
     authActions.logout();
     toast.success('Đã đăng xuất');
+    navigate({ to: '/login' });
+  };
+
+  const handleLogin = () => {
     navigate({ to: '/login' });
   };
 
@@ -49,11 +54,11 @@ export function NavUser({
             >
               <Avatar className="h-8 w-8 rounded-lg grayscale">
                 <AvatarImage src={user.avatar} alt={user.name} />
-                <AvatarFallback className="rounded-lg">CN</AvatarFallback>
+                <AvatarFallback className="rounded-lg">{isGuest ? 'G' : 'U'}</AvatarFallback>
               </Avatar>
               <div className="grid flex-1 text-start text-sm leading-tight">
-                <span className="truncate font-medium">{user.name}</span>
-                <span className="truncate text-xs text-muted-foreground">{user.email}</span>
+                <span className="truncate font-medium">{isGuest ? 'Local Workspace' : user.name}</span>
+                <span className="truncate text-xs text-muted-foreground">{isGuest ? 'Offline Mode' : user.email}</span>
               </div>
               <EllipsisVerticalIcon className="ms-auto size-4" />
             </SidebarMenuButton>
@@ -68,34 +73,43 @@ export function NavUser({
               <div className="flex items-center gap-2 px-1 py-1.5 text-start text-sm">
                 <Avatar className="h-8 w-8 rounded-lg">
                   <AvatarImage src={user.avatar} alt={user.name} />
-                  <AvatarFallback className="rounded-lg">CN</AvatarFallback>
+                  <AvatarFallback className="rounded-lg">{isGuest ? 'G' : 'U'}</AvatarFallback>
                 </Avatar>
                 <div className="grid flex-1 text-start text-sm leading-tight">
-                  <span className="truncate font-medium">{user.name}</span>
-                  <span className="truncate text-xs text-muted-foreground">{user.email}</span>
+                  <span className="truncate font-medium">{isGuest ? 'Local Workspace' : user.name}</span>
+                  <span className="truncate text-xs text-muted-foreground">{isGuest ? 'Offline Mode' : user.email}</span>
                 </div>
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuGroup>
-              <DropdownMenuItem>
-                <CircleUserRoundIcon />
-                Account
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <CreditCardIcon />
-                Billing
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <BellIcon />
-                Notifications
-              </DropdownMenuItem>
-            </DropdownMenuGroup>
+            {!isGuest && (
+              <DropdownMenuGroup>
+                <DropdownMenuItem>
+                  <CircleUserRoundIcon />
+                  Account
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  <CreditCardIcon />
+                  Billing
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  <BellIcon />
+                  Notifications
+                </DropdownMenuItem>
+              </DropdownMenuGroup>
+            )}
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={handleLogout} className="cursor-pointer">
-              <LogOutIcon />
-              Log out
-            </DropdownMenuItem>
+            {isGuest ? (
+              <DropdownMenuItem onClick={handleLogin} className="cursor-pointer text-primary">
+                <CircleUserRoundIcon />
+                Connect to Cloud
+              </DropdownMenuItem>
+            ) : (
+              <DropdownMenuItem onClick={handleLogout} className="cursor-pointer">
+                <LogOutIcon />
+                Log out
+              </DropdownMenuItem>
+            )}
           </DropdownMenuContent>
         </DropdownMenu>
       </SidebarMenuItem>

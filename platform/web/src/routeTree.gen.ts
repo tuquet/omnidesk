@@ -15,7 +15,7 @@ import { Route as SignupRouteImport } from './routes/signup'
 import { Route as MaintenanceRouteImport } from './routes/maintenance'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
-import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
+import { Route as WorkspaceRouteImport } from './routes/_workspace'
 import { Route as R503RouteImport } from './routes/503'
 import { Route as R500RouteImport } from './routes/500'
 import { Route as R404RouteImport } from './routes/404'
@@ -23,11 +23,11 @@ import { Route as R403RouteImport } from './routes/403'
 import { Route as R401RouteImport } from './routes/401'
 import { Route as AutomaAuthRouteImport } from './routes/automa.auth'
 import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
-import { Route as AuthenticatedAppStoreAppIdRouteImport } from './routes/_authenticated/app-store_.$appId'
+import { Route as WorkspaceAppStoreAppIdRouteImport } from './routes/_workspace/app-store_.$appId'
 
 const IndexLazyRouteImport = createFileRoute('/')()
-const AuthenticatedAppAppIdLazyRouteImport = createFileRoute(
-  '/_authenticated/app/$appId',
+const WorkspaceAppAppIdLazyRouteImport = createFileRoute(
+  '/_workspace/app/$appId',
 )()
 
 const SignupRoute = SignupRouteImport.update({
@@ -50,8 +50,8 @@ const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
   path: '/forgot-password',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedRoute = AuthenticatedRouteImport.update({
-  id: '/_authenticated',
+const WorkspaceRoute = WorkspaceRouteImport.update({
+  id: '/_workspace',
   getParentRoute: () => rootRouteImport,
 } as any)
 const R503Route = R503RouteImport.update({
@@ -94,20 +94,18 @@ const AuthCallbackRoute = AuthCallbackRouteImport.update({
   path: '/auth/callback',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedAppAppIdLazyRoute =
-  AuthenticatedAppAppIdLazyRouteImport.update({
-    id: '/app/$appId',
-    path: '/app/$appId',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any).lazy(() =>
-    import('./routes/_authenticated/app.$appId.lazy').then((d) => d.Route),
-  )
-const AuthenticatedAppStoreAppIdRoute =
-  AuthenticatedAppStoreAppIdRouteImport.update({
-    id: '/app-store_/$appId',
-    path: '/app-store/$appId',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
+const WorkspaceAppAppIdLazyRoute = WorkspaceAppAppIdLazyRouteImport.update({
+  id: '/app/$appId',
+  path: '/app/$appId',
+  getParentRoute: () => WorkspaceRoute,
+} as any).lazy(() =>
+  import('./routes/_workspace/app.$appId.lazy').then((d) => d.Route),
+)
+const WorkspaceAppStoreAppIdRoute = WorkspaceAppStoreAppIdRouteImport.update({
+  id: '/app-store_/$appId',
+  path: '/app-store/$appId',
+  getParentRoute: () => WorkspaceRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexLazyRoute
@@ -122,8 +120,8 @@ export interface FileRoutesByFullPath {
   '/signup': typeof SignupRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/automa/auth': typeof AutomaAuthRoute
-  '/app-store/$appId': typeof AuthenticatedAppStoreAppIdRoute
-  '/app/$appId': typeof AuthenticatedAppAppIdLazyRoute
+  '/app-store/$appId': typeof WorkspaceAppStoreAppIdRoute
+  '/app/$appId': typeof WorkspaceAppAppIdLazyRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexLazyRoute
@@ -138,8 +136,8 @@ export interface FileRoutesByTo {
   '/signup': typeof SignupRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/automa/auth': typeof AutomaAuthRoute
-  '/app-store/$appId': typeof AuthenticatedAppStoreAppIdRoute
-  '/app/$appId': typeof AuthenticatedAppAppIdLazyRoute
+  '/app-store/$appId': typeof WorkspaceAppStoreAppIdRoute
+  '/app/$appId': typeof WorkspaceAppAppIdLazyRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -149,15 +147,15 @@ export interface FileRoutesById {
   '/404': typeof R404Route
   '/500': typeof R500Route
   '/503': typeof R503Route
-  '/_authenticated': typeof AuthenticatedRouteWithChildren
+  '/_workspace': typeof WorkspaceRouteWithChildren
   '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
   '/maintenance': typeof MaintenanceRoute
   '/signup': typeof SignupRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/automa/auth': typeof AutomaAuthRoute
-  '/_authenticated/app-store_/$appId': typeof AuthenticatedAppStoreAppIdRoute
-  '/_authenticated/app/$appId': typeof AuthenticatedAppAppIdLazyRoute
+  '/_workspace/app-store_/$appId': typeof WorkspaceAppStoreAppIdRoute
+  '/_workspace/app/$appId': typeof WorkspaceAppAppIdLazyRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -200,15 +198,15 @@ export interface FileRouteTypes {
     | '/404'
     | '/500'
     | '/503'
-    | '/_authenticated'
+    | '/_workspace'
     | '/forgot-password'
     | '/login'
     | '/maintenance'
     | '/signup'
     | '/auth/callback'
     | '/automa/auth'
-    | '/_authenticated/app-store_/$appId'
-    | '/_authenticated/app/$appId'
+    | '/_workspace/app-store_/$appId'
+    | '/_workspace/app/$appId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -218,7 +216,7 @@ export interface RootRouteChildren {
   R404Route: typeof R404Route
   R500Route: typeof R500Route
   R503Route: typeof R503Route
-  AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
+  WorkspaceRoute: typeof WorkspaceRouteWithChildren
   ForgotPasswordRoute: typeof ForgotPasswordRoute
   LoginRoute: typeof LoginRoute
   MaintenanceRoute: typeof MaintenanceRoute
@@ -257,11 +255,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ForgotPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_authenticated': {
-      id: '/_authenticated'
+    '/_workspace': {
+      id: '/_workspace'
       path: ''
       fullPath: '/'
-      preLoaderRoute: typeof AuthenticatedRouteImport
+      preLoaderRoute: typeof WorkspaceRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/503': {
@@ -320,35 +318,35 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthCallbackRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_authenticated/app/$appId': {
-      id: '/_authenticated/app/$appId'
+    '/_workspace/app/$appId': {
+      id: '/_workspace/app/$appId'
       path: '/app/$appId'
       fullPath: '/app/$appId'
-      preLoaderRoute: typeof AuthenticatedAppAppIdLazyRouteImport
-      parentRoute: typeof AuthenticatedRoute
+      preLoaderRoute: typeof WorkspaceAppAppIdLazyRouteImport
+      parentRoute: typeof WorkspaceRoute
     }
-    '/_authenticated/app-store_/$appId': {
-      id: '/_authenticated/app-store_/$appId'
+    '/_workspace/app-store_/$appId': {
+      id: '/_workspace/app-store_/$appId'
       path: '/app-store/$appId'
       fullPath: '/app-store/$appId'
-      preLoaderRoute: typeof AuthenticatedAppStoreAppIdRouteImport
-      parentRoute: typeof AuthenticatedRoute
+      preLoaderRoute: typeof WorkspaceAppStoreAppIdRouteImport
+      parentRoute: typeof WorkspaceRoute
     }
   }
 }
 
-interface AuthenticatedRouteChildren {
-  AuthenticatedAppStoreAppIdRoute: typeof AuthenticatedAppStoreAppIdRoute
-  AuthenticatedAppAppIdLazyRoute: typeof AuthenticatedAppAppIdLazyRoute
+interface WorkspaceRouteChildren {
+  WorkspaceAppStoreAppIdRoute: typeof WorkspaceAppStoreAppIdRoute
+  WorkspaceAppAppIdLazyRoute: typeof WorkspaceAppAppIdLazyRoute
 }
 
-const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
-  AuthenticatedAppStoreAppIdRoute: AuthenticatedAppStoreAppIdRoute,
-  AuthenticatedAppAppIdLazyRoute: AuthenticatedAppAppIdLazyRoute,
+const WorkspaceRouteChildren: WorkspaceRouteChildren = {
+  WorkspaceAppStoreAppIdRoute: WorkspaceAppStoreAppIdRoute,
+  WorkspaceAppAppIdLazyRoute: WorkspaceAppAppIdLazyRoute,
 }
 
-const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
-  AuthenticatedRouteChildren,
+const WorkspaceRouteWithChildren = WorkspaceRoute._addFileChildren(
+  WorkspaceRouteChildren,
 )
 
 const rootRouteChildren: RootRouteChildren = {
@@ -358,7 +356,7 @@ const rootRouteChildren: RootRouteChildren = {
   R404Route: R404Route,
   R500Route: R500Route,
   R503Route: R503Route,
-  AuthenticatedRoute: AuthenticatedRouteWithChildren,
+  WorkspaceRoute: WorkspaceRouteWithChildren,
   ForgotPasswordRoute: ForgotPasswordRoute,
   LoginRoute: LoginRoute,
   MaintenanceRoute: MaintenanceRoute,

@@ -40,6 +40,20 @@ function resolveBreadcrumbs(pathname: string): BreadcrumbEntry[] {
   // Generic fallback
   const segments = pathname.split('/').filter(Boolean);
 
+  // If path is exactly /app/home, just show Home
+  if (pathname === '/app/home') {
+    return [{ label: 'Home', url: '/app/home' }];
+  }
+
+  // If it's an app inside /app/:appId
+  if (segments[0] === 'app' && segments[1] && segments[1] !== 'home') {
+    const trail: BreadcrumbEntry[] = [
+      { label: 'Home', url: '/app/home' },
+      { label: humanize(segments[1]), url: pathname }
+    ];
+    return trail;
+  }
+
   if (segments[0] === 'app-store') {
     const trail: BreadcrumbEntry[] = [{ label: 'App Store', url: '/app-store' }];
     if (segments.length > 1) {
@@ -48,11 +62,11 @@ function resolveBreadcrumbs(pathname: string): BreadcrumbEntry[] {
     return trail;
   }
 
-  const trail: BreadcrumbEntry[] = [{ label: 'Dashboard', url: '/dashboard' }];
+  const trail: BreadcrumbEntry[] = [{ label: 'Home', url: '/app/home' }];
   let accumulated = '';
   for (const seg of segments) {
     accumulated += `/${seg}`;
-    if (seg !== 'dashboard') {
+    if (seg !== 'home' && seg !== 'app') {
       trail.push({ label: humanize(seg), url: accumulated });
     }
   }

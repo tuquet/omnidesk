@@ -116,6 +116,26 @@ pub fn start_background_worker(pool: SqlitePool) {
                                 }
                             }
                         }
+                    } else if job.action == "UPDATE_PREFERENCES" {
+                        if let Ok(payload) = serde_json::from_str::<Value>(&decrypted_payload) {
+                            let res = client.post(&format!("{}/rest/v1/user_preferences", url))
+                                .header("apikey", &anon_key)
+                                .header("X-OmniDesk-Signature", &signature)
+                                .header("X-OmniDesk-User", &job.user_id)
+                                .header("Content-Type", "application/json")
+                                .header("Prefer", "resolution=merge-duplicates")
+                                .json(&payload)
+                                .send()
+                                .await;
+                            
+                            if let Ok(response) = res {
+                                if response.status().is_success() || response.status() == reqwest::StatusCode::CONFLICT {
+                                    success = true;
+                                } else {
+                                    eprintln!("[Worker] Sync UPDATE_PREFERENCES failed HTTP {}", response.status());
+                                }
+                            }
+                        }
                     }
 
                     if success {

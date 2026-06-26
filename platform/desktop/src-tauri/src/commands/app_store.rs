@@ -1,5 +1,6 @@
 use std::fs;
 use std::io::Read;
+#[cfg(debug_assertions)]
 use std::path::PathBuf;
 use tauri::{AppHandle, Manager};
 use zip::ZipArchive;
@@ -21,19 +22,18 @@ pub async fn install_local_app(
     let mut archive = ZipArchive::new(zip_file).map_err(|e| format!("Invalid zip archive: {}", e))?;
 
     // Step 1: Find and read manifest.json to get app_id
-    let mut app_id = String::new();
-    {
+    let app_id = {
         let mut manifest_file = archive.by_name("manifest.json").map_err(|_| "manifest.json not found in the root of zip")?;
         let mut manifest_content = String::new();
         manifest_file.read_to_string(&mut manifest_content).map_err(|e| format!("Failed to read manifest: {}", e))?;
         
         let manifest_json: Value = serde_json::from_str(&manifest_content).map_err(|e| format!("Invalid JSON in manifest: {}", e))?;
         if let Some(id) = manifest_json.get("id").and_then(|v| v.as_str()) {
-            app_id = id.to_string();
+            id.to_string()
         } else {
             return Err("Manifest is missing 'id' field".to_string());
         }
-    }
+    };
 
     let app_dir = app
         .path()

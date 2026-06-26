@@ -48,7 +48,7 @@ function NotFound() {
 
         {/* Go Home button */}
         <Button asChild size="lg" className="gap-2 px-8">
-          <Link to="/">
+          <Link to="/app/home">
             <ArrowLeft className="h-4 w-4" />
             Go Home
           </Link>
@@ -62,6 +62,7 @@ function NotFound() {
 }
 
 import { useDeepLinkAuth } from '@omnidesk/app-auth';
+import { AppLayout } from '@/app/layout';
 
 function RootComponent() {
   const { setDevMode } = useDevStore();
@@ -77,10 +78,12 @@ function RootComponent() {
   }, [setDevMode]);
 
   return (
-    <div className="relative flex h-screen flex-col">
+    <div className="relative flex h-screen flex-col bg-background">
       <ResizeHandles />
       <TitleBar />
-      <Outlet />
+      <div className="flex-1 flex flex-col min-h-0">
+        <AppLayout />
+      </div>
     </div>
   );
 }

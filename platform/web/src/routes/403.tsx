@@ -28,8 +28,8 @@ function ForbiddenPage() {
             Go Back
           </Button>
           <Button asChild variant="outline" size="lg" className="gap-2 px-8 w-full sm:w-auto">
-            <Link to="/">
-              Go to Dashboard
+            <Link to="/app/$appId" params={{ appId: 'home' }}>
+              Go to Home
             </Link>
           </Button>
         </div>
