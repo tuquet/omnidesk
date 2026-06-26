@@ -51,7 +51,7 @@ const SYSTEM_APPS: AppItem[] = [
     route: '/app-store', 
     isAppRoute: false,
     isSystem: true,
-    background: 'bg-card',
+    background: 'bg-card border-border/50 shadow-sm hover:bg-muted/50',
     iconColor: 'currentColor'
   },
   { 
@@ -61,7 +61,7 @@ const SYSTEM_APPS: AppItem[] = [
     route: '/settings', 
     isAppRoute: false,
     isSystem: true,
-    background: 'bg-card',
+    background: 'bg-card border-border/50 shadow-sm hover:bg-muted/50',
     iconColor: 'currentColor'
   },
 ];
@@ -97,13 +97,13 @@ function SortableAppItem({ app, onClick }: { app: AppItem, onClick: () => void }
         onClick={onClick}
         {...attributes}
         {...listeners}
-        className={`relative flex items-center justify-center w-[128px] h-[128px] rounded-[32px] border ${app.background} text-card-foreground hover:bg-accent hover:text-accent-foreground transition-all duration-300 ease-out group-hover:scale-105 group-active:scale-95 cursor-pointer outline-none shadow-sm`}
+        className={`relative flex items-center justify-center w-[100px] h-[100px] md:w-[110px] md:h-[110px] rounded-[24px] md:rounded-[28px] border overflow-hidden p-6 ${app.background} transition-all duration-300 ease-out group-hover:scale-[1.03] group-hover:shadow-md group-active:scale-95 cursor-pointer outline-none text-foreground`}
         style={{ touchAction: 'none' }}
       >
         {app.isSystem && app.icon ? (
-          <app.icon className="w-16 h-16" strokeWidth={1.5} style={{ color: app.iconColor }} />
+          <app.icon className="w-full h-full" strokeWidth={1.5} style={{ color: app.iconColor }} />
         ) : (
-          <PackageOpen className="w-16 h-16" strokeWidth={1.5} style={{ color: app.iconColor }} />
+          <PackageOpen className="w-full h-full" strokeWidth={1.5} style={{ color: app.iconColor }} />
         )}
       </button>
       <span 
@@ -176,15 +176,17 @@ export function CommandCenterDashboard() {
           }
         }
 
-        const mappedInstalled: AppItem[] = fetchedApps.map(a => ({
-          id: a.marketplace_apps.id,
-          name: a.marketplace_apps.name,
-          isSystem: false,
-          background: 'bg-card',
-          iconColor: 'currentColor',
-          route: `/app/${a.marketplace_apps.id}`,
-          isAppRoute: true,
-        }));
+        const mappedInstalled: AppItem[] = fetchedApps.map((a, index) => {
+          return {
+            id: a.marketplace_apps.id,
+            name: a.marketplace_apps.name,
+            isSystem: false,
+            background: 'bg-card border-border/50 shadow-sm hover:bg-muted/50',
+            iconColor: 'currentColor',
+            route: `/app/${a.marketplace_apps.id}`,
+            isAppRoute: true,
+          };
+        });
 
         const allApps = [...SYSTEM_APPS, ...mappedInstalled];
         

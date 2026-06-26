@@ -10,6 +10,7 @@ build/
 
 # Tauri
 target/
+target-check/
 gen/
 
 # Turbo

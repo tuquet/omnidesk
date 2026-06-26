@@ -111,3 +111,15 @@ export const launcherActions = {
 export function useLauncherStore() {
   return useStore(launcherStore);
 }
+
+/**
+ * Hook to get only non-core installed app IDs.
+ */
+export function useNonCoreInstalledApps() {
+  return useStore(launcherStore, (state) => {
+    return state.installedApps.filter((id) => {
+      const app = APP_REGISTRY[id];
+      return !app?.isCore;
+    });
+  });
+}

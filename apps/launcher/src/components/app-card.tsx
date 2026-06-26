@@ -27,59 +27,64 @@ export function AppCard({
 
   return (
     <div
-      className="group relative flex items-center gap-4 p-3 rounded-2xl hover:bg-muted/50 transition-colors cursor-pointer w-full max-w-[340px] shrink-0 snap-start"
+      className="group relative flex items-center gap-4 py-3 cursor-pointer w-full hover:bg-muted/30 px-3 -mx-3 rounded-2xl transition-colors"
       onClick={onClick}
     >
-      <div className="flex h-[72px] w-[72px] shrink-0 items-center justify-center rounded-[1.2rem] border shadow-sm bg-background transition-transform duration-300 group-hover:scale-105">
-        <Icon className="h-8 w-8 text-foreground/70" />
+      {/* App Icon - iOS Style */}
+      <div className="flex h-[64px] w-[64px] shrink-0 items-center justify-center rounded-[14px] border border-border/20 shadow-sm bg-background relative overflow-hidden">
+        {/* Subtle inner highlight to mimic iOS icon glass/3D effect */}
+        <div className="absolute inset-0 rounded-[14px] ring-1 ring-inset ring-foreground/5 pointer-events-none" />
+        <Icon className="h-8 w-8 text-foreground/80" strokeWidth={1.5} />
       </div>
 
-      <div className="flex flex-col min-w-0 flex-1 justify-center py-1">
-        <h3 className="text-[15px] font-medium leading-tight truncate text-foreground flex items-center gap-1.5">
-          {app.name}
-          {app.is_core && <Shield className="h-3 w-3 text-muted-foreground" />}
-        </h3>
-        <p className="text-[13px] text-muted-foreground truncate mt-0.5">{app.description}</p>
-        <p className="text-[11px] font-medium text-muted-foreground/60 uppercase tracking-wider mt-1">
-          {app.category}
-        </p>
-      </div>
+      {/* Info Container with Bottom Border */}
+      <div className="flex flex-1 min-w-0 items-center justify-between py-2 border-b border-border/40 group-last:border-transparent h-full">
+        <div className="flex flex-col min-w-0 pr-4 justify-center">
+          <h3 className="text-[16px] font-semibold leading-tight truncate text-foreground flex items-center gap-1.5">
+            {app.name}
+            {app.is_core && <Shield className="h-3.5 w-3.5 text-muted-foreground/60" />}
+          </h3>
+          <p className="text-[13px] text-muted-foreground truncate mt-0.5">{app.description}</p>
+          {/* Subtle category tag under the description (Mac App Store style) */}
+          <p className="text-[11px] font-medium text-muted-foreground/50 uppercase tracking-wider mt-1 hidden sm:block">
+            {app.category}
+          </p>
+        </div>
 
-      <div className="flex shrink-0 items-center pl-2" onClick={(e) => e.stopPropagation()}>
-        {isInstalled ? (
-          <Button
-            variant="secondary"
-            size="sm"
-            className="h-7 rounded-full px-4 text-xs font-bold text-muted-foreground bg-muted hover:bg-muted-foreground/20 hover:text-foreground transition-colors group/btn"
-            disabled={isUninstalling || app.is_core}
-            onClick={onUninstall}
-          >
-            {isUninstalling ? (
-              <Loader2 className="h-3.5 w-3.5 animate-spin" />
-            ) : (
-              <>
-                <span className="inline group-hover/btn:hidden">OPEN</span>
-                <span className="hidden group-hover/btn:inline">
-                  {app.is_core ? 'CORE' : 'REMOVE'}
-                </span>
-              </>
-            )}
-          </Button>
-        ) : (
-          <Button
-            variant="secondary"
-            size="sm"
-            className="h-7 rounded-full px-4 text-xs font-bold bg-primary/10 text-primary hover:bg-primary/20"
-            disabled={isInstalling}
-            onClick={onInstall}
-          >
-            {isInstalling ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : 'GET'}
-          </Button>
-        )}
+        {/* Action Button */}
+        <div className="flex shrink-0 items-center pl-2" onClick={(e) => e.stopPropagation()}>
+          {isInstalled ? (
+            <Button
+              variant="secondary"
+              size="sm"
+              className="h-7 rounded-full px-4 text-[13px] font-bold text-foreground bg-muted hover:bg-muted/80 transition-colors group/btn w-[72px]"
+              disabled={isUninstalling || app.is_core}
+              onClick={onUninstall}
+            >
+              {isUninstalling ? (
+                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+              ) : (
+                <>
+                  <span className="inline group-hover/btn:hidden">OPEN</span>
+                  <span className="hidden group-hover/btn:inline text-[11px]">
+                    {app.is_core ? 'CORE' : 'REMOVE'}
+                  </span>
+                </>
+              )}
+            </Button>
+          ) : (
+            <Button
+              variant="secondary"
+              size="sm"
+              className="h-7 rounded-full px-4 text-[13px] font-bold bg-muted text-foreground hover:bg-muted/80 w-[72px]"
+              disabled={isInstalling}
+              onClick={onInstall}
+            >
+              {isInstalling ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : 'GET'}
+            </Button>
+          )}
+        </div>
       </div>
-
-      {/* Subtle bottom separator for list view */}
-      <div className="absolute bottom-0 right-0 left-[104px] h-[1px] bg-border/40 group-hover:bg-transparent transition-colors" />
     </div>
   );
 }

@@ -10,6 +10,7 @@
   "dependencies": {
     "@omnidesk/app-auth": "workspace:*",
     "@omnidesk/app-file-browser": "workspace:*",
+    "@omnidesk/app-automa": "workspace:*",
     "@omnidesk/types": "workspace:*",
     "@omnidesk/ui": "workspace:*",
     "@radix-ui/react-slot": "^1.2.5",

@@ -26,7 +26,7 @@ export const SiteHeader = memo(function SiteHeader() {
   const navigate = useNavigate();
 
   return (
-    <header className="flex h-12 shrink-0 items-center border-b pl-4 pr-8 lg:pl-6 lg:pr-10">
+    <header className="flex h-12 shrink-0 items-center border-b px-4 lg:px-6">
       <div className="flex w-full items-center gap-1 lg:gap-2 px-2">
         <Button 
           variant="ghost" 

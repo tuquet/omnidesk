@@ -1,12 +1,12 @@
 {
   "id": "automa",
-  "name": "Automa Dashboard",
+  "name": "Automa E2E",
   "version": "0.1.0",
-  "description": "Publish and manage third-party apps for OmniDesk.",
+  "description": "End-to-End Orchestrator and test execution automation.",
   "icon": {
     "type": "lucide",
-    "displayName": "ServerCrash"
+    "displayName": "PlayCircle"
   },
   "category": "Development",
-  "isCore": true
+  "isCore": false
 }

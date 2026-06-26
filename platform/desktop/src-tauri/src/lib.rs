@@ -111,32 +111,39 @@ pub fn run() {
             
             let app_handle = app.handle().clone();
             
-            tauri::async_runtime::spawn(async move {
-                if let Ok(app_dir) = app_handle.path().app_data_dir() {
-                    if std::fs::create_dir_all(&app_dir).is_ok() {
-                        // Initialize database
-                        if let Ok(pool) = db::init_db(app_dir.clone()).await {
-                            // Manage state for Tauri commands
+            if let Ok(app_dir) = system::config::get_active_storage_path(&app_handle) {
+                if std::fs::create_dir_all(&app_dir).is_ok() {
+                    // Initialize database synchronously to prevent race conditions with the UI
+                    match tauri::async_runtime::block_on(async { db::init_db(app_dir.clone()).await }) {
+                        Ok(pool) => {
+                            // Manage state for Tauri commands before UI can call them
                             app_handle.manage(pool.clone());
                             
-                            // Start Background Worker for Offline Queue
-                            services::worker::start_background_worker(pool.clone());
+                            let pool_for_worker = pool.clone();
+                            let pool_for_rt = pool.clone();
+                            let app_handle_for_rt = app_handle.clone();
                             
-                            // Start Realtime WebSocket listener
-                            services::realtime::start_realtime_listener(app_handle.clone(), pool.clone());
-                            
-                            // Start Axum REST API and Swagger UI on port 1421
-                            api::serve(pool, app_dir, 1421).await;
-                        } else {
-                            eprintln!("Failed to initialize database");
+                            tauri::async_runtime::spawn(async move {
+                                // Start Background Worker for Offline Queue
+                                services::worker::start_background_worker(pool_for_worker);
+                                
+                                // Start Realtime WebSocket listener
+                                services::realtime::start_realtime_listener(app_handle_for_rt, pool_for_rt);
+                                
+                                // Start Axum REST API and Swagger UI on port 1421
+                                api::serve(pool, app_dir, 1421).await;
+                            });
                         }
-                    } else {
-                        eprintln!("Failed to create app data dir");
+                        Err(e) => {
+                            panic!("Failed to initialize database: {}", e);
+                        }
                     }
                 } else {
-                    eprintln!("Failed to get app data dir");
+                    eprintln!("Failed to create app data dir");
                 }
-            });
+            } else {
+                eprintln!("Failed to get app data dir");
+            }
             
             Ok(())
         })
@@ -148,6 +155,9 @@ pub fn run() {
             app_store::list_local_apps,
             preferences::get_user_preferences,
             preferences::update_home_screen_order,
+            commands::storage::get_storage_info,
+            commands::storage::update_storage_location,
+            commands::e2e::run_e2e_orchestrator,
         ])
         .run(tauri::generate_context!())
         .expect("error while running OmniDesk");

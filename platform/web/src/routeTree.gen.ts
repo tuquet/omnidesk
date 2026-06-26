@@ -23,6 +23,7 @@ import { Route as R403RouteImport } from './routes/403'
 import { Route as R401RouteImport } from './routes/401'
 import { Route as AutomaAuthRouteImport } from './routes/automa.auth'
 import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
+import { Route as WorkspaceAppStoreRouteImport } from './routes/_workspace/app-store'
 import { Route as WorkspaceAppStoreAppIdRouteImport } from './routes/_workspace/app-store_.$appId'
 
 const IndexLazyRouteImport = createFileRoute('/')()
@@ -94,6 +95,11 @@ const AuthCallbackRoute = AuthCallbackRouteImport.update({
   path: '/auth/callback',
   getParentRoute: () => rootRouteImport,
 } as any)
+const WorkspaceAppStoreRoute = WorkspaceAppStoreRouteImport.update({
+  id: '/app-store',
+  path: '/app-store',
+  getParentRoute: () => WorkspaceRoute,
+} as any)
 const WorkspaceAppAppIdLazyRoute = WorkspaceAppAppIdLazyRouteImport.update({
   id: '/app/$appId',
   path: '/app/$appId',
@@ -118,6 +124,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/maintenance': typeof MaintenanceRoute
   '/signup': typeof SignupRoute
+  '/app-store': typeof WorkspaceAppStoreRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/automa/auth': typeof AutomaAuthRoute
   '/app-store/$appId': typeof WorkspaceAppStoreAppIdRoute
@@ -134,6 +141,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/maintenance': typeof MaintenanceRoute
   '/signup': typeof SignupRoute
+  '/app-store': typeof WorkspaceAppStoreRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/automa/auth': typeof AutomaAuthRoute
   '/app-store/$appId': typeof WorkspaceAppStoreAppIdRoute
@@ -152,6 +160,7 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/maintenance': typeof MaintenanceRoute
   '/signup': typeof SignupRoute
+  '/_workspace/app-store': typeof WorkspaceAppStoreRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/automa/auth': typeof AutomaAuthRoute
   '/_workspace/app-store_/$appId': typeof WorkspaceAppStoreAppIdRoute
@@ -170,6 +179,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/maintenance'
     | '/signup'
+    | '/app-store'
     | '/auth/callback'
     | '/automa/auth'
     | '/app-store/$appId'
@@ -186,6 +196,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/maintenance'
     | '/signup'
+    | '/app-store'
     | '/auth/callback'
     | '/automa/auth'
     | '/app-store/$appId'
@@ -203,6 +214,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/maintenance'
     | '/signup'
+    | '/_workspace/app-store'
     | '/auth/callback'
     | '/automa/auth'
     | '/_workspace/app-store_/$appId'
@@ -318,6 +330,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthCallbackRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_workspace/app-store': {
+      id: '/_workspace/app-store'
+      path: '/app-store'
+      fullPath: '/app-store'
+      preLoaderRoute: typeof WorkspaceAppStoreRouteImport
+      parentRoute: typeof WorkspaceRoute
+    }
     '/_workspace/app/$appId': {
       id: '/_workspace/app/$appId'
       path: '/app/$appId'
@@ -336,11 +355,13 @@ declare module '@tanstack/react-router' {
 }
 
 interface WorkspaceRouteChildren {
+  WorkspaceAppStoreRoute: typeof WorkspaceAppStoreRoute
   WorkspaceAppStoreAppIdRoute: typeof WorkspaceAppStoreAppIdRoute
   WorkspaceAppAppIdLazyRoute: typeof WorkspaceAppAppIdLazyRoute
 }
 
 const WorkspaceRouteChildren: WorkspaceRouteChildren = {
+  WorkspaceAppStoreRoute: WorkspaceAppStoreRoute,
   WorkspaceAppStoreAppIdRoute: WorkspaceAppStoreAppIdRoute,
   WorkspaceAppAppIdLazyRoute: WorkspaceAppAppIdLazyRoute,
 }

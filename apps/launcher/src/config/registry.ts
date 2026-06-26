@@ -14,6 +14,7 @@ export interface AppDefinition {
 }
 
 import { appInfo as fileBrowserInfo } from '@omnidesk/app-file-browser';
+import { appInfo as automaInfo } from '@omnidesk/app-automa';
 import { CodeIcon } from 'lucide-react';
 export const APP_REGISTRY: Record<string, AppDefinition> = {
   'developer-console': {
@@ -25,4 +26,5 @@ export const APP_REGISTRY: Record<string, AppDefinition> = {
     isCore: true,
   },
   'file-browser': fileBrowserInfo,
+  'automa': automaInfo,
 };

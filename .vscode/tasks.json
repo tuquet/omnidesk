@@ -223,7 +223,7 @@
       "type": "shell",
       "command": "cargo check",
       "options": {
-        "cwd": "${workspaceFolder}/apps/desktop/src-tauri"
+        "cwd": "${workspaceFolder}/platform/desktop/src-tauri"
       },
       "problemMatcher": "$rustc",
       "presentation": {
@@ -237,7 +237,7 @@
       "type": "shell",
       "command": "cargo test",
       "options": {
-        "cwd": "${workspaceFolder}/apps/desktop/src-tauri"
+        "cwd": "${workspaceFolder}/platform/desktop/src-tauri"
       },
       "problemMatcher": "$rustc",
       "presentation": {
@@ -251,7 +251,21 @@
       "type": "shell",
       "command": "cargo clippy -- -W clippy::all",
       "options": {
-        "cwd": "${workspaceFolder}/apps/desktop/src-tauri"
+        "cwd": "${workspaceFolder}/platform/desktop/src-tauri"
+      },
+      "problemMatcher": "$rustc",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "group": "rust"
+      }
+    },
+    {
+      "label": "🦀 Rust: Auto Fix Warnings",
+      "type": "shell",
+      "command": "cargo clippy --fix --allow-dirty --allow-no-vcs",
+      "options": {
+        "cwd": "${workspaceFolder}/platform/desktop/src-tauri"
       },
       "problemMatcher": "$rustc",
       "presentation": {

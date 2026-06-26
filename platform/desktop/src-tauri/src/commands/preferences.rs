@@ -34,7 +34,7 @@ pub async fn update_home_screen_order(
         "home_screen_order": serde_json::from_str::<serde_json::Value>(&home_screen_order).unwrap_or(serde_json::json!([]))
     });
 
-    if let Ok((priv_key, pub_key)) = crate::services::crypto::get_or_generate_keypair(&user_id) {
+    if let Ok((_priv_key, pub_key)) = crate::services::crypto::get_or_generate_keypair(&user_id) {
         if let Ok(encrypted_payload) = crate::services::crypto::encrypt_payload(&pub_key, &payload.to_string()) {
             let _ = sqlx::query("INSERT INTO sync_queue (id, user_id, action, payload) VALUES (?, ?, ?, ?)")
                 .bind(job_id)

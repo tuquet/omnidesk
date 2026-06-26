@@ -4,6 +4,8 @@
 @import '@fontsource-variable/inter';
 
 @source "../../../../packages/ui/src";
+@source "../../../../apps/core/src";
+@source "../../../../apps/launcher/src";
 
 @custom-variant dark (&:is(.dark *));
 

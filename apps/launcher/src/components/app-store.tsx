@@ -1,7 +1,7 @@
 import { useState, useMemo, useCallback, useEffect } from 'react';
 import { useAuth } from '@omnidesk/app-auth';
 import { APP_REGISTRY } from '../config/registry';
-import { launcherActions, useLauncherStore } from '../stores/use-launcher-store';
+import { launcherActions, useLauncherStore, useNonCoreInstalledApps } from '../stores/use-launcher-store';
 import {
   useMarketplaceApps,
   useInstalledApps,
@@ -24,6 +24,7 @@ export function AppStore() {
   const [activeTab, setActiveTab] = useState('discover');
   const [uploadDialogOpen, setUploadDialogOpen] = useState(false);
   const { installedApps } = useLauncherStore();
+  const nonCoreInstalledIds = useNonCoreInstalledApps();
   const { user } = useAuth();
   const navigate = useNavigate();
 
@@ -223,7 +224,7 @@ export function AppStore() {
             {searchFilteredApps.length === 0 ? (
               <div className="text-muted-foreground py-10">No apps found for "{searchQuery}"</div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-x-6 gap-y-2">
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-x-8 gap-y-0 px-2">
                 {searchFilteredApps.map((app) => (
                   <AppCard
                     key={app.id}
@@ -246,11 +247,13 @@ export function AppStore() {
           <div className="flex flex-col gap-4">
             <div className="flex items-center justify-between">
               <h2 className="text-xl font-bold tracking-tight">Your Apps</h2>
-              <span className="text-sm text-muted-foreground">{installedApps.length} Apps</span>
+              <span className="text-sm text-muted-foreground">
+                {nonCoreInstalledIds.length} Apps
+              </span>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-x-6 gap-y-2">
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-x-8 gap-y-0 px-2">
               {apps
-                .filter((app) => installedApps.includes(app.id))
+                .filter((app) => nonCoreInstalledIds.includes(app.id))
                 .map((app) => (
                   <AppCard
                     key={app.id}
@@ -303,7 +306,7 @@ export function AppStore() {
                   </div>
 
                   {/* Responsive Grid Container */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-x-6 gap-y-2">
+                  <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-x-8 gap-y-0 px-2">
                     {categoryApps.map((app) => (
                       <AppCard
                         key={app.id}
@@ -330,7 +333,7 @@ export function AppStore() {
             {/* All other apps grid */}
             <div className="flex flex-col gap-4 pt-4 border-t border-border/40">
               <h2 className="text-2xl font-bold tracking-tight">Top Apps</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-x-6 gap-y-2">
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-x-8 gap-y-0 px-2">
                 {apps.map((app) => (
                   <AppCard
                     key={app.id}

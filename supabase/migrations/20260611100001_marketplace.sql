@@ -98,10 +98,5 @@ grant select, insert, delete on public.user_installed_apps to authenticated;
 insert into public.marketplace_apps (id, name, description, icon_name, category, is_core, sort_order) values
   ('dashboard',    'Dashboard',             'Central overview and control panel.',                    'Compass',        'Core',          true,  1),
   ('team',         'Team',                  'Manage team members and permissions.',                   'Users',          'Core',          true,  2),
-  ('lifecycle',    'Lifecycle',             'Track software development lifecycle stages.',            'List',           'Productivity',  false, 10),
-  ('analytics',    'Analytics',             'Data analytics and reporting tools.',                     'ChartBar',       'Analytics',     false, 11),
-  ('projects',     'Projects',              'Manage and track ongoing projects.',                      'Folder',         'Productivity',  false, 12),
-  ('documents',    'Documents',             'Data library, reports, and document management.',          'Database',       'Productivity',  false, 13),
-  ('showcase',     'UI Showcase',           'Component library showcase for developers.',              'Compass',        'Development',   false, 20),
-  ('error-pages',  'Error Pages Simulator', 'Test environment for various HTTP error states.',          'AlertTriangle',  'Development',   false, 21)
+  ('automa',       'Automa E2E',            'End-to-End Orchestrator and test execution automation.', 'PlayCircle',     'Development',   false, 10)
 on conflict (id) do nothing;

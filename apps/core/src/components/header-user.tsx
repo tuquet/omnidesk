@@ -40,11 +40,11 @@ export function HeaderUser() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" size="icon" className="relative h-9 w-9 shrink-0 grayscale">
+        <Button variant="outline" size="icon" className="relative h-9 w-9 shrink-0">
           {avatar ? (
             <img src={avatar} alt={name} className="h-5 w-5 rounded-full object-cover" />
           ) : (
-            <CircleUserRoundIcon className="h-4 w-4 text-muted-foreground" />
+            <CircleUserRoundIcon className="h-4 w-4" />
           )}
         </Button>
       </DropdownMenuTrigger>

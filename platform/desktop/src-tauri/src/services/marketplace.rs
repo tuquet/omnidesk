@@ -32,23 +32,32 @@ pub async fn get_marketplace_apps() -> Result<Vec<Value>, AppError> {
         .await
         .map_err(|e| AppError::Internal(format!("Failed to parse apps: {}", e)))?;
         
-    // Inject local WordPress Sync App definition if not already present
-    let has_wordpress_sync = apps.iter().any(|app| {
+    // Filter out mock apps
+    let mock_ids = vec!["lifecycle", "analytics", "projects", "documents", "showcase", "error-pages"];
+    apps.retain(|app| {
         app.get("id")
             .and_then(|id| id.as_str())
-            .map(|id_str| id_str == "wordpress-sync")
+            .map(|id_str| !mock_ids.contains(&id_str))
+            .unwrap_or(true)
+    });
+
+    // Inject Automa E2E Orchestrator App
+    let has_automa = apps.iter().any(|app| {
+        app.get("id")
+            .and_then(|id| id.as_str())
+            .map(|id_str| id_str == "automa")
             .unwrap_or(false)
     });
     
-    if !has_wordpress_sync {
+    if !has_automa {
         apps.push(serde_json::json!({
-            "id": "wordpress-sync",
-            "name": "WordPress Sync",
-            "description": "WordPress GitOps content & media synchronization workspace.",
-            "icon_name": "RefreshCw",
+            "id": "automa",
+            "name": "Automa E2E",
+            "description": "End-to-End Orchestrator and test execution automation.",
+            "icon_name": "PlayCircle",
             "category": "Development",
             "is_core": false,
-            "sort_order": 100,
+            "sort_order": 10,
             "created_at": chrono::Utc::now().to_rfc3339()
         }));
     }

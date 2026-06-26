@@ -633,6 +633,9 @@ importers:
       '@omnidesk/app-auth':
         specifier: workspace:*
         version: link:../auth
+      '@omnidesk/app-automa':
+        specifier: workspace:*
+        version: link:../automa
       '@omnidesk/app-file-browser':
         specifier: workspace:*
         version: link:../file-browser
@@ -1220,6 +1223,9 @@ importers:
       '@omnidesk/app-auth':
         specifier: workspace:*
         version: link:../../apps/auth
+      '@omnidesk/app-automa':
+        specifier: workspace:*
+        version: link:../../apps/automa
       '@omnidesk/app-core':
         specifier: workspace:*
         version: link:../../apps/core
