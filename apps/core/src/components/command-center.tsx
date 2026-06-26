@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Card, CardContent } from '@omnidesk/ui';
 import { Button } from '@omnidesk/ui';
 import { PackageOpen, ArrowRight, Loader2, LayoutGrid } from 'lucide-react';
-import { supabase } from '@omnidesk/app-auth';
+import { supabase } from '@/lib/supabase';
 import { useNavigate } from '@tanstack/react-router';
 
 interface InstalledApp {
