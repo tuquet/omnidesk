@@ -93,12 +93,6 @@ export const authActions = {
     }
   },
 
-  /** Sign in anonymously (Guest mode) */
-  signInAnonymously: async () => {
-    const { data, error } = await supabase.auth.signInAnonymously();
-    if (error) throw error;
-    return data;
-  },
 
   /** Sign up with email and password */
   signUp: async (email: string, password: string) => {
