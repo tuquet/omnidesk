@@ -265,14 +265,12 @@ pub async fn uninstall_app_impl(
     .execute(pool)
     .await?;
 
-    // 2. Remove sandbox folder if wordpress-sync
-    if app_id == "wordpress-sync" {
-        let sandbox_dir = app_dir.join("apps").join(app_id);
-        if sandbox_dir.exists() {
-            std::fs::remove_dir_all(&sandbox_dir)
-                .map_err(|e| AppError::Internal(format!("Failed to delete sandbox directory: {}", e)))?;
-            println!("Deleted sandbox directory at {:?}", sandbox_dir);
-        }
+    // 2. Remove sandbox folder
+    let sandbox_dir = app_dir.join("apps").join(app_id);
+    if sandbox_dir.exists() {
+        std::fs::remove_dir_all(&sandbox_dir)
+            .map_err(|e| AppError::Internal(format!("Failed to delete sandbox directory: {}", e)))?;
+        println!("Deleted sandbox directory at {:?}", sandbox_dir);
     }
     
     // 3. Queue for Cloud Sync (Encrypted)

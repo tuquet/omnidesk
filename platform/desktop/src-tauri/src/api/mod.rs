@@ -69,7 +69,6 @@ pub async fn serve(pool: SqlitePool, app_dir: PathBuf, port: u16) {
         .route("/api/apps/install/:id", post(handlers::apps::install_app).delete(handlers::apps::uninstall_app))
         .route("/mcp/sse", get(handlers::mcp::mcp_sse))
         .route("/mcp/messages", post(handlers::mcp::mcp_messages))
-        .route("/api/projects/:project_id/run-script/:script", get(handlers::projects::run_project_script))
         .nest_service("/apps", ServeDir::new(apps_sandbox_dir))
         .layer(CorsLayer::permissive())
         .with_state(state);

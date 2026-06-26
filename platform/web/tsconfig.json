@@ -20,13 +20,6 @@
       "@omnidesk/app-core/*": [
         "../../apps/core/src/*"
       ],
-      "@omnidesk/app-file-browser": [
-        "../../apps/file-browser/src",
-        "../../apps/file-browser/src/index.ts"
-      ],
-      "@omnidesk/app-file-browser/*": [
-        "../../apps/file-browser/src/*"
-      ],
       "@omnidesk/app-launcher": [
         "../../apps/launcher/src",
         "../../apps/launcher/src/index.ts"
