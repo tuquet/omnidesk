@@ -1,0 +1,12 @@
+.vercel
+node_modules
+dist
+.turbo
+coverage
+.vscode
+.DS_Store
+*.log
+platform/desktop/src-tauri/target
+branch/
+brain/
+scratch/
