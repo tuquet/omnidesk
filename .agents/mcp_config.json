@@ -2,7 +2,7 @@
   "mcpServers": {
     "supabase-mcp-server": {
       "$typeName": "exa.cascade_plugins_pb.CascadePluginCommandTemplate",
-      "command": "npx",
+      "command": "npx.cmd",
       "args": [
         "-y",
         "@supabase/mcp-server-supabase@latest",
@@ -22,10 +22,9 @@
     },
     "shadcn": {
       "$typeName": "exa.cascade_plugins_pb.CascadePluginCommandTemplate",
-      "command": "npx",
+      "command": "npx.cmd",
       "args": [
-        "-y",
-        "shadcn@latest",
+        "shadcn",
         "mcp"
       ],
       "env": {}
