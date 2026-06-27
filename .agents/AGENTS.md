@@ -10,19 +10,28 @@ Before substantial work:
 - Multiple matches: prefer the most specific local skill for the package or concern you are changing; load additional skills only when the task spans multiple packages or concerns.
 <!-- intent-skills:end -->
 
-# OmniDesk Agent Rules
+# OmniDesk Agent Rules (SOLID Architecture)
 
-## 1. Architectural Philosophy
+As an AI Agent modifying the OmniDesk ecosystem, you MUST evaluate every code change against the **SOLID Principles** enforced by our strict architectural philosophies:
 
-- **Micro-App Isolation**: Apps and packages (`apps/`, `packages/`) MUST NOT import from each other directly. All inter-app communication must go through the Rust API Gateway or Event Bus.
-- **Backend Supremacy**: The React frontend (`apps/desktop` or `apps/web`) is purely a view layer. The Rust Backend (Tauri v2 + Axum gateway on port `1421`) is the ultimate authority for routing, file access, and DB operations.
-- **Local-First, Cloud-Second**: All writes execute synchronously against local SQLite (via `SQLx`). Supabase acts strictly as a background asynchronous 2-way sync layer.
-- **Zero-Trust Web Auth**: Never use internal WebViews for external OAuth. Always open the native system browser and capture the token via `omnidesk://` deep links.
-- **Frontend Architecture**: Apps are strictly split into `apps/desktop` (Tauri+React) and `apps/web` (Web only). Universal features and UI components must be extracted to `packages/features/*` and `packages/ui` to be consumed by both apps.
+## 1. Single Responsibility Principle (SRP) & Micro-App Isolation
+- **Domain Strictness**: Apps (`apps/`) and packages (`packages/`) MUST NOT import from each other directly. `packages/ui` handles only pure UI. `packages/auth` handles only authentication.
+- **Rule**: If you find yourself writing business logic in a View component, or DB logic in the Frontend, you are violating SRP. Stop and decouple it. All inter-app communication must route through the Rust API Gateway or Event Bus.
+- **Frontend Architecture**: Apps are strictly split into `apps/desktop` (Tauri+React) and `apps/web` (Web only). Universal features must be extracted to `packages/features/*` and `packages/ui` to maintain single responsibility.
 
-## 2. Frontend & UI Engineering
+## 2. Open/Closed Principle (OCP) & Scalable Extensibility
+- **UI Composition**: Always prioritize using Shadcn blocks (`npx shadcn@latest add <block-name>`) before building custom features. Do not mutate base UI components to force new behavior; extend them via composition and responsive Tailwind CSS.
+- **Background Sync**: Adding new data models should simply extend the background `sync_queue` logic without breaking existing offline functionality.
 
-- **Cross-Platform by Default**: Ensure all Universal React code works flawlessly across Desktop (Tauri) and Web browsers.
-- **Graceful Fallbacks**: If utilizing native Tauri APIs (e.g., `fs`) in universal packages, always implement a Web equivalent (e.g., Browser File API) or provide a fallback UI for standard browsers.
-- **Shadcn Blocks**: Always prioritize using `npx shadcn@latest add <block-name>` (e.g., `login-02`) before building custom UI features to ensure design consistency and responsive layouts.
-- **Responsive Dimensions**: Never hardcode dimensions that break inside small Tauri windows or mobile browsers. Use responsive CSS/Tailwind utilities.
+## 3. Liskov Substitution Principle (LSP) & Cross-Platform Predictability
+- **Cross-Platform by Default**: Ensure all Universal React code works flawlessly across Desktop (Tauri) and Web browsers. Never hardcode dimensions that break inside small Tauri windows.
+- **Graceful Fallbacks**: If utilizing native Tauri APIs (e.g., `fs`) in universal packages, ALWAYS implement a Web equivalent (e.g., Browser File API). A Web runtime must be able to perfectly substitute a Tauri runtime without crashing.
+
+## 4. Interface Segregation Principle (ISP) & API Granularity
+- **Decoupled Gateway**: The Rust Backend offers both Tauri IPC commands and an Axum HTTP gateway. The Web clients must only depend on the HTTP interfaces they need, completely ignoring Tauri IPC.
+- **State Management**: **Always** use `@tanstack/store` and `@tanstack/react-store` for granular global state management. Do **NOT** use monolithic state libraries like `redux` or `zustand` unless explicitly asked.
+
+## 5. Dependency Inversion Principle (DIP) & Backend Supremacy
+- **Backend Supremacy**: The React frontend is purely a view layer. It must NEVER depend directly on the file system or DB. It must depend strictly on the HTTP abstraction exposed by the Rust Backend (`localhost:1421/api/...`).
+- **Local-First, Cloud-Second**: All writes execute synchronously against local SQLite (via `SQLx`). Supabase acts strictly as a background asynchronous 2-way sync layer. The UI must not wait for the Cloud.
+- **Zero-Trust Web Auth**: Never use internal WebViews for external OAuth. Abstract auth out to the native system browser and catch tokens via `omnidesk://` deep links.
