@@ -1,84 +1,67 @@
-# 🚀 Automa Kernel App - Development Roadmap
+# 🚀 OmniDesk E2E & Browser Manager - Development Roadmap
 
-Roadmap này định hướng phát triển hệ sinh thái **Automa Desktop Kernel**, một ứng dụng Tauri v2 đóng vai trò là "vỏ nhân" (kernel) để quản lý, phân phối và thực thi các workflow tự động hóa trình duyệt, kết hợp với hệ thống phân quyền (RBAC) chặt chẽ từ Supabase.
-
----
-
-## 📍 Giai đoạn 1: Foundation & Supabase RBAC (Core Security)
-
-_Mục tiêu: Xây dựng nền tảng vững chắc cho tài khoản, phân quyền và bảo mật lõi._
-
-- [ ] **Supabase Auth & Custom Claims**
-  - Tích hợp đăng nhập OAuth / Email an toàn qua giao diện Native Browser (Deeplink `omnidesk://`).
-  - Thiết lập Custom Claims trên Supabase để gán role (`admin`, `user`).
-- [ ] **RBAC (Role-Based Access Control)**
-  - **Admin Only**: Phân quyền truy cập các "Tính năng cốt lõi" (Core Features) như Quản lý người dùng, Đăng tải ứng dụng/workflow lên Marketplace, Quản lý cấu hình hệ thống.
-  - **User**: Quyền tải Kernel App, đăng nhập để truy cập marketplace và tải Automa.
-- [ ] **Row Level Security (RLS)**
-  - Viết các RLS policy trên Supabase PostgreSQL để đảm bảo dữ liệu (workflows, logs, apps) được bảo vệ tuyệt đối theo role.
+Roadmap này định hướng phát triển **OmniDesk E2E**, một ứng dụng Tauri v2 đóng vai trò là một trình quản lý đa Profile (Multi-profile Browser Manager) và là trung tâm điều khiển (Orchestrator) các kịch bản kiểm thử E2E tự động, tập trung mạnh vào hiệu năng Local và khả năng Bypass Anti-bot.
 
 ---
 
-## 📍 Giai đoạn 2: The Kernel Desktop App (Vỏ nhân Tauri)
+## 📍 Giai đoạn 1: Browser Profile & Local Data Management (MVP Foundation)
 
-_Mục tiêu: Hoàn thiện "Kernel App" có khả năng tải và chạy các module con (Apps)._
+_Mục tiêu: Quản lý hàng loạt các Profile trình duyệt độc lập và cấu hình khởi chạy an toàn (Anti-detect)._
 
-- [ ] **Hoàn thiện Rust API Gateway**
-  - Tối ưu hóa API Gateway (Axum) chạy trên cổng nội bộ `1421` để giao tiếp giữa Web View và Local System.
-- [ ] **Marketplace & App Installer (Local-first)**
-  - Hoàn thiện luồng: Users kéo ứng dụng (ví dụ: Automa) từ Supabase Marketplace về Kernel.
-  - Tải và giải nén các module tĩnh của app vào thư mục hệ thống (AppData) một cách an toàn.
-- [ ] **Custom Storage Configurations**
-  - Cho phép người dùng tùy chỉnh thư mục lưu trữ dữ liệu (Database, App Modules, Logs) trên ổ cứng cục bộ.
-
----
-
-## 📍 Giai đoạn 3: Automa Desktop Integration (Trái tim tự động hóa)
-
-_Mục tiêu: Biến Automa thành một ứng dụng Native Desktop chạy bên trong Kernel._
-
-- [ ] **Tích hợp Automa Dashboard**
-  - Nhúng Automa Dashboard (React/Vue) vào nền tảng của Kernel, giao tiếp với Local SQLite thay vì IndexedDB truyền thống của trình duyệt.
-- [ ] **The E2E Orchestrator (Trình điều khiển trình duyệt)**
-  - Phát triển module Orchestrator (Node.js/Playwright hoặc Rust webdriver) đi kèm Kernel.
-  - Cho phép Kernel App mở các trình duyệt (Chrome, Edge, Firefox) với profile độc lập để chạy workflow.
-- [ ] **Automa Extension Bridge**
-  - Cấu hình cầu nối (WebSocket / API Gateway) để Automa Extension (cài trong trình duyệt mục tiêu) có thể nhận lệnh trực tiếp từ Kernel App.
+- [ ] **Quản lý Cấu hình Profile (Local SQLite)**
+  - Quản lý danh sách Browser Profiles. Mỗi profile lưu thông tin cấu hình: Tên, Proxy, User-Agent riêng biệt.
+- [ ] **Lưu trữ dữ liệu Local-First (AppData)**
+  - Tách bạch hoàn toàn dữ liệu thật của từng trình duyệt (Cookies, Cache, History, LocalStorage) vào thư mục nội bộ (User Data Dir) thay vì đồng bộ thời gian thực lên mây để đảm bảo hiệu năng và tốc độ tốt nhất.
+- [ ] **Tự động tiêm Extension (Auto-Inject)**
+  - Tự động mount (tiêm) Automa Extension vào mỗi profile trình duyệt được sinh ra.
+- [ ] **Khởi chạy Anti-detect Command Line**
+  - Khởi chạy các trình duyệt (Chrome, Edge, Firefox) bằng CLI (qua `--remote-debugging-port`) thay vì Webdriver, nhằm vượt qua các hệ thống Anti-bot (như Cloudflare) dễ dàng.
 
 ---
 
-## 📍 Giai đoạn 4: Workflow Execution & Management
+## 📍 Giai đoạn 2: Automa Bridge & Test Execution (MVP Core)
 
-_Mục tiêu: Khởi chạy và quản lý luồng công việc từ Desktop._
+_Mục tiêu: Đóng vai trò là E2E Orchestrator, điều khiển các trình duyệt thực thi Kịch bản (Workflow) mà không cần can thiệp thủ công._
 
-- [ ] **Local Workflow Execution**
-  - Người dùng kích hoạt Workflow từ giao diện Kernel. Kernel gọi Orchestrator khởi chạy trình duyệt -> truyền lệnh cho Extension thực thi.
-- [ ] **Workflow Sync & Cloud Backup (Supabase 2-way sync)**
-  - Đồng bộ hóa định kỳ các Workflow của người dùng lên Supabase Storage/Database.
-  - Đảm bảo Local-First: Có mạng hay không, workflow vẫn chạy bình thường.
-- [ ] **Logs & Tracing**
-  - Ghi nhận lại lịch sử chạy, lỗi, và kết quả của từng workflow vào Local SQLite, sync lên Supabase khi cần.
-
----
-
-## 📍 Giai đoạn 5: Admin Core Features & Monetization (Mở rộng)
-
-_Mục tiêu: Cung cấp tính năng quản trị cấp cao và thương mại hóa._
-
-- [ ] **Admin Control Panel**
-  - Giao diện riêng cho Role `admin` để quản lý version của Kernel, đẩy bản cập nhật (OTA) qua Tauri Updater.
-- [ ] **Premium Workflows Marketplace**
-  - Cho phép Admin bán hoặc cấp quyền truy cập các workflow độc quyền (Premium Workflows) cho user cụ thể.
-- [ ] **Telemetry & Analytics**
-  - Thu thập ẩn danh trạng thái hệ thống, tỷ lệ lỗi workflow (Admin only dashboard) để cải thiện sản phẩm.
+- [ ] **Rust Local API & WebSocket (Cổng 1421)**
+  - Xây dựng cầu nối giao tiếp 2 chiều giữa **Tauri Desktop App** và **Automa Extension** chạy ngầm trong trình duyệt.
+- [ ] **Quản lý Danh sách Test Cases / Workflows**
+  - Xây dựng giao diện Desktop liệt kê các Kịch bản kiểm thử (Test Suites) từ Automa. Người dùng chỉ cần thiết kế kịch bản trực tiếp từ UI của Extension một lần.
+- [ ] **Thực thi lệnh & Theo dõi Logs (Execution & Tracing)**
+  - Người dùng bấm "Run" từ Desktop, hệ thống gửi lệnh qua API kích hoạt Automa Extension thực thi tự động.
+  - Ghi nhận Logs thời gian thực (Success/Fail/Error) từ Extension trả về Desktop App và lưu xuống SQLite.
 
 ---
 
-### 💡 Tóm tắt User Journey
+## 📍 Giai đoạn 3: Cloud Sync & Team Collaboration
 
-1. **Admin** thiết lập hệ thống, phân quyền, và đưa module `Automa` lên Marketplace.
-2. **Người dùng** truy cập website, tải **Kernel App** về máy.
-3. Người dùng đăng nhập Kernel App, hệ thống xác thực RBAC qua Supabase.
-4. Từ Marketplace của Kernel, người dùng click cài đặt **Automa**.
-5. Người dùng thiết kế Workflow trên Dashboard, bấm "Chạy".
-6. Kernel App tự động mở trình duyệt, kết nối Extension và thực thi các hành động trên website một cách hoàn toàn tự động.
+_Mục tiêu: Mở rộng khả năng sao lưu và chia sẻ kịch bản giữa nhiều người dùng._
+
+- [ ] **Tài khoản & Phân quyền Supabase (Auth)**
+  - Tích hợp đăng nhập an toàn bằng OAuth/Email.
+- [ ] **Đồng bộ Profile (Backup/Sync)**
+  - Nén (zip) cấu hình Profile và dữ liệu Browser (tùy chọn) thành một cục (bundle) và đẩy lên **Supabase Storage** khi người dùng có nhu cầu lưu trữ.
+- [ ] **Đồng bộ Workflows (Cloud Workflows)**
+  - Backup các JSON Workflows của Automa lên Supabase Database để làm kho Kịch bản chung (Centralized Repository) cho team QA.
+
+---
+
+## 📍 Giai đoạn 4: Kernel App & Phân phối (Bản mở rộng tương lai)
+
+_Mục tiêu: Xây dựng nền tảng mở (Marketplace), thương mại hóa các ứng dụng nội bộ._
+
+- [ ] **Kernel App Dynamic Loading**
+  - Modular hóa ứng dụng, hỗ trợ tải các phần mềm dưới dạng Module rời rạc vào "Vỏ nhân" OmniDesk.
+- [ ] **Supabase RBAC & Admin Core**
+  - Phân quyền theo Role (Admin, Editor, Viewer). Quản trị phiên bản (Updater), cấp phát License cho các ứng dụng.
+- [ ] **Workflow Marketplace**
+  - Chợ mua bán / chia sẻ các Kịch bản (Workflows) cao cấp chuyên ngành (Premium workflows).
+
+---
+
+### 💡 Tóm tắt User Journey (Cho bản MVP)
+
+1. **Thiết lập**: Người dùng tạo một (hoặc nhiều) Browser Profile từ giao diện Desktop App và gán Proxy/User-Agent riêng biệt.
+2. **Khởi chạy**: Người dùng bấm "Open", Desktop App kích hoạt Chrome mở theo User Data Dir tách biệt.
+3. **Thiết kế Kịch bản (1 lần)**: Người dùng dùng Automa Extension (đã cài sẵn) trong trình duyệt để kéo-thả kịch bản E2E Test.
+4. **Chạy Tự Động**: Đóng trình duyệt. Từ giao diện Desktop, chọn Test Suite và ấn "Execute". Desktop App tự động mở trình duyệt và ngầm ra lệnh cho Automa chạy bài Test, thu nhận kết quả Report trả về giao diện quản lý.
