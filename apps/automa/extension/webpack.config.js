@@ -14,7 +14,9 @@ const ASSET_PATH = process.env.ASSET_PATH || '/';
 const alias = {
   '@': path.resolve(__dirname, 'src/'),
   secrets: path.join(__dirname, 'secrets.blank.js'),
-  '@business': path.resolve(__dirname, 'business/dev'),
+  '@business/blocks': path.resolve(__dirname, 'business/dev/blocks'),
+  '@business/parameters': path.resolve(__dirname, 'business/dev/parameters'),
+  '@business': path.resolve(__dirname, 'business'),
 };
 
 // load the secrets

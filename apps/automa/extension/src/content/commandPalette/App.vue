@@ -178,7 +178,7 @@ import ParameterJsonValue from '@/components/newtab/workflow/edit/Parameter/Para
 import RendererWorkflowService from '@/service/renderer/RendererWorkflowService';
 import { debounce, parseJSON } from '@/utils/helper';
 import { sendMessage } from '@/utils/message';
-import workflowParameters from '@business/parameters';
+import workflowParameters from '@business/dev/parameters';
 import cloneDeep from 'lodash.clonedeep';
 import {
   computed,

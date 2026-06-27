@@ -129,7 +129,7 @@ import { useTheme } from '@/composable/theme';
 import dayjs from '@/lib/dayjs';
 import { parseJSON } from '@/utils/helper';
 import automa from '@business';
-import workflowParameters from '@business/parameters';
+import workflowParameters from '@business/dev/parameters';
 import { computed, onMounted, ref } from 'vue';
 import browser from 'webextension-polyfill';
 

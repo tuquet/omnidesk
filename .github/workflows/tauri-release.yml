@@ -36,7 +36,7 @@ jobs:
         uses: dtolnay/rust-toolchain@stable
 
       - name: Force default host target by removing local GNU config
-        run: rm -f apps/desktop/src-tauri/.cargo/config.toml
+        run: rm -f apps/automa/runtime/src-tauri/.cargo/config.toml
         shell: bash
 
       - name: Install dependencies (Ubuntu only)
@@ -53,7 +53,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          projectPath: './apps/desktop'
+          projectPath: './apps/automa/runtime'
           tauriScript: 'pnpm tauri'
           tagName: v__VERSION__
           releaseName: 'OmniDesk v__VERSION__'

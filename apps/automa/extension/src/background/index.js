@@ -1095,6 +1095,21 @@ message.on('downloads:watch-changed', async ({ downloadId, onComplete }) => {
   return true;
 });
 
+if (typeof window !== 'undefined') {
+  window.addEventListener('automa:execute-remote', async (e) => {
+    const { workflow, run_id } = e.detail;
+    try {
+      await BackgroundWorkflowUtils.instance.executeWorkflow(workflow, {
+        data: {
+          variables: { 'RUNTIME_RUN_ID': run_id }
+        }
+      });
+    } catch (err) {
+      console.error('[Background] Failed to execute remote workflow:', err);
+    }
+  });
+}
+
 automa('background', message);
 
 browser.runtime.onMessage.addListener(message.listener);

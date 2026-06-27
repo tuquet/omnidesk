@@ -243,6 +243,13 @@ class WorkflowWorker {
     const prevBlock = this.currentBlock;
     this.currentBlock = { ...block, startedAt: startExecuteTime };
 
+    if (this.engine.dispatchGlobalEvent) {
+      this.engine.dispatchGlobalEvent('block-started', {
+        blockId: block.id,
+        label: block.label
+      });
+    }
+
     const isInBreakpoint =
       this.engine.isTestingMode &&
       ((block.data?.$breakpoint && !execParam.resume) ||
@@ -320,6 +327,14 @@ class WorkflowWorker {
         duration: Math.round(Date.now() - startExecuteTime),
         ...obj,
       });
+
+      if (this.engine.dispatchGlobalEvent) {
+        this.engine.dispatchGlobalEvent('block-finished', {
+          blockId: block.id,
+          durationMs: Math.round(Date.now() - startExecuteTime),
+          data: obj
+        });
+      }
     };
 
     const executeBlocks = (blocks, data) => {

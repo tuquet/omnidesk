@@ -11,10 +11,10 @@ import {
   CommandList,
   CommandSeparator,
 } from '@omnidesk/ui';
-import { useDevStore } from '@/stores/use-dev-store';
-import { useRBAC } from '@/hooks/use-rbac';
+import { useDevStore } from '@omnidesk/core';
+import { useAppConfig } from '../providers/config-provider';
 import { SearchIcon } from 'lucide-react';
-import { NAV_MAIN, NAV_DOCUMENTS, NAV_SECONDARY, NAV_SHOWCASE, NAV_ERROR_PAGES } from '@/config';
+
 import { useTranslation } from 'react-i18next';
 import { useLauncherStore } from '@omnidesk/app-launcher';
 import { APP_REGISTRY, type AppDefinition } from '@omnidesk/app-launcher';
@@ -23,7 +23,8 @@ export function GlobalSearch() {
   const [open, setOpen] = React.useState(false);
   const navigate = useNavigate();
   const { isDevMode } = useDevStore();
-  const { can, filterNav } = useRBAC();
+  const { config, rbac: { can, filterNav } } = useAppConfig();
+  const { navMain: NAV_MAIN, navDocuments: NAV_DOCUMENTS, navSecondary: NAV_SECONDARY, navShowcase: NAV_SHOWCASE, navErrorPages: NAV_ERROR_PAGES } = config;
   const { t } = useTranslation();
 
   React.useEffect(() => {
@@ -72,14 +73,14 @@ export function GlobalSearch() {
 
             {mainItems.length > 0 && (
               <CommandGroup heading={t('nav.Main', 'Main')}>
-                {mainItems.map((item) => (
+                {mainItems.map((item: any) => (
                   <CommandItem
                     key={item.url}
-                    value={t(`nav.${item.title}`, item.title)}
+                    value={t(`nav.${item.title}`, item.title) as string}
                     onSelect={() => runCommand(() => navigate({ to: item.url }))}
                   >
                     <item.icon className="mr-2 h-4 w-4" />
-                    <span>{t(`nav.${item.title}`, item.title)}</span>
+                    <span>{t(`nav.${item.title}`, item.title) as string}</span>
                   </CommandItem>
                 ))}
               </CommandGroup>
@@ -89,14 +90,14 @@ export function GlobalSearch() {
               <>
                 <CommandSeparator />
                 <CommandGroup heading={t('nav.Documents', 'Documents')}>
-                  {documentItems.map((item) => (
+                  {documentItems.map((item: any) => (
                     <CommandItem
                       key={item.url}
-                      value={t(`nav.${item.name}`, item.name)}
+                      value={t(`nav.${item.name}`, item.name) as string}
                       onSelect={() => runCommand(() => navigate({ to: item.url }))}
                     >
                       <item.icon className="mr-2 h-4 w-4" />
-                      <span>{t(`nav.${item.name}`, item.name)}</span>
+                      <span>{t(`nav.${item.name}`, item.name) as string}</span>
                     </CommandItem>
                   ))}
                 </CommandGroup>
@@ -129,14 +130,14 @@ export function GlobalSearch() {
               <>
                 <CommandSeparator />
                 <CommandGroup heading={t('nav.Settings & More', 'Settings & More')}>
-                  {secondaryItems.map((item) => (
+                  {secondaryItems.map((item: any) => (
                     <CommandItem
                       key={item.url}
-                      value={t(`nav.${item.title}`, item.title)}
+                      value={t(`nav.${item.title}`, item.title) as string}
                       onSelect={() => runCommand(() => navigate({ to: item.url }))}
                     >
                       <item.icon className="mr-2 h-4 w-4" />
-                      <span>{t(`nav.${item.title}`, item.title)}</span>
+                      <span>{t(`nav.${item.title}`, item.title) as string}</span>
                     </CommandItem>
                   ))}
                 </CommandGroup>
@@ -147,14 +148,14 @@ export function GlobalSearch() {
               <>
                 <CommandSeparator />
                 <CommandGroup heading={t(`nav.${NAV_SHOWCASE.label}`, NAV_SHOWCASE.label)}>
-                  {showcaseItems.map((item) => (
+                  {showcaseItems.map((item: any) => (
                     <CommandItem
                       key={item.url}
-                      value={t(`nav.${item.title}`, item.title)}
+                      value={t(`nav.${item.title}`, item.title) as string}
                       onSelect={() => runCommand(() => navigate({ to: item.url }))}
                     >
                       <item.icon className="mr-2 h-4 w-4" />
-                      <span>{t(`nav.${item.title}`, item.title)}</span>
+                      <span>{t(`nav.${item.title}`, item.title) as string}</span>
                     </CommandItem>
                   ))}
                 </CommandGroup>
@@ -165,14 +166,14 @@ export function GlobalSearch() {
               <>
                 <CommandSeparator />
                 <CommandGroup heading={t(`nav.${NAV_ERROR_PAGES.label}`, NAV_ERROR_PAGES.label)}>
-                  {errorItems.map((item) => (
+                  {errorItems.map((item: any) => (
                     <CommandItem
                       key={item.url}
-                      value={t(`nav.${item.title}`, item.title)}
+                      value={t(`nav.${item.title}`, item.title) as string}
                       onSelect={() => runCommand(() => navigate({ to: item.url }))}
                     >
                       <item.icon className="mr-2 h-4 w-4" />
-                      <span>{t(`nav.${item.title}`, item.title)}</span>
+                      <span>{t(`nav.${item.title}`, item.title) as string}</span>
                     </CommandItem>
                   ))}
                 </CommandGroup>

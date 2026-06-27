@@ -1,0 +1,125 @@
+use sqlx::SqlitePool;
+use uuid::Uuid;
+use crate::error::AppError;
+use crate::commands::browser_profiles::{CreateBrowserProfilePayload, UpdateBrowserProfilePayload};
+use crate::db::models::browser_profile::BrowserProfile;
+use std::path::PathBuf;
+
+pub struct BrowserProfileService;
+
+impl BrowserProfileService {
+    pub async fn get_all(pool: &SqlitePool) -> Result<Vec<BrowserProfile>, AppError> {
+        let profiles = sqlx::query_as::<_, BrowserProfile>(
+            r#"
+            SELECT id, name, group_id, os, browser_type, data_dir_path, status, CAST(last_used_at AS TEXT) as last_used_at, CAST(created_at AS TEXT) as created_at, CAST(updated_at AS TEXT) as updated_at
+            FROM browser_profiles
+            ORDER BY created_at DESC
+            "#
+        )
+        .fetch_all(pool)
+        .await?;
+
+        Ok(profiles)
+    }
+
+    pub async fn get_by_id(pool: &SqlitePool, id: &str) -> Result<BrowserProfile, AppError> {
+        let profile = sqlx::query_as::<_, BrowserProfile>(
+            r#"
+            SELECT id, name, group_id, os, browser_type, data_dir_path, status, CAST(last_used_at AS TEXT) as last_used_at, CAST(created_at AS TEXT) as created_at, CAST(updated_at AS TEXT) as updated_at
+            FROM browser_profiles
+            WHERE id = ?
+            "#
+        )
+        .bind(id)
+        .fetch_optional(pool)
+        .await?
+        .ok_or_else(|| AppError::NotFound(format!("Profile {} not found", id)))?;
+
+        Ok(profile)
+    }
+
+    pub async fn create(pool: &SqlitePool, payload: CreateBrowserProfilePayload) -> Result<BrowserProfile, AppError> {
+        let id = Uuid::now_v7().to_string();
+        let os = payload.os.unwrap_or_else(|| "win".to_string());
+        let browser_type = payload.browser_type.unwrap_or_else(|| "chrome".to_string());
+        let status = payload.status.unwrap_or_else(|| "IDLE".to_string());
+        
+        sqlx::query(
+            r#"
+            INSERT INTO browser_profiles (id, name, group_id, os, browser_type, data_dir_path, status)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+            "#
+        )
+        .bind(&id)
+        .bind(&payload.name)
+        .bind(&payload.group_id)
+        .bind(&os)
+        .bind(&browser_type)
+        .bind(&payload.data_dir_path)
+        .bind(&status)
+        .execute(pool)
+        .await?;
+
+        Self::get_by_id(pool, &id).await
+    }
+
+    pub async fn update(pool: &SqlitePool, payload: UpdateBrowserProfilePayload) -> Result<BrowserProfile, AppError> {
+        let result = sqlx::query(
+            r#"
+            UPDATE browser_profiles
+            SET name = ?, group_id = ?, os = ?, browser_type = ?, data_dir_path = ?, status = ?, updated_at = CURRENT_TIMESTAMP
+            WHERE id = ?
+            "#
+        )
+        .bind(&payload.name)
+        .bind(&payload.group_id)
+        .bind(&payload.os)
+        .bind(&payload.browser_type)
+        .bind(&payload.data_dir_path)
+        .bind(&payload.status)
+        .bind(&payload.id)
+        .execute(pool)
+        .await?;
+
+        if result.rows_affected() == 0 {
+            return Err(AppError::NotFound(format!("Profile {} not found", payload.id)));
+        }
+
+        Self::get_by_id(pool, &payload.id).await
+    }
+
+    pub async fn delete(pool: &SqlitePool, id: &str) -> Result<(), AppError> {
+        let result = sqlx::query(
+            r#"
+            DELETE FROM browser_profiles
+            WHERE id = ?
+            "#
+        )
+        .bind(id)
+        .execute(pool)
+        .await?;
+
+        if result.rows_affected() == 0 {
+            return Err(AppError::NotFound(format!("Profile {} not found", id)));
+        }
+
+        Ok(())
+    }
+
+    pub fn resolve_data_dir(app: &tauri::AppHandle, profile: &BrowserProfile) -> Result<PathBuf, AppError> {
+        use crate::system::config::get_active_storage_path;
+        let app_dir = get_active_storage_path(app)
+            .map_err(|_| AppError::Internal("Failed to get storage path".to_string()))?;
+        
+        let data_dir = if profile.data_dir_path.contains(":") || profile.data_dir_path.starts_with("/") {
+            PathBuf::from(&profile.data_dir_path)
+        } else {
+            app_dir.join(&profile.data_dir_path)
+        };
+
+        std::fs::create_dir_all(&data_dir)
+            .map_err(|e| AppError::Internal(format!("Failed to create data dir: {}", e)))?;
+
+        Ok(data_dir)
+    }
+}

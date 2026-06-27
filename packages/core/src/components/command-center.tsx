@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { Card, CardContent } from '@omnidesk/ui';
 import { PackageOpen, Loader2, StoreIcon, SettingsIcon } from 'lucide-react';
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@omnidesk/supabase';
 import { useNavigate } from '@tanstack/react-router';
-import { Platform } from '@/lib/platform';
+
 import {
   DndContext,
   closestCenter,
@@ -21,6 +20,7 @@ import {
   useSortable
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
+import { apiUrl } from '../lib/api-config';
 
 interface InstalledApp {
   user_id: string;
@@ -119,6 +119,7 @@ export function CommandCenterDashboard() {
   const [items, setItems] = useState<AppItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
+  
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -137,22 +138,26 @@ export function CommandCenterDashboard() {
         let savedOrder: string[] = [];
         let fetchedApps: InstalledApp[] = [];
         let userId = 'local';
+        const token = localStorage.getItem('omnidesk_token') || '';
 
-        if (Platform.isDesktop) {
-          const { invoke } = await import('@tauri-apps/api/core');
-          try {
-            const localApps = await invoke<any[]>('list_local_apps');
-            fetchedApps = localApps.map(a => ({
+        try {
+          const resApps = await fetch(apiUrl('/api/apps/local'), { headers: { Authorization: `Bearer ${token}` }});
+          if (resApps.ok) {
+            const localApps = await resApps.json();
+            fetchedApps = localApps.map((a: any) => ({
                user_id: 'local',
                app_id: a.id,
                marketplace_apps: { id: a.id, name: a.name || a.id, package_hash: 'local' }
-            }));
-            const prefStr = await invoke<string>('get_user_preferences', { userId: 'local' });
-            savedOrder = JSON.parse(prefStr || '[]');
-          } catch (e) {
-             console.error('Tauri fetch error:', e);
+            })) as unknown as InstalledApp[];
           }
-        } else {
+
+          const resPref = await fetch(apiUrl('/api/users/home-layout'), { headers: { Authorization: `Bearer ${token}` }});
+          if (resPref.ok) {
+             const prefStr = await resPref.json();
+             savedOrder = JSON.parse(prefStr || '[]');
+          }
+        } catch (e) {
+          console.warn('Local API not available, falling back to Supabase:', e);
           const { data: userData } = await supabase.auth.getUser();
           if (userData.user) {
             userId = userData.user.id;
@@ -160,9 +165,9 @@ export function CommandCenterDashboard() {
               .from('user_installed_apps')
               .select('user_id, app_id, marketplace_apps(id, name, package_hash)');
             
-            if (!error && data) {
-               fetchedApps = data.filter(item => item.marketplace_apps) as InstalledApp[];
-            }
+             if (!error && data) {
+                fetchedApps = data.filter(item => item.marketplace_apps) as unknown as InstalledApp[];
+             }
             
             const { data: prefData } = await supabase
               .from('user_preferences')
@@ -176,7 +181,7 @@ export function CommandCenterDashboard() {
           }
         }
 
-        const mappedInstalled: AppItem[] = fetchedApps.map((a, index) => {
+        const mappedInstalled: AppItem[] = fetchedApps.map((a) => {
           return {
             id: a.marketplace_apps.id,
             name: a.marketplace_apps.name,
@@ -215,21 +220,28 @@ export function CommandCenterDashboard() {
 
   const saveOrder = async (order: string[]) => {
     try {
-      if (Platform.isDesktop) {
-        const { invoke } = await import('@tauri-apps/api/core');
-        await invoke('update_home_screen_order', { 
-           userId: 'local', 
-           homeScreenOrder: JSON.stringify(order) 
+      const token = localStorage.getItem('omnidesk_token') || '';
+      try {
+         const res = await fetch(apiUrl('/api/users/home-layout'), {
+             method: 'PUT',
+             headers: {
+                 'Authorization': `Bearer ${token}`,
+                 'Content-Type': 'application/json'
+             },
+             body: JSON.stringify({ home_screen_order: JSON.stringify(order) })
+         });
+         if (res.ok) return; // Saved successfully to local backend
+      } catch (e) {
+         console.warn("Local API not available, falling back to Supabase...");
+      }
+
+      const { data: userData } = await supabase.auth.getUser();
+      if (userData.user) {
+        await supabase.from('user_preferences').upsert({
+          user_id: userData.user.id,
+          home_screen_order: order,
+          updated_at: new Date().toISOString(),
         });
-      } else {
-        const { data: userData } = await supabase.auth.getUser();
-        if (userData.user) {
-          await supabase.from('user_preferences').upsert({
-            user_id: userData.user.id,
-            home_screen_order: order,
-            updated_at: new Date().toISOString(),
-          });
-        }
       }
     } catch (e) {
       console.error("Failed to save order:", e);

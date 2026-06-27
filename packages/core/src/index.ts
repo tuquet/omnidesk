@@ -16,3 +16,18 @@ export * from './components/title-bar';
 export * from './components/updater-button';
 export * from './components/window-controls';
 export * from './components/header-user';
+export * from './providers/platform-provider';
+export * from './hooks/use-deep-link-auth';
+
+// Stores
+export * from './stores/use-console-store';
+export * from './stores/use-dev-store';
+export * from './stores/use-layout-store';
+export * from './stores/utils';
+
+export * from './providers/config-provider';
+
+export * from './components/can';
+
+// API
+export * from './lib/api-config';

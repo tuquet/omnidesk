@@ -30,6 +30,7 @@ export * from './components/ui/command';
 export * from './components/ui/dialog';
 export * from './components/ui/textarea';
 export * from './components/ui/input-group';
+export * from './components/ui/page-header';
 export { cn } from './lib/utils';
 export * from './blocks/auth/login-form';
 export * from './blocks/auth/signup-form';
@@ -42,3 +43,15 @@ export * from './blocks/dashboard-01/nav-secondary';
 export * from './blocks/dashboard-01/nav-user';
 export * from './blocks/dashboard-01/section-cards';
 export * from './blocks/dashboard-01/site-header';
+
+// Shared Components
+export * from './components/shared/confirm-dialog';
+export * from './components/shared/env-setup-warning';
+export * from './components/shared/error-boundary';
+export * from './components/shared/progress-bar';
+
+// Landing Components
+export * from './components/landing/desktop-landing';
+export * from './components/landing/web-landing';
+
+// Landing Components

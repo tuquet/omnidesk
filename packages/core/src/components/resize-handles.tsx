@@ -1,4 +1,4 @@
-import { Platform } from '@/lib/platform';
+import { usePlatform } from '../providers/platform-provider';
 
 /**
  * Invisible resize handles for frameless Tauri windows.
@@ -27,7 +27,9 @@ const zones: { direction: ResizeDirection; style: React.CSSProperties; cursor: s
 ];
 
 export function ResizeHandles() {
-  if (!Platform.isDesktop) return null;
+  const platformApi = usePlatform();
+
+  if (platformApi.platform !== 'desktop') return null;
 
   return (
     <>
@@ -44,7 +46,7 @@ export function ResizeHandles() {
             if (e.button !== 0) return;
             e.preventDefault();
             e.stopPropagation();
-            Platform.startResizeDragging(direction);
+            platformApi.window.startResizeDragging(direction as any);
           }}
         />
       ))}

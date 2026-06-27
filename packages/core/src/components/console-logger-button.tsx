@@ -9,8 +9,8 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
 } from '@omnidesk/ui';
-import { useConsoleStore } from '@/stores/use-console-store';
-import type { LogLevel } from '@/stores/use-console-store';
+import { useConsoleStore } from '@omnidesk/core';
+import type { LogLevel } from '@omnidesk/core';
 import { toast } from 'sonner';
 
 const getLevelIcon = (level: LogLevel) => {
@@ -43,8 +43,8 @@ export function ConsoleLoggerButton() {
   const { logs, unreadCount, clearLogs, markAsRead } = useConsoleStore();
   const [isOpen, setIsOpen] = useState(false);
 
-  const errorCount = logs.filter((l) => l.level === 'error').length;
-  const warnCount = logs.filter((l) => l.level === 'warn').length;
+  const errorCount = logs.filter((l: any) => l.level === 'error').length;
+  const warnCount = logs.filter((l: any) => l.level === 'warn').length;
 
   const handleOpenChange = (open: boolean) => {
     setIsOpen(open);
@@ -116,7 +116,7 @@ export function ConsoleLoggerButton() {
             </div>
           ) : (
             <div className="flex flex-col" style={{ padding: '4px' }}>
-              {logs.map((log) => (
+              {logs.map((log: any, index: number) => (
                 <div
                   key={log.id}
                   className={`flex flex-col gap-1 rounded-md ${log.level === 'error' ? 'bg-destructive/5' : ''}`}

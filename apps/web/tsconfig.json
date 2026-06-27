@@ -1,0 +1,19 @@
+{
+  "extends": "../../packages/config/tsconfig/react.json",
+  "compilerOptions": {
+    "allowJs": true,
+    "ignoreDeprecations": "6.0",
+    "paths": {
+      "@/*": ["./src/*"]
+    }
+  },
+  "include": [
+    "src",
+    "vite.config.ts",
+    "vitest.config.ts",
+    "vitest.setup.ts",
+    "eslint.config.js",
+    "openapi-ts.config.ts",
+    "scripts/generate-app.mjs"
+  ]
+}

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Bell, Clock, Loader2 } from 'lucide-react';
+import { Bell } from 'lucide-react';
 import {
   Button,
   DropdownMenu,
@@ -13,9 +13,7 @@ import {
 export function NotificationButton() {
   const [isOpen, setIsOpen] = useState(false);
 
-  const notifications: any[] = [];
-  const unreadCount = 0;
-  const isLoading = false;
+  const [unreadCount] = useState(0);
 
   const handleOpenChange = (open: boolean) => {
     setIsOpen(open);

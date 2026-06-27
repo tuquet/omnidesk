@@ -12,9 +12,11 @@ import {
   FieldSeparator,
   Input,
 } from '@omnidesk/ui';
+
 import { authActions } from '../stores/use-auth-store';
 
-export function SignupForm({ className, ...props }: React.ComponentProps<'form'>) {
+export function SignupForm({ className, platformApi, ...props }: React.ComponentPropsWithoutRef<'div'> & { platformApi?: any }) {
+  
   const form = useForm({
     defaultValues: {
       name: '',
@@ -39,7 +41,7 @@ export function SignupForm({ className, ...props }: React.ComponentProps<'form'>
 
   const handleGitHubSignup = async () => {
     try {
-      await authActions.signInWithGitHub();
+      await authActions.signInWithGitHub(platformApi);
     } catch (err) {
       const message = err instanceof Error ? err.message : 'GitHub signup failed';
       toast.error(message);

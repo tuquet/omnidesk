@@ -1,15 +1,16 @@
 import { useState, useEffect } from 'react';
-import { Platform } from '@/lib/platform';
+import { usePlatform } from '../providers/platform-provider';
 
 export function WindowControls() {
   const [isMaximized, setIsMaximized] = useState(false);
+  const platformApi = usePlatform();
 
   useEffect(() => {
-    if (!Platform.isDesktop) return;
+    if (platformApi.platform !== 'desktop') return;
 
     let unlistenFn: (() => void) | undefined;
 
-    Platform.listenToWindowResized((maximized) => {
+    platformApi.window.listenToResized((maximized) => {
       setIsMaximized(maximized);
     }).then((unlisten) => {
       unlistenFn = unlisten;
@@ -20,14 +21,14 @@ export function WindowControls() {
     };
   }, []);
 
-  if (!Platform.isDesktop) return null;
+  if (platformApi.platform !== 'desktop') return null;
 
   return (
     <div className="flex items-center gap-1 pr-2">
       {/* Minimize */}
       <button
         type="button"
-        onClick={() => Platform.minimizeWindow()}
+        onClick={() => platformApi.window.minimize()}
         className="inline-flex h-7 w-10 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
         aria-label="Minimize"
       >
@@ -44,7 +45,7 @@ export function WindowControls() {
       {/* Maximize / Restore */}
       <button
         type="button"
-        onClick={() => Platform.toggleMaximize()}
+        onClick={() => platformApi.window.toggleMaximize()}
         className="inline-flex h-7 w-10 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
         aria-label="Maximize"
       >
@@ -73,7 +74,7 @@ export function WindowControls() {
       {/* Close */}
       <button
         type="button"
-        onClick={() => Platform.closeWindow()}
+        onClick={() => platformApi.window.close()}
         className="inline-flex h-7 w-10 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-[#e81123] hover:text-white"
         aria-label="Close"
       >

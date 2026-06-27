@@ -32,9 +32,9 @@
       "name": "🦀 Rust: Debug Tauri",
       "type": "lldb",
       "request": "launch",
-      "program": "${workspaceFolder}/apps/desktop/src-tauri/target/debug/omnidesk",
+      "program": "${workspaceFolder}/apps/automa/runtime/src-tauri/target/debug/omnidesk",
       "args": [],
-      "cwd": "${workspaceFolder}/apps/desktop/src-tauri",
+      "cwd": "${workspaceFolder}/apps/automa/runtime/src-tauri",
       "sourceLanguages": ["rust"],
       "preLaunchTask": "🦀 Rust: Check"
     },

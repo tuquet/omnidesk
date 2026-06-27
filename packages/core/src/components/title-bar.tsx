@@ -1,8 +1,8 @@
-import { Platform } from '@/lib/platform';
 import { toast } from 'sonner';
-import { useNavigate } from '@tanstack/react-router';
 import { useTheme } from 'next-themes';
 import { useTranslation } from 'react-i18next';
+import { usePlatform } from '../providers/platform-provider';
+import { useAppConfig } from '../providers/config-provider';
 
 import {
   Menubar,
@@ -14,18 +14,19 @@ import {
   MenubarTrigger,
 } from '@omnidesk/ui';
 import { WindowControls } from './window-controls';
-import { GITHUB_REPO, GITHUB_ISSUES, API_DOCS_URL } from '@/config';
+
 
 export function TitleBar() {
-  const navigate = useNavigate();
   const { setTheme, theme } = useTheme();
   const { i18n } = useTranslation();
+  const platformApi = usePlatform();
+  const { config } = useAppConfig();
 
-  if (!Platform.isDesktop) return null;
+  if (platformApi.platform !== 'desktop') return null;
 
   const checkUpdate = async () => {
     try {
-      const update = await Platform.checkUpdate() as { version: string } | null | undefined;
+      const update = await platformApi.checkUpdate() as { version: string } | null | undefined;
       if (update) {
         toast.info(`Found update ${update.version}`);
       } else {
@@ -59,9 +60,9 @@ export function TitleBar() {
               File
             </MenubarTrigger>
             <MenubarContent>
-              <MenubarItem onClick={() => Platform.openUrl('file://')}>Open Data Folder</MenubarItem>
+              <MenubarItem onClick={() => platformApi.openUrl('file://')}>Open Data Folder</MenubarItem>
               <MenubarSeparator />
-              <MenubarItem onClick={() => Platform.quitApp()}>
+              <MenubarItem onClick={() => platformApi.quitApp()}>
                 Quit
                 <MenubarShortcut>Ctrl+Q</MenubarShortcut>
               </MenubarItem>
@@ -128,7 +129,7 @@ export function TitleBar() {
               Tools
             </MenubarTrigger>
             <MenubarContent>
-              <MenubarItem onClick={() => Platform.openUrl(API_DOCS_URL)}>
+              <MenubarItem onClick={() => platformApi.openUrl(config.apiDocsUrl)}>
                 API Documentation
               </MenubarItem>
             </MenubarContent>
@@ -140,17 +141,17 @@ export function TitleBar() {
               Window
             </MenubarTrigger>
             <MenubarContent>
-              <MenubarItem onClick={() => Platform.minimizeWindow()}>
+              <MenubarItem onClick={() => platformApi.window.minimize()}>
                 Minimize
                 <MenubarShortcut>Ctrl+M</MenubarShortcut>
               </MenubarItem>
-              <MenubarItem onClick={() => Platform.toggleMaximize()}>
+              <MenubarItem onClick={() => platformApi.window.toggleMaximize()}>
                 Toggle Maximize
               </MenubarItem>
               <MenubarSeparator />
               <MenubarItem
                 onClick={async () => {
-                  await Platform.resetWindowSize(1280, 800);
+                  await platformApi.window.resetSize(1280, 800);
                 }}
               >
                 Reset Window Size
@@ -164,12 +165,12 @@ export function TitleBar() {
               Help
             </MenubarTrigger>
             <MenubarContent>
-              <MenubarItem onClick={() => Platform.openUrl(GITHUB_REPO)}>
+              <MenubarItem onClick={() => platformApi.openUrl(config.githubRepo)}>
                 Documentation
                 <MenubarShortcut>F1</MenubarShortcut>
               </MenubarItem>
               <MenubarSeparator />
-              <MenubarItem onClick={() => Platform.openUrl(GITHUB_ISSUES)}>Report a Bug</MenubarItem>
+              <MenubarItem onClick={() => platformApi.openUrl(config.githubIssues)}>Report a Bug</MenubarItem>
               <MenubarSeparator />
               <MenubarItem onClick={checkUpdate}>Check for Updates...</MenubarItem>
             </MenubarContent>
@@ -189,9 +190,9 @@ export function TitleBar() {
 
           if (e.detail >= 2) {
             // Browser-native double-click detection (respects OS dblclick speed)
-            Platform.toggleMaximize();
+            platformApi.window.toggleMaximize();
           } else {
-            Platform.startDragging();
+            platformApi.window.startDragging();
           }
         }}
       />

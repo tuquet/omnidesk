@@ -1,4 +1,4 @@
-import customHandlers from '@business/blocks/contentHandler';
+import customHandlers from '@business/dev/blocks/contentHandler';
 import { toCamelCase } from '@/utils/helper';
 
 const blocksHandler = require.context('./blocksHandler', false, /\.js$/);

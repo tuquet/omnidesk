@@ -1,17 +1,18 @@
 import * as React from 'react';
 import { useRouterState } from '@tanstack/react-router';
-import { Platform } from '@/lib/platform';
+import { usePlatform } from '../providers/platform-provider';
 import { cn } from '@omnidesk/ui';
-import { TITLE_BAR_HEIGHT, PROGRESS_BAR_HEIGHT, PROGRESS_BAR_Z } from '@/config';
+
 
 export function RouteProgressBar() {
   const status = useRouterState({ select: (s) => s.status });
   const [progress, setProgress] = React.useState(0);
   const [visible, setVisible] = React.useState(false);
+  const platformApi = usePlatform();
 
   React.useEffect(() => {
-    let interval: NodeJS.Timeout;
-    let timeout: NodeJS.Timeout;
+    let interval: ReturnType<typeof setTimeout>;
+    let timeout: ReturnType<typeof setTimeout>;
 
     if (status === 'pending') {
       setVisible(true);
@@ -40,7 +41,7 @@ export function RouteProgressBar() {
 
   if (!visible) return null;
 
-  const topOffset = Platform.isDesktop ? TITLE_BAR_HEIGHT : 0;
+  const topOffset = platformApi.platform === 'desktop' ? 32 : 0;
 
   return (
     <div
@@ -50,8 +51,8 @@ export function RouteProgressBar() {
       )}
       style={{
         top: `${topOffset}px`,
-        height: `${PROGRESS_BAR_HEIGHT}px`,
-        zIndex: PROGRESS_BAR_Z,
+        height: `${3}px`,
+        zIndex: 100,
       }}
     >
       <div

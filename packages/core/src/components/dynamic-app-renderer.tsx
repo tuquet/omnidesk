@@ -4,8 +4,8 @@ import * as LucideIcons from 'lucide-react';
 import * as OmnideskUI from '@omnidesk/ui';
 // Import UI if needed, but we will pass it dynamically
 import { Skeleton } from '@omnidesk/ui';
-import { Platform } from '@/lib/platform';
 import { CommandCenterDashboard } from './command-center';
+import { usePlatform } from '../providers/platform-provider';
 
 interface DynamicAppRendererProps {
   appId: string;
@@ -21,6 +21,8 @@ if (typeof window !== 'undefined') {
 export function DynamicAppRenderer({ appId }: DynamicAppRendererProps) {
   const [Component, setComponent] = useState<React.ComponentType | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const platformApi = usePlatform();
+  const { invoke, convertFileSrc, getAppDataDir } = platformApi;
 
   useEffect(() => {
     let isMounted = true;
@@ -31,21 +33,18 @@ export function DynamicAppRenderer({ appId }: DynamicAppRendererProps) {
         return;
       }
 
-      if (!Platform.isDesktop) {
+      if (platformApi.platform !== 'desktop') {
         if (isMounted) setError(`App "${appId}" cannot be dynamically loaded in the web browser. Please use the Desktop app.`);
         return;
       }
 
       try {
-        const { convertFileSrc, invoke } = await import('@tauri-apps/api/core');
-        const { appDataDir } = await import('@tauri-apps/api/path');
-
         // Fetch installed apps to check if there is a devPath
         const apps: any[] = await invoke('list_local_apps');
         const appMetadata = apps.find(a => a.id === appId);
 
         // Get the app data dir path
-        const dataDir = await appDataDir();
+        const dataDir = await getAppDataDir();
         const pathSep = navigator.userAgent.includes('Windows') ? '\\' : '/';
 
         let scriptPath = '';

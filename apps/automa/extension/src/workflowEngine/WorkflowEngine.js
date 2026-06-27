@@ -538,6 +538,12 @@ class WorkflowEngine {
         startedTimestamp: this.startedTimestamp,
       });
 
+      this.dispatchGlobalEvent('workflow-finished', {
+        status,
+        error: message,
+        id: this.id
+      });
+
       if (this.workflow.settings.reuseLastState) {
         const workflowState = {
           [`state:${this.workflow.id}`]: {
@@ -658,6 +664,13 @@ class WorkflowEngine {
     listeners.forEach((callback) => {
       callback(params);
     });
+  }
+
+  dispatchGlobalEvent(name, detail) {
+    if (typeof window !== 'undefined') {
+      const event = new CustomEvent(`automa:${name}`, { detail });
+      window.dispatchEvent(event);
+    }
   }
 
   on(name, listener) {

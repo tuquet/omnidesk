@@ -38,9 +38,35 @@
       }
     },
     {
-      "label": "🖥️ Dev: Desktop (Tauri)",
+      "label": "🖥️ Dev: Workflow App",
       "type": "shell",
-      "command": "pnpm --filter @omnidesk/desktop tauri dev",
+      "command": "pnpm --filter @omnidesk/automa-workflow tauri dev",
+      "group": "build",
+      "isBackground": true,
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "group": "dev"
+      }
+    },
+    {
+      "label": "🖥️ Dev: Profile App",
+      "type": "shell",
+      "command": "pnpm --filter @omnidesk/automa-profile tauri dev",
+      "group": "build",
+      "isBackground": true,
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "group": "dev"
+      }
+    },
+    {
+      "label": "🖥️ Dev: Runtime App",
+      "type": "shell",
+      "command": "pnpm --filter @omnidesk/automa-runtime tauri dev",
       "group": "build",
       "isBackground": true,
       "problemMatcher": [],
@@ -54,6 +80,32 @@
       "label": "🚀 Dev: All (Web + Docs)",
       "type": "shell",
       "command": "pnpm dev:all",
+      "group": "build",
+      "isBackground": true,
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "group": "dev"
+      }
+    },
+    {
+      "label": "🚀 Dev: All Automa (WF + PRF + RT)",
+      "type": "shell",
+      "command": "pnpm dev:automa",
+      "group": "build",
+      "isBackground": true,
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "group": "dev"
+      }
+    },
+    {
+      "label": "🖥️ Dev: Automa Extension",
+      "type": "shell",
+      "command": "pnpm --filter automa dev",
       "group": "build",
       "isBackground": true,
       "problemMatcher": [],
@@ -160,9 +212,9 @@
       }
     },
     {
-      "label": "📦 Build: Desktop (Tauri)",
+      "label": "📦 Build: All Tauri Apps",
       "type": "shell",
-      "command": "pnpm --filter @omnidesk/desktop tauri build",
+      "command": "pnpm --filter \"@omnidesk/automa-*\" tauri build",
       "group": "build",
       "problemMatcher": [],
       "presentation": {
@@ -219,11 +271,11 @@
     // === Rust (Tauri Backend)
     // ==========================================
     {
-      "label": "🦀 Rust: Check",
+      "label": "🦀 Rust: Check All",
       "type": "shell",
       "command": "cargo check",
       "options": {
-        "cwd": "${workspaceFolder}/platform/desktop/src-tauri"
+        "cwd": "${workspaceFolder}"
       },
       "problemMatcher": "$rustc",
       "presentation": {
@@ -233,11 +285,11 @@
       }
     },
     {
-      "label": "🦀 Rust: Test",
+      "label": "🦀 Rust: Check Runtime",
       "type": "shell",
-      "command": "cargo test",
+      "command": "cargo check",
       "options": {
-        "cwd": "${workspaceFolder}/platform/desktop/src-tauri"
+        "cwd": "${workspaceFolder}/apps/automa/runtime/src-tauri"
       },
       "problemMatcher": "$rustc",
       "presentation": {
@@ -247,11 +299,11 @@
       }
     },
     {
-      "label": "🦀 Rust: Clippy",
+      "label": "🦀 Rust: Check Workflow",
       "type": "shell",
-      "command": "cargo clippy -- -W clippy::all",
+      "command": "cargo check",
       "options": {
-        "cwd": "${workspaceFolder}/platform/desktop/src-tauri"
+        "cwd": "${workspaceFolder}/apps/automa/workflow/src-tauri"
       },
       "problemMatcher": "$rustc",
       "presentation": {
@@ -261,11 +313,11 @@
       }
     },
     {
-      "label": "🦀 Rust: Auto Fix Warnings",
+      "label": "🦀 Rust: Check Profile",
       "type": "shell",
-      "command": "cargo clippy --fix --allow-dirty --allow-no-vcs",
+      "command": "cargo check",
       "options": {
-        "cwd": "${workspaceFolder}/platform/desktop/src-tauri"
+        "cwd": "${workspaceFolder}/apps/automa/profile/src-tauri"
       },
       "problemMatcher": "$rustc",
       "presentation": {

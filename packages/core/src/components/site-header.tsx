@@ -1,7 +1,6 @@
 import { memo } from 'react';
 import { useNavigate } from '@tanstack/react-router';
 import {
-  Separator,
   Button,
   DropdownMenu,
   DropdownMenuTrigger,
@@ -10,15 +9,14 @@ import {
   DropdownMenuSeparator,
   DropdownMenuLabel,
 } from '@omnidesk/ui';
-import { WrenchIcon, TrashIcon, BugIcon, LogOutIcon, FolderOpenIcon, LayoutGridIcon } from 'lucide-react';
+import { WrenchIcon, TrashIcon, BugIcon, LogOutIcon, Home } from 'lucide-react';
 import { ThemeToggle } from '@omnidesk/core';
-import { Platform } from '@/lib/platform';
 import { LanguageSwitcher } from '@omnidesk/core';
 import { NotificationButton } from '@omnidesk/core';
 import { ConsoleLoggerButton } from '@omnidesk/core';
 import { SmartBreadcrumb } from '@omnidesk/core';
 import { GlobalSearch } from '@omnidesk/core';
-import { useDevStore } from '@/stores/use-dev-store';
+import { useDevStore } from '@omnidesk/core';
 import { HeaderUser } from './header-user';
 
 export const SiteHeader = memo(function SiteHeader() {
@@ -32,10 +30,10 @@ export const SiteHeader = memo(function SiteHeader() {
           variant="ghost" 
           size="icon" 
           className="h-8 w-8 text-muted-foreground hover:text-foreground shrink-0 -ml-2"
-          onClick={() => navigate({ to: '/app/home' })}
+          onClick={() => navigate({ to: '/' })}
           title="Home"
         >
-          <LayoutGridIcon className="h-4 w-4" />
+          <Home className="h-4 w-4" />
           <span className="sr-only">Home</span>
         </Button>
         <div className="h-4 w-px bg-border mx-1" />

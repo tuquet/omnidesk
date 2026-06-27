@@ -49,10 +49,10 @@ jobs:
 
       - uses: Swatinem/rust-cache@v2
         with:
-          workspaces: apps/desktop/src-tauri
+          workspaces: apps/automa/runtime/src-tauri
 
       - name: Cargo Check
-        run: cargo check --manifest-path apps/desktop/src-tauri/Cargo.toml
+        run: cargo check --manifest-path apps/automa/runtime/src-tauri/Cargo.toml
 
       - name: Clippy
-        run: cargo clippy --manifest-path apps/desktop/src-tauri/Cargo.toml -- -D warnings
+        run: cargo clippy --manifest-path apps/automa/runtime/src-tauri/Cargo.toml -- -D warnings

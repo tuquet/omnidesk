@@ -12,10 +12,10 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
 } from '@omnidesk/ui';
-import { BREADCRUMB_MAP, type BreadcrumbEntry } from '@/config';
+import { useAppConfig, type BreadcrumbEntry } from '../providers/config-provider';
 import { useTranslation } from 'react-i18next';
-import { ChevronDownIcon } from 'lucide-react';
-import { useDevStore } from '@/stores/use-dev-store';
+import { ChevronDownIcon, Home } from 'lucide-react';
+import { useDevStore } from '@omnidesk/core';
 import { toast } from 'sonner';
 
 /**
@@ -33,22 +33,22 @@ function humanize(segment: string): string {
  * 1. Exact match in BREADCRUMB_MAP → use it.
  * 2. Otherwise walk segments and build a generic trail.
  */
-function resolveBreadcrumbs(pathname: string): BreadcrumbEntry[] {
+function resolveBreadcrumbs(pathname: string, BREADCRUMB_MAP: Record<string, BreadcrumbEntry[]> = {}): BreadcrumbEntry[] {
   // Exact hit – preferred path
-  if (BREADCRUMB_MAP[pathname]) return BREADCRUMB_MAP[pathname];
+  if (BREADCRUMB_MAP && BREADCRUMB_MAP[pathname]) return BREADCRUMB_MAP[pathname];
 
   // Generic fallback
   const segments = pathname.split('/').filter(Boolean);
 
-  // If path is exactly /app/home, just show Home
-  if (pathname === '/app/home') {
-    return [{ label: 'Home', url: '/app/home' }];
+  // If path is exactly /, just show Home
+  if (pathname === '/') {
+    return [{ label: 'Home', url: '/' }];
   }
 
   // If it's an app inside /app/:appId
   if (segments[0] === 'app' && segments[1] && segments[1] !== 'home') {
     const trail: BreadcrumbEntry[] = [
-      { label: 'Home', url: '/app/home' },
+      { label: 'Home', url: '/' },
       { label: humanize(segments[1]), url: pathname }
     ];
     return trail;
@@ -62,7 +62,7 @@ function resolveBreadcrumbs(pathname: string): BreadcrumbEntry[] {
     return trail;
   }
 
-  const trail: BreadcrumbEntry[] = [{ label: 'Home', url: '/app/home' }];
+  const trail: BreadcrumbEntry[] = [{ label: 'Home', url: '/' }];
   let accumulated = '';
   for (const seg of segments) {
     accumulated += `/${seg}`;
@@ -75,7 +75,15 @@ function resolveBreadcrumbs(pathname: string): BreadcrumbEntry[] {
 
 export function SmartBreadcrumb() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
-  const items = React.useMemo(() => resolveBreadcrumbs(pathname), [pathname]);
+  const { config: { breadcrumbMap } } = useAppConfig();
+  const resolvedItems = React.useMemo(() => resolveBreadcrumbs(pathname, breadcrumbMap), [pathname, breadcrumbMap]);
+  const items = React.useMemo(() => {
+    if (resolvedItems.length === 0) return [];
+    if (resolvedItems[0].label !== 'Home') {
+      return [{ label: 'Home', url: '/' }, ...resolvedItems];
+    }
+    return resolvedItems;
+  }, [resolvedItems]);
   const { toggleDevMode } = useDevStore();
   const { t } = useTranslation();
 
@@ -115,7 +123,7 @@ export function SmartBreadcrumb() {
                 {isLast ? (
                   /* ── Current page ── */
                   <BreadcrumbPage className="font-medium">
-                    {t(`nav.${item.label}`, item.label)}
+                    {item.label === 'Home' ? <Home className="size-4" /> : t(`nav.${item.label}`, item.label)}
                   </BreadcrumbPage>
                 ) : hasSiblings ? (
                   /* ── Parent with sibling dropdown ── */
@@ -127,7 +135,7 @@ export function SmartBreadcrumb() {
                       <ChevronDownIcon className="size-3.5 opacity-60" />
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="start" className="min-w-44">
-                      {item.siblings?.map((sibling) => (
+                      {item.siblings?.map((sibling: BreadcrumbEntry) => (
                         <DropdownMenuItem key={sibling.url} asChild>
                           <Link
                             to={sibling.url}
@@ -143,7 +151,9 @@ export function SmartBreadcrumb() {
                 ) : (
                   /* ── Normal parent link ── */
                   <BreadcrumbLink asChild>
-                    <Link to={item.url}>{t(`nav.${item.label}`, item.label)}</Link>
+                    <Link to={item.url} className="flex items-center">
+                      {item.label === 'Home' ? <Home className="size-4" /> : t(`nav.${item.label}`, item.label)}
+                    </Link>
                   </BreadcrumbLink>
                 )}
               </BreadcrumbItem>

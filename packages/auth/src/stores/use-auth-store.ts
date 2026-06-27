@@ -1,8 +1,8 @@
 import { Store } from '@tanstack/store';
 import { useStore } from '@tanstack/react-store';
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@omnidesk/supabase';
 import type { Session, User } from '@supabase/supabase-js';
-import { Platform } from '@/lib/platform';
+import type { PlatformAdapter } from '@omnidesk/types';
 
 export type Role = 'GUEST' | 'USER' | 'ADMIN';
 
@@ -67,30 +67,23 @@ export const authActions = {
   },
 
   /** Sign in with GitHub OAuth */
-  signInWithGitHub: async () => {
-    if (Platform.isDesktop) {
-      const { data, error } = await supabase.auth.signInWithOAuth({
-        provider: 'github',
-        options: {
-          redirectTo: 'omnidesk://auth/callback',
-          skipBrowserRedirect: true,
-        },
-      });
-      if (error) throw error;
-      if (data.url) {
-        await Platform.openUrl(data.url);
-      }
-      return data;
-    } else {
-      const { data, error } = await supabase.auth.signInWithOAuth({
-        provider: 'github',
-        options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
-        },
-      });
-      if (error) throw error;
-      return data;
+  signInWithGitHub: async (platformApi: PlatformAdapter) => {
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider: 'github',
+      options: {
+        redirectTo: platformApi.getOAuthRedirectUrl(),
+        skipBrowserRedirect: platformApi.isOAuthSkipBrowserRedirect(),
+      },
+    });
+    if (error) throw error;
+    
+    // If the platform skipped the browser redirect (e.g. desktop native auth flow),
+    // we must manually open the URL using the platform's API
+    if (platformApi.isOAuthSkipBrowserRedirect() && data.url) {
+      await platformApi.openUrl(data.url);
     }
+    
+    return data;
   },
 
 
@@ -125,7 +118,7 @@ export const authActions = {
     // Listen for auth changes (login, logout, token refresh)
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
+    } = supabase.auth.onAuthStateChange((_event: any, session: any) => {
       syncAuthState(session);
     });
 

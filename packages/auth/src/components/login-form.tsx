@@ -1,6 +1,6 @@
 import { cn } from '@omnidesk/ui';
 import { Link, useNavigate } from '@tanstack/react-router';
-import { UserRound, Loader2 } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useForm } from '@tanstack/react-form';
 import { DEFAULT_AUTHENTICATED_ROUTE } from '@/config/route-config';
@@ -13,11 +13,13 @@ import {
   FieldSeparator,
   Input,
 } from '@omnidesk/ui';
+import type { PlatformAdapter } from '@omnidesk/types';
 import { authActions } from '../stores/use-auth-store';
 import { loginFormSchema } from '../schemas';
 
-export function LoginForm({ className, ...props }: React.ComponentProps<'div'>) {
+export function LoginForm({ className, platformApi, ...props }: React.ComponentPropsWithoutRef<'div'> & { platformApi?: any }) {
   const navigate = useNavigate();
+  
 
   const form = useForm({
     defaultValues: {
@@ -38,7 +40,7 @@ export function LoginForm({ className, ...props }: React.ComponentProps<'div'>) 
 
   const handleGitHubLogin = async () => {
     try {
-      await authActions.signInWithGitHub();
+      await authActions.signInWithGitHub(platformApi);
     } catch (err) {
       const message = err instanceof Error ? err.message : 'GitHub login failed';
       toast.error(message);

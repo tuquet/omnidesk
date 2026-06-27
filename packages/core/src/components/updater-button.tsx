@@ -1,16 +1,17 @@
 import { useState } from 'react';
-import { Platform } from '@/lib/platform';
+import { usePlatform } from '../providers/platform-provider';
 import { Button } from '@omnidesk/ui';
 import { RefreshCw } from 'lucide-react';
 import { toast } from 'sonner';
 
 export function UpdaterButton() {
   const [isChecking, setIsChecking] = useState(false);
+  const platformApi = usePlatform();
 
   async function checkForUpdates() {
     setIsChecking(true);
     try {
-      const update = await Platform.checkUpdate() as {
+      const update = await platformApi.checkUpdate() as {
         version: string;
         body?: string;
         downloadAndInstall: (onEvent: (event: { event: string }) => void) => Promise<void>;
@@ -31,7 +32,7 @@ export function UpdaterButton() {
                       break;
                   }
                 });
-                await Platform.relaunchApp();
+                await platformApi.relaunchApp();
               } catch (err) {
                 toast.error('Failed to install update.', { id: toastId });
                 console.error(err);
@@ -50,7 +51,7 @@ export function UpdaterButton() {
     }
   }
 
-  if (!Platform.isDesktop) {
+  if (platformApi.platform !== 'desktop') {
     return null;
   }
 

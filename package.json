@@ -18,7 +18,11 @@
     "docs:build": "vitepress build docs",
     "docs:preview": "vitepress preview docs",
     "dev:all": "concurrently -n WEB,DOCS -c blue,green \"pnpm dev\" \"pnpm docs:dev\"",
-    "dev:desktop": "pnpm --filter @omnidesk/desktop tauri dev"
+    "dev:desktop": "pnpm --filter @omnidesk/desktop tauri dev",
+    "dev:automa:workflow": "pnpm --filter @omnidesk/automa-workflow tauri dev",
+    "dev:automa:profile": "pnpm --filter @omnidesk/automa-profile tauri dev",
+    "dev:automa:runtime": "pnpm --filter @omnidesk/automa-runtime tauri dev",
+    "dev:automa": "concurrently -n WF,PRF,RT -c blue,magenta,green \"pnpm dev:automa:workflow\" \"pnpm dev:automa:profile\" \"pnpm dev:automa:runtime\""
   },
   "devDependencies": {
     "@changesets/cli": "^2.27.0",

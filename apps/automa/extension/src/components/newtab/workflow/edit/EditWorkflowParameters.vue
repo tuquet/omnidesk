@@ -137,7 +137,7 @@
   </div>
 </template>
 <script setup>
-import workflowParameters from '@business/parameters';
+import workflowParameters from '@business/dev/parameters';
 import cloneDeep from 'lodash.clonedeep';
 import { nanoid } from 'nanoid/non-secure';
 import { reactive, watch } from 'vue';
