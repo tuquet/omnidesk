@@ -4,10 +4,10 @@
   "version": "0.1.0",
   "identifier": "com.omnidesk.devtool",
   "build": {
-    "beforeDevCommand": "pnpm --filter @omnidesk/web dev",
+    "beforeDevCommand": "pnpm dev",
     "devUrl": "http://localhost:1420",
-    "beforeBuildCommand": "pnpm --filter @omnidesk/web build",
-    "frontendDist": "../../web/dist"
+    "beforeBuildCommand": "pnpm build",
+    "frontendDist": "../dist"
   },
   "app": {
     "macOSPrivateApi": true,

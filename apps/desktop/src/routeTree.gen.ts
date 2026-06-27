@@ -23,6 +23,7 @@ import { Route as R403RouteImport } from './routes/403'
 import { Route as R401RouteImport } from './routes/401'
 import { Route as AutomaAuthRouteImport } from './routes/automa.auth'
 import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
+import { Route as WorkspaceBrowserProfilesRouteImport } from './routes/_workspace/browser-profiles'
 import { Route as WorkspaceAppStoreRouteImport } from './routes/_workspace/app-store'
 import { Route as WorkspaceAppStoreAppIdRouteImport } from './routes/_workspace/app-store_.$appId'
 
@@ -95,6 +96,12 @@ const AuthCallbackRoute = AuthCallbackRouteImport.update({
   path: '/auth/callback',
   getParentRoute: () => rootRouteImport,
 } as any)
+const WorkspaceBrowserProfilesRoute =
+  WorkspaceBrowserProfilesRouteImport.update({
+    id: '/browser-profiles',
+    path: '/browser-profiles',
+    getParentRoute: () => WorkspaceRoute,
+  } as any)
 const WorkspaceAppStoreRoute = WorkspaceAppStoreRouteImport.update({
   id: '/app-store',
   path: '/app-store',
@@ -125,6 +132,7 @@ export interface FileRoutesByFullPath {
   '/maintenance': typeof MaintenanceRoute
   '/signup': typeof SignupRoute
   '/app-store': typeof WorkspaceAppStoreRoute
+  '/browser-profiles': typeof WorkspaceBrowserProfilesRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/automa/auth': typeof AutomaAuthRoute
   '/app-store/$appId': typeof WorkspaceAppStoreAppIdRoute
@@ -142,6 +150,7 @@ export interface FileRoutesByTo {
   '/maintenance': typeof MaintenanceRoute
   '/signup': typeof SignupRoute
   '/app-store': typeof WorkspaceAppStoreRoute
+  '/browser-profiles': typeof WorkspaceBrowserProfilesRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/automa/auth': typeof AutomaAuthRoute
   '/app-store/$appId': typeof WorkspaceAppStoreAppIdRoute
@@ -161,6 +170,7 @@ export interface FileRoutesById {
   '/maintenance': typeof MaintenanceRoute
   '/signup': typeof SignupRoute
   '/_workspace/app-store': typeof WorkspaceAppStoreRoute
+  '/_workspace/browser-profiles': typeof WorkspaceBrowserProfilesRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/automa/auth': typeof AutomaAuthRoute
   '/_workspace/app-store_/$appId': typeof WorkspaceAppStoreAppIdRoute
@@ -180,6 +190,7 @@ export interface FileRouteTypes {
     | '/maintenance'
     | '/signup'
     | '/app-store'
+    | '/browser-profiles'
     | '/auth/callback'
     | '/automa/auth'
     | '/app-store/$appId'
@@ -197,6 +208,7 @@ export interface FileRouteTypes {
     | '/maintenance'
     | '/signup'
     | '/app-store'
+    | '/browser-profiles'
     | '/auth/callback'
     | '/automa/auth'
     | '/app-store/$appId'
@@ -215,6 +227,7 @@ export interface FileRouteTypes {
     | '/maintenance'
     | '/signup'
     | '/_workspace/app-store'
+    | '/_workspace/browser-profiles'
     | '/auth/callback'
     | '/automa/auth'
     | '/_workspace/app-store_/$appId'
@@ -330,6 +343,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthCallbackRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_workspace/browser-profiles': {
+      id: '/_workspace/browser-profiles'
+      path: '/browser-profiles'
+      fullPath: '/browser-profiles'
+      preLoaderRoute: typeof WorkspaceBrowserProfilesRouteImport
+      parentRoute: typeof WorkspaceRoute
+    }
     '/_workspace/app-store': {
       id: '/_workspace/app-store'
       path: '/app-store'
@@ -356,12 +376,14 @@ declare module '@tanstack/react-router' {
 
 interface WorkspaceRouteChildren {
   WorkspaceAppStoreRoute: typeof WorkspaceAppStoreRoute
+  WorkspaceBrowserProfilesRoute: typeof WorkspaceBrowserProfilesRoute
   WorkspaceAppStoreAppIdRoute: typeof WorkspaceAppStoreAppIdRoute
   WorkspaceAppAppIdLazyRoute: typeof WorkspaceAppAppIdLazyRoute
 }
 
 const WorkspaceRouteChildren: WorkspaceRouteChildren = {
   WorkspaceAppStoreRoute: WorkspaceAppStoreRoute,
+  WorkspaceBrowserProfilesRoute: WorkspaceBrowserProfilesRoute,
   WorkspaceAppStoreAppIdRoute: WorkspaceAppStoreAppIdRoute,
   WorkspaceAppAppIdLazyRoute: WorkspaceAppAppIdLazyRoute,
 }

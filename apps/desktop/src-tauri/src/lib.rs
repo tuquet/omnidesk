@@ -5,7 +5,7 @@ pub mod system;
 pub mod error;
 pub mod services;
 
-use commands::{credentials, app_store, preferences};
+use commands::{credentials, app_store, preferences, browser_profiles};
 use tauri::{
     menu::{Menu, MenuItem},
     tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent},
@@ -158,6 +158,11 @@ pub fn run() {
             commands::storage::get_storage_info,
             commands::storage::update_storage_location,
             commands::e2e::run_e2e_orchestrator,
+            browser_profiles::get_browser_profiles,
+            browser_profiles::create_browser_profile,
+            browser_profiles::update_browser_profile,
+            browser_profiles::delete_browser_profile,
+            browser_profiles::launch_browser_profile,
         ])
         .run(tauri::generate_context!())
         .expect("error while running OmniDesk");

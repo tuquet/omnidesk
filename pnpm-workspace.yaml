@@ -1,5 +1,4 @@
 packages:
-  - "platform/*"
   - "apps/*"
   - "apps/automa/*"
   - "packages/*"

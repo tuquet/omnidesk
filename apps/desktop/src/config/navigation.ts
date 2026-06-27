@@ -2,13 +2,6 @@ import type { LucideIcon } from 'lucide-react';
 import type { Permission } from './rbac';
 import {
   LayoutDashboardIcon,
-  ListIcon,
-  ChartBarIcon,
-  FolderIcon,
-  UsersIcon,
-  DatabaseIcon,
-  FileChartColumnIcon,
-  FileIcon,
   SquareMousePointerIcon,
   CreditCardIcon,
   MessageSquareIcon,
@@ -20,7 +13,6 @@ import {
   BugIcon,
   WrenchIcon,
   StoreIcon,
-  RefreshCw,
 } from 'lucide-react';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -58,7 +50,9 @@ export interface DocumentItem {
 
 // ─── Navigation Groups ──────────────────────────────────────────────────────
 
-export const NAV_MAIN: NavItem[] = [];
+export const NAV_MAIN: NavItem[] = [
+  { title: 'Browser Profiles', url: '/browser-profiles', icon: LayoutDashboardIcon },
+];
 
 export const NAV_SHOWCASE: NavGroup = {
   label: 'Component Showcase',

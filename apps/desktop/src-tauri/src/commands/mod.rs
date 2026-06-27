@@ -3,3 +3,4 @@ pub mod app_store;
 pub mod preferences;
 pub mod storage;
 pub mod e2e;
+pub mod browser_profiles;
