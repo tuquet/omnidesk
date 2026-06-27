@@ -1,5 +1,9 @@
 <div align="center">
-  <img src="https://raw.githubusercontent.com/tauri-apps/tauri/HEAD/app-icon.png" width="120" alt="OmniDesk Logo" />
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="./branch/logo_diamond_dark.svg">
+    <source media="(prefers-color-scheme: light)" srcset="./branch/logo_diamond_light.svg">
+    <img src="./branch/logo_diamond_transparent.svg" width="120" alt="OmniDesk Logo" />
+  </picture>
   <h1>OmniDesk</h1>
   <p><strong>Hệ điều hành Doanh nghiệp & Không gian làm việc cho Lập trình viên (Local-First)</strong></p>
 </div>
