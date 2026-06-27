@@ -1,67 +1,58 @@
 # 🚀 OmniDesk E2E & Browser Manager - Development Roadmap
 
-Roadmap này định hướng phát triển **OmniDesk E2E**, một ứng dụng Tauri v2 đóng vai trò là một trình quản lý đa Profile (Multi-profile Browser Manager) và là trung tâm điều khiển (Orchestrator) các kịch bản kiểm thử E2E tự động, tập trung mạnh vào hiệu năng Local và khả năng Bypass Anti-bot.
+Roadmap này định hướng phát triển **OmniDesk E2E**, một ứng dụng Tauri v2 đóng vai trò là trình quản lý đa Profile (Multi-profile Browser Manager) và máy chủ cung cấp kịch bản (Workflow Host). Hệ thống đi theo kiến trúc "Stateless Workflow Orchestrator", tận dụng tối đa hệ thống File System và tính năng Hosted Workflow của Automa.
 
 ---
 
-## 📍 Giai đoạn 1: Browser Profile & Local Data Management (MVP Foundation)
+## 📍 Giai đoạn 1: Browser Profiles Database & Anti-detect Launch (MVP Foundation)
 
-_Mục tiêu: Quản lý hàng loạt các Profile trình duyệt độc lập và cấu hình khởi chạy an toàn (Anti-detect)._
+_Mục tiêu: Xây dựng nền tảng quản lý Profile trình duyệt độc lập và an toàn._
 
-- [ ] **Quản lý Cấu hình Profile (Local SQLite)**
-  - Quản lý danh sách Browser Profiles. Mỗi profile lưu thông tin cấu hình: Tên, Proxy, User-Agent riêng biệt.
-- [ ] **Lưu trữ dữ liệu Local-First (AppData)**
-  - Tách bạch hoàn toàn dữ liệu thật của từng trình duyệt (Cookies, Cache, History, LocalStorage) vào thư mục nội bộ (User Data Dir) thay vì đồng bộ thời gian thực lên mây để đảm bảo hiệu năng và tốc độ tốt nhất.
-- [ ] **Tự động tiêm Extension (Auto-Inject)**
-  - Tự động mount (tiêm) Automa Extension vào mỗi profile trình duyệt được sinh ra.
-- [ ] **Khởi chạy Anti-detect Command Line**
-  - Khởi chạy các trình duyệt (Chrome, Edge, Firefox) bằng CLI (qua `--remote-debugging-port`) thay vì Webdriver, nhằm vượt qua các hệ thống Anti-bot (như Cloudflare) dễ dàng.
+- [ ] **Khởi tạo Local SQLite Database (Chỉ dành cho Profile)**
+  - Bảng `browser_profiles`: Lưu cấu hình (Tên, Proxy, User-Agent, Data Dir). Không dùng SQLite cho Workflows.
+- [ ] **Quản lý Browser Profiles & UI**
+  - Xây dựng UI (React) CRUD Profiles.
+  - Tách bạch dữ liệu thật của trình duyệt (Cookies, Cache, History) vào thư mục `AppData` riêng biệt theo từng Profile.
+- [ ] **Khởi chạy Anti-detect & Tự động tiêm Extension**
+  - Mở Chrome/Edge bằng CLI (`--remote-debugging-port` & `--user-data-dir`) để bypass anti-bot.
+  - Tự động mount (tiêm) Automa Extension vào mỗi profile.
 
 ---
 
-## 📍 Giai đoạn 2: Automa Bridge & Test Execution (MVP Core)
+## 📍 Giai đoạn 2: Stateless Workflow Host & Execution (MVP Core)
 
-_Mục tiêu: Đóng vai trò là E2E Orchestrator, điều khiển các trình duyệt thực thi Kịch bản (Workflow) mà không cần can thiệp thủ công._
+_Mục tiêu: Đóng vai trò là Local Server cung cấp kịch bản cho Extension Automa, không can thiệp lưu trữ._
 
-- [ ] **Rust Local API & WebSocket (Cổng 1421)**
-  - Xây dựng cầu nối giao tiếp 2 chiều giữa **Tauri Desktop App** và **Automa Extension** chạy ngầm trong trình duyệt.
-- [ ] **Quản lý Danh sách Test Cases / Workflows**
-  - Xây dựng giao diện Desktop liệt kê các Kịch bản kiểm thử (Test Suites) từ Automa. Người dùng chỉ cần thiết kế kịch bản trực tiếp từ UI của Extension một lần.
-- [ ] **Thực thi lệnh & Theo dõi Logs (Execution & Tracing)**
-  - Người dùng bấm "Run" từ Desktop, hệ thống gửi lệnh qua API kích hoạt Automa Extension thực thi tự động.
-  - Ghi nhận Logs thời gian thực (Success/Fail/Error) từ Extension trả về Desktop App và lưu xuống SQLite.
+- [ ] **File-System Workflow Manager**
+  - Desktop App quét thư mục vật lý (vd: `Workflows/Project_A`) để hiển thị danh sách các file `.json` của Automa. Mỗi thư mục là một Project, mỗi file là một Test Case.
+- [ ] **Hosted Workflow API (Rust Web Server)**
+  - Chạy Local Web Server ở cổng `1421`.
+  - Cung cấp API endpoint (`/api/workflows/{project}/{file.json}`) để Automa Extension có thể điền URL vào tính năng "Add Hosted Workflow" và tự động tải kịch bản.
+- [ ] **Execution Trigger (Tùy chọn nâng cao)**
+  - Xây dựng cơ chế WebSocket/API để Desktop App có thể bấm nút "Run" trên UI và ra lệnh cho Extension tự động chạy Hosted Workflow tương ứng.
 
 ---
 
 ## 📍 Giai đoạn 3: Cloud Sync & Team Collaboration
 
-_Mục tiêu: Mở rộng khả năng sao lưu và chia sẻ kịch bản giữa nhiều người dùng._
+_Mục tiêu: Sao lưu và chia sẻ trong team QA (Dựa trên File System)._
 
 - [ ] **Tài khoản & Phân quyền Supabase (Auth)**
-  - Tích hợp đăng nhập an toàn bằng OAuth/Email.
-- [ ] **Đồng bộ Profile (Backup/Sync)**
-  - Nén (zip) cấu hình Profile và dữ liệu Browser (tùy chọn) thành một cục (bundle) và đẩy lên **Supabase Storage** khi người dùng có nhu cầu lưu trữ.
-- [ ] **Đồng bộ Workflows (Cloud Workflows)**
-  - Backup các JSON Workflows của Automa lên Supabase Database để làm kho Kịch bản chung (Centralized Repository) cho team QA.
+  - Đăng nhập an toàn bằng OAuth/Email.
+- [ ] **Git/Cloud Sync cho Workflows**
+  - Do các kịch bản lưu hoàn toàn dưới dạng file `.json`, có thể tích hợp cơ chế Sync đơn giản lên Supabase Storage hoặc cho phép người dùng dùng Git để quản lý phiên bản Test Case.
+- [ ] **Đồng bộ Browser Profiles (Storage Backup)**
+  - Nén (zip) cấu hình Profile và dữ liệu cục bộ, tải lên Supabase Storage.
 
 ---
 
 ## 📍 Giai đoạn 4: Kernel App & Phân phối (Bản mở rộng tương lai)
 
-_Mục tiêu: Xây dựng nền tảng mở (Marketplace), thương mại hóa các ứng dụng nội bộ._
+_Mục tiêu: Đóng gói thành nền tảng mở (Marketplace), thương mại hóa._
 
 - [ ] **Kernel App Dynamic Loading**
   - Modular hóa ứng dụng, hỗ trợ tải các phần mềm dưới dạng Module rời rạc vào "Vỏ nhân" OmniDesk.
 - [ ] **Supabase RBAC & Admin Core**
-  - Phân quyền theo Role (Admin, Editor, Viewer). Quản trị phiên bản (Updater), cấp phát License cho các ứng dụng.
-- [ ] **Workflow Marketplace**
-  - Chợ mua bán / chia sẻ các Kịch bản (Workflows) cao cấp chuyên ngành (Premium workflows).
-
----
-
-### 💡 Tóm tắt User Journey (Cho bản MVP)
-
-1. **Thiết lập**: Người dùng tạo một (hoặc nhiều) Browser Profile từ giao diện Desktop App và gán Proxy/User-Agent riêng biệt.
-2. **Khởi chạy**: Người dùng bấm "Open", Desktop App kích hoạt Chrome mở theo User Data Dir tách biệt.
-3. **Thiết kế Kịch bản (1 lần)**: Người dùng dùng Automa Extension (đã cài sẵn) trong trình duyệt để kéo-thả kịch bản E2E Test.
-4. **Chạy Tự Động**: Đóng trình duyệt. Từ giao diện Desktop, chọn Test Suite và ấn "Execute". Desktop App tự động mở trình duyệt và ngầm ra lệnh cho Automa chạy bài Test, thu nhận kết quả Report trả về giao diện quản lý.
+  - Phân quyền theo Role (Admin, Editor, Viewer). Quản trị phiên bản (Updater), cấp phát License.
+- [ ] **Premium Workflow Marketplace**
+  - Chợ chia sẻ hoặc bán các Test Cases/Workflows `.json` chuyên ngành.
