@@ -13,19 +13,13 @@
     "mempalace": {
       "$typeName": "exa.cascade_plugins_pb.CascadePluginCommandTemplate",
       "command": "mempalace-mcp",
-      "args": [
-        "--palace",
-        "C:\\Users\\Admin\\OneDrive\\Documents\\MemPalace\\palace"
-      ],
+      "args": ["--palace", "C:\\Users\\Admin\\OneDrive\\Documents\\MemPalace\\palace"],
       "env": {}
     },
     "shadcn": {
       "$typeName": "exa.cascade_plugins_pb.CascadePluginCommandTemplate",
       "command": "node",
-      "args": [
-        "node_modules/shadcn/dist/index.js",
-        "mcp"
-      ],
+      "args": ["node_modules/shadcn/dist/index.js", "mcp", "--cwd", "packages/ui"],
       "env": {}
     },
     "obsidian": {
