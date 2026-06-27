@@ -24,6 +24,9 @@ importers:
       '@eslint/js':
         specifier: ^9.21.0
         version: 9.39.4
+      '@modelcontextprotocol/server-filesystem':
+        specifier: ^2026.1.14
+        version: 2026.1.14(zod@3.25.76)
       '@supabase/mcp-server-supabase':
         specifier: ^0.8.2
         version: 0.8.2(@modelcontextprotocol/sdk@1.29.0(zod@3.25.76))(zod@3.25.76)
@@ -54,9 +57,6 @@ importers:
       lint-staged:
         specifier: ^15.2.0
         version: 15.5.2
-      mcp-obsidian:
-        specifier: ^1.0.0
-        version: 1.0.0(zod@3.25.76)
       prettier:
         specifier: ^3.4.0
         version: 3.8.3
@@ -2826,9 +2826,6 @@ packages:
   '@mjackson/multipart-parser@0.10.1':
     resolution: {integrity: sha512-cHMD6+ErH/DrEfC0N6Ru/+1eAdavxdV0C35PzSb5/SD7z3XoaDMc16xPJcb8CahWjSpqHY+Too9sAb6/UNuq7A==}
 
-  '@modelcontextprotocol/sdk@0.5.0':
-    resolution: {integrity: sha512-RXgulUX6ewvxjAG0kOpLMEdXXWkzWgaoCGaA2CwNW7cQCIphjpJhjpHSiaPdVCnisjRF/0Cm9KWHUuIoeiAblQ==}
-
   '@modelcontextprotocol/sdk@1.29.0':
     resolution: {integrity: sha512-zo37mZA9hJWpULgkRpowewez1y6ML5GsXJPY8FI0tBBCd77HEvza4jDqRKOXgHNn867PVGCyTdzqpz0izu5ZjQ==}
     engines: {node: '>=18'}
@@ -2838,6 +2835,10 @@ packages:
     peerDependenciesMeta:
       '@cfworker/json-schema':
         optional: true
+
+  '@modelcontextprotocol/server-filesystem@2026.1.14':
+    resolution: {integrity: sha512-bGAfu3fWRVeF10NxvPhFBDlRen6ExSx6YkKJzoVgQMNrbdVVV4okfGGQ3KBRu9ygXYfw5/N9ermHAJXA0uys+g==}
+    hasBin: true
 
   '@n8n_io/riot-tmpl@2.0.0':
     resolution: {integrity: sha512-gQNJYlek30YIWLru2CdyFgU/0uvPAbbQwt2G5EN0PDxXD1rGAYWZsd2c94bW3YlvXT6V2GEd7Bt/gT6QUwhzfQ==}
@@ -6030,6 +6031,10 @@ packages:
     resolution: {integrity: sha512-X07nttJQkwkfKfvTPG/KSnE2OMdcUCao6+eXF3wmnIQRn2aPAHH3VxDbDOdegkd6JbPsXqShpvEOHfAT+nCNwQ==}
     engines: {node: '>=0.3.1'}
 
+  diff@5.2.2:
+    resolution: {integrity: sha512-vtcDfH3TOjP8UekytvnHH1o1P4FcUdt4eQ1Y+Abap1tk/OB2MWQvcwS2ClCd1zuIhc3JKOx6p3kod8Vfys3E+A==}
+    engines: {node: '>=0.3.1'}
+
   diff@8.0.4:
     resolution: {integrity: sha512-DPi0FmjiSU5EvQV0++GFDOJ9ASQUVFh5kD+OzOnYdi7n3Wpm9hWWGfB/O2blfHcMVTL5WkQXSnRiK9makhrcnw==}
     engines: {node: '>=0.3.1'}
@@ -7710,10 +7715,6 @@ packages:
   math-intrinsics@1.1.0:
     resolution: {integrity: sha512-/IXtbwEk5HTPyEwyKX6hGkYXxM9nbj64B+ilVJnC/R6B0pH5G4V3b0pVbL7DBj4tkhBAppbQUlf6F6Xl9LHu1g==}
     engines: {node: '>= 0.4'}
-
-  mcp-obsidian@1.0.0:
-    resolution: {integrity: sha512-SrmQ3Lthb1YlDt2DSEzaaiKrp3NpkakGmR82c/QxwJrl2XKMFvTJCiuNWJKi8sP09pAstVJTQdRgF8u2CXikOA==}
-    hasBin: true
 
   mdast-util-to-hast@13.2.1:
     resolution: {integrity: sha512-cctsq2wp5vTsLIcaymblUriiTcZd0CwWtCbLvrOzYCDZoWyMNV8sZ7krj09FSnsiJi3WVsHLM4k6Dq/yaPyCXA==}
@@ -11747,12 +11748,6 @@ snapshots:
     dependencies:
       '@mjackson/headers': 0.11.1
 
-  '@modelcontextprotocol/sdk@0.5.0':
-    dependencies:
-      content-type: 1.0.5
-      raw-body: 3.0.2
-      zod: 3.25.76
-
   '@modelcontextprotocol/sdk@1.29.0(zod@3.25.76)':
     dependencies:
       '@hono/node-server': 1.19.14(hono@4.12.25)
@@ -11774,6 +11769,18 @@ snapshots:
       zod-to-json-schema: 3.25.2(zod@3.25.76)
     transitivePeerDependencies:
       - supports-color
+
+  '@modelcontextprotocol/server-filesystem@2026.1.14(zod@3.25.76)':
+    dependencies:
+      '@modelcontextprotocol/sdk': 1.29.0(zod@3.25.76)
+      diff: 5.2.2
+      glob: 10.5.0
+      minimatch: 10.2.5
+      zod-to-json-schema: 3.25.2(zod@3.25.76)
+    transitivePeerDependencies:
+      - '@cfworker/json-schema'
+      - supports-color
+      - zod
 
   '@n8n_io/riot-tmpl@2.0.0':
     dependencies:
@@ -15163,6 +15170,8 @@ snapshots:
 
   diff@4.0.4: {}
 
+  diff@5.2.2: {}
+
   diff@8.0.4: {}
 
   dir-glob@3.0.1:
@@ -17137,14 +17146,6 @@ snapshots:
       uc.micro: 2.1.0
 
   math-intrinsics@1.1.0: {}
-
-  mcp-obsidian@1.0.0(zod@3.25.76):
-    dependencies:
-      '@modelcontextprotocol/sdk': 0.5.0
-      glob: 10.5.0
-      zod-to-json-schema: 3.25.2(zod@3.25.76)
-    transitivePeerDependencies:
-      - zod
 
   mdast-util-to-hast@13.2.1:
     dependencies:
