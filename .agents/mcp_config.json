@@ -36,6 +36,15 @@
         "C:\\Users\\Admin\\OneDrive\\Documents\\Obsidian Vault"
       ],
       "env": {}
+    },
+    "bruno": {
+      "$typeName": "exa.cascade_plugins_pb.CascadePluginCommandTemplate",
+      "command": "node",
+      "args": [
+        "node_modules/@modelcontextprotocol/server-filesystem/dist/index.js",
+        "C:\\Users\\Admin\\OneDrive\\Documents\\bruno"
+      ],
+      "env": {}
     }
   }
 }
