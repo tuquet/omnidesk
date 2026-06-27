@@ -27,6 +27,18 @@
         "mcp"
       ],
       "env": {}
+    },
+    "obsidian": {
+      "$typeName": "exa.cascade_plugins_pb.CascadePluginCommandTemplate",
+      "command": "node",
+      "args": [
+        "node_modules/mcp-obsidian/dist/index.js"
+      ],
+      "env": {
+        "OBSIDIAN_API_KEY": "YOUR_API_KEY",
+        "OBSIDIAN_HOST": "127.0.0.1",
+        "OBSIDIAN_PORT": "27124"
+      }
     }
   }
 }
