@@ -18,8 +18,8 @@
     },
     "shadcn": {
       "$typeName": "exa.cascade_plugins_pb.CascadePluginCommandTemplate",
-      "command": "node",
-      "args": ["node_modules/shadcn/dist/index.js", "mcp", "--cwd", "packages/ui"],
+      "command": "npx",
+      "args": ["-y", "shadcn@latest", "mcp", "--cwd", "packages/ui"],
       "env": {}
     },
     "obsidian": {
