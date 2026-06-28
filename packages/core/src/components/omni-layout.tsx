@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call */
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   SidebarProvider,
   ResizablePanelGroup,
@@ -24,6 +24,19 @@ export function OmniLayout({ sidebarContent, children }: OmniLayoutProps) {
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const sidebarPanelRef = useRef<any>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [containerWidth, setContainerWidth] = useState(0);
+
+  useEffect(() => {
+    if (!containerRef.current) return;
+    const observer = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        setContainerWidth(entry.contentRect.width);
+      }
+    });
+    observer.observe(containerRef.current);
+    return () => observer.disconnect();
+  }, []);
 
   useEffect(() => {
     const panel = sidebarPanelRef.current;
@@ -36,13 +49,17 @@ export function OmniLayout({ sidebarContent, children }: OmniLayoutProps) {
     }
   }, [sidebarOpen]);
 
+  // Convert 240px and 400px to percentages dynamically
+  const minSize = containerWidth > 0 ? (240 / containerWidth) * 100 : 15;
+  const maxSize = containerWidth > 0 ? (400 / containerWidth) * 100 : 40;
+
   const mainArea = (
     <SidebarProvider
       open={sidebarOpen}
       onOpenChange={setSidebarOpen}
       style={{ '--sidebar-width': '100%' } as React.CSSProperties}
     >
-      <ResizablePanelGroup orientation="horizontal" className="h-full w-full">
+      <ResizablePanelGroup ref={containerRef} orientation="horizontal" className="h-full w-full">
         {sidebarContent && (
           <>
             <ResizablePanel
@@ -50,9 +67,9 @@ export function OmniLayout({ sidebarContent, children }: OmniLayoutProps) {
               ref={sidebarPanelRef}
               collapsible={true}
               collapsedSize={0}
-              minSize={15}
-              maxSize={40}
-              defaultSize={20}
+              minSize={minSize}
+              maxSize={maxSize}
+              defaultSize={minSize}
               onCollapse={() => {
                 if (sidebarOpen) setSidebarOpen(false);
               }}
@@ -66,13 +83,6 @@ export function OmniLayout({ sidebarContent, children }: OmniLayoutProps) {
             >
               <div className="w-full h-full flex flex-col">{sidebarContent}</div>
             </ResizablePanel>
-            <style>{`
-              #omni-sidebar-panel {
-                min-width: ${sidebarOpen ? '240px' : '0px'} !important;
-                max-width: ${sidebarOpen ? '400px' : '0px'} !important;
-                ${!sidebarOpen ? 'flex: 0 1 0px !important; overflow: hidden !important; border: none !important;' : ''}
-              }
-            `}</style>
             <ResizableHandle withHandle className={sidebarOpen ? 'block' : 'hidden'} />
           </>
         )}
