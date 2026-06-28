@@ -1,5 +1,6 @@
 import { Store } from '@tanstack/store';
 import { useStore } from '@tanstack/react-store';
+import { useCallback } from 'react';
 import { PROFILE_API_URL } from '@omnidesk/core';
 
 export interface BrowserProfile {
@@ -91,7 +92,7 @@ async function fetchApi<T>(path: string, options: RequestInit = {}): Promise<T> 
 export function useBrowserProfileStore() {
   const state = useStore(browserProfileStore);
 
-  const fetchProfiles = async () => {
+  const fetchProfiles = useCallback(async () => {
     browserProfileStore.setState((s) => ({ ...s, isLoading: true, error: null }));
     try {
       const profiles = await fetchApi<BrowserProfile[]>('/api/browser-profiles');
@@ -103,7 +104,7 @@ export function useBrowserProfileStore() {
         isLoading: false,
       }));
     }
-  };
+  }, []);
 
   const createProfile = async (payload: CreateBrowserProfilePayload) => {
     browserProfileStore.setState((s) => ({ ...s, isLoading: true, error: null }));
