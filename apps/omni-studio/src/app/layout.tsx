@@ -15,7 +15,7 @@ import { Activity, Workflow, Blocks, Clock } from 'lucide-react';
 
 function StudioSidebar() {
   return (
-    <Sidebar variant="inset" collapsible="none">
+    <Sidebar variant="inset" collapsible="none" className="w-full">
       <SidebarHeader>
         <div className="flex items-center gap-2 px-2 py-1.5 font-semibold text-sm">
           <Workflow className="h-4 w-4" />
