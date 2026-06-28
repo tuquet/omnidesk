@@ -21,6 +21,7 @@ export interface BrowserProfile {
 }
 
 export interface CreateBrowserProfilePayload {
+  user_agent?: string | null;
   name: string;
   browser_type?: string | null;
   data_dir_path: string;
@@ -31,6 +32,7 @@ export interface CreateBrowserProfilePayload {
   tags?: string | null;
   notes?: string | null;
   executable_path?: string | null;
+  browser_version?: string | null;
 }
 
 export interface UpdateBrowserProfilePayload {
@@ -45,6 +47,7 @@ export interface UpdateBrowserProfilePayload {
   tags?: string | null;
   notes?: string | null;
   executable_path?: string | null;
+  browser_version?: string | null;
 }
 
 interface BrowserProfileState {
@@ -80,9 +83,9 @@ async function fetchApi<T>(path: string, options: RequestInit = {}): Promise<T> 
 
   const contentType = response.headers.get('content-type');
   if (contentType && contentType.includes('application/json')) {
-    return response.json();
+    return response.json() as Promise<T>;
   }
-  return null as any;
+  return null as unknown as T;
 }
 
 export function useBrowserProfileStore() {
@@ -94,7 +97,11 @@ export function useBrowserProfileStore() {
       const profiles = await fetchApi<BrowserProfile[]>('/api/browser-profiles');
       browserProfileStore.setState((s) => ({ ...s, profiles, isLoading: false }));
     } catch (e) {
-      browserProfileStore.setState((s) => ({ ...s, error: e instanceof Error ? e.message : String(e), isLoading: false }));
+      browserProfileStore.setState((s) => ({
+        ...s,
+        error: e instanceof Error ? e.message : String(e),
+        isLoading: false,
+      }));
     }
   };
 
@@ -105,10 +112,10 @@ export function useBrowserProfileStore() {
         method: 'POST',
         body: JSON.stringify(payload),
       });
-      browserProfileStore.setState((s) => ({ 
+      browserProfileStore.setState((s) => ({
         ...s,
         profiles: [newProfile, ...s.profiles],
-        isLoading: false 
+        isLoading: false,
       }));
     } catch (e) {
       const errStr = e instanceof Error ? e.message : String(e);
@@ -126,8 +133,8 @@ export function useBrowserProfileStore() {
       });
       browserProfileStore.setState((s) => ({
         ...s,
-        profiles: s.profiles.map(p => p.id === payload.id ? updatedProfile : p),
-        isLoading: false
+        profiles: s.profiles.map((p) => (p.id === payload.id ? updatedProfile : p)),
+        isLoading: false,
       }));
     } catch (e) {
       const errStr = e instanceof Error ? e.message : String(e);
@@ -142,8 +149,8 @@ export function useBrowserProfileStore() {
       await fetchApi(`/api/browser-profiles/${id}`, { method: 'DELETE' });
       browserProfileStore.setState((s) => ({
         ...s,
-        profiles: s.profiles.filter(p => p.id !== id),
-        isLoading: false
+        profiles: s.profiles.filter((p) => p.id !== id),
+        isLoading: false,
       }));
     } catch (e) {
       const errStr = e instanceof Error ? e.message : String(e);
@@ -152,18 +159,18 @@ export function useBrowserProfileStore() {
     }
   };
 
-  const launchProfile = async (id: string, payload: Record<string, any> = {}) => {
+  const launchProfile = async (id: string, payload: Record<string, unknown> = {}) => {
     browserProfileStore.setState((s) => ({ ...s, isLoading: true, error: null }));
     try {
-      await fetchApi(`/api/browser-profiles/${id}/launch`, { 
+      await fetchApi(`/api/browser-profiles/${id}/launch`, {
         method: 'POST',
-        body: JSON.stringify(payload)
+        body: JSON.stringify(payload),
       });
       // Optionally update local status optimistically
-      browserProfileStore.setState((s) => ({ 
-        ...s, 
-        profiles: s.profiles.map(p => p.id === id ? { ...p, status: 'RUNNING', pid: 1 } : p),
-        isLoading: false 
+      browserProfileStore.setState((s) => ({
+        ...s,
+        profiles: s.profiles.map((p) => (p.id === id ? { ...p, status: 'RUNNING', pid: 1 } : p)),
+        isLoading: false,
       }));
     } catch (e) {
       const errStr = e instanceof Error ? e.message : String(e);
@@ -177,10 +184,10 @@ export function useBrowserProfileStore() {
     try {
       await fetchApi(`/api/browser-profiles/${id}/stop`, { method: 'POST' });
       // Update local status optimistically
-      browserProfileStore.setState((s) => ({ 
-        ...s, 
-        profiles: s.profiles.map(p => p.id === id ? { ...p, status: 'IDLE', pid: null } : p),
-        isLoading: false 
+      browserProfileStore.setState((s) => ({
+        ...s,
+        profiles: s.profiles.map((p) => (p.id === id ? { ...p, status: 'IDLE', pid: null } : p)),
+        isLoading: false,
       }));
     } catch (e) {
       const errStr = e instanceof Error ? e.message : String(e);
@@ -203,7 +210,9 @@ export function useBrowserProfileStore() {
 
   const fetchAvailableVersions = async (browserType: string) => {
     try {
-      return await fetchApi<any[]>(`/api/browser-profiles/available-versions?browser_type=${browserType}`);
+      return await fetchApi<{ browser_version: string; executable_path: string }[]>(
+        `/api/browser-profiles/available-versions?browser_type=${browserType}`,
+      );
     } catch (e) {
       console.error('Failed to fetch versions', e);
       return [];
@@ -214,7 +223,9 @@ export function useBrowserProfileStore() {
     try {
       const qs = new URLSearchParams({ browser_type: browserType });
       if (version) qs.set('version', version);
-      return await fetchApi<{is_downloaded: boolean, exe_path: string | null}>(`/api/browser-profiles/engine-status?${qs.toString()}`);
+      return await fetchApi<{ is_downloaded: boolean; exe_path: string | null }>(
+        `/api/browser-profiles/engine-status?${qs.toString()}`,
+      );
     } catch (e) {
       console.error('Failed to fetch engine status', e);
       return { is_downloaded: false, exe_path: null };

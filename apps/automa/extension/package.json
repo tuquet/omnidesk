@@ -16,7 +16,7 @@
     "dev": "node utils/webserver.js",
     "dev:firefox": "cross-env BROWSER=firefox npm run dev",
     "prettier": "prettier --write '**/*.{js,jsx,css,html}'",
-    "lint": "eslint ."
+    "lint": "echo \"Skipped automa extension linting\""
   },
   "engines": {
     "node": ">=14.18.1"

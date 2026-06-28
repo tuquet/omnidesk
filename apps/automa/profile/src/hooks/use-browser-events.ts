@@ -6,7 +6,7 @@ export function useBrowserEvents() {
   const { fetchProfiles } = useBrowserProfileStore();
   const [downloadProgress, setDownloadProgress] = useState<{
     status: string;
-    percentage: number | null;
+    percent: number | null;
   } | null>(null);
 
   // Server-Sent Events for download progress
@@ -25,8 +25,7 @@ export function useBrowserEvents() {
                 if (prev?.status === 'done' && data.status === 'done') {
                   return prev;
                 }
-                // @ts-expect-error valid type assignment
-                return data;
+                return data as { status: string; percent: number | null };
               });
 
               if (data.status === 'done') {

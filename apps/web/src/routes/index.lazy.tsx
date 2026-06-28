@@ -1,4 +1,4 @@
-import { createLazyFileRoute, Navigate } from '@tanstack/react-router';
+import { createLazyFileRoute } from '@tanstack/react-router';
 import { usePlatform } from '@omnidesk/core';
 import { DesktopLanding } from '@omnidesk/ui';
 import { WebLanding } from '@omnidesk/ui';
@@ -12,11 +12,9 @@ function LandingPage() {
   const { isAuthenticated } = useAuth();
   const platformApi = usePlatform();
 
-
-
   if (platformApi.platform === 'desktop') {
-    return <DesktopLanding />;
+    return <DesktopLanding isAuthenticated={isAuthenticated} />;
   }
 
-  return <WebLanding isAuthenticated={isAuthenticated} />;
+  return <WebLanding />;
 }

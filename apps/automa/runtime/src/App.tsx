@@ -13,12 +13,13 @@ import './app/globals.css';
 // Create a new router instance
 import { useStore } from '@tanstack/react-store';
 import { authStore, authActions } from '@omnidesk/auth';
+import type { AuthState } from '@omnidesk/auth';
 import { useEffect } from 'react';
 
 const router = createRouter({
   routeTree,
   context: {
-    auth: undefined as any,
+    auth: undefined as unknown as AuthState,
   },
 });
 
@@ -28,7 +29,6 @@ declare module '@tanstack/react-router' {
     router: typeof router;
   }
 }
-
 
 import { isSupabaseConfigured } from './lib/supabase';
 import { EnvSetupWarning } from '@omnidesk/ui';

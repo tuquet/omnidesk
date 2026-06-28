@@ -1,8 +1,20 @@
 import { useState, useEffect } from 'react';
 import {
-  Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription,
-  Button, Input, Label, Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
-  Textarea, Separator,
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetDescription,
+  Button,
+  Input,
+  Label,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+  Textarea,
+  Separator,
 } from '@omnidesk/ui';
 import { Loader2Icon, SaveIcon, PlusIcon } from 'lucide-react';
 import { toast } from 'sonner';
@@ -26,7 +38,13 @@ const DEFAULT_PROXY: ProxyData = {
   password: '',
 };
 
-export function ProfileFormDialog({ open, onOpenChange, mode, profile, onSuccess }: ProfileFormDialogProps) {
+export function ProfileFormDialog({
+  open,
+  onOpenChange,
+  mode,
+  profile,
+  onSuccess,
+}: ProfileFormDialogProps) {
   const { createProfile, updateProfile, fetchAvailableVersions } = useBrowserProfileStore();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -40,10 +58,12 @@ export function ProfileFormDialog({ open, onOpenChange, mode, profile, onSuccess
   const [proxy, setProxy] = useState<ProxyData>(DEFAULT_PROXY);
   const [executablePath, setExecutablePath] = useState('');
 
-  const [availableVersions, setAvailableVersions] = useState<any[]>([]);
+  const [availableVersions, setAvailableVersions] = useState<
+    { browser_version: string; executable_path: string }[]
+  >([]);
 
   useEffect(() => {
-    fetchAvailableVersions(browserType).then(setAvailableVersions);
+    fetchAvailableVersions(browserType).then((versions) => setAvailableVersions(versions));
     setBrowserVersion('latest');
   }, [browserType]);
 
@@ -52,12 +72,12 @@ export function ProfileFormDialog({ open, onOpenChange, mode, profile, onSuccess
     if (mode === 'edit' && profile) {
       setName(profile.name);
       setBrowserType(profile.browser_type || 'chrome');
-      setBrowserVersion((profile as any).browser_version || 'latest');
+      setBrowserVersion(profile.browser_version || 'latest');
       setOs(profile.os || 'win');
       setNotes(profile.notes || '');
-      setExecutablePath((profile as any).executable_path || '');
+      setExecutablePath((profile as unknown as { executable_path: string }).executable_path || '');
       try {
-        const tags = JSON.parse(profile.tags || '[]');
+        const tags = JSON.parse(profile.tags || '[]') as unknown;
         setTagsInput(Array.isArray(tags) ? tags.join(', ') : '');
       } catch {
         setTagsInput('');
@@ -77,14 +97,17 @@ export function ProfileFormDialog({ open, onOpenChange, mode, profile, onSuccess
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name.trim()) {
-      toast.error('Profile name is required');
+    if (!name.trim() || name.length < 3) {
+      toast.error('Profile name must be at least 3 characters');
       return;
     }
 
     setIsSubmitting(true);
     const tags = JSON.stringify(
-      tagsInput.split(',').map(t => t.trim()).filter(Boolean)
+      tagsInput
+        .split(',')
+        .map((t) => t.trim())
+        .filter(Boolean),
     );
 
     try {
@@ -99,7 +122,7 @@ export function ProfileFormDialog({ open, onOpenChange, mode, profile, onSuccess
           notes: notes || null,
           executable_path: executablePath || null,
           tags,
-        } as any);
+        });
         toast.success('Profile created successfully');
       } else if (profile) {
         await updateProfile({
@@ -112,12 +135,12 @@ export function ProfileFormDialog({ open, onOpenChange, mode, profile, onSuccess
           notes: notes || null,
           executable_path: executablePath || null,
           tags,
-        } as any);
+        });
         toast.success('Profile updated successfully');
       }
       onOpenChange(false);
       onSuccess?.();
-    } catch (err) {
+    } catch {
       toast.error(mode === 'create' ? 'Failed to create profile' : 'Failed to update profile');
     } finally {
       setIsSubmitting(false);
@@ -132,11 +155,12 @@ export function ProfileFormDialog({ open, onOpenChange, mode, profile, onSuccess
             {mode === 'create' ? 'Create New Profile' : `Edit: ${profile?.name}`}
           </SheetTitle>
           <SheetDescription className="sr-only">
-            Fill out the form below to {mode === 'create' ? 'create a new' : 'edit the'} browser profile.
+            Fill out the form below to {mode === 'create' ? 'create a new' : 'edit the'} browser
+            profile.
           </SheetDescription>
         </SheetHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-6 flex-1">
+        <form onSubmit={handleSubmit} className="space-y-5 flex-1 mt-2">
           {/* Name */}
           <div className="space-y-2">
             <Label htmlFor="profile-name">
@@ -148,13 +172,17 @@ export function ProfileFormDialog({ open, onOpenChange, mode, profile, onSuccess
               value={name}
               onChange={(e) => setName(e.target.value)}
               autoFocus
+              required
+              minLength={3}
             />
           </div>
 
           {/* Browser + Version + OS */}
           <div className="grid grid-cols-12 gap-3">
             <div className="col-span-5 space-y-2">
-              <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Browser Engine</Label>
+              <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                Browser Engine
+              </Label>
               <Select value={browserType} onValueChange={setBrowserType}>
                 <SelectTrigger className="w-full">
                   <SelectValue />
@@ -168,21 +196,27 @@ export function ProfileFormDialog({ open, onOpenChange, mode, profile, onSuccess
               </Select>
             </div>
             <div className="col-span-4 space-y-2">
-              <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Version</Label>
+              <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                Version
+              </Label>
               <Select value={browserVersion} onValueChange={setBrowserVersion}>
                 <SelectTrigger className="w-full">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="latest">Latest</SelectItem>
-                  {availableVersions.map(v => (
-                    <SelectItem key={v.version} value={v.version}>{v.version}</SelectItem>
+                  {availableVersions.map((v) => (
+                    <SelectItem key={v.browser_version} value={v.browser_version}>
+                      {v.browser_version}
+                    </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </div>
             <div className="col-span-3 space-y-2">
-              <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Platform</Label>
+              <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                Platform
+              </Label>
               <Select value={os} onValueChange={setOs}>
                 <SelectTrigger className="w-full">
                   <SelectValue />
@@ -198,7 +232,9 @@ export function ProfileFormDialog({ open, onOpenChange, mode, profile, onSuccess
 
           {/* Executable Path */}
           <div className="space-y-2">
-            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Browser Executable Path (Optional)</Label>
+            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+              Browser Executable Path (Optional)
+            </Label>
             <Input
               placeholder="Leave empty to auto-download / use default"
               value={executablePath}
@@ -208,7 +244,9 @@ export function ProfileFormDialog({ open, onOpenChange, mode, profile, onSuccess
 
           {/* Tags */}
           <div className="space-y-2">
-            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Tags</Label>
+            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+              Tags
+            </Label>
             <Input
               placeholder="facebook, main, ads (comma-separated)"
               value={tagsInput}
@@ -218,7 +256,9 @@ export function ProfileFormDialog({ open, onOpenChange, mode, profile, onSuccess
 
           {/* Notes */}
           <div className="space-y-2">
-            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Notes</Label>
+            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+              Notes
+            </Label>
             <Textarea
               className="min-h-[80px] resize-none"
               placeholder="Optional notes about this profile..."

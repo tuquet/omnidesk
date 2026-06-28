@@ -1,8 +1,6 @@
-import { createFileRoute, useNavigate } from '@tanstack/react-router';
+import { useNavigate } from '@tanstack/react-router';
 import { Button } from '@omnidesk/ui';
 import { ArrowLeft, Ghost } from 'lucide-react';
-
-
 
 export function NotFoundPage() {
   const navigate = useNavigate();
@@ -41,7 +39,7 @@ export function NotFoundPage() {
         </p>
 
         {/* Go Home button */}
-        <Button size="lg" className="gap-2 px-8" onClick={() => navigate({ to: '/app/$appId', params: { appId: 'home' } } as any)}>
+        <Button size="lg" className="gap-2 px-8" onClick={() => navigate({ to: '/' })}>
           <ArrowLeft className="h-4 w-4" />
           Go Home
         </Button>

@@ -43,8 +43,8 @@ export function ConsoleLoggerButton() {
   const { logs, unreadCount, clearLogs, markAsRead } = useConsoleStore();
   const [isOpen, setIsOpen] = useState(false);
 
-  const errorCount = logs.filter((l: any) => l.level === 'error').length;
-  const warnCount = logs.filter((l: any) => l.level === 'warn').length;
+  const errorCount = logs.filter((l: { level?: string }) => l.level === 'error').length;
+  const warnCount = logs.filter((l: { level?: string }) => l.level === 'warn').length;
 
   const handleOpenChange = (open: boolean) => {
     setIsOpen(open);
@@ -71,7 +71,7 @@ export function ConsoleLoggerButton() {
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-80" align="end">
         <DropdownMenuLabel className="p-0">
-          <div 
+          <div
             className="flex items-center justify-between"
             style={{ padding: '8px 12px 6px 12px' }}
           >
@@ -108,7 +108,7 @@ export function ConsoleLoggerButton() {
 
         <div style={{ height: '300px', overflowY: 'auto', overflowX: 'hidden' }}>
           {logs.length === 0 ? (
-            <div 
+            <div
               className="flex items-center justify-center text-xs text-muted-foreground"
               style={{ height: '100%', padding: '16px' }}
             >
@@ -116,42 +116,44 @@ export function ConsoleLoggerButton() {
             </div>
           ) : (
             <div className="flex flex-col" style={{ padding: '4px' }}>
-              {logs.map((log: any, index: number) => (
-                <div
-                  key={log.id}
-                  className={`flex flex-col gap-1 rounded-md ${log.level === 'error' ? 'bg-destructive/5' : ''}`}
-                  style={{ padding: '8px 10px', marginBottom: '4px' }}
-                >
-                  <div className="flex items-center justify-between gap-2">
-                    <div className="flex items-center gap-1.5">
-                      {getLevelIcon(log.level)}
-                      <Badge
-                        variant="outline"
-                        className={`text-[9px] uppercase px-1 h-3.5 font-mono rounded-sm ${getLevelColor(log.level)}`}
-                      >
-                        {log.level}
-                      </Badge>
+              {logs.map(
+                (log: { id?: string; level?: string; message?: string; timestamp?: string }) => (
+                  <div
+                    key={log.id}
+                    className={`flex flex-col gap-1 rounded-md ${(log.level || 'info') === 'error' ? 'bg-destructive/5' : ''}`}
+                    style={{ padding: '8px 10px', marginBottom: '4px' }}
+                  >
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="flex items-center gap-1.5">
+                        {getLevelIcon(log.level || 'info')}
+                        <Badge
+                          variant="outline"
+                          className={`text-[9px] uppercase px-1 h-3.5 font-mono rounded-sm ${getLevelColor(log.level || 'info')}`}
+                        >
+                          {log.level || 'info'}
+                        </Badge>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-[10px] text-muted-foreground whitespace-nowrap">
+                          {new Date(log.timestamp || '').toLocaleTimeString()}
+                        </span>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-5 w-5 text-muted-foreground hover:text-foreground hover:bg-muted"
+                          onClick={() => copySingleLog(log.message || '')}
+                          title="Copy log entry"
+                        >
+                          <Copy className="h-3 w-3" />
+                        </Button>
+                      </div>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-[10px] text-muted-foreground whitespace-nowrap">
-                        {new Date(log.timestamp).toLocaleTimeString()}
-                      </span>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-5 w-5 text-muted-foreground hover:text-foreground hover:bg-muted"
-                        onClick={() => copySingleLog(log.message)}
-                        title="Copy log entry"
-                      >
-                        <Copy className="h-3 w-3" />
-                      </Button>
-                    </div>
+                    <pre className="font-mono whitespace-pre-wrap break-words text-foreground/90 leading-relaxed overflow-hidden bg-muted/30 p-1.5 rounded border border-border/50 mt-1">
+                      {log.message || ''}
+                    </pre>
                   </div>
-                  <pre className="font-mono whitespace-pre-wrap break-words text-foreground/90 leading-relaxed overflow-hidden bg-muted/30 p-1.5 rounded border border-border/50 mt-1">
-                    {log.message}
-                  </pre>
-                </div>
-              ))}
+                ),
+              )}
             </div>
           )}
         </div>

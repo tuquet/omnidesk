@@ -1,7 +1,11 @@
 import { useState, useMemo, useCallback, useEffect } from 'react';
 import { useAuth } from '@omnidesk/auth';
 import { APP_REGISTRY } from '../config/registry';
-import { launcherActions, useLauncherStore, useNonCoreInstalledApps } from '../stores/use-launcher-store';
+import {
+  launcherActions,
+  useLauncherStore,
+  useNonCoreInstalledApps,
+} from '../stores/use-launcher-store';
 import {
   useMarketplaceApps,
   useInstalledApps,
@@ -45,9 +49,7 @@ export function AppStore() {
     }
   }, [serverInstalledApps]);
 
-  const {
-    data: localApps,
-  } = useLocalInstalledApps();
+  const { data: localApps } = useLocalInstalledApps();
 
   const apps: MarketplaceApp[] = useMemo(() => {
     const rawApps =
@@ -62,12 +64,12 @@ export function AppStore() {
         sort_order: 0,
         created_at: new Date().toISOString(),
       }));
-      
+
     // Merge local apps, overriding server apps if duplicate ID
     const merged = [...rawApps];
     if (localApps) {
       for (const localApp of localApps) {
-        const idx = merged.findIndex(a => a.id === localApp.id);
+        const idx = merged.findIndex((a) => a.id === localApp.id);
         if (idx >= 0) {
           merged[idx] = localApp;
         } else {
@@ -75,7 +77,7 @@ export function AppStore() {
         }
       }
     }
-    
+
     return merged.filter((a) => !a.is_core);
   }, [marketplaceApps, localApps]);
 
@@ -235,7 +237,7 @@ export function AppStore() {
                     }
                     onInstall={() => handleInstall(app.id, app.name)}
                     onUninstall={() => handleUninstall(app.id, app.name)}
-                    onClick={() => navigate({ to: '/app-store/$appId', params: { appId: app.id } })}
+                    onClick={() => navigate({ to: '/' })}
                   />
                 ))}
               </div>
@@ -264,7 +266,7 @@ export function AppStore() {
                     }
                     onInstall={() => {}}
                     onUninstall={() => handleUninstall(app.id, app.name)}
-                    onClick={() => navigate({ to: '/app-store/$appId', params: { appId: app.id } })}
+                    onClick={() => navigate({ to: '/' })}
                   />
                 ))}
             </div>
@@ -281,9 +283,7 @@ export function AppStore() {
                   installMutation.isPending && installMutation.variables === featuredApp.id
                 }
                 onInstall={() => handleInstall(featuredApp.id, featuredApp.name)}
-                onClick={() =>
-                  navigate({ to: '/app-store/$appId', params: { appId: featuredApp.id } })
-                }
+                onClick={() => navigate({ to: '/' })}
               />
             )}
 
@@ -319,9 +319,7 @@ export function AppStore() {
                         }
                         onInstall={() => handleInstall(app.id, app.name)}
                         onUninstall={() => handleUninstall(app.id, app.name)}
-                        onClick={() =>
-                          navigate({ to: '/app-store/$appId', params: { appId: app.id } })
-                        }
+                        onClick={() => navigate({ to: '/' })}
                       />
                     ))}
                   </div>
@@ -332,7 +330,7 @@ export function AppStore() {
             {/* All other apps grid */}
             <div className="flex flex-col gap-4 pt-4 border-t border-border/40">
               <h2 className="text-2xl font-bold tracking-tight">Top Apps</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-x-8 gap-y-0 px-2">
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-x-8 gap-y-0 px-2">
                 {apps.map((app) => (
                   <AppCard
                     key={app.id}
@@ -344,7 +342,7 @@ export function AppStore() {
                     }
                     onInstall={() => handleInstall(app.id, app.name)}
                     onUninstall={() => handleUninstall(app.id, app.name)}
-                    onClick={() => navigate({ to: '/app-store/$appId', params: { appId: app.id } })}
+                    onClick={() => navigate({ to: '/' })}
                   />
                 ))}
               </div>
@@ -352,7 +350,7 @@ export function AppStore() {
           </>
         )}
       </div>
-      
+
       <UploadAppDialog open={uploadDialogOpen} onOpenChange={setUploadDialogOpen} />
     </div>
   );

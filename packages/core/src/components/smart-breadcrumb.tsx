@@ -33,7 +33,10 @@ function humanize(segment: string): string {
  * 1. Exact match in BREADCRUMB_MAP → use it.
  * 2. Otherwise walk segments and build a generic trail.
  */
-function resolveBreadcrumbs(pathname: string, BREADCRUMB_MAP: Record<string, BreadcrumbEntry[]> = {}): BreadcrumbEntry[] {
+function resolveBreadcrumbs(
+  pathname: string,
+  BREADCRUMB_MAP: Record<string, BreadcrumbEntry[]> = {},
+): BreadcrumbEntry[] {
   // Exact hit – preferred path
   if (BREADCRUMB_MAP && BREADCRUMB_MAP[pathname]) return BREADCRUMB_MAP[pathname];
 
@@ -49,7 +52,7 @@ function resolveBreadcrumbs(pathname: string, BREADCRUMB_MAP: Record<string, Bre
   if (segments[0] === 'app' && segments[1] && segments[1] !== 'home') {
     const trail: BreadcrumbEntry[] = [
       { label: 'Home', url: '/' },
-      { label: humanize(segments[1]), url: pathname }
+      { label: humanize(segments[1]), url: pathname },
     ];
     return trail;
   }
@@ -75,11 +78,16 @@ function resolveBreadcrumbs(pathname: string, BREADCRUMB_MAP: Record<string, Bre
 
 export function SmartBreadcrumb() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
-  const { config: { breadcrumbMap } } = useAppConfig();
-  const resolvedItems = React.useMemo(() => resolveBreadcrumbs(pathname, breadcrumbMap), [pathname, breadcrumbMap]);
+  const {
+    config: { breadcrumbMap },
+  } = useAppConfig();
+  const resolvedItems = React.useMemo(
+    () => resolveBreadcrumbs(pathname, breadcrumbMap),
+    [pathname, breadcrumbMap],
+  );
   const items = React.useMemo(() => {
     if (resolvedItems.length === 0) return [];
-    if (resolvedItems[0].label !== 'Home') {
+    if (resolvedItems[0]?.label !== 'Home') {
       return [{ label: 'Home', url: '/' }, ...resolvedItems];
     }
     return resolvedItems;
@@ -123,7 +131,11 @@ export function SmartBreadcrumb() {
                 {isLast ? (
                   /* ── Current page ── */
                   <BreadcrumbPage className="font-medium">
-                    {item.label === 'Home' ? <Home className="size-4" /> : t(`nav.${item.label}`, item.label)}
+                    {item.label === 'Home' ? (
+                      <Home className="size-4" />
+                    ) : (
+                      t(`nav.${item.label}`, item.label)
+                    )}
                   </BreadcrumbPage>
                 ) : hasSiblings ? (
                   /* ── Parent with sibling dropdown ── */
@@ -152,7 +164,11 @@ export function SmartBreadcrumb() {
                   /* ── Normal parent link ── */
                   <BreadcrumbLink asChild>
                     <Link to={item.url} className="flex items-center">
-                      {item.label === 'Home' ? <Home className="size-4" /> : t(`nav.${item.label}`, item.label)}
+                      {item.label === 'Home' ? (
+                        <Home className="size-4" />
+                      ) : (
+                        t(`nav.${item.label}`, item.label)
+                      )}
                     </Link>
                   </BreadcrumbLink>
                 )}

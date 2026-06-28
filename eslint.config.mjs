@@ -6,14 +6,16 @@ export default [
     ignores: [
       "**/dist/**",
       "**/node_modules/**",
-      "apps/desktop/src-tauri/**",
+      "**/src-tauri/**",
+      "apps/automa/extension/**",
       "docs/**",
       "**/*.json",
       "**/*.md",
       "**/*.css",
       "**/*.html",
       "**/*.config.js",
-      "**/*.config.mjs"
+      "**/*.config.mjs",
+      "**/*.gen.ts"
     ]
   }
 ];

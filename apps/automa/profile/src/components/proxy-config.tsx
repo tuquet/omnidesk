@@ -1,4 +1,14 @@
-import { Input, Label, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Switch, Separator } from '@omnidesk/ui';
+import {
+  Input,
+  Label,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+  Switch,
+  Separator,
+} from '@omnidesk/ui';
 import { ShieldIcon } from 'lucide-react';
 
 export interface ProxyData {
@@ -34,10 +44,15 @@ export function ProxyConfig({ proxy, onChange }: ProxyConfigProps) {
       </div>
 
       {proxy.enabled && (
-        <div className="space-y-4 rounded-lg border p-4 bg-muted/30">
+        <div className="space-y-4 rounded-lg border p-4 bg-muted/30 animate-in fade-in slide-in-from-top-2 duration-300">
           <div className="space-y-2">
-            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Type</Label>
-            <Select value={proxy.type} onValueChange={(v) => update({ type: v as ProxyData['type'] })}>
+            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+              Type
+            </Label>
+            <Select
+              value={proxy.type}
+              onValueChange={(v) => update({ type: v as ProxyData['type'] })}
+            >
               <SelectTrigger className="h-8">
                 <SelectValue />
               </SelectTrigger>
@@ -53,7 +68,9 @@ export function ProxyConfig({ proxy, onChange }: ProxyConfigProps) {
             <>
               <div className="grid grid-cols-3 gap-3">
                 <div className="col-span-2 space-y-2">
-                  <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Host</Label>
+                  <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                    Host
+                  </Label>
                   <Input
                     className="h-8"
                     placeholder="proxy.example.com"
@@ -62,7 +79,9 @@ export function ProxyConfig({ proxy, onChange }: ProxyConfigProps) {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Port</Label>
+                  <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                    Port
+                  </Label>
                   <Input
                     className="h-8"
                     placeholder="8080"
@@ -74,7 +93,9 @@ export function ProxyConfig({ proxy, onChange }: ProxyConfigProps) {
               <Separator />
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-2">
-                  <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Username</Label>
+                  <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                    Username
+                  </Label>
                   <Input
                     className="h-8"
                     placeholder="Optional"
@@ -83,7 +104,9 @@ export function ProxyConfig({ proxy, onChange }: ProxyConfigProps) {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Password</Label>
+                  <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                    Password
+                  </Label>
                   <Input
                     className="h-8"
                     type="password"

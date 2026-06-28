@@ -12,9 +12,26 @@ import {
   MenubarSeparator,
   MenubarShortcut,
   MenubarTrigger,
+  MenubarSub,
+  MenubarSubContent,
+  MenubarSubTrigger,
+  Button,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
 } from '@omnidesk/ui';
+import {
+  Menu,
+  Home,
+  ChevronDown,
+  Search,
+  Plus,
+  MoreVertical,
+  Sidebar,
+  Columns3,
+} from 'lucide-react';
 import { WindowControls } from './window-controls';
-
 
 export function TitleBar() {
   const { setTheme, theme } = useTheme();
@@ -26,7 +43,7 @@ export function TitleBar() {
 
   const checkUpdate = async () => {
     try {
-      const update = await platformApi.checkUpdate() as { version: string } | null | undefined;
+      const update = (await platformApi.checkUpdate()) as { version: string } | null | undefined;
       if (update) {
         toast.info(`Found update ${update.version}`);
       } else {
@@ -46,145 +63,161 @@ export function TitleBar() {
   };
 
   return (
-    <div className="flex h-8 shrink-0 items-center border-b bg-background select-none">
-      {/* App icon + Menubar */}
-      <div className="flex items-center">
-        <div className="flex h-8 w-10 items-center justify-center pointer-events-none">
-          <img src="/logo-gold.svg" alt="OmniDesk Logo" className="h-4 w-4" />
-        </div>
-
-        <Menubar className="h-8 rounded-none border-none bg-transparent shadow-none">
-          {/* ── File ── */}
+    <div className="flex h-[38px] shrink-0 items-center justify-between border-b bg-background select-none relative z-50">
+      {/* ── Left Section: Menu & Workspace ── */}
+      <div className="flex items-center pl-2 gap-1 z-10" data-tauri-drag-region>
+        <Menubar className="h-7 rounded-md border-none bg-transparent shadow-none p-0">
           <MenubarMenu>
-            <MenubarTrigger className="h-7 cursor-default px-2 py-1 text-xs font-normal">
-              File
+            <MenubarTrigger className="h-7 w-8 px-0 flex justify-center cursor-default data-[state=open]:bg-muted hover:bg-muted focus:bg-muted">
+              <Menu className="h-4 w-4 text-muted-foreground" />
             </MenubarTrigger>
-            <MenubarContent>
-              <MenubarItem onClick={async () => {
-                try {
-                  await platformApi.invoke('open_data_folder');
-                } catch (e) {
-                  toast.error('Could not open data folder: ' + String(e));
-                }
-              }}>Open Data Folder</MenubarItem>
-              <MenubarSeparator />
-              <MenubarItem onClick={() => platformApi.quitApp()}>
-                Quit
-                <MenubarShortcut>Ctrl+Q</MenubarShortcut>
-              </MenubarItem>
-            </MenubarContent>
-          </MenubarMenu>
+            <MenubarContent align="start" sideOffset={4}>
+              {/* File */}
+              <MenubarSub>
+                <MenubarSubTrigger>File</MenubarSubTrigger>
+                <MenubarSubContent>
+                  <MenubarItem
+                    onClick={async () => {
+                      try {
+                        await platformApi.invoke('open_data_folder');
+                      } catch (e) {
+                        toast.error('Could not open data folder: ' + String(e));
+                      }
+                    }}
+                  >
+                    Open Data Folder
+                  </MenubarItem>
+                  <MenubarSeparator />
+                  <MenubarItem onClick={() => platformApi.quitApp()}>
+                    Quit
+                    <MenubarShortcut>Ctrl+Q</MenubarShortcut>
+                  </MenubarItem>
+                </MenubarSubContent>
+              </MenubarSub>
 
-          {/* ── Edit ── */}
-          <MenubarMenu>
-            <MenubarTrigger className="h-7 cursor-default px-2 py-1 text-xs font-normal">
-              Edit
-            </MenubarTrigger>
-            <MenubarContent>
-              <MenubarItem onClick={() => document.execCommand('undo')}>
-                Undo
-                <MenubarShortcut>Ctrl+Z</MenubarShortcut>
-              </MenubarItem>
-              <MenubarItem onClick={() => document.execCommand('redo')}>
-                Redo
-                <MenubarShortcut>Ctrl+Y</MenubarShortcut>
-              </MenubarItem>
-              <MenubarSeparator />
-              <MenubarItem onClick={() => document.execCommand('cut')}>
-                Cut
-                <MenubarShortcut>Ctrl+X</MenubarShortcut>
-              </MenubarItem>
-              <MenubarItem onClick={() => document.execCommand('copy')}>
-                Copy
-                <MenubarShortcut>Ctrl+C</MenubarShortcut>
-              </MenubarItem>
-              <MenubarItem onClick={() => document.execCommand('paste')}>
-                Paste
-                <MenubarShortcut>Ctrl+V</MenubarShortcut>
-              </MenubarItem>
-            </MenubarContent>
-          </MenubarMenu>
+              {/* Edit */}
+              <MenubarSub>
+                <MenubarSubTrigger>Edit</MenubarSubTrigger>
+                <MenubarSubContent>
+                  <MenubarItem onClick={() => document.execCommand('undo')}>
+                    Undo<MenubarShortcut>Ctrl+Z</MenubarShortcut>
+                  </MenubarItem>
+                  <MenubarItem onClick={() => document.execCommand('redo')}>
+                    Redo<MenubarShortcut>Ctrl+Y</MenubarShortcut>
+                  </MenubarItem>
+                  <MenubarSeparator />
+                  <MenubarItem onClick={() => document.execCommand('cut')}>
+                    Cut<MenubarShortcut>Ctrl+X</MenubarShortcut>
+                  </MenubarItem>
+                  <MenubarItem onClick={() => document.execCommand('copy')}>
+                    Copy<MenubarShortcut>Ctrl+C</MenubarShortcut>
+                  </MenubarItem>
+                  <MenubarItem onClick={() => document.execCommand('paste')}>
+                    Paste<MenubarShortcut>Ctrl+V</MenubarShortcut>
+                  </MenubarItem>
+                </MenubarSubContent>
+              </MenubarSub>
 
-          {/* ── View ── */}
-          <MenubarMenu>
-            <MenubarTrigger className="h-7 cursor-default px-2 py-1 text-xs font-normal">
-              View
-            </MenubarTrigger>
-            <MenubarContent>
-              <MenubarItem onClick={toggleFullscreen}>
-                Toggle Fullscreen
-                <MenubarShortcut>F11</MenubarShortcut>
-              </MenubarItem>
-              <MenubarSeparator />
-              <MenubarItem onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}>
-                {theme === 'dark' ? 'Light Mode' : 'Dark Mode'}
-                <MenubarShortcut>Ctrl+Shift+D</MenubarShortcut>
-              </MenubarItem>
-              <MenubarSeparator />
-              <MenubarItem
-                onClick={() => i18n.changeLanguage(i18n.language === 'vi' ? 'en' : 'vi')}
-              >
-                {i18n.language === 'vi' ? '🇺🇸 English' : '🇻🇳 Tiếng Việt'}
-              </MenubarItem>
-            </MenubarContent>
-          </MenubarMenu>
+              {/* View */}
+              <MenubarSub>
+                <MenubarSubTrigger>View</MenubarSubTrigger>
+                <MenubarSubContent>
+                  <MenubarItem onClick={toggleFullscreen}>
+                    Toggle Fullscreen<MenubarShortcut>F11</MenubarShortcut>
+                  </MenubarItem>
+                  <MenubarSeparator />
+                  <MenubarItem onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}>
+                    {theme === 'dark' ? 'Light Mode' : 'Dark Mode'}
+                    <MenubarShortcut>Ctrl+Shift+D</MenubarShortcut>
+                  </MenubarItem>
+                  <MenubarSeparator />
+                  <MenubarItem
+                    onClick={() => i18n.changeLanguage(i18n.language === 'vi' ? 'en' : 'vi')}
+                  >
+                    {i18n.language === 'vi' ? '🇺🇸 English' : '🇻🇳 Tiếng Việt'}
+                  </MenubarItem>
+                </MenubarSubContent>
+              </MenubarSub>
 
-          {/* ── Tools ── */}
-          <MenubarMenu>
-            <MenubarTrigger className="h-7 cursor-default px-2 py-1 text-xs font-normal">
-              Tools
-            </MenubarTrigger>
-            <MenubarContent>
-              <MenubarItem onClick={() => platformApi.openUrl(config.apiDocsUrl || "")}>
-                API Documentation
-              </MenubarItem>
-            </MenubarContent>
-          </MenubarMenu>
-
-          {/* ── Window ── */}
-          <MenubarMenu>
-            <MenubarTrigger className="h-7 cursor-default px-2 py-1 text-xs font-normal">
-              Window
-            </MenubarTrigger>
-            <MenubarContent>
-              <MenubarItem onClick={() => platformApi.window.minimize()}>
-                Minimize
-                <MenubarShortcut>Ctrl+M</MenubarShortcut>
-              </MenubarItem>
-              <MenubarItem onClick={() => platformApi.window.toggleMaximize()}>
-                Toggle Maximize
-              </MenubarItem>
-              <MenubarSeparator />
-              <MenubarItem
-                onClick={async () => {
-                  await platformApi.window.resetSize(1280, 800);
-                }}
-              >
-                Reset Window Size
-              </MenubarItem>
-            </MenubarContent>
-          </MenubarMenu>
-
-          {/* ── Help ── */}
-          <MenubarMenu>
-            <MenubarTrigger className="h-7 cursor-default px-2 py-1 text-xs font-normal">
-              Help
-            </MenubarTrigger>
-            <MenubarContent>
-              <MenubarItem onClick={() => platformApi.openUrl(config.githubRepo || "")}>
-                Documentation
-                <MenubarShortcut>F1</MenubarShortcut>
-              </MenubarItem>
-              <MenubarSeparator />
-              <MenubarItem onClick={() => platformApi.openUrl(config.githubIssues || "")}>Report a Bug</MenubarItem>
-              <MenubarSeparator />
-              <MenubarItem onClick={checkUpdate}>Check for Updates...</MenubarItem>
+              {/* Help */}
+              <MenubarSub>
+                <MenubarSubTrigger>Help</MenubarSubTrigger>
+                <MenubarSubContent>
+                  <MenubarItem onClick={() => platformApi.openUrl(config.githubRepo || '')}>
+                    Documentation
+                    <MenubarShortcut>F1</MenubarShortcut>
+                  </MenubarItem>
+                  <MenubarItem onClick={() => platformApi.openUrl(config.apiDocsUrl || '')}>
+                    API Documentation
+                  </MenubarItem>
+                  <MenubarSeparator />
+                  <MenubarItem onClick={() => platformApi.openUrl(config.githubIssues || '')}>
+                    Report a Bug
+                  </MenubarItem>
+                  <MenubarSeparator />
+                  <MenubarItem onClick={checkUpdate}>Check for Updates...</MenubarItem>
+                </MenubarSubContent>
+              </MenubarSub>
             </MenubarContent>
           </MenubarMenu>
         </Menubar>
+
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-7 w-7 text-muted-foreground hover:text-foreground"
+        >
+          <Home className="h-4 w-4" />
+        </Button>
+
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-7 px-2 text-xs font-semibold tracking-wide text-foreground hover:bg-muted"
+            >
+              My Workspace <ChevronDown className="ml-1 h-3 w-3 text-muted-foreground" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="start" className="w-48">
+            <DropdownMenuItem>My Workspace</DropdownMenuItem>
+            <DropdownMenuItem>Create Workspace...</DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+
+        <div className="flex items-center gap-0.5 ml-1">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-7 w-7 text-muted-foreground hover:text-foreground"
+          >
+            <Search className="h-3.5 w-3.5" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-7 w-7 text-muted-foreground hover:text-foreground"
+          >
+            <Plus className="h-3.5 w-3.5" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-7 w-7 text-muted-foreground hover:text-foreground"
+          >
+            <MoreVertical className="h-3.5 w-3.5" />
+          </Button>
+        </div>
       </div>
 
-      {/* Drag region — mimics native Windows title bar behavior */}
+      {/* ── Center Section: Logo & App Name ── */}
+      <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center justify-center gap-2 pointer-events-none">
+        <img src="/logo-gold.svg" alt="OmniDesk Logo" className="h-4 w-4" />
+        <span className="text-xs font-bold tracking-tight text-foreground">OmniDesk</span>
+      </div>
+
+      {/* ── Drag Region (Expands to fill empty space) ── */}
       <div
         className="flex-1 h-full"
         style={{ cursor: 'default' }}
@@ -195,7 +228,6 @@ export function TitleBar() {
           e.stopPropagation();
 
           if (e.detail >= 2) {
-            // Browser-native double-click detection (respects OS dblclick speed)
             platformApi.window.toggleMaximize();
           } else {
             platformApi.window.startDragging();
@@ -203,8 +235,19 @@ export function TitleBar() {
         }}
       />
 
-      {/* Window controls */}
-      <WindowControls />
+      {/* ── Right Section: View Toggles & Window Controls ── */}
+      <div className="flex items-center gap-1 z-10" data-tauri-drag-region>
+        <div className="flex items-center mr-2 text-muted-foreground">
+          <Button variant="ghost" size="icon" className="h-7 w-7 hover:text-foreground">
+            <Sidebar className="h-4 w-4" />
+          </Button>
+          <Button variant="ghost" size="icon" className="h-7 w-7 hover:text-foreground">
+            <Columns3 className="h-4 w-4" />
+          </Button>
+        </div>
+
+        <WindowControls />
+      </div>
     </div>
   );
 }

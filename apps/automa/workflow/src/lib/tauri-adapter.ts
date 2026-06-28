@@ -1,4 +1,4 @@
-import { PlatformAdapter } from '@omnidesk/core';
+import type { PlatformAdapter } from '@omnidesk/core';
 import { invoke } from '@tauri-apps/api/core';
 import { convertFileSrc } from '@tauri-apps/api/core';
 import { appDataDir } from '@tauri-apps/api/path';
@@ -6,47 +6,47 @@ import { getCurrentWindow } from '@tauri-apps/api/window';
 
 export const tauriAdapter: PlatformAdapter = {
   platform: 'desktop',
-  
+
   invoke: async <T>(cmd: string, args?: Record<string, unknown>): Promise<T> => {
     return invoke<T>(cmd, args);
   },
-  
+
   convertFileSrc: (path: string): string => {
     return convertFileSrc(path);
   },
-  
+
   getAppDataDir: async (): Promise<string> => {
     return appDataDir();
   },
-  
+
   quitApp: async (): Promise<void> => {
     const { exit } = await import('@tauri-apps/plugin-process');
     await exit(0);
   },
-  
+
   relaunchApp: async (): Promise<void> => {
     const { relaunch } = await import('@tauri-apps/plugin-process');
     await relaunch();
   },
-  
-  checkUpdate: async (): Promise<any> => {
+
+  checkUpdate: async (): Promise<unknown> => {
     const { check } = await import('@tauri-apps/plugin-updater');
     return check();
   },
-  
+
   openUrl: async (url: string): Promise<void> => {
     const { openUrl } = await import('@tauri-apps/plugin-opener');
     await openUrl(url);
   },
-  
-  getOAuthRedirectUrl: () => 'omnidesk://auth/callback',
+
+  getOAuthRedirectUrl: () => 'omnidesk-workflow://auth/callback',
   isOAuthSkipBrowserRedirect: () => true,
 
   listenToDeepLink: async (callback: (urls: string[]) => void): Promise<() => void> => {
     try {
       const { onOpenUrl } = await import('@tauri-apps/plugin-deep-link');
       const { listen } = await import('@tauri-apps/api/event');
-      
+
       const unlistenOpenUrl = await onOpenUrl((urls) => {
         callback(urls);
       });
@@ -64,7 +64,7 @@ export const tauriAdapter: PlatformAdapter = {
       return () => {};
     }
   },
-  
+
   window: {
     minimize: async () => {
       const win = getCurrentWindow();
@@ -96,7 +96,7 @@ export const tauriAdapter: PlatformAdapter = {
     },
     startResizeDragging: async (direction: number) => {
       const win = getCurrentWindow();
-      await win.startResizeDragging(direction as any);
+      await win.startResizeDragging(direction as unknown as number);
     },
     resetSize: async (width: number, height: number) => {
       const { LogicalSize } = await import('@tauri-apps/api/dpi');
@@ -106,7 +106,7 @@ export const tauriAdapter: PlatformAdapter = {
     },
     listenToResized: async (callback: (maximized: boolean) => void) => {
       const win = getCurrentWindow();
-      
+
       const unlisten = await win.onResized(async () => {
         const maximized = await win.isMaximized();
         callback(maximized);
@@ -116,6 +116,6 @@ export const tauriAdapter: PlatformAdapter = {
       callback(maximized);
 
       return unlisten;
-    }
-  }
+    },
+  },
 };

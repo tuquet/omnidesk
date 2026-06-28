@@ -15,8 +15,11 @@ import {
 
 import { authActions } from '../stores/use-auth-store';
 
-export function SignupForm({ className, platformApi, ...props }: React.ComponentPropsWithoutRef<'div'> & { platformApi?: any }) {
-  
+export function SignupForm({
+  className,
+  platformApi,
+  ...props
+}: React.ComponentPropsWithoutRef<'form'> & { platformApi?: unknown }) {
   const form = useForm({
     defaultValues: {
       name: '',

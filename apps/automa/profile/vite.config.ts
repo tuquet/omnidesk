@@ -9,7 +9,7 @@ export default defineConfig({
   plugins: [TanStackRouterVite(), react(), tailwindcss()],
   envDir: '../../../',
   define: {
-    'import.meta.env.VITE_API_PORT': '"1423"',
+    'import.meta.env.VITE_API_PORT': '"1421"',
   },
   resolve: {
     alias: {

@@ -1,8 +1,6 @@
-import { createFileRoute, Link } from '@tanstack/react-router';
+import { Link } from '@tanstack/react-router';
 import { Button } from '@omnidesk/ui';
 import { ArrowLeft, ShieldAlert } from 'lucide-react';
-
-
 
 export function Error403Page() {
   return (
@@ -17,18 +15,21 @@ export function Error403Page() {
         </h1>
 
         <p className="mb-8 text-base leading-relaxed text-muted-foreground">
-          You don&apos;t have permission to access this resource. If you believe this is an error, please contact your administrator.
+          You don&apos;t have permission to access this resource. If you believe this is an error,
+          please contact your administrator.
         </p>
 
         <div className="flex flex-col gap-3 sm:flex-row w-full sm:w-auto">
-          <Button size="lg" className="gap-2 px-8 w-full sm:w-auto" onClick={() => window.history.back()}>
+          <Button
+            size="lg"
+            className="gap-2 px-8 w-full sm:w-auto"
+            onClick={() => window.history.back()}
+          >
             <ArrowLeft className="h-4 w-4" />
             Go Back
           </Button>
           <Button asChild variant="outline" size="lg" className="gap-2 px-8 w-full sm:w-auto">
-            <Link to="/app/$appId" params={{ appId: 'home' }}>
-              Go to Home
-            </Link>
+            <Link to="/">Go to Home</Link>
           </Button>
         </div>
       </div>

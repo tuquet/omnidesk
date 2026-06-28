@@ -2,28 +2,29 @@ import { apiUrl } from './lib/api-config';
 import { useState, useEffect, useRef } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, Button } from '@omnidesk/ui';
 import { Bug, Activity, ShieldCheck, PlayCircle, Clock, Terminal } from 'lucide-react';
-import { invoke } from '@tauri-apps/api/core';
 import { listen } from '@tauri-apps/api/event';
 import { createClient } from '@supabase/supabase-js';
 
 // Determine if we are in Tauri context
-const isTauri = !!(window as any).__TAURI_INTERNALS__;
+const isTauri = !!(window as unknown as { __TAURI_INTERNALS__: unknown }).__TAURI_INTERNALS__;
 
 export default function AutomaDashboard() {
-  const [workflows, setWorkflows] = useState<any[]>([]);
+  const [workflows, setWorkflows] = useState<
+    { id: string; name: string; [key: string]: unknown }[]
+  >([]);
   const [logs, setLogs] = useState<string[]>([]);
   const [isRunning, setIsRunning] = useState(false);
   const logsEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     fetchWorkflows();
-    
+
     if (isTauri) {
-      const unlisten = listen('e2e-log', (event: any) => {
-        setLogs(prev => [...prev, event.payload as string]);
+      const unlisten = listen('e2e-log', (event: { payload: unknown }) => {
+        setLogs((prev) => [...prev, event.payload as string]);
       });
       return () => {
-        unlisten.then(f => f());
+        unlisten.then((f) => f());
       };
     }
   }, []);
@@ -37,10 +38,10 @@ export default function AutomaDashboard() {
 
   const fetchWorkflows = async () => {
     try {
-      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
-      const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
+      const supabaseUrl = (import.meta.env.VITE_SUPABASE_URL as string) || '';
+      const supabaseKey = (import.meta.env.VITE_SUPABASE_ANON_KEY as string) || '';
       if (!supabaseUrl || !supabaseKey) return;
-      
+
       const supabase = createClient(supabaseUrl, supabaseKey);
       const { data } = await supabase.from('e2e_workflows').select('*');
       if (data) {
@@ -54,23 +55,23 @@ export default function AutomaDashboard() {
   const runTests = async () => {
     setIsRunning(true);
     setLogs(['[System] Starting E2E Orchestrator via HTTP API...']);
-    
+
     try {
       const token = localStorage.getItem('omnidesk_token') || '';
       const response = await fetch(apiUrl('/api/automa/run'), {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${token}`
-        }
+          Authorization: `Bearer ${token}`,
+        },
       });
-      
+
       if (!response.ok) {
         throw new Error(`Server returned ${response.status}`);
       }
       // Note: The orchestrator runs async, so it doesn't block.
       // We rely on logs to see progress. (Note: Web clients currently don't receive Tauri events, SSE needed in future)
-    } catch (e: any) {
-      setLogs(prev => [...prev, `[System] Error: ${e.message || String(e)}`]);
+    } catch (e: unknown) {
+      setLogs((prev) => [...prev, `[System] Error: ${e instanceof Error ? e.message : String(e)}`]);
       setIsRunning(false);
     }
   };
@@ -98,9 +99,7 @@ export default function AutomaDashboard() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{workflows.length}</div>
-              <p className="text-xs text-muted-foreground mt-1">
-                Active in database
-              </p>
+              <p className="text-xs text-muted-foreground mt-1">Active in database</p>
             </CardContent>
           </Card>
           <Card className="shadow-sm">
@@ -110,9 +109,7 @@ export default function AutomaDashboard() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-green-500">--</div>
-              <p className="text-xs text-muted-foreground mt-1">
-                Awaiting first run
-              </p>
+              <p className="text-xs text-muted-foreground mt-1">Awaiting first run</p>
             </CardContent>
           </Card>
           <Card className="shadow-sm border-destructive/20 bg-destructive/5">
@@ -134,9 +131,7 @@ export default function AutomaDashboard() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">0m</div>
-              <p className="text-xs text-muted-foreground mt-1">
-                Across all environments
-              </p>
+              <p className="text-xs text-muted-foreground mt-1">Across all environments</p>
             </CardContent>
           </Card>
         </div>
@@ -152,7 +147,7 @@ export default function AutomaDashboard() {
                 {workflows.length === 0 ? (
                   <p className="text-sm text-muted-foreground">No workflows found.</p>
                 ) : (
-                  workflows.map(wf => (
+                  workflows.map((wf) => (
                     <div key={wf.id} className="flex items-center">
                       <span className="relative flex h-2 w-2 rounded-full bg-muted-foreground mr-4"></span>
                       <div className="space-y-1">
@@ -174,17 +169,29 @@ export default function AutomaDashboard() {
                   <CardTitle className="text-sm font-mono font-normal">Orchestrator Logs</CardTitle>
                 </div>
                 {logs.length > 0 && (
-                  <Button variant="ghost" size="sm" className="h-6 text-xs text-slate-400" onClick={() => setLogs([])}>Clear</Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-6 text-xs text-slate-400"
+                    onClick={() => setLogs([])}
+                  >
+                    Clear
+                  </Button>
                 )}
               </div>
             </CardHeader>
             <CardContent className="flex-1 p-4 font-mono text-xs overflow-y-auto">
               {logs.length === 0 ? (
-                <div className="text-slate-600 italic">No output yet. Click 'Run Tests' to start.</div>
+                <div className="text-slate-600 italic">
+                  No output yet. Click 'Run Tests' to start.
+                </div>
               ) : (
                 <div className="space-y-1">
                   {logs.map((log, i) => (
-                    <div key={i} className={log.includes('ERROR:') ? 'text-red-400' : 'text-slate-300'}>
+                    <div
+                      key={i}
+                      className={log.includes('ERROR:') ? 'text-red-400' : 'text-slate-300'}
+                    >
                       {log}
                     </div>
                   ))}

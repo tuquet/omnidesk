@@ -15,6 +15,7 @@
     "@omnidesk/ui": "workspace:*",
     "@tanstack/react-store": "^0.6.0",
     "@tanstack/store": "^0.6.0",
+    "@tauri-apps/api": "^2.2.0",
     "lucide-react": "^0.453.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",

@@ -7,8 +7,13 @@ import {
   TableRow,
   Badge,
   Button,
+  Skeleton,
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
 } from '@omnidesk/ui';
-import { PlayIcon, EditIcon, TrashIcon, SquareIcon } from 'lucide-react';
+import { PlayIcon, EditIcon, TrashIcon, SquareIcon, GhostIcon } from 'lucide-react';
 import type { BrowserProfile } from '@omnidesk/browser-profiles';
 
 interface ProfileTableProps {
@@ -29,112 +34,186 @@ export function ProfileTable({
   onDelete,
 }: ProfileTableProps) {
   return (
-    <div className="rounded-md border bg-card">
-      <Table data-testid="table-profile-list">
-        <TableHeader>
-          <TableRow>
-            <TableHead className="w-[250px]">Profile Name</TableHead>
-            <TableHead>Browser</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead>Proxy</TableHead>
-            <TableHead>Tags</TableHead>
-            <TableHead className="text-right">Actions</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {isLoading ? (
+    <TooltipProvider delayDuration={300}>
+      <div className="rounded-md border bg-card shadow-sm">
+        <Table data-testid="table-profile-list">
+          <TableHeader>
             <TableRow>
-              <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
-                Loading profiles...
-              </TableCell>
+              <TableHead className="w-[250px]">Profile Name</TableHead>
+              <TableHead>Browser</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead>Proxy</TableHead>
+              <TableHead>Tags</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
             </TableRow>
-          ) : profiles.length === 0 ? (
-            <TableRow>
-              <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
-                No profiles found matching your filters.
-              </TableCell>
-            </TableRow>
-          ) : (
-            profiles.map((profile) => {
-              let parsedTags: string[] = [];
-              try {
-                parsedTags = profile.tags ? (JSON.parse(profile.tags) as string[]) : [];
-              } catch {
-                // Ignore parse errors
-              }
-
-              return (
-                <TableRow key={profile.id} data-testid={`row-profile-${profile.id}`}>
-                  <TableCell className="font-medium">{profile.name}</TableCell>
-                  <TableCell className="capitalize">{profile.browser_type}</TableCell>
+          </TableHeader>
+          <TableBody>
+            {isLoading ? (
+              // SKELETON LOADING STATE
+              Array.from({ length: 5 }).map((_, i) => (
+                <TableRow key={i}>
                   <TableCell>
-                    {profile.status === 'RUNNING' || profile.pid ? (
-                      <Badge variant="default" className="bg-green-500 hover:bg-green-600">
-                        Running
-                      </Badge>
-                    ) : (
-                      <Badge variant="secondary">Stopped</Badge>
-                    )}
+                    <Skeleton className="h-4 w-3/4" />
                   </TableCell>
-                  <TableCell className="text-muted-foreground">{profile.proxy || 'None'}</TableCell>
                   <TableCell>
-                    <div className="flex gap-1 flex-wrap">
-                      {parsedTags.map((tag) => (
-                        <Badge key={tag} variant="outline" className="text-xs">
-                          {tag}
-                        </Badge>
-                      ))}
-                    </div>
+                    <Skeleton className="h-4 w-1/2" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-5 w-16 rounded-full" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-4 w-1/3" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-5 w-24 rounded-full" />
                   </TableCell>
                   <TableCell className="text-right">
-                    <div className="flex items-center justify-end gap-2">
-                      {profile.status === 'RUNNING' || profile.pid ? (
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-8 w-8 text-orange-500 hover:text-orange-600 hover:bg-orange-500/10"
-                          data-testid={`btn-stop-profile-${profile.id}`}
-                          onClick={() => onStop(profile.id)}
-                        >
-                          <SquareIcon className="h-4 w-4" />
-                        </Button>
-                      ) : (
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-8 w-8 text-green-500 hover:text-green-600 hover:bg-green-500/10"
-                          data-testid={`btn-launch-profile-${profile.id}`}
-                          onClick={() => onLaunch(profile.id)}
-                        >
-                          <PlayIcon className="h-4 w-4" />
-                        </Button>
-                      )}
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8"
-                        data-testid={`btn-edit-profile-${profile.id}`}
-                        onClick={() => onEdit(profile)}
-                      >
-                        <EditIcon className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10"
-                        data-testid={`btn-delete-profile-${profile.id}`}
-                        onClick={() => onDelete(profile.id)}
-                      >
-                        <TrashIcon className="h-4 w-4" />
-                      </Button>
+                    <div className="flex justify-end gap-2">
+                      <Skeleton className="h-8 w-8 rounded-md" />
+                      <Skeleton className="h-8 w-8 rounded-md" />
+                      <Skeleton className="h-8 w-8 rounded-md" />
                     </div>
                   </TableCell>
                 </TableRow>
-              );
-            })
-          )}
-        </TableBody>
-      </Table>
-    </div>
+              ))
+            ) : profiles.length === 0 ? (
+              // EMPTY STATE
+              <TableRow>
+                <TableCell colSpan={6} className="h-64">
+                  <div className="flex flex-col items-center justify-center text-center">
+                    <div className="mb-4 rounded-full bg-muted p-4">
+                      <GhostIcon className="h-8 w-8 text-muted-foreground/60" />
+                    </div>
+                    <h3 className="text-lg font-semibold">No profiles found</h3>
+                    <p className="text-sm text-muted-foreground max-w-sm mt-1">
+                      There are no browser profiles matching your current filters, or you haven't
+                      created one yet.
+                    </p>
+                  </div>
+                </TableCell>
+              </TableRow>
+            ) : (
+              profiles.map((profile) => {
+                let parsedTags: string[] = [];
+                try {
+                  parsedTags = profile.tags ? (JSON.parse(profile.tags) as string[]) : [];
+                } catch {
+                  // Ignore parse errors
+                }
+
+                const isRunning = profile.status === 'RUNNING' || profile.pid;
+
+                return (
+                  <TableRow
+                    key={profile.id}
+                    data-testid={`row-profile-${profile.id}`}
+                    className="group transition-colors"
+                  >
+                    <TableCell className="font-medium">{profile.name}</TableCell>
+                    <TableCell className="capitalize">{profile.browser_type}</TableCell>
+                    <TableCell>
+                      {isRunning ? (
+                        <Badge
+                          variant="outline"
+                          className="bg-emerald-500/10 text-emerald-600 border-emerald-500/20 dark:text-emerald-400"
+                        >
+                          <span className="mr-1.5 flex h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
+                          Running
+                        </Badge>
+                      ) : (
+                        <Badge variant="secondary" className="text-muted-foreground">
+                          Stopped
+                        </Badge>
+                      )}
+                    </TableCell>
+                    <TableCell className="text-muted-foreground text-sm">
+                      {profile.proxy || 'None'}
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex gap-1.5 flex-wrap">
+                        {parsedTags.length > 0 ? (
+                          parsedTags.map((tag) => (
+                            <Badge key={tag} variant="outline" className="text-xs bg-muted/30">
+                              {tag}
+                            </Badge>
+                          ))
+                        ) : (
+                          <span className="text-muted-foreground text-xs italic">No tags</span>
+                        )}
+                      </div>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity focus-within:opacity-100 sm:opacity-100">
+                        {isRunning ? (
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-8 w-8 text-orange-600 hover:text-orange-700 hover:bg-orange-500/10 dark:text-orange-400 dark:hover:bg-orange-500/20 transition-colors"
+                                data-testid={`btn-stop-profile-${profile.id}`}
+                                onClick={() => onStop(profile.id)}
+                              >
+                                <SquareIcon className="h-4 w-4" />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>Stop Profile</TooltipContent>
+                          </Tooltip>
+                        ) : (
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-8 w-8 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-500/10 dark:text-emerald-400 dark:hover:bg-emerald-500/20 transition-colors"
+                                data-testid={`btn-launch-profile-${profile.id}`}
+                                onClick={() => onLaunch(profile.id)}
+                              >
+                                <PlayIcon className="h-4 w-4 fill-current" />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>Launch Browser</TooltipContent>
+                          </Tooltip>
+                        )}
+
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8 transition-colors"
+                              data-testid={`btn-edit-profile-${profile.id}`}
+                              onClick={() => onEdit(profile)}
+                            >
+                              <EditIcon className="h-4 w-4" />
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>Edit Profile</TooltipContent>
+                        </Tooltip>
+
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10 transition-colors"
+                              data-testid={`btn-delete-profile-${profile.id}`}
+                              onClick={() => onDelete(profile.id)}
+                            >
+                              <TrashIcon className="h-4 w-4" />
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>Delete Profile</TooltipContent>
+                        </Tooltip>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                );
+              })
+            )}
+          </TableBody>
+        </Table>
+      </div>
+    </TooltipProvider>
   );
 }

@@ -27,7 +27,7 @@ function BrowserProfilesPage() {
 
   useEffect(() => {
     fetchProfiles();
-  }, []);
+  }, [fetchProfiles]);
 
   const handleCreate = () => {
     setFormMode('create');

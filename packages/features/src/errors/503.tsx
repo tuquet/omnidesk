@@ -1,8 +1,6 @@
-import { createFileRoute, Link } from '@tanstack/react-router';
+import { Link } from '@tanstack/react-router';
 import { Button } from '@omnidesk/ui';
 import { ArrowLeft, RefreshCw, ServerCrash } from 'lucide-react';
-
-
 
 export function Error503Page() {
   return (

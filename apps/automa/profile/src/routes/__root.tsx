@@ -4,7 +4,7 @@ import { useDevStore } from '@omnidesk/core';
 import type { AuthState } from '@omnidesk/auth';
 import { Button } from '@omnidesk/ui';
 import { ArrowLeft, Ghost } from 'lucide-react';
-import { TitleBar } from '@omnidesk/core';
+import { TitleBar, StatusBar } from '@omnidesk/core';
 import { AppConfigProvider } from '@omnidesk/core';
 import * as config from '@/config';
 import { useRBAC } from '@/hooks/use-rbac';
@@ -81,14 +81,29 @@ function RootComponent() {
   }, [setDevMode]);
 
   return (
-        <div className="relative flex h-screen flex-col bg-background">
-      <AppConfigProvider config={{...config, navMain: config.NAV_MAIN, navDocuments: config.NAV_DOCUMENTS, navSecondary: config.NAV_SECONDARY, navShowcase: config.NAV_SHOWCASE, navErrorPages: config.NAV_ERROR_PAGES, breadcrumbMap: config.BREADCRUMB_MAP, githubRepo: config.GITHUB_REPO, githubIssues: config.GITHUB_ISSUES, apiDocsUrl: config.API_DOCS_URL}} rbac={rbac}>
-      <ResizeHandles />
-      <TitleBar />
-      <div className="flex-1 flex flex-col min-h-0">
-        <AppLayout />
-      </div>
-          </AppConfigProvider>
+    <div className="relative flex h-screen flex-col bg-background">
+      <AppConfigProvider
+        config={{
+          ...config,
+          navMain: config.NAV_MAIN,
+          navDocuments: config.NAV_DOCUMENTS,
+          navSecondary: config.NAV_SECONDARY,
+          navShowcase: config.NAV_SHOWCASE,
+          navErrorPages: config.NAV_ERROR_PAGES,
+          breadcrumbMap: config.BREADCRUMB_MAP,
+          githubRepo: config.GITHUB_REPO,
+          githubIssues: config.GITHUB_ISSUES,
+          apiDocsUrl: config.API_DOCS_URL,
+        }}
+        rbac={rbac}
+      >
+        <ResizeHandles />
+        <TitleBar title={config.APP_NAME} />
+        <div className="flex-1 flex flex-col min-h-0">
+          <AppLayout />
+        </div>
+        <StatusBar />
+      </AppConfigProvider>
     </div>
   );
 }

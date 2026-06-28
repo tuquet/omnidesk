@@ -2,38 +2,37 @@ import type { PlatformAdapter } from '@omnidesk/core';
 
 export const webAdapter: PlatformAdapter = {
   platform: 'web',
-  
+
   invoke: async <T>(cmd: string, args?: Record<string, unknown>): Promise<T> => {
     console.warn(`[WebAdapter] Ignored Tauri invoke: ${cmd}`, args);
     return null as T;
   },
-  
+
   convertFileSrc: (path: string): string => {
     return path;
   },
-  
+
   getAppDataDir: async (): Promise<string> => {
     console.warn('[WebAdapter] getAppDataDir not supported on web');
     return '/';
   },
-  
+
   quitApp: async (): Promise<void> => {
     console.warn('[WebAdapter] quitApp not supported on web');
   },
-  
+
   relaunchApp: async (): Promise<void> => {
     window.location.reload();
   },
-  
-  checkUpdate: async (): Promise<any> => {
-    console.log('[WebAdapter] Updates are handled by the browser');
+
+  checkUpdate: async (): Promise<unknown> => {
     return null;
   },
-  
+
   openUrl: async (url: string): Promise<void> => {
     window.open(url, '_blank');
   },
-  
+
   getOAuthRedirectUrl: () => `${window.location.origin}/auth/callback`,
   isOAuthSkipBrowserRedirect: () => false,
 
@@ -46,12 +45,14 @@ export const webAdapter: PlatformAdapter = {
     }
     return () => {};
   },
-  
+
   window: {
     minimize: async () => {},
     maximize: async () => {},
     toggleMaximize: async () => {},
-    close: async () => { window.close(); },
+    close: async () => {
+      window.close();
+    },
     hide: async () => {},
     isMaximized: async () => document.fullscreenElement !== null,
     startDragging: async () => {},

@@ -4,7 +4,6 @@ import { Button } from '@omnidesk/ui';
 import { ArrowRight, CloudOff, Database, Network } from 'lucide-react';
 
 export function DesktopLanding({ isAuthenticated }: { isAuthenticated: boolean }) {
-
   return (
     <div className="flex flex-1 flex-col items-center justify-center bg-background relative overflow-y-auto overflow-x-hidden px-6 py-12 text-center">
       {/* Background decoration */}
@@ -15,16 +14,21 @@ export function DesktopLanding({ isAuthenticated }: { isAuthenticated: boolean }
       <div className="relative z-10 max-w-3xl flex flex-col items-center">
         {/* Golden Obsidian Logo */}
         <div className="mb-8 flex items-center justify-center animate-in zoom-in duration-500">
-          <img src="/logo-gold.svg" alt="OmniDesk Logo" className="h-28 w-28 drop-shadow-[0_0_15px_rgba(255,215,0,0.3)] hover:drop-shadow-[0_0_25px_rgba(255,215,0,0.6)] transition-all duration-500 hover:scale-105" />
+          <img
+            src="/logo-gold.svg"
+            alt="OmniDesk Logo"
+            className="h-28 w-28 drop-shadow-[0_0_15px_rgba(255,215,0,0.3)] hover:drop-shadow-[0_0_25px_rgba(255,215,0,0.6)] transition-all duration-500 hover:scale-105"
+          />
         </div>
 
         <h1 className="text-4xl font-extrabold tracking-tight lg:text-6xl mb-6 bg-gradient-to-br from-foreground to-foreground/70 bg-clip-text text-transparent">
           Welcome to OmniDesk
         </h1>
         <p className="text-xl text-muted-foreground mb-10 max-w-2xl leading-relaxed">
-          Your unified workspace for productivity and automation. Built on a Local-First architecture, keeping your data secure and fast.
+          Your unified workspace for productivity and automation. Built on a Local-First
+          architecture, keeping your data secure and fast.
         </p>
-        
+
         {/* System Status Indicators */}
         <div className="flex flex-wrap items-center justify-center gap-4 mb-12">
           <div className="flex items-center gap-2 px-4 py-2 rounded-full border bg-background/50 backdrop-blur-sm text-sm font-medium">
@@ -47,24 +51,35 @@ export function DesktopLanding({ isAuthenticated }: { isAuthenticated: boolean }
 
         <div className="flex flex-col sm:flex-row gap-4 w-full justify-center">
           {isAuthenticated ? (
-            <Button asChild size="lg" className="h-14 px-8 text-lg rounded-full shadow-lg hover:shadow-xl transition-all group">
-              <Link to="/app/$appId" params={{ appId: "home" }}>
+            <Button
+              asChild
+              size="lg"
+              className="h-14 px-8 text-lg rounded-full shadow-lg hover:shadow-xl transition-all group"
+            >
+              <Link to="/">
                 Go to Home
                 <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </Link>
             </Button>
           ) : (
             <>
-              <Button asChild size="lg" className="h-14 px-8 text-lg rounded-full shadow-lg hover:shadow-xl transition-all group">
-                <Link to="/app/$appId" params={{ appId: "home" }}>
+              <Button
+                asChild
+                size="lg"
+                className="h-14 px-8 text-lg rounded-full shadow-lg hover:shadow-xl transition-all group"
+              >
+                <Link to="/">
                   Launch Local Workspace
                   <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
                 </Link>
               </Button>
-              <Button asChild variant="outline" size="lg" className="h-14 px-8 text-lg rounded-full backdrop-blur-sm">
-                <Link to="/login">
-                  Connect to Cloud
-                </Link>
+              <Button
+                asChild
+                variant="outline"
+                size="lg"
+                className="h-14 px-8 text-lg rounded-full backdrop-blur-sm"
+              >
+                <Link to="/login">Connect to Cloud</Link>
               </Button>
             </>
           )}
