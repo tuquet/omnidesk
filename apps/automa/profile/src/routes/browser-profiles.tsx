@@ -102,13 +102,13 @@ function BrowserProfilesPage() {
                     : 'Ready!'}
               </span>
               <span>
-                {downloadProgress.percentage ? Math.round(downloadProgress.percentage) : 0}%
+                {downloadProgress.percent ? Math.round(Number(downloadProgress.percent)) : 0}%
               </span>
             </div>
             <div className="h-2 w-full bg-secondary rounded-full overflow-hidden">
               <div
                 className="h-full bg-primary transition-all duration-300 ease-in-out"
-                style={{ width: `${downloadProgress.percentage || 0}%` }}
+                style={{ width: `${downloadProgress.percent || 0}%` }}
               />
             </div>
           </div>

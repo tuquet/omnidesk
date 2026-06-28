@@ -50,7 +50,17 @@ impl BrowserProfileService {
                 sys.refresh_processes(sysinfo::ProcessesToUpdate::All, true);
                 
                 let sys_pid = sysinfo::Pid::from_u32(pid as u32);
-                if sys.process(sys_pid).is_none() {
+                let mut is_alive = false;
+                
+                if let Some(process) = sys.process(sys_pid) {
+                    let name = process.name().to_string_lossy().to_lowercase();
+                    // Avoid PID collision by checking if process is actually a browser
+                    if name.contains("chrome") || name.contains("msedge") || name.contains("firefox") || name.contains("chromium") {
+                        is_alive = true;
+                    }
+                }
+                
+                if !is_alive {
                     profile.status = Some("IDLE".to_string());
                     profile.pid = None;
                     
@@ -79,7 +89,15 @@ impl BrowserProfileService {
                 tokio::time::sleep(std::time::Duration::from_secs(2)).await;
                 sys.refresh_processes(sysinfo::ProcessesToUpdate::All, true);
                 
-                if sys.process(sys_pid).is_none() {
+                let mut is_alive = false;
+                if let Some(process) = sys.process(sys_pid) {
+                    let name = process.name().to_string_lossy().to_lowercase();
+                    if name.contains("chrome") || name.contains("msedge") || name.contains("firefox") || name.contains("chromium") {
+                        is_alive = true;
+                    }
+                }
+                
+                if !is_alive {
                     let _ = sqlx::query("UPDATE browser_profiles SET status = 'IDLE', pid = NULL, updated_at = CURRENT_TIMESTAMP WHERE id = ?")
                         .bind(&profile_id)
                         .execute(&pool)
