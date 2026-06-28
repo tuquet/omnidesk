@@ -135,7 +135,7 @@ export function TitleBar() {
               Tools
             </MenubarTrigger>
             <MenubarContent>
-              <MenubarItem onClick={() => platformApi.openUrl(config.apiDocsUrl)}>
+              <MenubarItem onClick={() => platformApi.openUrl(config.apiDocsUrl || "")}>
                 API Documentation
               </MenubarItem>
             </MenubarContent>
@@ -171,12 +171,12 @@ export function TitleBar() {
               Help
             </MenubarTrigger>
             <MenubarContent>
-              <MenubarItem onClick={() => platformApi.openUrl(config.githubRepo)}>
+              <MenubarItem onClick={() => platformApi.openUrl(config.githubRepo || "")}>
                 Documentation
                 <MenubarShortcut>F1</MenubarShortcut>
               </MenubarItem>
               <MenubarSeparator />
-              <MenubarItem onClick={() => platformApi.openUrl(config.githubIssues)}>Report a Bug</MenubarItem>
+              <MenubarItem onClick={() => platformApi.openUrl(config.githubIssues || "")}>Report a Bug</MenubarItem>
               <MenubarSeparator />
               <MenubarItem onClick={checkUpdate}>Check for Updates...</MenubarItem>
             </MenubarContent>

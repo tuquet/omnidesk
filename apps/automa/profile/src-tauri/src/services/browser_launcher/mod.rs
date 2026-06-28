@@ -1,5 +1,5 @@
 use std::process::Command;
-use std::path::PathBuf;
+
 use crate::error::AppError;
 use crate::db::models::browser_profile::BrowserProfile;
 
@@ -29,7 +29,7 @@ impl BrowserLauncher {
         &self, 
         profile: &BrowserProfile, 
         app: &tauri::AppHandle,
-        data_dir: &PathBuf
+        data_dir: &std::path::Path
     ) -> Result<Command, AppError> {
         match self {
             Self::Chrome(l) => l.build_command(profile, app, data_dir).await,
@@ -43,7 +43,7 @@ impl BrowserLauncher {
         &self,
         profile: &BrowserProfile,
         app: &tauri::AppHandle,
-        data_dir: &PathBuf
+        data_dir: &std::path::Path
     ) -> Result<u32, AppError> {
         let mut cmd = self.build_command(profile, app, data_dir).await?;
         

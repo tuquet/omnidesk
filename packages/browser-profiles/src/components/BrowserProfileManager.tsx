@@ -55,8 +55,8 @@ export function BrowserProfileManager() {
     // Fallback: HTTP Polling (Universal for both Web and Tauri)
     const interval = setInterval(async () => {
       try {
-        const { API_BASE_URL } = await import('@omnidesk/core');
-        const res = await fetch(`${API_BASE_URL}/api/browser-profiles/download-status`);
+        const { PROFILE_API_URL } = await import('@omnidesk/core');
+        const res = await fetch(`${PROFILE_API_URL}/api/browser-profiles/download-status`);
         if (res.ok) {
           const data = await res.json();
           if (data && data.status) {

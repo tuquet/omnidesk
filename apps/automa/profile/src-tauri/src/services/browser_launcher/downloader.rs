@@ -1,5 +1,5 @@
 use std::path::PathBuf;
-use tauri::{AppHandle, Emitter};
+use tauri::AppHandle;
 use futures_util::StreamExt;
 use std::io::Write;
 use reqwest::Client;

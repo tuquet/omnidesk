@@ -4,7 +4,6 @@ use axum::{
     routing::{get, post},
     Json, Router,
 };
-use uuid::Uuid;
 use crate::db::models::browser_profile::BrowserProfile;
 use crate::api::AppState;
 
@@ -124,7 +123,7 @@ pub async fn launch_profile(
     let app = state.app_handle.clone();
     
     use crate::services::browser_profile_service::BrowserProfileService;
-    use crate::services::browser_launcher::LauncherFactory;
+    
 
     let _profile = match BrowserProfileService::get_by_id(pool, &id).await {
         Ok(p) => p,
@@ -182,7 +181,7 @@ async fn clean_profile_storage(
         if let Some(parent) = run_dir.parent() {
             std::fs::create_dir_all(parent).unwrap_or_default();
         }
-        if let Ok(_) = crate::services::storage_optimizer::StorageOptimizer::unzip_dir(&zip_file, &run_dir) {
+        if crate::services::storage_optimizer::StorageOptimizer::unzip_dir(&zip_file, &run_dir).is_ok() {
             let _ = crate::services::storage_optimizer::StorageOptimizer::clean_storage(&run_dir);
             let _ = crate::services::storage_optimizer::StorageOptimizer::zip_dir(&run_dir, &zip_file);
             let _ = std::fs::remove_dir_all(&run_dir);

@@ -1,4 +1,4 @@
-use std::path::PathBuf;
+use std::path::Path;
 use std::fs::File;
 use std::io::{Read, Write};
 use walkdir::WalkDir;
@@ -9,7 +9,7 @@ pub struct StorageOptimizer;
 
 impl StorageOptimizer {
     /// Safely deletes heavy cache folders inside a browser profile directory.
-    pub fn clean_storage(profile_dir: &PathBuf) -> Result<(), AppError> {
+    pub fn clean_storage(profile_dir: &Path) -> Result<(), AppError> {
         let items_to_clean = vec![
             "Default/Cache",
             "Default/Code Cache",
@@ -36,7 +36,7 @@ impl StorageOptimizer {
     }
 
     /// Zips a directory into a zip file.
-    pub fn zip_dir(src_dir: &PathBuf, dest_zip: &PathBuf) -> Result<(), AppError> {
+    pub fn zip_dir(src_dir: &Path, dest_zip: &Path) -> Result<(), AppError> {
         if !src_dir.exists() {
             return Ok(());
         }
@@ -81,7 +81,7 @@ impl StorageOptimizer {
     }
 
     /// Unzips a zip file to a destination directory.
-    pub fn unzip_dir(src_zip: &PathBuf, dest_dir: &PathBuf) -> Result<(), AppError> {
+    pub fn unzip_dir(src_zip: &Path, dest_dir: &Path) -> Result<(), AppError> {
         let file = File::open(src_zip)
             .map_err(|e| AppError::Internal(format!("Failed to open zip file: {}", e)))?;
             

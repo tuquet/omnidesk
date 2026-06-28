@@ -1,35 +1,24 @@
 use sqlx::SqlitePool;
+use reqwest::Client;
+use serde::{Deserialize, Serialize};
 
 use crate::db::models::workflow::WorkflowRun;
 use crate::error::AppError;
-use crate::services::workflow_service::WorkflowService;
-use crate::services::browser_launcher::LauncherFactory;
-use crate::services::browser_profile_service::BrowserProfileService;
 use crate::api::handlers::automa::AutomaEvent;
 use tauri::AppHandle;
 use tokio::sync::broadcast::Sender;
 use std::time::Duration;
 
-/// WorkflowExecutor orchestrates a single workflow execution:
-///
-/// 1. Load workflow from SQLite
-/// 2. Load browser profile + config
-/// 3. Create a WorkflowRun record (status=RUNNING)
-/// 4. Launch browser with profile (fingerprint, proxy, extensions)
-/// 5. Wait for Extension to connect via WebSocket
-/// 6. Send `execute_workflow` event with workflow JSON
-/// 7. Collect block logs from Extension
-/// 8. Finalize WorkflowRun with status + summary
-///
-/// For Phase 4, we implement steps 1-3 and record-keeping.
-/// Steps 4-7 require Phase 5 (Extension Integration) to fully work.
+#[derive(Serialize, Deserialize)]
+pub struct WorkflowResponse {
+    pub id: String,
+    pub name: String,
+    // Add other fields as needed for the event
+}
+
 pub struct WorkflowExecutor;
 
 impl WorkflowExecutor {
-    /// Execute a workflow with a given browser profile.
-    ///
-    /// This creates a WorkflowRun record and prepares the execution.
-    /// Full browser launch + Extension control is Phase 5.
     pub async fn execute(
         db: &SqlitePool,
         app: &AppHandle,
@@ -39,10 +28,17 @@ impl WorkflowExecutor {
         schedule_id: Option<&str>,
     ) -> Result<WorkflowRun, AppError> {
         // 1. Verify workflow exists
-        let workflow = WorkflowService::get_by_id(db, workflow_id).await?;
-        println!("[Executor] Starting workflow '{}' ({})", workflow.name, workflow.id);
+        let workflow_name: String = sqlx::query_scalar(
+            "SELECT name FROM workflows WHERE id = ?"
+        )
+        .bind(workflow_id)
+        .fetch_one(db)
+        .await
+        .map_err(|_| AppError::NotFound(format!("Workflow {} not found", workflow_id)))?;
 
-        // 1.5. Profile Lock Check - fail if profile is already in use
+        println!("[Executor] Starting workflow '{}' ({})", workflow_name, workflow_id);
+
+        // 1.5. Profile Lock Check
         let active_runs: i64 = sqlx::query_scalar(
             "SELECT COUNT(*) FROM workflow_runs WHERE profile_id = ? AND status = 'RUNNING'"
         )
@@ -57,37 +53,48 @@ impl WorkflowExecutor {
         }
 
         // 2. Create run record
-        let run = WorkflowService::create_run(
-            db,
-            workflow_id,
-            Some(profile_id),
-            schedule_id,
-        ).await?;
-
-        println!("[Executor] Created run {} for workflow '{}'", run.id, workflow.name);
-
-        // 3. Launch browser with profile
-        let profile = BrowserProfileService::get_by_id(db, profile_id).await?;
-        let data_dir = BrowserProfileService::resolve_data_dir(app, &profile)?;
+        let run_id = uuid::Uuid::new_v4().to_string();
+        let now = chrono::Utc::now().timestamp_millis();
         
-        {
-            let launcher = LauncherFactory::create(profile.browser_type.as_deref().unwrap_or("chrome"));
-            let init_url = format!("http://localhost:1424/init?profile_id={}", profile_id);
-            launcher.launch(&profile, app, &data_dir, Some(&init_url))?;
+        sqlx::query(
+            "INSERT INTO workflow_runs (id, workflow_id, profile_id, schedule_id, status, started_at, created_at, updated_at) 
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
+        )
+        .bind(&run_id)
+        .bind(workflow_id)
+        .bind(profile_id)
+        .bind(schedule_id)
+        .bind("RUNNING")
+        .bind(now)
+        .bind(now)
+        .bind(now)
+        .execute(db)
+        .await?;
+
+        println!("[Executor] Created run {} for workflow '{}'", run_id, workflow_name);
+
+        // 3. Launch browser via Profile Microservice (HTTP)
+        let client = Client::new();
+        let profile_api_url = format!("http://127.0.0.1:1421/api/browser-profiles/{}/launch", profile_id);
+        
+        let launch_res = client.post(&profile_api_url)
+            .send()
+            .await;
+            
+        if let Err(e) = launch_res {
+            eprintln!("[Executor] Failed to call Profile API to launch browser: {}", e);
+            return Err(AppError::Internal(format!("Failed to launch profile: {}", e)));
         }
 
-        // 4. Send execute_workflow event to any waiting extension connected on WS
-        // Note: The extension connection is asynchronous. The RuntimeBridge connects
-        // when the browser opens the init_url.
-        // We broadcast it to the WS channel. A robust implementation would wait for
-        // the `extension_ready` event before sending `execute_workflow`.
-        
         // Wait briefly for the browser to launch and connect
         tokio::time::sleep(Duration::from_secs(3)).await;
 
         let payload = serde_json::json!({
-            "run_id": run.id,
-            "workflow": workflow
+            "run_id": run_id,
+            "workflow": {
+                "id": workflow_id,
+                "name": workflow_name
+            }
         });
         
         let event = AutomaEvent {
@@ -99,17 +106,12 @@ impl WorkflowExecutor {
             eprintln!("[Executor] Failed to send execute_workflow event to WS: {}", e);
         }
 
-        // For now: mark as RUNNING. The Extension will send block_started / block_finished
-        // and eventually workflow_finished.
-        WorkflowService::finish_run(
-            db,
-            &run.id,
-            "RUNNING",
-            None,
-            Some(&format!("{{\"workflow_name\":\"{}\"}}", workflow.name)),
-        ).await?;
+        // 4. Return the run record
+        let run = sqlx::query_as::<_, WorkflowRun>("SELECT * FROM workflow_runs WHERE id = ?")
+            .bind(&run_id)
+            .fetch_one(db)
+            .await?;
 
-        // Return the run record
-        WorkflowService::get_run_by_id(db, &run.id).await
+        Ok(run)
     }
 }

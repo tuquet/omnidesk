@@ -35,16 +35,25 @@ pub struct AppState {
         ping,
         latest_update,
         me,
+        handlers::automa::ws_handler,
+        handlers::automa::run_e2e,
+        handlers::schedules::list_schedules,
+        handlers::schedules::create_schedule,
+        handlers::schedules::get_schedule,
+        handlers::schedules::update_schedule,
+        handlers::schedules::delete_schedule,
+        handlers::schedules::toggle_schedule,
+        handlers::schedules::run_now,
         handlers::apps::get_apps,
+        handlers::apps::get_local_apps,
         handlers::apps::get_installed_apps,
         handlers::apps::get_installed_details,
         handlers::apps::install_app,
-        handlers::apps::uninstall_app
+        handlers::apps::uninstall_app,
     ),
     tags(
         (name = "health", description = "Health check endpoints"),
         (name = "auth", description = "Authenticated endpoints"),
-        (name = "apps", description = "Marketplace apps endpoints")
     )
 )]
 pub struct ApiDoc;
@@ -90,14 +99,9 @@ pub async fn serve(pool: SqlitePool, app_dir: PathBuf, port: u16, app_handle: Ap
         .route("/ping", get(ping))
         .route("/updates/latest.json", get(latest_update))
         .route("/api/me", get(me))
-        .route("/api/apps", get(handlers::apps::get_apps))
-        .route("/api/apps/installed", get(handlers::apps::get_installed_apps))
-        .route("/api/apps/installed-details", get(handlers::apps::get_installed_details))
-        .route("/api/apps/install/:id", post(handlers::apps::install_app).delete(handlers::apps::uninstall_app))
-        .nest("/api/browser-profiles", handlers::browser_profiles::router())
         .nest("/api/automa", handlers::automa::router())
-        .nest("/api/automa/workflows", handlers::workflows::router())
         .nest("/api/automa/schedules", handlers::schedules::router())
+        .nest("/api/marketplace/apps", handlers::apps::router())
         .route("/mcp/sse", get(handlers::mcp::mcp_sse))
         .route("/mcp/messages", post(handlers::mcp::mcp_messages))
         .nest_service("/apps", ServeDir::new(apps_sandbox_dir))

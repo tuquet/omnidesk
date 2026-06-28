@@ -1,10 +1,8 @@
-use serde::Deserialize;
 use sqlx::SqlitePool;
 use tauri::{State, command};
 
 use crate::db::models::browser_profile::{BrowserProfile, CreateBrowserProfilePayload, UpdateBrowserProfilePayload};
 use crate::services::browser_profile_service::BrowserProfileService;
-use crate::services::browser_launcher::LauncherFactory;
 
 #[command]
 pub async fn get_browser_profiles(
@@ -51,9 +49,9 @@ pub async fn launch_browser_profile(
     pool: State<'_, SqlitePool>,
     app: tauri::AppHandle,
 ) -> Result<(), String> {
-    BrowserProfileService::launch(&*pool, &app, &id)
+    BrowserProfileService::launch(&pool, &app, &id)
         .await
-        .map_err(|e| String::from(e))
+        .map_err(String::from)
 }
 
 #[command]
@@ -61,9 +59,9 @@ pub async fn stop_browser_profile(
     pool: State<'_, SqlitePool>,
     id: String,
 ) -> Result<(), String> {
-    BrowserProfileService::stop(&*pool, &id)
+    BrowserProfileService::stop(&pool, &id)
         .await
-        .map_err(|e| String::from(e))
+        .map_err(String::from)
 }
 
 pub fn get_handlers() -> impl Fn(tauri::ipc::Invoke) -> bool {

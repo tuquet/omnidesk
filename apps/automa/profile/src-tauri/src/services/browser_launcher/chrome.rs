@@ -1,8 +1,7 @@
 use std::process::Command;
-use std::path::PathBuf;
+
 use crate::error::AppError;
 use crate::db::models::browser_profile::BrowserProfile;
-use super::BrowserLauncher;
 
 pub struct ChromeLauncher;
 
@@ -60,7 +59,7 @@ impl ChromeLauncher {
         &self, 
         profile: &BrowserProfile, 
         app: &tauri::AppHandle,
-        data_dir: &PathBuf
+        data_dir: &std::path::Path
     ) -> Result<Command, AppError> {
         let exe_path = self.resolve_executable(profile, app).await?;
         let mut cmd = Command::new(&exe_path);

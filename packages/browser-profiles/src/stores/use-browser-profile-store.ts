@@ -1,6 +1,6 @@
 import { Store } from '@tanstack/store';
 import { useStore } from '@tanstack/react-store';
-import { API_BASE_URL } from '@omnidesk/core';
+import { PROFILE_API_URL } from '@omnidesk/core';
 
 export interface BrowserProfile {
   id: string;
@@ -69,7 +69,7 @@ async function fetchApi<T>(path: string, options: RequestInit = {}): Promise<T> 
     headers.set('Content-Type', 'application/json');
   }
 
-  const response = await fetch(`${API_BASE_URL}${path}`, {
+  const response = await fetch(`${PROFILE_API_URL}${path}`, {
     ...options,
     headers,
   });

@@ -62,7 +62,7 @@ async fn connect_and_listen(app_handle: AppHandle, pool: SqlitePool) -> Result<(
         "ref": "1"
     });
     
-    write.send(Message::Text(join_payload.to_string().into())).await?;
+    write.send(Message::Text(join_payload.to_string())).await?;
     
     let mut interval = tokio::time::interval(Duration::from_secs(30));
     
@@ -75,7 +75,7 @@ async fn connect_and_listen(app_handle: AppHandle, pool: SqlitePool) -> Result<(
                     "payload": {},
                     "ref": "2"
                 });
-                write.send(Message::Text(heartbeat.to_string().into())).await?;
+                write.send(Message::Text(heartbeat.to_string())).await?;
             }
             msg = read.next() => {
                 let msg = match msg {

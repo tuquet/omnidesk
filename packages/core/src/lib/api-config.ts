@@ -1,17 +1,23 @@
 /**
- * Shared API configuration — single source of truth for the backend URL.
- * All packages and apps should import from here instead of hardcoding ports.
- *
- * The port is read from the VITE_API_PORT env var (set per-app in .env files).
- * Falls back to 1424 (Runtime) if not set.
+ * Microservice API configurations.
+ * Each domain has its own dedicated microservice backend.
  */
-export const API_PORT = import.meta.env.VITE_API_PORT || '1424';
-export const API_BASE_URL = `http://localhost:${API_PORT}`;
+export const RUNTIME_PORT = import.meta.env.VITE_API_PORT || '1424';
+export const PROFILE_PORT = import.meta.env.VITE_PROFILE_PORT || '1421';
+export const WORKFLOW_PORT = import.meta.env.VITE_WORKFLOW_PORT || '1422';
 
-/**
- * Helper to build a full API URL from a path.
- * @example apiUrl('/api/automa/workflows') => 'http://localhost:1424/api/automa/workflows'
- */
+export const API_BASE_URL = `http://localhost:${RUNTIME_PORT}`;
+export const PROFILE_API_URL = `http://localhost:${PROFILE_PORT}`;
+export const WORKFLOW_API_URL = `http://localhost:${WORKFLOW_PORT}`;
+
 export function apiUrl(path: string): string {
   return `${API_BASE_URL}${path}`;
+}
+
+export function profileApiUrl(path: string): string {
+  return `${PROFILE_API_URL}${path}`;
+}
+
+export function workflowApiUrl(path: string): string {
+  return `${WORKFLOW_API_URL}${path}`;
 }

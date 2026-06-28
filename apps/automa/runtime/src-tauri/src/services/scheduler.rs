@@ -7,7 +7,6 @@ use uuid::Uuid as JobUuid;
 
 use crate::db::models::workflow::Schedule;
 use crate::error::AppError;
-use crate::services::workflow_service::WorkflowService;
 use crate::services::workflow_executor::WorkflowExecutor;
 use crate::db::models::workflow::WorkflowRun;
 use tauri::AppHandle;
@@ -46,8 +45,10 @@ impl SchedulerService {
             automa_ws_tx,
         };
 
-        // Load all enabled schedules
-        let schedules = WorkflowService::get_enabled_schedules(&db).await?;
+        let schedules = sqlx::query_as::<_, Schedule>("SELECT * FROM schedules WHERE is_enabled = 1")
+            .fetch_all(&db)
+            .await
+            .unwrap_or_default();
         println!("[Scheduler] Loading {} enabled schedules", schedules.len());
 
         for schedule in &schedules {
@@ -90,9 +91,14 @@ impl SchedulerService {
                     schedule_name, workflow_id, profile_id);
 
                 // Update run stats
-                if let Err(e) = WorkflowService::update_schedule_run_stats(&db, &schedule_id).await {
-                    eprintln!("[Scheduler] Failed to update run stats: {:?}", e);
-                }
+                let now = chrono::Utc::now().timestamp_millis();
+                let _ = sqlx::query(
+                    "UPDATE schedules SET last_run_at = ?, run_count = run_count + 1 WHERE id = ?"
+                )
+                .bind(now)
+                .bind(&schedule_id)
+                .execute(&db)
+                .await;
 
                 // Execute the workflow
                 match WorkflowExecutor::execute(&db, &app_handle, &ws_tx, &workflow_id, &profile_id, Some(&schedule_id)).await {
@@ -102,7 +108,21 @@ impl SchedulerService {
                     Err(e) => {
                         eprintln!("[Scheduler] Execution failed: {:?}", e);
                         // Still create a failed run record
-                        let _ = WorkflowService::create_run(&db, &workflow_id, Some(&profile_id), Some(&schedule_id)).await;
+                        let run_id = uuid::Uuid::new_v4().to_string();
+                        let _ = sqlx::query(
+                            "INSERT INTO workflow_runs (id, workflow_id, profile_id, schedule_id, status, started_at, created_at, updated_at) 
+                             VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
+                        )
+                        .bind(&run_id)
+                        .bind(&workflow_id)
+                        .bind(&profile_id)
+                        .bind(&schedule_id)
+                        .bind("FAILED")
+                        .bind(now)
+                        .bind(now)
+                        .bind(now)
+                        .execute(&db)
+                        .await;
                     }
                 }
             })
@@ -143,7 +163,14 @@ impl SchedulerService {
             schedule.name, schedule.workflow_id, schedule.profile_id);
 
         // Update run stats
-        WorkflowService::update_schedule_run_stats(db, &schedule.id).await?;
+        let now = chrono::Utc::now().timestamp_millis();
+        let _ = sqlx::query(
+            "UPDATE schedules SET last_run_at = ?, run_count = run_count + 1 WHERE id = ?"
+        )
+        .bind(now)
+        .bind(&schedule.id)
+        .execute(db)
+        .await;
 
         // Execute
         WorkflowExecutor::execute(db, &self.app_handle, &self.automa_ws_tx, &schedule.workflow_id, &schedule.profile_id, Some(&schedule.id)).await

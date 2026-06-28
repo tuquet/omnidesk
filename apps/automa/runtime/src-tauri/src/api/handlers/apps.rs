@@ -35,7 +35,7 @@ pub fn router() -> Router<AppState> {
     )
 )]
 pub async fn get_apps() -> Result<impl IntoResponse, AppError> {
-    let apps = marketplace::get_marketplace_apps().await?;
+    let apps: Vec<serde_json::Value> = marketplace::get_marketplace_apps().await?;
     Ok(Json(apps))
 }
 
@@ -54,7 +54,7 @@ pub async fn get_installed_apps(
     State(state): State<AppState>,
     claims: Claims,
 ) -> Result<impl IntoResponse, AppError> {
-    let installed = marketplace::get_installed_apps(&state.db, claims.user_id()).await?;
+    let installed: Vec<String> = marketplace::get_installed_apps(&state.db, claims.user_id()).await?;
     Ok(Json(installed))
 }
 
@@ -73,7 +73,7 @@ pub async fn get_installed_details(
     State(state): State<AppState>,
     claims: Claims,
 ) -> Result<impl IntoResponse, AppError> {
-    let installed = marketplace::get_installed_details(&state.db, claims.user_id()).await?;
+    let installed: Vec<crate::services::marketplace::InstalledAppDetails> = marketplace::get_installed_details(&state.db, claims.user_id()).await?;
     Ok(Json(installed))
 }
 
