@@ -46,6 +46,7 @@ export function OmniLayout({ sidebarContent, children }: OmniLayoutProps) {
         {sidebarContent && (
           <>
             <ResizablePanel
+              id="omni-sidebar-panel"
               ref={sidebarPanelRef}
               collapsible={true}
               collapsedSize={0}
@@ -60,11 +61,18 @@ export function OmniLayout({ sidebarContent, children }: OmniLayoutProps) {
               }}
               className={cn(
                 'flex flex-col relative min-h-0 bg-sidebar transition-all duration-200 ease-linear',
-                sidebarOpen ? 'min-w-[240px]' : 'min-w-0 max-w-0 overflow-hidden border-none',
+                !sidebarOpen && 'overflow-hidden border-none',
               )}
             >
-              <div className="w-full h-full flex flex-col min-w-[240px]">{sidebarContent}</div>
+              <div className="w-full h-full flex flex-col">{sidebarContent}</div>
             </ResizablePanel>
+            <style>{`
+              #omni-sidebar-panel {
+                min-width: ${sidebarOpen ? '240px' : '0px'} !important;
+                max-width: ${sidebarOpen ? '400px' : '0px'} !important;
+                ${!sidebarOpen ? 'flex: 0 1 0px !important; overflow: hidden !important; border: none !important;' : ''}
+              }
+            `}</style>
             <ResizableHandle withHandle className={sidebarOpen ? 'block' : 'hidden'} />
           </>
         )}
