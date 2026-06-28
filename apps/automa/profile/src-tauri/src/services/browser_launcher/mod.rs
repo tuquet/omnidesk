@@ -26,13 +26,13 @@ pub trait BrowserLauncher {
         profile: &BrowserProfile,
         app: &tauri::AppHandle,
         data_dir: &PathBuf
-    ) -> Result<(), AppError> {
+    ) -> Result<u32, AppError> {
         let mut cmd = self.build_command(profile, app, data_dir)?;
         
         println!("[Tauri] Launching browser via Strategy: {:?}", cmd);
         
-        cmd.spawn().map_err(|e| AppError::Internal(format!("Failed to launch browser: {}", e)))?;
-        Ok(())
+        let child = cmd.spawn().map_err(|e| AppError::Internal(format!("Failed to launch browser: {}", e)))?;
+        Ok(child.id())
     }
 }
 

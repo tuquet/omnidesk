@@ -31,3 +31,6 @@ export * from './components/can';
 
 // API
 export * from './lib/api-config';
+
+// API
+export * from './lib/api-config';

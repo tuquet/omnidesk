@@ -120,6 +120,9 @@ pub fn run() {
                             // Manage state for Tauri commands before UI can call them
                             app_handle.manage(pool.clone());
                             
+                            let (tx, _rx) = broadcast::channel(100);
+                            app_handle.manage(crate::DownloadProgressState { tx });
+                            
                             let pool_for_worker = pool.clone();
                             let pool_for_rt = pool.clone();
                             let app_dir = app_handle.path().app_data_dir().unwrap_or_else(|_| PathBuf::from("."));
@@ -161,6 +164,7 @@ pub fn run() {
             preferences::update_home_screen_order,
             commands::storage::get_storage_info,
             commands::storage::update_storage_location,
+            commands::storage::open_data_folder,
             commands::e2e::run_e2e_orchestrator,
             browser_profiles::get_browser_profiles,
             browser_profiles::create_browser_profile,
@@ -170,4 +174,19 @@ pub fn run() {
         ])
         .run(tauri::generate_context!())
         .expect("error while running OmniDesk");
+}
+
+
+use tokio::sync::broadcast;
+#[derive(Clone, serde::Serialize)]
+pub struct DownloadProgress {
+    pub browser: String,
+    pub total: u64,
+    pub downloaded: u64,
+    pub percent: f32,
+    pub status: String,
+}
+
+pub struct DownloadProgressState {
+    pub tx: broadcast::Sender<DownloadProgress>,
 }

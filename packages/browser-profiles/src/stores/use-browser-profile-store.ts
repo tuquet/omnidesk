@@ -1,6 +1,6 @@
-import { API_BASE_URL } from '@omnidesk/core';
 import { Store } from '@tanstack/store';
 import { useStore } from '@tanstack/react-store';
+import { API_BASE_URL } from '@omnidesk/core';
 
 export interface BrowserProfile {
   id: string;
@@ -13,6 +13,11 @@ export interface BrowserProfile {
   last_used_at: string | null;
   created_at: string | null;
   updated_at: string | null;
+  proxy?: string | null;
+  tags?: string | null;
+  notes?: string | null;
+  pid?: number | null;
+  browser_version?: string | null;
 }
 
 export interface CreateBrowserProfilePayload {
@@ -22,6 +27,10 @@ export interface CreateBrowserProfilePayload {
   group_id?: string | null;
   os?: string | null;
   status?: string | null;
+  proxy?: string | null;
+  tags?: string | null;
+  notes?: string | null;
+  executable_path?: string | null;
 }
 
 export interface UpdateBrowserProfilePayload {
@@ -32,6 +41,10 @@ export interface UpdateBrowserProfilePayload {
   group_id?: string | null;
   os?: string | null;
   status?: string | null;
+  proxy?: string | null;
+  tags?: string | null;
+  notes?: string | null;
+  executable_path?: string | null;
 }
 
 interface BrowserProfileState {
@@ -45,8 +58,6 @@ export const browserProfileStore = new Store<BrowserProfileState>({
   isLoading: false,
   error: null,
 });
-
-// BASE_URL imported from @omnidesk/core as API_BASE_URL
 
 async function fetchApi<T>(path: string, options: RequestInit = {}): Promise<T> {
   const token = localStorage.getItem('omnidesk_token') || '';
@@ -141,15 +152,72 @@ export function useBrowserProfileStore() {
     }
   };
 
-  const launchProfile = async (id: string) => {
+  const launchProfile = async (id: string, payload: Record<string, any> = {}) => {
     browserProfileStore.setState((s) => ({ ...s, isLoading: true, error: null }));
     try {
-      await fetchApi(`/api/browser-profiles/${id}/launch`, { method: 'POST' });
+      await fetchApi(`/api/browser-profiles/${id}/launch`, { 
+        method: 'POST',
+        body: JSON.stringify(payload)
+      });
+      // Optionally update local status optimistically
+      browserProfileStore.setState((s) => ({ 
+        ...s, 
+        profiles: s.profiles.map(p => p.id === id ? { ...p, status: 'RUNNING', pid: 1 } : p),
+        isLoading: false 
+      }));
+    } catch (e) {
+      const errStr = e instanceof Error ? e.message : String(e);
+      browserProfileStore.setState((s) => ({ ...s, error: errStr, isLoading: false }));
+      throw new Error(errStr);
+    }
+  };
+
+  const stopProfile = async (id: string) => {
+    browserProfileStore.setState((s) => ({ ...s, isLoading: true, error: null }));
+    try {
+      await fetchApi(`/api/browser-profiles/${id}/stop`, { method: 'POST' });
+      // Update local status optimistically
+      browserProfileStore.setState((s) => ({ 
+        ...s, 
+        profiles: s.profiles.map(p => p.id === id ? { ...p, status: 'IDLE', pid: null } : p),
+        isLoading: false 
+      }));
+    } catch (e) {
+      const errStr = e instanceof Error ? e.message : String(e);
+      browserProfileStore.setState((s) => ({ ...s, error: errStr, isLoading: false }));
+      throw new Error(errStr);
+    }
+  };
+
+  const resetBrowserEngine = async () => {
+    browserProfileStore.setState((s) => ({ ...s, isLoading: true, error: null }));
+    try {
+      await fetchApi(`/api/browser-profiles/browser-engine`, { method: 'DELETE' });
       browserProfileStore.setState((s) => ({ ...s, isLoading: false }));
     } catch (e) {
       const errStr = e instanceof Error ? e.message : String(e);
       browserProfileStore.setState((s) => ({ ...s, error: errStr, isLoading: false }));
       throw new Error(errStr);
+    }
+  };
+
+  const fetchAvailableVersions = async (browserType: string) => {
+    try {
+      return await fetchApi<any[]>(`/api/browser-profiles/available-versions?browser_type=${browserType}`);
+    } catch (e) {
+      console.error('Failed to fetch versions', e);
+      return [];
+    }
+  };
+
+  const fetchEngineStatus = async (browserType: string, version?: string) => {
+    try {
+      const qs = new URLSearchParams({ browser_type: browserType });
+      if (version) qs.set('version', version);
+      return await fetchApi<{is_downloaded: boolean, exe_path: string | null}>(`/api/browser-profiles/engine-status?${qs.toString()}`);
+    } catch (e) {
+      console.error('Failed to fetch engine status', e);
+      return { is_downloaded: false, exe_path: null };
     }
   };
 
@@ -160,5 +228,9 @@ export function useBrowserProfileStore() {
     updateProfile,
     deleteProfile,
     launchProfile,
+    stopProfile,
+    resetBrowserEngine,
+    fetchAvailableVersions,
+    fetchEngineStatus,
   };
 }

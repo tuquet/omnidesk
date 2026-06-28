@@ -9,9 +9,9 @@ pub struct BrowserProfileService;
 
 impl BrowserProfileService {
     pub async fn get_all(pool: &SqlitePool) -> Result<Vec<BrowserProfile>, AppError> {
-        let profiles = sqlx::query_as::<_, BrowserProfile>(
+        let mut profiles = sqlx::query_as::<_, BrowserProfile>(
             r#"
-            SELECT id, name, group_id, os, browser_type, data_dir_path, status, CAST(last_used_at AS TEXT) as last_used_at, CAST(created_at AS TEXT) as created_at, CAST(updated_at AS TEXT) as updated_at
+            SELECT id, name, group_id, os, browser_type, data_dir_path, status, CAST(last_used_at AS TEXT) as last_used_at, CAST(created_at AS TEXT) as created_at, CAST(updated_at AS TEXT) as updated_at, notes, tags, pid, cdp_url, browser_version
             FROM browser_profiles
             ORDER BY created_at DESC
             "#
@@ -19,13 +19,17 @@ impl BrowserProfileService {
         .fetch_all(pool)
         .await?;
 
+        for p in &mut profiles {
+            let _ = Self::sync_status(pool, p).await;
+        }
+
         Ok(profiles)
     }
 
     pub async fn get_by_id(pool: &SqlitePool, id: &str) -> Result<BrowserProfile, AppError> {
-        let profile = sqlx::query_as::<_, BrowserProfile>(
+        let mut profile = sqlx::query_as::<_, BrowserProfile>(
             r#"
-            SELECT id, name, group_id, os, browser_type, data_dir_path, status, CAST(last_used_at AS TEXT) as last_used_at, CAST(created_at AS TEXT) as created_at, CAST(updated_at AS TEXT) as updated_at
+            SELECT id, name, group_id, os, browser_type, data_dir_path, status, CAST(last_used_at AS TEXT) as last_used_at, CAST(created_at AS TEXT) as created_at, CAST(updated_at AS TEXT) as updated_at, notes, tags, pid, cdp_url, browser_version
             FROM browser_profiles
             WHERE id = ?
             "#
@@ -35,7 +39,63 @@ impl BrowserProfileService {
         .await?
         .ok_or_else(|| AppError::NotFound(format!("Profile {} not found", id)))?;
 
+        let _ = Self::sync_status(pool, &mut profile).await;
+
         Ok(profile)
+    }
+
+    pub async fn sync_status(pool: &SqlitePool, profile: &mut BrowserProfile) -> Result<(), AppError> {
+        if profile.status.as_deref() == Some("RUNNING") {
+            if let Some(pid) = profile.pid {
+                let mut sys = sysinfo::System::new_all();
+                sys.refresh_processes(sysinfo::ProcessesToUpdate::All, true);
+                
+                let sys_pid = sysinfo::Pid::from_u32(pid as u32);
+                if sys.process(sys_pid).is_none() {
+                    profile.status = Some("IDLE".to_string());
+                    profile.pid = None;
+                    
+                    sqlx::query("UPDATE browser_profiles SET status = 'IDLE', pid = NULL, updated_at = CURRENT_TIMESTAMP WHERE id = ?")
+                        .bind(&profile.id)
+                        .execute(pool)
+                        .await?;
+                }
+            } else {
+                profile.status = Some("IDLE".to_string());
+                sqlx::query("UPDATE browser_profiles SET status = 'IDLE', pid = NULL, updated_at = CURRENT_TIMESTAMP WHERE id = ?")
+                    .bind(&profile.id)
+                    .execute(pool)
+                    .await?;
+            }
+        }
+        Ok(())
+    }
+
+    pub fn monitor_process(pool: SqlitePool, app: tauri::AppHandle, profile_id: String, pid: u32) {
+        tokio::spawn(async move {
+            let mut sys = sysinfo::System::new_all();
+            let sys_pid = sysinfo::Pid::from_u32(pid);
+            
+            loop {
+                tokio::time::sleep(std::time::Duration::from_secs(2)).await;
+                sys.refresh_processes(sysinfo::ProcessesToUpdate::All, true);
+                
+                if sys.process(sys_pid).is_none() {
+                    let _ = sqlx::query("UPDATE browser_profiles SET status = 'IDLE', pid = NULL, updated_at = CURRENT_TIMESTAMP WHERE id = ?")
+                        .bind(&profile_id)
+                        .execute(&pool)
+                        .await;
+                    
+                    use tauri::Emitter;
+                    let _ = app.emit("profile-status-changed", serde_json::json!({
+                        "id": profile_id,
+                        "status": "IDLE"
+                    }));
+                    
+                    break;
+                }
+            }
+        });
     }
 
     pub async fn create(pool: &SqlitePool, payload: CreateBrowserProfilePayload) -> Result<BrowserProfile, AppError> {
@@ -46,8 +106,8 @@ impl BrowserProfileService {
         
         sqlx::query(
             r#"
-            INSERT INTO browser_profiles (id, name, group_id, os, browser_type, data_dir_path, status)
-            VALUES (?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO browser_profiles (id, name, group_id, os, browser_type, data_dir_path, status, notes, tags, browser_version)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             "#
         )
         .bind(&id)
@@ -57,6 +117,9 @@ impl BrowserProfileService {
         .bind(&browser_type)
         .bind(&payload.data_dir_path)
         .bind(&status)
+        .bind(&payload.notes)
+        .bind(&payload.tags)
+        .bind(&payload.browser_version)
         .execute(pool)
         .await?;
 
@@ -67,7 +130,7 @@ impl BrowserProfileService {
         let result = sqlx::query(
             r#"
             UPDATE browser_profiles
-            SET name = ?, group_id = ?, os = ?, browser_type = ?, data_dir_path = ?, status = ?, updated_at = CURRENT_TIMESTAMP
+            SET name = ?, group_id = ?, os = ?, browser_type = ?, data_dir_path = ?, status = ?, notes = ?, tags = ?, browser_version = ?, updated_at = CURRENT_TIMESTAMP
             WHERE id = ?
             "#
         )
@@ -77,6 +140,9 @@ impl BrowserProfileService {
         .bind(&payload.browser_type)
         .bind(&payload.data_dir_path)
         .bind(&payload.status)
+        .bind(&payload.notes)
+        .bind(&payload.tags)
+        .bind(&payload.browser_version)
         .bind(&payload.id)
         .execute(pool)
         .await?;

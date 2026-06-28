@@ -6,6 +6,7 @@ import {
   TerminalIcon,
   SettingsIcon,
   StoreIcon,
+  CalendarIcon,
 } from 'lucide-react';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -45,6 +46,7 @@ export interface DocumentItem {
 
 export const NAV_MAIN: NavItem[] = [
   { title: 'Dashboard', url: '/dashboard', icon: LayoutDashboardIcon },
+  { title: 'Job Scheduler', url: '/scheduler', icon: CalendarIcon },
   { title: 'Active Jobs', url: '/active-jobs', icon: ActivityIcon },
   { title: 'System Logs', url: '/system-logs', icon: TerminalIcon },
   { title: 'Settings', url: '/settings', icon: SettingsIcon },

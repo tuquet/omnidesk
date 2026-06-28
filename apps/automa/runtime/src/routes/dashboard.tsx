@@ -1,6 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { PageContainer, PageHeader, PageTitle, PageDescription, Card, CardHeader, CardTitle, CardContent, ScrollArea } from '@omnidesk/ui';
 import { ActivityIcon, CpuIcon, MemoryStickIcon, TerminalIcon, ServerCrashIcon } from 'lucide-react';
+import { ActivityIcon, CpuIcon, MemoryStickIcon, TerminalIcon, ServerCrashIcon } from 'lucide-react';
 
 export const Route = createFileRoute('/dashboard')({
   component: DashboardPage,

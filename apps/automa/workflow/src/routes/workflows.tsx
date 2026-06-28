@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { PageContainer, PageHeader, PageTitle, PageDescription, Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter, Button, Badge } from '@omnidesk/ui';
-import { PlayIcon, EditIcon, CheckCircle2Icon } from 'lucide-react';
+import { PlayIcon, EditIcon, CheckCircle2Icon, TrashIcon } from 'lucide-react';
 
 export const Route = createFileRoute('/workflows')({
   component: WorkflowsPage,
@@ -21,11 +21,14 @@ function WorkflowsPage() {
             <PageTitle>Workflows</PageTitle>
             <PageDescription>Create and manage automated tasks.</PageDescription>
           </div>
-          <Button>Import JSON</Button>
+          <div className="flex gap-2">
+            <Button variant="outline" data-testid="btn-import-workflow">Import JSON</Button>
+            <Button data-testid="btn-create-workflow">Create Workflow</Button>
+          </div>
         </div>
       </PageHeader>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" data-testid="grid-workflow-list">
         {workflows.map(wf => (
           <Card key={wf.id} className="hover:border-primary/50 transition-colors">
             <CardHeader className="pb-2">
@@ -42,8 +45,9 @@ function WorkflowsPage() {
                 <CheckCircle2Icon className="h-3 w-3 mr-1 text-green-500" /> Last run: 2h ago
               </div>
               <div className="flex gap-2">
-                <Button variant="ghost" size="icon" className="h-8 w-8"><EditIcon className="h-4 w-4" /></Button>
-                <Button variant="default" size="icon" className="h-8 w-8"><PlayIcon className="h-4 w-4" /></Button>
+                <Button variant="ghost" size="icon" className="h-8 w-8 text-green-500"><PlayIcon className="h-4 w-4" /></Button>
+                <Button variant="ghost" size="icon" className="h-8 w-8" data-testid={`btn-edit-workflow-${wf.id}`}><EditIcon className="h-4 w-4" /></Button>
+                <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10" data-testid={`btn-delete-workflow-${wf.id}`}><TrashIcon className="h-4 w-4" /></Button>
               </div>
             </CardFooter>
           </Card>

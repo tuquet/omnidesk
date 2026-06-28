@@ -8,6 +8,9 @@ import path from 'path';
 export default defineConfig({
   plugins: [TanStackRouterVite(), react(), tailwindcss()],
   envDir: '../../../',
+  define: {
+    'import.meta.env.VITE_API_PORT': '"1422"',
+  },
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),

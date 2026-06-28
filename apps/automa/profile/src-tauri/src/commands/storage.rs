@@ -35,3 +35,32 @@ pub async fn update_storage_location(
     // Restart app to apply changes
     app_handle.restart();
 }
+
+#[tauri::command]
+pub async fn open_data_folder(app_handle: AppHandle) -> Result<(), String> {
+    let current_path = crate::system::config::get_active_storage_path(&app_handle)?;
+    
+    #[cfg(target_os = "windows")]
+    {
+        std::process::Command::new("explorer")
+            .arg(current_path)
+            .spawn()
+            .map_err(|e| e.to_string())?;
+    }
+    #[cfg(target_os = "macos")]
+    {
+        std::process::Command::new("open")
+            .arg(current_path)
+            .spawn()
+            .map_err(|e| e.to_string())?;
+    }
+    #[cfg(target_os = "linux")]
+    {
+        std::process::Command::new("xdg-open")
+            .arg(current_path)
+            .spawn()
+            .map_err(|e| e.to_string())?;
+    }
+    
+    Ok(())
+}

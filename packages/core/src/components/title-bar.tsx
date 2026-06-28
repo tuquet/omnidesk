@@ -60,7 +60,13 @@ export function TitleBar() {
               File
             </MenubarTrigger>
             <MenubarContent>
-              <MenubarItem onClick={() => platformApi.openUrl('file://')}>Open Data Folder</MenubarItem>
+              <MenubarItem onClick={async () => {
+                try {
+                  await platformApi.invoke('open_data_folder');
+                } catch (e) {
+                  toast.error('Could not open data folder: ' + String(e));
+                }
+              }}>Open Data Folder</MenubarItem>
               <MenubarSeparator />
               <MenubarItem onClick={() => platformApi.quitApp()}>
                 Quit

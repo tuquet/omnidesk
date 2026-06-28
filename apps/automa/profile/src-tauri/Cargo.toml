@@ -51,6 +51,10 @@ url = "2.5"
 sha2 = "0.11.0"
 async-stream = "0.3.6"
 tauri-plugin-log = "2"
+walkdir = "2.5.0"
+log = "0.4.33"
+tokio-stream = { version = "0.1.18", features = ["sync"] }
+sysinfo = "0.33"
 
 [[bin]]
 name = "omnidesk-automa-profile-cli"

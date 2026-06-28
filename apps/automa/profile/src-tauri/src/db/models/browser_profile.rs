@@ -7,6 +7,10 @@ pub struct ProfileGroup {
     pub color: Option<String>,
     pub created_at: Option<String>,
     pub updated_at: Option<String>,
+    pub pid: Option<i32>,
+    pub cdp_url: Option<String>,
+    pub notes: Option<String>,
+    pub tags: Option<String>,
 }
 
 use sqlx::FromRow;
@@ -23,6 +27,11 @@ pub struct BrowserProfile {
     pub last_used_at: Option<String>,
     pub created_at: Option<String>,
     pub updated_at: Option<String>,
+    pub pid: Option<i32>,
+    pub cdp_url: Option<String>,
+    pub notes: Option<String>,
+    pub tags: Option<String>,
+    pub browser_version: Option<String>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -40,6 +49,10 @@ pub struct ProfileFingerprint {
     pub disable_audio_noise: Option<bool>,
     pub created_at: Option<String>,
     pub updated_at: Option<String>,
+    pub pid: Option<i32>,
+    pub cdp_url: Option<String>,
+    pub notes: Option<String>,
+    pub tags: Option<String>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -52,6 +65,10 @@ pub struct ProfileProxy {
     pub password: Option<String>,
     pub created_at: Option<String>,
     pub updated_at: Option<String>,
+    pub pid: Option<i32>,
+    pub cdp_url: Option<String>,
+    pub notes: Option<String>,
+    pub tags: Option<String>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -62,4 +79,8 @@ pub struct ProfileExtension {
     pub is_enabled: Option<bool>,
     pub created_at: Option<String>,
     pub updated_at: Option<String>,
+    pub pid: Option<i32>,
+    pub cdp_url: Option<String>,
+    pub notes: Option<String>,
+    pub tags: Option<String>,
 }

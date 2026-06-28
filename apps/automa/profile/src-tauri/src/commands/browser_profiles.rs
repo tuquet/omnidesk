@@ -14,6 +14,9 @@ pub struct CreateBrowserProfilePayload {
     pub group_id: Option<String>,
     pub os: Option<String>,
     pub status: Option<String>,
+    pub notes: Option<String>,
+    pub tags: Option<String>,
+    pub browser_version: Option<String>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -25,6 +28,9 @@ pub struct UpdateBrowserProfilePayload {
     pub group_id: Option<String>,
     pub os: Option<String>,
     pub status: Option<String>,
+    pub notes: Option<String>,
+    pub tags: Option<String>,
+    pub browser_version: Option<String>,
 }
 
 #[command]
@@ -85,8 +91,19 @@ pub async fn launch_browser_profile(
     let browser_type = profile.browser_type.clone().unwrap_or_else(|| "chrome".to_string());
     let launcher = LauncherFactory::create(&browser_type);
     
-    // We may need to map BrowserProfile to the old struct expected by launcher,
-    // or update LauncherFactory to accept our new BrowserProfile model.
-    launcher.launch(&profile, &app, &data_dir)
-        .map_err(String::from)
+    let launch_result = launcher.launch(&profile, &app, &data_dir);
+    drop(launcher);
+
+    match launch_result {
+        Ok(pid) => {
+            let _ = sqlx::query("UPDATE browser_profiles SET status = 'RUNNING', pid = ? WHERE id = ?")
+                .bind(pid as i32)
+                .bind(&id)
+                .execute(&*pool)
+                .await;
+            BrowserProfileService::monitor_process((*pool).clone(), app.clone(), id.clone(), pid);
+            Ok(())
+        },
+        Err(e) => Err(String::from(e))
+    }
 }
