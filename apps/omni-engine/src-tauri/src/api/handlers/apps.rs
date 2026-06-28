@@ -181,7 +181,7 @@ pub async fn get_local_apps(
     // IN DEVELOPMENT: Also read from the monorepo's `apps/` folder.
     #[cfg(debug_assertions)]
     {
-        let workspace_apps_dir = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../../apps");
+        let workspace_apps_dir = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../apps");
         if workspace_apps_dir.exists() {
             if let Ok(entries) = fs::read_dir(workspace_apps_dir) {
                 for entry in entries {

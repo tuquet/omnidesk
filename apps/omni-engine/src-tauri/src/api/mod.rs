@@ -191,6 +191,6 @@ mod tests {
     fn export_openapi_json() {
         let doc = ApiDoc::openapi();
         let json = doc.to_pretty_json().expect("Failed to serialize OpenAPI spec");
-        fs::write("../../../openapi.json", json).expect("Failed to write openapi.json");
+        fs::write("../../openapi.json", json).expect("Failed to write openapi.json");
     }
 }

@@ -3,10 +3,10 @@
 @import 'shadcn/tailwind.css';
 @import '@fontsource-variable/inter';
 
-@source "../../../../../packages/ui/src";
-@source "../../../../../packages/core/src";
-@source "../../../../../packages/app-launcher/src";
-@source "../../../../../packages/features/src";
+@source "../../../packages/ui/src";
+@source "../../../packages/core/src";
+@source "../../../packages/app-launcher/src";
+@source "../../../packages/features/src";
 
 @custom-variant dark (&:is(.dark *));
 
