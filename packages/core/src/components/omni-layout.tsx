@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call */
 import React, { useEffect, useRef, useState } from 'react';
 import {
   SidebarProvider,
@@ -21,45 +20,36 @@ export interface OmniLayoutProps {
 export function OmniLayout({ sidebarContent, children }: OmniLayoutProps) {
   const { sidebarOpen, setSidebarOpen } = useLayoutStore();
   const { isDevMode } = useDevStore();
+  const [sidebarWidth, setSidebarWidth] = useState(240);
+  const isDragging = useRef(false);
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sidebarPanelRef = useRef<any>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [containerWidth, setContainerWidth] = useState(0);
+  // Custom drag logic for sidebar
+  const startDrag = (e: React.MouseEvent) => {
+    e.preventDefault();
+    isDragging.current = true;
+    document.body.style.cursor = 'col-resize';
+    const startX = e.clientX;
+    const startWidth = sidebarWidth;
 
-  useEffect(() => {
-    if (!containerRef.current) return;
-    const observer = new ResizeObserver((entries) => {
-      for (const entry of entries) {
-        setContainerWidth(entry.contentRect.width);
-      }
-    });
-    observer.observe(containerRef.current);
-    return () => observer.disconnect();
-  }, []);
+    const onMouseMove = (e: MouseEvent) => {
+      if (!isDragging.current) return;
+      const delta = e.clientX - startX;
+      let newWidth = startWidth + delta;
+      if (newWidth < 240) newWidth = 240;
+      if (newWidth > 600) newWidth = 600;
+      setSidebarWidth(newWidth);
+    };
 
-  useEffect(() => {
-    const panel = sidebarPanelRef.current;
-    if (!panel) return;
+    const onMouseUp = () => {
+      isDragging.current = false;
+      document.body.style.cursor = '';
+      window.removeEventListener('mousemove', onMouseMove);
+      window.removeEventListener('mouseup', onMouseUp);
+    };
 
-    if (sidebarOpen) {
-      if (panel.isCollapsed()) panel.expand();
-
-      // Enforce minimum physical pixel width imperatively
-      if (containerWidth > 0) {
-        const minPct = (240 / containerWidth) * 100;
-        if (panel.getSize() < minPct) {
-          panel.resize(minPct);
-        }
-      }
-    } else {
-      if (!panel.isCollapsed()) panel.collapse();
-    }
-  }, [sidebarOpen, containerWidth]);
-
-  // Convert 240px and 400px to percentages dynamically
-  const minSize = containerWidth > 0 ? (240 / containerWidth) * 100 : 15;
-  const maxSize = containerWidth > 0 ? (400 / containerWidth) * 100 : 40;
+    window.addEventListener('mousemove', onMouseMove);
+    window.addEventListener('mouseup', onMouseUp);
+  };
 
   const mainArea = (
     <SidebarProvider
@@ -67,39 +57,35 @@ export function OmniLayout({ sidebarContent, children }: OmniLayoutProps) {
       onOpenChange={setSidebarOpen}
       style={{ '--sidebar-width': '100%' } as React.CSSProperties}
     >
-      <ResizablePanelGroup ref={containerRef} orientation="horizontal" className="h-full w-full">
+      <div className="flex h-full w-full bg-background overflow-hidden relative">
+        {/* Sidebar Area */}
         {sidebarContent && (
-          <>
-            <ResizablePanel
-              id="omni-sidebar-panel"
-              ref={sidebarPanelRef}
-              collapsible={true}
-              collapsedSize={0}
-              minSize={minSize}
-              maxSize={maxSize}
-              defaultSize={minSize}
-              onCollapse={() => {
-                if (sidebarOpen) setSidebarOpen(false);
-              }}
-              onExpand={() => {
-                if (!sidebarOpen) setSidebarOpen(true);
-              }}
+          <div
+            className={cn(
+              'flex-shrink-0 relative transition-[width,opacity] duration-200 ease-linear bg-sidebar',
+              sidebarOpen ? 'opacity-100' : 'w-0 opacity-0 overflow-hidden',
+            )}
+            style={{ width: sidebarOpen ? `${sidebarWidth}px` : '0px' }}
+          >
+            <div className="w-full h-full flex flex-col min-w-[240px]">{sidebarContent}</div>
+
+            {/* Custom Resize Handle */}
+            <div
+              onMouseDown={startDrag}
               className={cn(
-                'flex flex-col relative min-h-0 bg-sidebar transition-all duration-200 ease-linear',
-                !sidebarOpen && 'overflow-hidden border-none',
+                'absolute right-0 top-0 bottom-0 w-1.5 cursor-col-resize z-50 hover:bg-border/80 transition-colors',
+                !sidebarOpen && 'hidden',
               )}
-            >
-              <div className="w-full h-full flex flex-col">{sidebarContent}</div>
-            </ResizablePanel>
-            <ResizableHandle withHandle className={sidebarOpen ? 'block' : 'hidden'} />
-          </>
-        )}
-        <ResizablePanel minSize={30} className="flex flex-col relative min-h-0">
-          <div className="flex flex-1 flex-col overflow-auto relative bg-background">
-            {children}
+            />
           </div>
-        </ResizablePanel>
-      </ResizablePanelGroup>
+        )}
+
+        {/* Separator Line */}
+        {sidebarContent && sidebarOpen && <div className="w-px h-full bg-border flex-shrink-0" />}
+
+        {/* Main Content Area */}
+        <div className="flex-1 min-w-0 flex flex-col relative bg-background">{children}</div>
+      </div>
     </SidebarProvider>
   );
 
