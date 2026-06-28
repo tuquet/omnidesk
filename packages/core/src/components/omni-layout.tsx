@@ -5,6 +5,7 @@ import {
   ResizablePanelGroup,
   ResizablePanel,
   ResizableHandle,
+  cn,
 } from '@omnidesk/ui';
 import { useLayoutStore } from '../stores/use-layout-store';
 import { useDevStore } from '../stores/use-dev-store';
@@ -57,13 +58,12 @@ export function OmniLayout({ sidebarContent, children }: OmniLayoutProps) {
               onExpand={() => {
                 if (!sidebarOpen) setSidebarOpen(true);
               }}
-              className={`flex flex-col relative min-h-0 bg-sidebar transition-all duration-200 ease-linear`}
-              style={{
-                minWidth: sidebarOpen ? '260px' : '0px',
-                maxWidth: sidebarOpen ? '400px' : '0px',
-              }}
+              className={cn(
+                'flex flex-col relative min-h-0 bg-sidebar transition-all duration-200 ease-linear',
+                sidebarOpen ? 'min-w-[240px]' : 'min-w-0 max-w-0 overflow-hidden border-none',
+              )}
             >
-              {sidebarContent}
+              <div className="w-full h-full flex flex-col min-w-[240px]">{sidebarContent}</div>
             </ResizablePanel>
             <ResizableHandle withHandle className={sidebarOpen ? 'block' : 'hidden'} />
           </>
