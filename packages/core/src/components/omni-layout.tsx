@@ -44,10 +44,18 @@ export function OmniLayout({ sidebarContent, children }: OmniLayoutProps) {
 
     if (sidebarOpen) {
       if (panel.isCollapsed()) panel.expand();
+
+      // Enforce minimum physical pixel width imperatively
+      if (containerWidth > 0) {
+        const minPct = (240 / containerWidth) * 100;
+        if (panel.getSize() < minPct) {
+          panel.resize(minPct);
+        }
+      }
     } else {
       if (!panel.isCollapsed()) panel.collapse();
     }
-  }, [sidebarOpen]);
+  }, [sidebarOpen, containerWidth]);
 
   // Convert 240px and 400px to percentages dynamically
   const minSize = containerWidth > 0 ? (240 / containerWidth) * 100 : 15;
