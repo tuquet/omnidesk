@@ -3,6 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
+  "scripts": {
+    "ui:add": "shadcn add && python fix_aliases.py"
+  },
   "main": "./src/index.ts",
   "types": "./src/index.ts",
   "exports": {
