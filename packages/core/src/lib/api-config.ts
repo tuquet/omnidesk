@@ -1,8 +1,9 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
 /**
  * Microservice API configurations.
  * Each domain has its own dedicated microservice backend.
  */
-export const RUNTIME_PORT = import.meta.env.VITE_API_PORT || '1424';
+export const RUNTIME_PORT = import.meta.env.VITE_API_PORT || '1423';
 export const PROFILE_PORT = import.meta.env.VITE_PROFILE_PORT || '1421';
 export const WORKFLOW_PORT = import.meta.env.VITE_WORKFLOW_PORT || '1422';
 

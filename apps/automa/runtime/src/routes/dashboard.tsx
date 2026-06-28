@@ -1,7 +1,22 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { PageContainer, PageHeader, PageTitle, PageDescription, Card, CardHeader, CardTitle, CardContent, ScrollArea } from '@omnidesk/ui';
-import { ActivityIcon, CpuIcon, MemoryStickIcon, TerminalIcon, ServerCrashIcon } from 'lucide-react';
-import { ActivityIcon, CpuIcon, MemoryStickIcon, TerminalIcon, ServerCrashIcon } from 'lucide-react';
+import {
+  PageContainer,
+  PageHeader,
+  PageTitle,
+  PageDescription,
+  Card,
+  CardHeader,
+  CardTitle,
+  CardContent,
+  ScrollArea,
+} from '@omnidesk/ui';
+import {
+  ActivityIcon,
+  CpuIcon,
+  MemoryStickIcon,
+  TerminalIcon,
+  ServerCrashIcon,
+} from 'lucide-react';
 
 export const Route = createFileRoute('/dashboard')({
   component: DashboardPage,
@@ -9,12 +24,20 @@ export const Route = createFileRoute('/dashboard')({
 
 function DashboardPage() {
   const logs = [
-    { time: '18:42:01', level: 'INFO', message: 'Runtime Engine started successfully on port 1421' },
+    {
+      time: '18:42:01',
+      level: 'INFO',
+      message: 'Runtime Engine started successfully on port 1421',
+    },
     { time: '18:42:05', level: 'DEBUG', message: 'Connected to local SQLite database' },
     { time: '18:42:10', level: 'WARN', message: 'Realtime sync queue is empty' },
     { time: '18:45:00', level: 'INFO', message: 'Scheduler trigger: [Scrape Daily News]' },
     { time: '18:45:01', level: 'INFO', message: 'Allocating browser profile #12 (Proxy: US-NY-1)' },
-    { time: '18:45:03', level: 'INFO', message: 'WebSocket connection established with Extension Bridge' },
+    {
+      time: '18:45:03',
+      level: 'INFO',
+      message: 'WebSocket connection established with Extension Bridge',
+    },
   ];
 
   return (
@@ -46,7 +69,7 @@ function DashboardPage() {
             <p className="text-xs text-muted-foreground">Normal load</p>
           </CardContent>
         </Card>
-        
+
         <Card className="bg-card">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Memory (RAM)</CardTitle>
@@ -90,16 +113,23 @@ function DashboardPage() {
           <ScrollArea className="h-full w-full">
             <div className="p-4 space-y-1">
               {logs.map((log, i) => (
-                <div key={i} className="flex items-start hover:bg-white/5 px-1 rounded transition-colors">
+                <div
+                  key={i}
+                  className="flex items-start hover:bg-white/5 px-1 rounded transition-colors"
+                >
                   <span className="text-zinc-500 mr-3 shrink-0">[{log.time}]</span>
-                  <span className={`shrink-0 w-12 ${log.level === 'INFO' ? 'text-blue-400' : log.level === 'WARN' ? 'text-yellow-400' : log.level === 'ERROR' ? 'text-red-400' : 'text-zinc-400'}`}>
+                  <span
+                    className={`shrink-0 w-12 ${log.level === 'INFO' ? 'text-blue-400' : log.level === 'WARN' ? 'text-yellow-400' : log.level === 'ERROR' ? 'text-red-400' : 'text-zinc-400'}`}
+                  >
                     {log.level}
                   </span>
                   <span className="ml-2 text-zinc-300 break-words">{log.message}</span>
                 </div>
               ))}
               <div className="flex items-start px-1 animate-pulse">
-                <span className="text-zinc-500 mr-3 shrink-0">[{new Date().toLocaleTimeString('en-GB', { hour12: false })}]</span>
+                <span className="text-zinc-500 mr-3 shrink-0">
+                  [{new Date().toLocaleTimeString('en-GB', { hour12: false })}]
+                </span>
                 <span className="text-zinc-400">Waiting for events...</span>
               </div>
             </div>
