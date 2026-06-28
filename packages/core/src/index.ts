@@ -29,6 +29,8 @@ export * from './stores/utils';
 export * from './providers/config-provider';
 
 export * from './components/can';
+export * from './components/dev-tools-pane';
+export * from './components/omni-layout';
 
 // API
 export * from './lib/api-config';
