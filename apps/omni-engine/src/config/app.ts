@@ -6,8 +6,9 @@
  */
 
 // ─── Branding ────────────────────────────────────────────────────────────────
-export const APP_NAME = 'OmniDesk';
-export const APP_DESCRIPTION = 'Premium B2B Enterprise Platform with App Store';
+export const APP_NAME = 'Omni Engine';
+export const APP_DESCRIPTION = 'Workflow Execution Engine';
+export const LOGO_SRC = '/logo-purple.svg';
 
 // ─── External URLs ───────────────────────────────────────────────────────────
 export const GITHUB_REPO = 'https://github.com/tuquet/omnidesk';

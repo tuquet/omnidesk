@@ -85,6 +85,8 @@ function RootComponent() {
       <AppConfigProvider
         config={{
           ...config,
+          appName: config.APP_NAME,
+          logoSrc: config.LOGO_SRC,
           navMain: config.NAV_MAIN,
           navDocuments: config.NAV_DOCUMENTS,
           navSecondary: config.NAV_SECONDARY,
@@ -98,7 +100,7 @@ function RootComponent() {
         rbac={rbac}
       >
         <ResizeHandles />
-        <TitleBar title={config.APP_NAME} />
+        <TitleBar />
         <div className="flex-1 flex flex-col min-h-0">
           <AppLayout />
         </div>
