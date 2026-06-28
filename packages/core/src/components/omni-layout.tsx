@@ -22,11 +22,13 @@ export function OmniLayout({ sidebarContent, children }: OmniLayoutProps) {
   const { isDevMode } = useDevStore();
   const [sidebarWidth, setSidebarWidth] = useState(240);
   const isDragging = useRef(false);
+  const [isDraggingState, setIsDraggingState] = useState(false);
 
   // Custom drag logic for sidebar
   const startDrag = (e: React.MouseEvent) => {
     e.preventDefault();
     isDragging.current = true;
+    setIsDraggingState(true);
     document.body.style.cursor = 'col-resize';
     const startX = e.clientX;
     const startWidth = sidebarWidth;
@@ -42,6 +44,7 @@ export function OmniLayout({ sidebarContent, children }: OmniLayoutProps) {
 
     const onMouseUp = () => {
       isDragging.current = false;
+      setIsDraggingState(false);
       document.body.style.cursor = '';
       window.removeEventListener('mousemove', onMouseMove);
       window.removeEventListener('mouseup', onMouseUp);
@@ -62,7 +65,8 @@ export function OmniLayout({ sidebarContent, children }: OmniLayoutProps) {
         {sidebarContent && (
           <div
             className={cn(
-              'flex-shrink-0 relative transition-[width,opacity] duration-200 ease-linear bg-sidebar',
+              'flex-shrink-0 relative bg-sidebar',
+              !isDraggingState && 'transition-[width,opacity] duration-200 ease-linear',
               sidebarOpen ? 'opacity-100' : 'w-0 opacity-0 overflow-hidden',
             )}
             style={{ width: sidebarOpen ? `${sidebarWidth}px` : '0px' }}
