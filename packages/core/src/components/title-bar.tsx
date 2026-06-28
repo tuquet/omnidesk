@@ -20,16 +20,17 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  DropdownMenuSeparator,
 } from '@omnidesk/ui';
 import {
   Menu,
   Home,
   ChevronDown,
-  Search,
-  Plus,
-  MoreVertical,
-  Sidebar,
-  Columns3,
+  PanelLeft,
+  GitBranch,
+  Play,
+  Shield,
+  TerminalSquare,
 } from 'lucide-react';
 import { WindowControls } from './window-controls';
 
@@ -162,10 +163,21 @@ export function TitleBar() {
           </MenubarMenu>
         </Menubar>
 
+        {/* Sidebar Toggle */}
         <Button
           variant="ghost"
           size="icon"
-          className="h-7 w-7 text-muted-foreground hover:text-foreground"
+          className="h-7 w-7 text-muted-foreground hover:bg-muted hover:text-foreground"
+          title="Toggle Sidebar"
+        >
+          <PanelLeft className="h-4 w-4" />
+        </Button>
+
+        {/* Home */}
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-7 w-7 text-muted-foreground hover:bg-muted hover:text-foreground"
         >
           <Home className="h-4 w-4" />
         </Button>
@@ -189,8 +201,14 @@ export function TitleBar() {
 
       {/* ── Center Section: Logo & App Name ── */}
       <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center justify-center gap-2 pointer-events-none">
-        <img src={config.logoSrc || "/logo-gold.svg"} alt={`${config.appName || 'OmniDesk'} Logo`} className="h-4 w-4" />
-        <span className="text-xs font-bold tracking-tight text-foreground">{config.appName || 'OmniDesk'}</span>
+        <img
+          src={config.logoSrc || '/logo-gold.svg'}
+          alt={`${config.appName || 'OmniDesk'} Logo`}
+          className="h-4 w-4"
+        />
+        <span className="text-xs font-bold tracking-tight text-foreground">
+          {config.appName || 'OmniDesk'}
+        </span>
       </div>
 
       {/* ── Drag Region (Expands to fill empty space) ── */}
@@ -212,15 +230,66 @@ export function TitleBar() {
       />
 
       {/* ── Right Section: View Toggles & Window Controls ── */}
-      <div className="flex items-center gap-1 z-10" data-tauri-drag-region>
-        <div className="flex items-center mr-2 text-muted-foreground">
-          <Button variant="ghost" size="icon" className="h-7 w-7 hover:text-foreground">
-            <Sidebar className="h-4 w-4" />
-          </Button>
-          <Button variant="ghost" size="icon" className="h-7 w-7 hover:text-foreground">
-            <Columns3 className="h-4 w-4" />
-          </Button>
-        </div>
+      <div className="flex items-center gap-1 z-10 pr-2" data-tauri-drag-region>
+        {/* Initialize Git */}
+        <Button
+          variant="outline"
+          size="sm"
+          className="h-6 px-2 mr-1 text-[10px] uppercase font-bold tracking-wider text-muted-foreground bg-transparent border-dashed hover:text-foreground"
+        >
+          <GitBranch className="h-3 w-3 mr-1.5" />
+          Initialize Git
+        </Button>
+
+        {/* Runner / Terminal */}
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-7 w-7 text-muted-foreground hover:text-foreground"
+          title="Runner"
+        >
+          <Play className="h-4 w-4" />
+        </Button>
+
+        {/* Auth / Shield */}
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-7 w-7 text-muted-foreground hover:text-foreground"
+          title="Security"
+        >
+          <Shield className="h-4 w-4" />
+        </Button>
+
+        {/* Environment Selector */}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-6 px-2 mx-1 text-xs text-muted-foreground bg-transparent border-border hover:bg-muted"
+            >
+              No Environment <ChevronDown className="ml-1 h-3 w-3" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-48">
+            <DropdownMenuItem>No Environment</DropdownMenuItem>
+            <DropdownMenuItem>Development</DropdownMenuItem>
+            <DropdownMenuItem>Production</DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem>Manage Environments...</DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+
+        {/* Dev Tools Active */}
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-7 w-7 bg-muted text-primary hover:bg-primary/20"
+          title="Dev Tools (Active)"
+        >
+          <TerminalSquare className="h-4 w-4" />
+        </Button>
 
         <WindowControls />
       </div>
