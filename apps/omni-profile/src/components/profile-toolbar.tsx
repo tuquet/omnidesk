@@ -62,7 +62,7 @@ export function ProfileToolbar({
           <SelectTrigger className="h-9 w-[150px] capitalize">
             <SelectValue placeholder="All Browsers" />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent position="popper">
             <SelectItem value="all">All Browsers</SelectItem>
             {allBrowsers.map((b) => (
               <SelectItem key={b} value={b} className="capitalize">
@@ -79,7 +79,7 @@ export function ProfileToolbar({
           <SelectTrigger className="h-9 w-[150px]">
             <SelectValue placeholder="All Tags" />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent position="popper">
             <SelectItem value="all">All Tags</SelectItem>
             {allTags.map((tag) => (
               <SelectItem key={tag} value={tag}>

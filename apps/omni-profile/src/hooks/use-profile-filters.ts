@@ -1,8 +1,10 @@
 import { useState, useMemo } from 'react';
 import type { BrowserProfile } from '@omnidesk/browser-profiles';
+import { useDebounce } from 'use-debounce';
 
 export function useProfileFilters(profiles: BrowserProfile[]) {
   const [searchQuery, setSearchQuery] = useState('');
+  const [debouncedSearchQuery] = useDebounce(searchQuery, 300);
   const [selectedTag, setSelectedTag] = useState<string | null>(null);
   const [selectedBrowser, setSelectedBrowser] = useState<string | null>(null);
 
@@ -27,8 +29,8 @@ export function useProfileFilters(profiles: BrowserProfile[]) {
   const filteredProfiles = useMemo(() => {
     return profiles.filter((p) => {
       let match = true;
-      if (searchQuery) {
-        const q = searchQuery.toLowerCase();
+      if (debouncedSearchQuery) {
+        const q = debouncedSearchQuery.toLowerCase();
         match =
           p.name.toLowerCase().includes(q) ||
           (!!p.notes && p.notes.toLowerCase().includes(q)) ||
@@ -48,7 +50,7 @@ export function useProfileFilters(profiles: BrowserProfile[]) {
       }
       return match;
     });
-  }, [profiles, searchQuery, selectedTag, selectedBrowser]);
+  }, [profiles, debouncedSearchQuery, selectedTag, selectedBrowser]);
 
   return {
     searchQuery,

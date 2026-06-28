@@ -23,6 +23,7 @@ interface ProfileTableProps {
   onStop: (id: string) => void;
   onEdit: (profile: BrowserProfile) => void;
   onDelete: (id: string) => void;
+  onCreate?: () => void;
 }
 
 export function ProfileTable({
@@ -32,6 +33,7 @@ export function ProfileTable({
   onStop,
   onEdit,
   onDelete,
+  onCreate,
 }: ProfileTableProps) {
   return (
     <TooltipProvider delayDuration={300}>
@@ -80,20 +82,23 @@ export function ProfileTable({
               // EMPTY STATE
               <TableRow>
                 <TableCell colSpan={6} className="h-64">
-                  <div className="flex flex-col items-center justify-center text-center">
-                    <div className="mb-4 rounded-full bg-muted p-4">
-                      <GhostIcon className="h-8 w-8 text-muted-foreground/60" />
+                  <div className="flex flex-col items-center justify-center text-center p-8 border-2 border-dashed border-muted-foreground/20 rounded-xl m-4 bg-muted/10">
+                    <div className="mb-4 rounded-full bg-primary/10 p-4 ring-1 ring-primary/20 shadow-inner">
+                      <GhostIcon className="h-8 w-8 text-primary/70" />
                     </div>
-                    <h3 className="text-lg font-semibold">No profiles found</h3>
-                    <p className="text-sm text-muted-foreground max-w-sm mt-1">
+                    <h3 className="text-lg font-semibold tracking-tight">No profiles found</h3>
+                    <p className="text-sm text-muted-foreground max-w-sm mt-2 mb-6">
                       There are no browser profiles matching your current filters, or you haven't
                       created one yet.
                     </p>
+                    <Button variant="outline" className="shadow-sm" onClick={onCreate}>
+                      Create your first profile
+                    </Button>
                   </div>
                 </TableCell>
               </TableRow>
             ) : (
-              profiles.map((profile) => {
+              profiles.map((profile, index) => {
                 let parsedTags: string[] = [];
                 try {
                   parsedTags = profile.tags ? (JSON.parse(profile.tags) as string[]) : [];
@@ -107,7 +112,8 @@ export function ProfileTable({
                   <TableRow
                     key={profile.id}
                     data-testid={`row-profile-${profile.id}`}
-                    className="group transition-colors"
+                    className="group transition-colors animate-in fade-in slide-in-from-bottom-2 duration-500 fill-mode-backwards"
+                    style={{ animationDelay: `${Math.min(index * 50, 500)}ms` }}
                   >
                     <TableCell className="font-medium">{profile.name}</TableCell>
                     <TableCell className="capitalize">{profile.browser_type}</TableCell>

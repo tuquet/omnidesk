@@ -123,6 +123,7 @@ function BrowserProfilesPage() {
           onStop={handleStop}
           onEdit={handleEdit}
           onDelete={handleDelete}
+          onCreate={handleCreate}
         />
       </div>
 
