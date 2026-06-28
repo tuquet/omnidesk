@@ -1,6 +1,6 @@
 {
   "$schema": "https://raw.githubusercontent.com/tauri-apps/tauri/dev/crates/tauri-cli/schema.json",
-  "productName": "OmniDesk Runtime Engine",
+  "productName": "Omni Engine",
   "version": "0.1.0",
   "identifier": "com.omnidesk.omni-engine",
   "build": {
@@ -13,7 +13,7 @@
     "macOSPrivateApi": true,
     "windows": [
       {
-        "title": "OmniDesk Runtime",
+        "title": "Omni Engine",
         "width": 1280,
         "height": 800,
         "minWidth": 900,

@@ -1,6 +1,6 @@
 {
   "$schema": "https://raw.githubusercontent.com/tauri-apps/tauri/dev/crates/tauri-cli/schema.json",
-  "productName": "OmniDesk Workflow",
+  "productName": "Omni Studio",
   "version": "0.1.0",
   "identifier": "omnidesk-omni-studio",
   "build": {
@@ -13,7 +13,7 @@
     "macOSPrivateApi": true,
     "windows": [
       {
-        "title": "OmniDesk Workflow",
+        "title": "Omni Studio",
         "width": 1280,
         "height": 800,
         "minWidth": 900,

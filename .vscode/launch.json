@@ -32,7 +32,7 @@
       "name": "🦀 Rust: Debug Tauri",
       "type": "lldb",
       "request": "launch",
-      "program": "${workspaceFolder}/apps/omni-engine/src-tauri/target/debug/omnidesk",
+      "program": "${workspaceFolder}/apps/omni-engine/src-tauri/target/debug/omni-engine",
       "args": [],
       "cwd": "${workspaceFolder}/apps/omni-engine/src-tauri",
       "sourceLanguages": ["rust"],

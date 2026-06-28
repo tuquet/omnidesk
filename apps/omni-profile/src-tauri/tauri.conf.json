@@ -1,6 +1,6 @@
 {
   "$schema": "https://raw.githubusercontent.com/tauri-apps/tauri/dev/crates/tauri-cli/schema.json",
-  "productName": "OmniDesk Profile Manager",
+  "productName": "Omni Profile",
   "version": "0.1.0",
   "identifier": "com.omnidesk.omni-profile",
   "build": {
@@ -13,7 +13,7 @@
     "macOSPrivateApi": true,
     "windows": [
       {
-        "title": "OmniDesk Profile",
+        "title": "Omni Profile",
         "width": 1280,
         "height": 800,
         "minWidth": 900,

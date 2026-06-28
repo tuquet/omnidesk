@@ -38,7 +38,7 @@
       }
     },
     {
-      "label": "🖥️ Dev: Workflow App",
+      "label": "🖥️ Dev: Omni Studio",
       "type": "shell",
       "command": "pnpm --filter @omnidesk/omni-studio tauri dev",
       "group": "build",
@@ -51,7 +51,7 @@
       }
     },
     {
-      "label": "🖥️ Dev: Profile App",
+      "label": "🖥️ Dev: Omni Profile",
       "type": "shell",
       "command": "pnpm --filter @omnidesk/omni-profile tauri dev",
       "group": "build",
@@ -64,7 +64,7 @@
       }
     },
     {
-      "label": "🖥️ Dev: Runtime App",
+      "label": "🖥️ Dev: Omni Engine",
       "type": "shell",
       "command": "pnpm --filter @omnidesk/omni-engine tauri dev",
       "group": "build",
