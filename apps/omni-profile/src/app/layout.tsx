@@ -11,11 +11,11 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
 } from '@omnidesk/ui';
-import { Database, Activity, FileJson } from 'lucide-react';
+import { Database, FileJson } from 'lucide-react';
 
 function ProfileSidebar() {
   return (
-    <Sidebar variant="inset">
+    <Sidebar variant="inset" collapsible="none">
       <SidebarHeader>
         <div className="flex items-center gap-2 px-2 py-1.5 font-semibold text-sm">
           <Database className="h-4 w-4" />

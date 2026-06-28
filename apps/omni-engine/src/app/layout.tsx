@@ -15,7 +15,7 @@ import { MonitorPlay, Settings, Terminal, Zap } from 'lucide-react';
 
 function EngineSidebar() {
   return (
-    <Sidebar variant="inset">
+    <Sidebar variant="inset" collapsible="none">
       <SidebarHeader>
         <div className="flex items-center gap-2 px-2 py-1.5 font-semibold text-sm">
           <MonitorPlay className="h-4 w-4" />
