@@ -57,7 +57,7 @@ export function OmniLayout({ sidebarContent, children }: OmniLayoutProps) {
               onExpand={() => {
                 if (!sidebarOpen) setSidebarOpen(true);
               }}
-              className="flex flex-col relative min-h-0 bg-sidebar"
+              className={`flex flex-col relative min-h-0 bg-sidebar ${sidebarOpen ? 'min-w-[250px]' : 'min-w-0'}`}
             >
               {sidebarContent}
             </ResizablePanel>
