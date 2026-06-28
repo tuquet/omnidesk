@@ -7,7 +7,7 @@
     {
       "label": "🌐 Dev: Web (Vite)",
       "type": "shell",
-      "command": "pnpm --filter @omnidesk/web dev",
+      "command": "pnpm --filter @omnidesk/web-portal dev",
       "group": "build",
       "isBackground": true,
       "problemMatcher": {
@@ -40,7 +40,7 @@
     {
       "label": "🖥️ Dev: Workflow App",
       "type": "shell",
-      "command": "pnpm --filter @omnidesk/automa-workflow tauri dev",
+      "command": "pnpm --filter @omnidesk/omni-studio tauri dev",
       "group": "build",
       "isBackground": true,
       "problemMatcher": [],
@@ -53,7 +53,7 @@
     {
       "label": "🖥️ Dev: Profile App",
       "type": "shell",
-      "command": "pnpm --filter @omnidesk/automa-profile tauri dev",
+      "command": "pnpm --filter @omnidesk/omni-profile tauri dev",
       "group": "build",
       "isBackground": true,
       "problemMatcher": [],
@@ -66,7 +66,7 @@
     {
       "label": "🖥️ Dev: Runtime App",
       "type": "shell",
-      "command": "pnpm --filter @omnidesk/automa-runtime tauri dev",
+      "command": "pnpm --filter @omnidesk/omni-engine tauri dev",
       "group": "build",
       "isBackground": true,
       "problemMatcher": [],
@@ -92,7 +92,7 @@
     {
       "label": "🚀 Dev: All Automa (WF + PRF + RT)",
       "type": "shell",
-      "command": "pnpm dev:automa",
+      "command": "pnpm dev:omni",
       "group": "build",
       "isBackground": true,
       "problemMatcher": [],
@@ -105,7 +105,7 @@
     {
       "label": "🖥️ Dev: Automa Extension",
       "type": "shell",
-      "command": "pnpm --filter automa dev",
+      "command": "pnpm --filter @omnidesk/omni-extension dev",
       "group": "build",
       "isBackground": true,
       "problemMatcher": [],
@@ -202,7 +202,7 @@
     {
       "label": "📦 Build: Web Only",
       "type": "shell",
-      "command": "pnpm --filter @omnidesk/web build",
+      "command": "pnpm --filter @omnidesk/web-portal build",
       "group": "build",
       "problemMatcher": "$tsc",
       "presentation": {
@@ -214,7 +214,7 @@
     {
       "label": "📦 Build: All Tauri Apps",
       "type": "shell",
-      "command": "pnpm --filter \"@omnidesk/automa-*\" tauri build",
+      "command": "pnpm --filter \"@omnidesk/omni-*\" tauri build",
       "group": "build",
       "problemMatcher": [],
       "presentation": {
@@ -289,7 +289,7 @@
       "type": "shell",
       "command": "cargo check",
       "options": {
-        "cwd": "${workspaceFolder}/apps/automa/runtime/src-tauri"
+        "cwd": "${workspaceFolder}/apps/omni-engine/src-tauri"
       },
       "problemMatcher": "$rustc",
       "presentation": {
@@ -303,7 +303,7 @@
       "type": "shell",
       "command": "cargo check",
       "options": {
-        "cwd": "${workspaceFolder}/apps/automa/workflow/src-tauri"
+        "cwd": "${workspaceFolder}/apps/omni-studio/src-tauri"
       },
       "problemMatcher": "$rustc",
       "presentation": {
@@ -317,7 +317,7 @@
       "type": "shell",
       "command": "cargo check",
       "options": {
-        "cwd": "${workspaceFolder}/apps/automa/profile/src-tauri"
+        "cwd": "${workspaceFolder}/apps/omni-profile/src-tauri"
       },
       "problemMatcher": "$rustc",
       "presentation": {

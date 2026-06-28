@@ -10,7 +10,7 @@ import {
   DropdownMenuSeparator,
 } from '@omnidesk/ui';
 
-export function NotificationButton() {
+export function NotificationButton({ triggerNode }: { triggerNode?: React.ReactNode }) {
   const [isOpen, setIsOpen] = useState(false);
 
   const [unreadCount] = useState(0);
@@ -22,15 +22,19 @@ export function NotificationButton() {
   return (
     <DropdownMenu open={isOpen} onOpenChange={handleOpenChange}>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" size="icon" className="relative h-9 w-9">
-          <Bell className="h-4 w-4" />
-          {unreadCount > 0 && (
-            <span className="absolute -top-1 -right-1 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-primary px-1 text-[10px] font-bold text-primary-foreground">
-              {unreadCount > 9 ? '9+' : unreadCount}
-            </span>
-          )}
-          <span className="sr-only">Notifications</span>
-        </Button>
+        {triggerNode ? (
+          triggerNode
+        ) : (
+          <Button variant="outline" size="icon" className="relative h-9 w-9">
+            <Bell className="h-4 w-4" />
+            {unreadCount > 0 && (
+              <span className="absolute -top-1 -right-1 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-primary px-1 text-[10px] font-bold text-primary-foreground">
+                {unreadCount > 9 ? '9+' : unreadCount}
+              </span>
+            )}
+            <span className="sr-only">Notifications</span>
+          </Button>
+        )}
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-80" align="end">
         <DropdownMenuLabel className="p-0">

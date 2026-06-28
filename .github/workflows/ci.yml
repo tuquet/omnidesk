@@ -30,7 +30,7 @@ jobs:
         run: pnpm typecheck
 
       - name: Build Web
-        run: pnpm --filter @omnidesk/web build
+        run: pnpm --filter @omnidesk/web-portal build
 
   backend:
     name: Backend (Cargo Check + Clippy)
@@ -49,10 +49,10 @@ jobs:
 
       - uses: Swatinem/rust-cache@v2
         with:
-          workspaces: apps/automa/runtime/src-tauri
+          workspaces: apps/omni-engine/src-tauri
 
       - name: Cargo Check
-        run: cargo check --manifest-path apps/automa/runtime/src-tauri/Cargo.toml
+        run: cargo check --manifest-path apps/omni-engine/src-tauri/Cargo.toml
 
       - name: Clippy
-        run: cargo clippy --manifest-path apps/automa/runtime/src-tauri/Cargo.toml -- -D warnings
+        run: cargo clippy --manifest-path apps/omni-engine/src-tauri/Cargo.toml -- -D warnings

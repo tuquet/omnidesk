@@ -15,6 +15,8 @@ export interface BreadcrumbEntry {
 }
 
 export interface AppConfig {
+  appName?: string;
+  logoSrc?: string;
   navMain: NavItem[];
   navDocuments: NavItem[];
   navSecondary: NavItem[];

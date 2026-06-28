@@ -19,7 +19,7 @@ import { useTranslation } from 'react-i18next';
 import { useLauncherStore } from '@omnidesk/app-launcher';
 import { APP_REGISTRY, type AppDefinition } from '@omnidesk/app-launcher';
 
-export function GlobalSearch() {
+export function GlobalSearch({ triggerNode }: { triggerNode?: React.ReactNode }) {
   const [open, setOpen] = React.useState(false);
   const navigate = useNavigate();
   const { isDevMode } = useDevStore();
@@ -56,15 +56,19 @@ export function GlobalSearch() {
 
   return (
     <>
-      <Button
-        variant="outline"
-        size="icon"
-        className="relative h-9 w-9 shrink-0"
-        onClick={() => setOpen(true)}
-      >
-        <SearchIcon className="h-4 w-4" />
-        <span className="sr-only">Search</span>
-      </Button>
+      {triggerNode ? (
+        <div onClick={() => setOpen(true)}>{triggerNode}</div>
+      ) : (
+        <Button
+          variant="outline"
+          size="icon"
+          className="relative h-9 w-9 shrink-0"
+          onClick={() => setOpen(true)}
+        >
+          <SearchIcon className="h-4 w-4" />
+          <span className="sr-only">Search</span>
+        </Button>
+      )}
       <CommandDialog open={open} onOpenChange={setOpen}>
         <Command>
           <CommandInput placeholder="Type a command or search..." />

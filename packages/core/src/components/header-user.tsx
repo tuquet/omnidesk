@@ -18,7 +18,7 @@ import { authActions, useAuth } from '@omnidesk/auth';
 import { toast } from 'sonner';
 import { useNavigate } from '@tanstack/react-router';
 
-export function HeaderUser() {
+export function HeaderUser({ triggerNode }: { triggerNode?: React.ReactNode }) {
   const { user, displayName } = useAuth();
   const navigate = useNavigate();
   
@@ -40,13 +40,17 @@ export function HeaderUser() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" size="icon" className="relative h-9 w-9 shrink-0">
-          {avatar ? (
-            <img src={avatar} alt={name} className="h-5 w-5 rounded-full object-cover" />
-          ) : (
-            <CircleUserRoundIcon className="h-4 w-4" />
-          )}
-        </Button>
+        {triggerNode ? (
+          triggerNode
+        ) : (
+          <Button variant="outline" size="icon" className="relative h-8 w-8 shrink-0 rounded-full">
+            {avatar ? (
+              <img src={avatar} alt={name} className="h-8 w-8 rounded-full object-cover" />
+            ) : (
+              <CircleUserRoundIcon className="h-4 w-4" />
+            )}
+          </Button>
+        )}
       </DropdownMenuTrigger>
       <DropdownMenuContent
         className="w-56 rounded-lg"
@@ -81,6 +85,7 @@ export function HeaderUser() {
             <DropdownMenuSeparator />
           </>
         )}
+
         {isGuest ? (
           <DropdownMenuItem onClick={handleLogin} className="cursor-pointer text-primary">
             <CircleUserRoundIcon className="mr-2 h-4 w-4" />

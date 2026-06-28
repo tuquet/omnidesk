@@ -185,36 +185,12 @@ export function TitleBar() {
             <DropdownMenuItem>Create Workspace...</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
-
-        <div className="flex items-center gap-0.5 ml-1">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-7 w-7 text-muted-foreground hover:text-foreground"
-          >
-            <Search className="h-3.5 w-3.5" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-7 w-7 text-muted-foreground hover:text-foreground"
-          >
-            <Plus className="h-3.5 w-3.5" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-7 w-7 text-muted-foreground hover:text-foreground"
-          >
-            <MoreVertical className="h-3.5 w-3.5" />
-          </Button>
-        </div>
       </div>
 
       {/* ── Center Section: Logo & App Name ── */}
       <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center justify-center gap-2 pointer-events-none">
-        <img src="/logo-gold.svg" alt="OmniDesk Logo" className="h-4 w-4" />
-        <span className="text-xs font-bold tracking-tight text-foreground">OmniDesk</span>
+        <img src={config.logoSrc || "/logo-gold.svg"} alt={`${config.appName || 'OmniDesk'} Logo`} className="h-4 w-4" />
+        <span className="text-xs font-bold tracking-tight text-foreground">{config.appName || 'OmniDesk'}</span>
       </div>
 
       {/* ── Drag Region (Expands to fill empty space) ── */}

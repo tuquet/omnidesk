@@ -14,16 +14,20 @@ const LANGUAGES = [
   { code: 'en', label: '🇺🇸 English' },
 ] as const;
 
-export function LanguageSwitcher() {
+export function LanguageSwitcher({ triggerNode }: { triggerNode?: React.ReactNode }) {
   const { i18n } = useTranslation();
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" size="icon" className="h-9 w-9">
-          <Languages className="h-4 w-4" />
-          <span className="sr-only">Switch language</span>
-        </Button>
+        {triggerNode ? (
+          triggerNode
+        ) : (
+          <Button variant="outline" size="icon" className="h-9 w-9">
+            <Languages className="h-4 w-4" />
+            <span className="sr-only">Switch language</span>
+          </Button>
+        )}
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         {LANGUAGES.map((lang) => (

@@ -4,7 +4,7 @@
   "version": "0.1.0",
   "description": "Tauri + React + Axum monorepo boilerplate",
   "scripts": {
-    "dev": "turbo run dev --filter=@omnidesk/web --filter=@omnidesk/app-*",
+    "dev": "turbo run dev --filter=@omnidesk/web-portal --filter=@omnidesk/app-*",
     "build": "turbo run build",
     "lint": "turbo run lint",
     "typecheck": "turbo run typecheck",
@@ -19,10 +19,10 @@
     "docs:preview": "vitepress preview docs",
     "dev:all": "concurrently -n WEB,DOCS -c blue,green \"pnpm dev\" \"pnpm docs:dev\"",
     "dev:desktop": "pnpm --filter @omnidesk/desktop tauri dev",
-    "dev:automa:workflow": "pnpm --filter @omnidesk/automa-workflow tauri dev",
-    "dev:automa:profile": "pnpm --filter @omnidesk/automa-profile tauri dev",
-    "dev:automa:runtime": "pnpm --filter @omnidesk/automa-runtime tauri dev",
-    "dev:automa": "concurrently -n WF,PRF,RT -c blue,magenta,green \"pnpm dev:automa:workflow\" \"pnpm dev:automa:profile\" \"pnpm dev:automa:runtime\""
+    "dev:omni:studio": "pnpm --filter @omnidesk/omni-studio tauri dev",
+    "dev:omni:profile": "pnpm --filter @omnidesk/omni-profile tauri dev",
+    "dev:omni:engine": "pnpm --filter @omnidesk/omni-engine tauri dev",
+    "dev:omni": "concurrently -n WF,PRF,RT -c blue,magenta,green \"pnpm dev:omni:studio\" \"pnpm dev:omni:profile\" \"pnpm dev:omni:engine\""
   },
   "devDependencies": {
     "@changesets/cli": "^2.27.0",

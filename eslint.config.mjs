@@ -7,7 +7,7 @@ export default [
       "**/dist/**",
       "**/node_modules/**",
       "**/src-tauri/**",
-      "apps/automa/extension/**",
+      "apps/omni-extension/**",
       "docs/**",
       "**/*.json",
       "**/*.md",

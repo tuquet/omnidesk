@@ -12,7 +12,14 @@ import {
   Search,
   Cookie,
   Wrench,
+  Monitor,
+  Languages,
 } from 'lucide-react';
+import { HeaderUser } from './header-user';
+import { NotificationButton } from './notification-button';
+import { GlobalSearch } from './global-search';
+import { ThemeToggle } from './theme-toggle';
+import { LanguageSwitcher } from './language-switcher';
 
 export function StatusBar() {
   const platformApi = usePlatform();
@@ -27,28 +34,33 @@ export function StatusBar() {
         <Button variant="ghost" size="icon" className="h-6 w-6 hover:text-foreground">
           <Settings className="h-3.5 w-3.5" />
         </Button>
-        <Button variant="ghost" size="icon" className="h-6 w-6 hover:text-foreground">
-          <Key className="h-3.5 w-3.5" />
-        </Button>
-        <Button variant="ghost" size="icon" className="h-6 w-6 hover:text-foreground">
-          <Bell className="h-3.5 w-3.5" />
-        </Button>
-        <Button
-          variant="ghost"
-          size="icon"
+        <ThemeToggle triggerNode={
+          <Button variant="ghost" size="icon" className="h-6 w-6 hover:text-foreground" title="Toggle Theme">
+            <Monitor className="h-3.5 w-3.5" />
+          </Button>
+        } />
+        <LanguageSwitcher triggerNode={
+          <Button variant="ghost" size="icon" className="h-6 w-6 hover:text-foreground" title="Switch Language">
+            <Languages className="h-3.5 w-3.5" />
+          </Button>
+        } />
+        <HeaderUser triggerNode={
+          <Button variant="ghost" size="icon" className="h-6 w-6 hover:text-foreground" title="Account & Login">
+            <Key className="h-3.5 w-3.5" />
+          </Button>
+        } />
+        <Button 
+          variant="ghost" 
+          size="icon" 
           className="h-6 w-6 hover:text-foreground"
-          onClick={() => platformApi.openUrl(config.githubRepo || '')}
+          onClick={() => platformApi.openUrl(config.githubRepo || "")}
         >
           <Github className="h-3.5 w-3.5" />
         </Button>
-
+        
         <div className="h-4 w-px bg-border mx-1" />
 
-        <Button
-          variant="ghost"
-          size="sm"
-          className="h-6 px-2 text-amber-500 hover:text-amber-400 hover:bg-amber-500/10 font-medium"
-        >
+        <Button variant="ghost" size="sm" className="h-6 px-2 text-amber-500 hover:text-amber-400 hover:bg-amber-500/10 font-medium">
           <Diamond className="h-3.5 w-3.5 mr-1.5 fill-current" />
           OmniDesk Pro
         </Button>
@@ -56,22 +68,25 @@ export function StatusBar() {
 
       {/* ── Right Section ── */}
       <div className="flex items-center gap-1">
-        <Button
-          variant="ghost"
-          size="sm"
-          className="h-6 px-2 text-amber-500 hover:text-amber-400 hover:bg-amber-500/10"
-        >
+        <GlobalSearch triggerNode={
+          <Button variant="ghost" size="icon" className="h-6 w-6 hover:text-foreground" title="Global Search (Cmd+K)">
+            <Search className="h-3.5 w-3.5" />
+          </Button>
+        } />
+
+        <NotificationButton triggerNode={
+          <Button variant="ghost" size="icon" className="h-6 w-6 hover:text-foreground" title="Notifications">
+            <Bell className="h-3.5 w-3.5" />
+          </Button>
+        } />
+
+        <Button variant="ghost" size="sm" className="h-6 px-2 text-amber-500 hover:text-amber-400 hover:bg-amber-500/10">
           <AlertTriangle className="h-3 w-3 mr-1.5" />
           System Status
         </Button>
 
         <div className="h-4 w-px bg-border mx-1" />
-
-        <Button variant="ghost" size="sm" className="h-6 px-2 hover:text-foreground">
-          <Search className="h-3.5 w-3.5 mr-1.5" />
-          Search
-        </Button>
-
+        
         <Button variant="ghost" size="sm" className="h-6 px-2 hover:text-foreground">
           <Cookie className="h-3.5 w-3.5 mr-1.5" />
           Cookies

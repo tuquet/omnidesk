@@ -1,7 +1,7 @@
 {
   "version": 2,
-  "buildCommand": "pnpm --filter @omnidesk/web build",
-  "outputDirectory": "platform/web/dist",
+  "buildCommand": "pnpm --filter @omnidesk/web-portal build",
+  "outputDirectory": "apps/web-portal/dist",
   "installCommand": "pnpm install",
   "rewrites": [
     {

@@ -1,5 +1,4 @@
 import { memo } from 'react';
-import { useNavigate } from '@tanstack/react-router';
 import {
   Button,
   DropdownMenu,
@@ -9,9 +8,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuLabel,
 } from '@omnidesk/ui';
-import { WrenchIcon, TrashIcon, BugIcon, LogOutIcon, Home } from 'lucide-react';
-import { ThemeToggle } from '@omnidesk/core';
-import { LanguageSwitcher } from '@omnidesk/core';
+import { WrenchIcon, TrashIcon, BugIcon, LogOutIcon } from 'lucide-react';
 import { NotificationButton } from '@omnidesk/core';
 import { ConsoleLoggerButton } from '@omnidesk/core';
 import { SmartBreadcrumb } from '@omnidesk/core';
@@ -21,22 +18,10 @@ import { HeaderUser } from './header-user';
 
 export const SiteHeader = memo(function SiteHeader() {
   const { isDevMode, setDevMode } = useDevStore();
-  const navigate = useNavigate();
 
   return (
     <header className="flex h-12 shrink-0 items-center border-b px-4 lg:px-6">
       <div className="flex w-full items-center gap-1 lg:gap-2 px-2">
-        <Button 
-          variant="ghost" 
-          size="icon" 
-          className="h-8 w-8 text-muted-foreground hover:text-foreground shrink-0 -ml-2"
-          onClick={() => navigate({ to: '/' })}
-          title="Home"
-        >
-          <Home className="h-4 w-4" />
-          <span className="sr-only">Home</span>
-        </Button>
-        <div className="h-4 w-px bg-border mx-1" />
         <SmartBreadcrumb />
         <div className="flex-1" />
         <div className="flex items-center gap-1 shrink-0">
@@ -84,8 +69,6 @@ export const SiteHeader = memo(function SiteHeader() {
             </>
           )}
           <NotificationButton />
-          <LanguageSwitcher />
-          <ThemeToggle />
           <HeaderUser />
         </div>
       </div>
