@@ -13,7 +13,7 @@ export const LOGO_SRC = '/logo-purple.svg';
 // ─── External URLs ───────────────────────────────────────────────────────────
 export const GITHUB_REPO = 'https://github.com/tuquet/omnidesk';
 export const GITHUB_ISSUES = `${GITHUB_REPO}/issues`;
-export const API_DOCS_URL = 'http://127.0.0.1:1424/scalar';
+export const API_DOCS_URL = 'http://127.0.0.1:1423/scalar';
 
 // ─── Default User (mock) ────────────────────────────────────────────────────
 export const DEFAULT_USER = {

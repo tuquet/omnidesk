@@ -28,7 +28,7 @@ pub struct Workflow {
 }
 
 /// A single execution of a workflow.
-#[derive(Debug, Clone, Serialize, Deserialize, FromRow)]
+#[derive(Debug, Clone, Serialize, Deserialize, FromRow, ToSchema)]
 pub struct WorkflowRun {
     pub id: String,
     pub workflow_id: String,
@@ -43,7 +43,7 @@ pub struct WorkflowRun {
 }
 
 /// Per-block execution log entry within a run.
-#[derive(Debug, Clone, Serialize, Deserialize, FromRow)]
+#[derive(Debug, Clone, Serialize, Deserialize, FromRow, ToSchema)]
 pub struct WorkflowLog {
     pub id: String,
     pub run_id: String,
@@ -56,7 +56,7 @@ pub struct WorkflowLog {
 }
 
 /// Schedule: Profile × Workflow on a cron.
-#[derive(Debug, Clone, Serialize, Deserialize, FromRow)]
+#[derive(Debug, Clone, Serialize, Deserialize, FromRow, ToSchema)]
 pub struct Schedule {
     pub id: String,
     pub name: String,

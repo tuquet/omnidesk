@@ -32,10 +32,32 @@ pub struct AppState {
         health_check,
         ping,
         me,
+        handlers::workflows::list_workflows,
+        handlers::workflows::create_workflow,
+        handlers::workflows::get_workflow,
+        handlers::workflows::update_workflow,
+        handlers::workflows::delete_workflow,
+        handlers::workflows::get_workflow_runs,
+        handlers::workflows::get_run_logs,
+        handlers::sync::push_workflows,
+        handlers::sync::export_workflow,
+        handlers::sync::import_workflow,
+        handlers::sync::sync_status,
+    ),
+    components(
+        schemas(
+            crate::db::models::workflow::Workflow,
+            crate::db::models::workflow::WorkflowRun,
+            crate::db::models::workflow::WorkflowLog,
+            crate::db::models::workflow::Schedule,
+            handlers::sync::PushWorkflowsPayload,
+            handlers::sync::SyncStatusResponse
+        )
     ),
     tags(
         (name = "health", description = "Health check endpoints"),
-        (name = "workflows", description = "Workflow management endpoints")
+        (name = "workflows", description = "Workflow management endpoints"),
+        (name = "sync", description = "Sync endpoints")
     )
 )]
 pub struct ApiDoc;

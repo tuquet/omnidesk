@@ -51,9 +51,17 @@ pub struct AppState {
         handlers::apps::install_app,
         handlers::apps::uninstall_app,
     ),
+    components(
+        schemas(
+            crate::db::models::workflow::Schedule,
+            handlers::schedules::CreateSchedulePayload,
+            handlers::schedules::UpdateSchedulePayload
+        )
+    ),
     tags(
         (name = "health", description = "Health check endpoints"),
         (name = "auth", description = "Authenticated endpoints"),
+        (name = "schedules", description = "Scheduler endpoints"),
     )
 )]
 pub struct ApiDoc;

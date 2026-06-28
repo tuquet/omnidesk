@@ -26,7 +26,7 @@ pub struct PushWorkflowsPayload {
 }
 
 /// Response for sync status
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, ToSchema)]
 pub struct SyncStatusResponse {
     pub watch_dir: String,
     pub workflow_count: usize,

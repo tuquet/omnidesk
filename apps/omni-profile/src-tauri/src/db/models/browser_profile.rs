@@ -15,7 +15,7 @@ pub struct ProfileGroup {
 
 use sqlx::FromRow;
 
-#[derive(Debug, Clone, Serialize, Deserialize, FromRow)]
+#[derive(Debug, Clone, Serialize, Deserialize, FromRow, utoipa::ToSchema)]
 pub struct BrowserProfile {
     pub id: String,
     pub name: String,
@@ -34,7 +34,7 @@ pub struct BrowserProfile {
     pub browser_version: Option<String>,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
 pub struct CreateBrowserProfilePayload {
     pub name: String,
     pub browser_type: Option<String>,
@@ -47,7 +47,7 @@ pub struct CreateBrowserProfilePayload {
     pub browser_version: Option<String>,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
 pub struct UpdateBrowserProfilePayload {
     pub id: String,
     pub name: String,

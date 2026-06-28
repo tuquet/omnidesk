@@ -20,7 +20,15 @@ pub fn router() -> Router<AppState> {
         .route("/engine-status", get(get_engine_status))
 }
 
-async fn list_profiles(
+#[utoipa::path(
+    get,
+    path = "/api/browser-profiles",
+    tag = "profiles",
+    responses(
+        (status = 200, description = "List of browser profiles", body = [BrowserProfile])
+    )
+)]
+pub async fn list_profiles(
     State(state): State<AppState>,
 ) -> Result<Json<Vec<BrowserProfile>>, StatusCode> {
     use crate::services::browser_profile_service::BrowserProfileService;
@@ -35,7 +43,16 @@ async fn list_profiles(
     Ok(Json(profiles))
 }
 
-async fn create_profile(
+#[utoipa::path(
+    post,
+    path = "/api/browser-profiles",
+    tag = "profiles",
+    request_body = crate::db::models::browser_profile::CreateBrowserProfilePayload,
+    responses(
+        (status = 200, description = "Browser profile created", body = BrowserProfile)
+    )
+)]
+pub async fn create_profile(
     State(state): State<AppState>,
     Json(payload): Json<crate::db::models::browser_profile::CreateBrowserProfilePayload>,
 ) -> Result<Json<BrowserProfile>, StatusCode> {
@@ -51,7 +68,19 @@ async fn create_profile(
     Ok(Json(profile))
 }
 
-async fn get_profile(
+#[utoipa::path(
+    get,
+    path = "/api/browser-profiles/{id}",
+    tag = "profiles",
+    params(
+        ("id" = String, Path, description = "Profile ID")
+    ),
+    responses(
+        (status = 200, description = "Browser profile", body = BrowserProfile),
+        (status = 404, description = "Profile not found")
+    )
+)]
+pub async fn get_profile(
     State(state): State<AppState>,
     Path(id): Path<String>,
 ) -> Result<Json<BrowserProfile>, StatusCode> {
@@ -68,7 +97,20 @@ async fn get_profile(
     }
 }
 
-async fn update_profile(
+#[utoipa::path(
+    put,
+    path = "/api/browser-profiles/{id}",
+    tag = "profiles",
+    params(
+        ("id" = String, Path, description = "Profile ID")
+    ),
+    request_body = crate::db::models::browser_profile::UpdateBrowserProfilePayload,
+    responses(
+        (status = 200, description = "Browser profile updated", body = BrowserProfile),
+        (status = 404, description = "Profile not found")
+    )
+)]
+pub async fn update_profile(
     State(state): State<AppState>,
     Path(id): Path<String>,
     Json(mut payload): Json<crate::db::models::browser_profile::UpdateBrowserProfilePayload>,
@@ -87,7 +129,19 @@ async fn update_profile(
     }
 }
 
-async fn delete_profile(
+#[utoipa::path(
+    delete,
+    path = "/api/browser-profiles/{id}",
+    tag = "profiles",
+    params(
+        ("id" = String, Path, description = "Profile ID")
+    ),
+    responses(
+        (status = 204, description = "Browser profile deleted"),
+        (status = 404, description = "Profile not found")
+    )
+)]
+pub async fn delete_profile(
     State(state): State<AppState>,
     Path(id): Path<String>,
 ) -> Result<StatusCode, StatusCode> {

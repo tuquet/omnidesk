@@ -30,6 +30,27 @@ pub struct AppState {
         health_check,
         ping,
         me,
+        handlers::browser_profiles::list_profiles,
+        handlers::browser_profiles::create_profile,
+        handlers::browser_profiles::get_profile,
+        handlers::browser_profiles::update_profile,
+        handlers::browser_profiles::delete_profile,
+        handlers::browser_profiles::launch_profile,
+        handlers::browser_profiles::stop_profile,
+        handlers::browser_profiles::clean_profile_storage,
+        handlers::browser_profiles::delete_browser_engine,
+        handlers::browser_profiles::get_download_status,
+        handlers::browser_profiles::get_available_versions,
+        handlers::browser_profiles::get_engine_status,
+    ),
+    components(
+        schemas(
+            crate::db::models::browser_profile::BrowserProfile,
+            crate::db::models::browser_profile::CreateBrowserProfilePayload,
+            crate::db::models::browser_profile::UpdateBrowserProfilePayload,
+            handlers::browser_profiles::BrowserVersion,
+            handlers::browser_profiles::EngineStatusResponse
+        )
     ),
     tags(
         (name = "health", description = "Health check endpoints"),
