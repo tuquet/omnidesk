@@ -19,7 +19,7 @@
       "type": "node",
       "request": "launch",
       "runtimeExecutable": "pnpm",
-      "runtimeArgs": ["--filter", "@omnidesk/web", "dev"],
+      "runtimeArgs": ["--filter", "@omnidesk/web-portal", "dev"],
       "cwd": "${workspaceFolder}",
       "console": "integratedTerminal",
       "skipFiles": ["<node_internals>/**"]
