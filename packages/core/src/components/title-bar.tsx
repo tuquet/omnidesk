@@ -3,6 +3,8 @@ import { useTheme } from 'next-themes';
 import { useTranslation } from 'react-i18next';
 import { usePlatform } from '../providers/platform-provider';
 import { useAppConfig } from '../providers/config-provider';
+import { useLayoutStore } from '../stores/use-layout-store';
+import { useDevStore } from '../stores/use-dev-store';
 
 import {
   Menubar,
@@ -39,6 +41,8 @@ export function TitleBar() {
   const { i18n } = useTranslation();
   const platformApi = usePlatform();
   const { config } = useAppConfig();
+  const { toggleSidebar, sidebarOpen } = useLayoutStore();
+  const { toggleDevMode, isDevMode } = useDevStore();
 
   if (platformApi.platform !== 'desktop') return null;
 
@@ -167,7 +171,8 @@ export function TitleBar() {
         <Button
           variant="ghost"
           size="icon"
-          className="h-7 w-7 text-muted-foreground hover:bg-muted hover:text-foreground"
+          onClick={toggleSidebar}
+          className={`h-7 w-7 ${sidebarOpen ? 'bg-muted text-primary hover:bg-primary/20' : 'text-muted-foreground hover:bg-muted hover:text-foreground'}`}
           title="Toggle Sidebar"
         >
           <PanelLeft className="h-4 w-4" />
@@ -285,8 +290,9 @@ export function TitleBar() {
         <Button
           variant="ghost"
           size="icon"
-          className="h-7 w-7 bg-muted text-primary hover:bg-primary/20"
-          title="Dev Tools (Active)"
+          onClick={toggleDevMode}
+          className={`h-7 w-7 ${isDevMode ? 'bg-muted text-primary hover:bg-primary/20' : 'text-muted-foreground hover:bg-muted hover:text-foreground'}`}
+          title={isDevMode ? 'Dev Tools (Active)' : 'Dev Tools'}
         >
           <TerminalSquare className="h-4 w-4" />
         </Button>
