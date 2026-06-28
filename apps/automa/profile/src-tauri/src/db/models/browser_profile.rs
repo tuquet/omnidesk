@@ -35,6 +35,33 @@ pub struct BrowserProfile {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct CreateBrowserProfilePayload {
+    pub name: String,
+    pub browser_type: Option<String>,
+    pub data_dir_path: String,
+    pub group_id: Option<String>,
+    pub os: Option<String>,
+    pub status: Option<String>,
+    pub notes: Option<String>,
+    pub tags: Option<String>,
+    pub browser_version: Option<String>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct UpdateBrowserProfilePayload {
+    pub id: String,
+    pub name: String,
+    pub browser_type: Option<String>,
+    pub data_dir_path: String,
+    pub group_id: Option<String>,
+    pub os: Option<String>,
+    pub status: Option<String>,
+    pub notes: Option<String>,
+    pub tags: Option<String>,
+    pub browser_version: Option<String>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ProfileFingerprint {
     pub profile_id: String,
     pub user_agent: Option<String>,

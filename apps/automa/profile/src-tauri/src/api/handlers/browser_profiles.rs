@@ -24,136 +24,85 @@ pub fn router() -> Router<AppState> {
 async fn list_profiles(
     State(state): State<AppState>,
 ) -> Result<Json<Vec<BrowserProfile>>, StatusCode> {
+    use crate::services::browser_profile_service::BrowserProfileService;
     let pool = &state.db;
-    let profiles = sqlx::query_as::<_, BrowserProfile>(
-        r#"
-        SELECT id, name, group_id, os, browser_type, data_dir_path, status, CAST(last_used_at AS TEXT) as last_used_at, CAST(created_at AS TEXT) as created_at, CAST(updated_at AS TEXT) as updated_at, notes, tags, pid, cdp_url, browser_version
-        FROM browser_profiles
-        ORDER BY created_at DESC
-        "#
-    )
-    .fetch_all(pool)
-    .await
-    .map_err(|e| {
-        eprintln!("Error fetching profiles: {}", e);
-        StatusCode::INTERNAL_SERVER_ERROR
-    })?;
+    
+    let profiles = BrowserProfileService::get_all(pool).await
+        .map_err(|e| {
+            eprintln!("Error fetching profiles: {:?}", e);
+            StatusCode::INTERNAL_SERVER_ERROR
+        })?;
 
     Ok(Json(profiles))
 }
 
 async fn create_profile(
     State(state): State<AppState>,
-    Json(mut payload): Json<BrowserProfile>,
+    Json(payload): Json<crate::db::models::browser_profile::CreateBrowserProfilePayload>,
 ) -> Result<Json<BrowserProfile>, StatusCode> {
+    use crate::services::browser_profile_service::BrowserProfileService;
     let pool = &state.db;
-    let id = Uuid::now_v7().to_string();
-    payload.id = id.clone();
-    
-    // Set defaults if missing
-    if payload.os.is_none() { payload.os = Some("win".to_string()); }
-    if payload.browser_type.is_none() { payload.browser_type = Some("chrome".to_string()); }
-    if payload.status.is_none() { payload.status = Some("IDLE".to_string()); }
 
-    sqlx::query(
-        r#"
-        INSERT INTO browser_profiles (id, name, group_id, os, browser_type, data_dir_path, status, notes, tags, browser_version)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        "#
-    )
-    .bind(&payload.id)
-    .bind(&payload.name)
-    .bind(&payload.group_id)
-    .bind(&payload.os)
-    .bind(&payload.browser_type)
-    .bind(&payload.data_dir_path)
-    .bind(&payload.status)
-    .bind(&payload.notes)
-    .bind(&payload.tags)
-    .bind(&payload.browser_version)
-    .execute(pool)
-    .await
-    .map_err(|e| {
-        eprintln!("Error creating profile: {}", e);
-        StatusCode::INTERNAL_SERVER_ERROR
-    })?;
+    let profile = BrowserProfileService::create(pool, payload).await
+        .map_err(|e| {
+            eprintln!("Error creating profile: {:?}", e);
+            StatusCode::INTERNAL_SERVER_ERROR
+        })?;
 
-    Ok(Json(payload))
+    Ok(Json(profile))
 }
 
 async fn get_profile(
     State(state): State<AppState>,
     Path(id): Path<String>,
 ) -> Result<Json<BrowserProfile>, StatusCode> {
+    use crate::services::browser_profile_service::BrowserProfileService;
     let pool = &state.db;
-    let profile = sqlx::query_as::<_, BrowserProfile>(
-        r#"
-        SELECT id, name, group_id, os, browser_type, data_dir_path, status, CAST(last_used_at AS TEXT) as last_used_at, CAST(created_at AS TEXT) as created_at, CAST(updated_at AS TEXT) as updated_at, notes, tags, pid, cdp_url, browser_version
-        FROM browser_profiles
-        WHERE id = ?
-        "#
-    )
-    .bind(id)
-    .fetch_optional(pool)
-    .await
-    .map_err(|e| {
-        eprintln!("Error fetching profile: {}", e);
-        StatusCode::INTERNAL_SERVER_ERROR
-    })?;
 
-    match profile {
-        Some(p) => Ok(Json(p)),
-        None => Err(StatusCode::NOT_FOUND),
+    match BrowserProfileService::get_by_id(pool, &id).await {
+        Ok(p) => Ok(Json(p)),
+        Err(crate::error::AppError::NotFound(_)) => Err(StatusCode::NOT_FOUND),
+        Err(e) => {
+            eprintln!("Error fetching profile: {:?}", e);
+            Err(StatusCode::INTERNAL_SERVER_ERROR)
+        }
     }
 }
 
 async fn update_profile(
     State(state): State<AppState>,
     Path(id): Path<String>,
-    Json(payload): Json<BrowserProfile>,
+    Json(mut payload): Json<crate::db::models::browser_profile::UpdateBrowserProfilePayload>,
 ) -> Result<Json<BrowserProfile>, StatusCode> {
+    use crate::services::browser_profile_service::BrowserProfileService;
     let pool = &state.db;
-    
-    sqlx::query(
-        r#"
-        UPDATE browser_profiles
-        SET name = ?, group_id = ?, os = ?, browser_type = ?, data_dir_path = ?, status = ?, updated_at = CURRENT_TIMESTAMP
-        WHERE id = ?
-        "#
-    )
-    .bind(&payload.name)
-    .bind(&payload.group_id)
-    .bind(&payload.os)
-    .bind(&payload.browser_type)
-    .bind(&payload.data_dir_path)
-    .bind(&payload.status)
-    .bind(&id)
-    .execute(pool)
-    .await
-    .map_err(|e| {
-        eprintln!("Error updating profile: {}", e);
-        StatusCode::INTERNAL_SERVER_ERROR
-    })?;
+    payload.id = id;
 
-    get_profile(State(state), Path(id)).await
+    match BrowserProfileService::update(pool, payload).await {
+        Ok(p) => Ok(Json(p)),
+        Err(crate::error::AppError::NotFound(_)) => Err(StatusCode::NOT_FOUND),
+        Err(e) => {
+            eprintln!("Error updating profile: {:?}", e);
+            Err(StatusCode::INTERNAL_SERVER_ERROR)
+        }
+    }
 }
 
 async fn delete_profile(
     State(state): State<AppState>,
     Path(id): Path<String>,
 ) -> Result<StatusCode, StatusCode> {
+    use crate::services::browser_profile_service::BrowserProfileService;
     let pool = &state.db;
     
-    sqlx::query("DELETE FROM browser_profiles WHERE id = ?")
-        .bind(id)
-        .execute(pool)
-        .await
-        .map_err(|e| {
-            eprintln!("Error deleting profile: {}", e);
-            StatusCode::INTERNAL_SERVER_ERROR
-        })?;
-
-    Ok(StatusCode::NO_CONTENT)
+    match BrowserProfileService::delete(pool, &id).await {
+        Ok(_) => Ok(StatusCode::NO_CONTENT),
+        Err(crate::error::AppError::NotFound(_)) => Err(StatusCode::NOT_FOUND),
+        Err(e) => {
+            eprintln!("Error deleting profile: {:?}", e);
+            Err(StatusCode::INTERNAL_SERVER_ERROR)
+        }
+    }
 }
 
 
@@ -177,7 +126,7 @@ pub async fn launch_profile(
     use crate::services::browser_profile_service::BrowserProfileService;
     use crate::services::browser_launcher::LauncherFactory;
 
-    let profile = match BrowserProfileService::get_by_id(pool, &id).await {
+    let _profile = match BrowserProfileService::get_by_id(pool, &id).await {
         Ok(p) => p,
         Err(e) => {
             eprintln!("Failed to get profile: {:?}", e);
@@ -185,30 +134,8 @@ pub async fn launch_profile(
         }
     };
 
-    let data_dir = match BrowserProfileService::resolve_data_dir(&app, &profile) {
-        Ok(d) => d,
-        Err(e) => {
-            eprintln!("Failed to resolve data dir: {:?}", e);
-            return Err(StatusCode::INTERNAL_SERVER_ERROR);
-        }
-    };
-
-    let browser_type = profile.browser_type.clone().unwrap_or_else(|| "chrome".to_string());
-    let launcher = LauncherFactory::create(&browser_type);
-    
-    let launch_result = launcher.launch(&profile, &app, &data_dir);
-    drop(launcher);
-    
-    match launch_result {
-        Ok(pid) => {
-            let _ = sqlx::query("UPDATE browser_profiles SET status = 'RUNNING', pid = ? WHERE id = ?")
-                .bind(pid as i32)
-                .bind(&id)
-                .execute(pool)
-                .await;
-            BrowserProfileService::monitor_process(pool.clone(), app.clone(), id.clone(), pid);
-            Ok(StatusCode::OK)
-        },
+    match BrowserProfileService::launch(pool, &app, &id).await {
+        Ok(_) => Ok(StatusCode::OK),
         Err(e) => {
             eprintln!("Failed to launch browser: {:?}", e);
             Err(StatusCode::INTERNAL_SERVER_ERROR)
@@ -283,38 +210,17 @@ async fn stop_profile(
     State(state): State<AppState>,
     Path(id): Path<String>,
 ) -> Result<StatusCode, StatusCode> {
+    use crate::services::browser_profile_service::BrowserProfileService;
     let pool = &state.db;
-    let profile = sqlx::query_as::<_, BrowserProfile>(
-        "SELECT id, name, group_id, os, browser_type, data_dir_path, status, CAST(last_used_at AS TEXT) as last_used_at, CAST(created_at AS TEXT) as created_at, CAST(updated_at AS TEXT) as updated_at, notes, tags, pid, cdp_url, browser_version FROM browser_profiles WHERE id = ?"
-    ).bind(&id).fetch_optional(pool).await.map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
     
-    let profile = match profile {
-        Some(p) => p,
-        None => return Err(StatusCode::NOT_FOUND),
-    };
-    
-    if let Some(pid) = profile.pid {
-        #[cfg(target_os = "windows")]
-        {
-            let _ = std::process::Command::new("taskkill")
-                .args(["/F", "/T", "/PID", &pid.to_string()])
-                .output();
-        }
-        #[cfg(not(target_os = "windows"))]
-        {
-            let _ = std::process::Command::new("kill")
-                .args(["-9", &pid.to_string()])
-                .output();
+    match BrowserProfileService::stop(pool, &id).await {
+        Ok(_) => Ok(StatusCode::OK),
+        Err(crate::error::AppError::NotFound(_)) => Err(StatusCode::NOT_FOUND),
+        Err(e) => {
+            eprintln!("Error stopping profile: {:?}", e);
+            Err(StatusCode::INTERNAL_SERVER_ERROR)
         }
     }
-    
-    sqlx::query("UPDATE browser_profiles SET status = 'IDLE', pid = NULL, cdp_url = NULL, updated_at = CURRENT_TIMESTAMP WHERE id = ?")
-        .bind(&id)
-        .execute(pool)
-        .await
-        .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
-    
-    Ok(StatusCode::OK)
 }
 
 use axum::response::sse::{Event, Sse};

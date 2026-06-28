@@ -5,17 +5,7 @@ use std::io::Write;
 use reqwest::Client;
 use crate::error::AppError;
 
-#[derive(Clone, serde::Serialize, serde::Deserialize, utoipa::ToSchema)]
-pub struct DownloadProgress {
-    pub status: String,
-    pub downloaded_bytes: u64,
-    pub total_bytes: Option<u64>,
-    pub percentage: Option<f64>,
-}
-
-const CHROMIUM_URL: &str = "https://cdn.playwright.dev/builds/cft/149.0.7827.55/win64/chrome-win64.zip";
-
-pub async fn emit_progress(app: &AppHandle, progress: DownloadProgress) {
+pub async fn emit_progress(app: &AppHandle, progress: crate::DownloadProgress) {
     use tauri::Manager;
     if let Some(state) = app.try_state::<crate::DownloadProgressState>() {
         let _ = state.tx.send(progress);
@@ -47,12 +37,12 @@ pub async fn download_browser_if_missing(
         
     let total_size = res.content_length();
     
-    // Emit initial 0% progress
-    emit_progress(app, DownloadProgress {
+    emit_progress(app, crate::DownloadProgress {
+        browser: "chromium".to_string(),
         status: "downloading".to_string(),
-        downloaded_bytes: 0,
-        total_bytes: total_size,
-        percentage: Some(0.0),
+        downloaded: 0,
+        total: total_size.unwrap_or(0),
+        percent: 0.0,
     }).await;
     
     let mut downloaded: u64 = 0;
@@ -73,11 +63,12 @@ pub async fn download_browser_if_missing(
         if let Some(p) = percentage {
             if p - last_percentage > 1.0 || downloaded == total_size.unwrap_or(0) {
                 last_percentage = p;
-                emit_progress(app, DownloadProgress {
+                emit_progress(app, crate::DownloadProgress {
+                    browser: "chromium".to_string(),
                     status: "downloading".to_string(),
-                    downloaded_bytes: downloaded,
-                    total_bytes: total_size,
-                    percentage,
+                    downloaded,
+                    total: total_size.unwrap_or(0),
+                    percent: p as f32,
                 }).await;
             }
         }
@@ -86,30 +77,38 @@ pub async fn download_browser_if_missing(
     file.flush().unwrap();
     
     log::info!("[Downloader] Download complete. Extracting...");
-    emit_progress(app, DownloadProgress {
+    emit_progress(app, crate::DownloadProgress {
+        browser: "chromium".to_string(),
         status: "extracting".to_string(),
-        downloaded_bytes: downloaded,
-        total_bytes: total_size,
-        percentage: Some(100.0),
+        downloaded,
+        total: total_size.unwrap_or(0),
+        percent: 100.0,
     }).await;
     
     let zip_file = std::fs::File::open(&zip_path)
         .map_err(|e| AppError::Internal(format!("Failed to open zip for extraction: {}", e)))?;
         
-    let mut archive = zip::ZipArchive::new(zip_file)
-        .map_err(|e| AppError::Internal(format!("Failed to read zip archive: {}", e)))?;
-        
-    archive.extract(browser_dir)
-        .map_err(|e| AppError::Internal(format!("Failed to extract zip archive: {}", e)))?;
-        
-    let _ = std::fs::remove_file(&zip_path);
+    let browser_dir_clone = browser_dir.clone();
+    let zip_path_clone = zip_path.clone();
+
+    tokio::task::spawn_blocking(move || {
+        let mut archive = zip::ZipArchive::new(zip_file)
+            .map_err(|e| AppError::Internal(format!("Failed to read zip archive: {}", e)))?;
+            
+        archive.extract(&browser_dir_clone)
+            .map_err(|e| AppError::Internal(format!("Failed to extract zip archive: {}", e)))?;
+            
+        let _ = std::fs::remove_file(&zip_path_clone);
+        Ok::<(), AppError>(())
+    }).await.map_err(|e| AppError::Internal(format!("Task join error: {}", e)))??;
     
     log::info!("[Downloader] Extraction complete!");
-    emit_progress(app, DownloadProgress {
+    emit_progress(app, crate::DownloadProgress {
+        browser: "chromium".to_string(),
         status: "done".to_string(),
-        downloaded_bytes: downloaded,
-        total_bytes: total_size,
-        percentage: Some(100.0),
+        downloaded,
+        total: total_size.unwrap_or(0),
+        percent: 100.0,
     }).await;
 
     Ok(exe_path)

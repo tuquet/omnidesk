@@ -1,8 +1,7 @@
 use sqlx::SqlitePool;
 use uuid::Uuid;
 use crate::error::AppError;
-use crate::commands::browser_profiles::{CreateBrowserProfilePayload, UpdateBrowserProfilePayload};
-use crate::db::models::browser_profile::BrowserProfile;
+use crate::db::models::browser_profile::{BrowserProfile, CreateBrowserProfilePayload, UpdateBrowserProfilePayload};
 use std::path::PathBuf;
 
 pub struct BrowserProfileService;
@@ -169,6 +168,53 @@ impl BrowserProfileService {
             return Err(AppError::NotFound(format!("Profile {} not found", id)));
         }
 
+        Ok(())
+    }
+
+    pub async fn stop(pool: &SqlitePool, id: &str) -> Result<(), AppError> {
+        let profile = Self::get_by_id(pool, id).await?;
+        
+        if let Some(pid) = profile.pid {
+            #[cfg(target_os = "windows")]
+            {
+                let _ = std::process::Command::new("taskkill")
+                    .args(["/F", "/T", "/PID", &pid.to_string()])
+                    .output();
+            }
+            #[cfg(not(target_os = "windows"))]
+            {
+                let _ = std::process::Command::new("kill")
+                    .args(["-9", &pid.to_string()])
+                    .output();
+            }
+        }
+        
+        sqlx::query("UPDATE browser_profiles SET status = 'IDLE', pid = NULL, cdp_url = NULL, updated_at = CURRENT_TIMESTAMP WHERE id = ?")
+            .bind(id)
+            .execute(pool)
+            .await?;
+            
+        Ok(())
+    }
+
+    pub async fn launch(pool: &SqlitePool, app: &tauri::AppHandle, id: &str) -> Result<(), AppError> {
+        let profile = Self::get_by_id(pool, id).await?;
+        
+        use crate::services::browser_launcher::LauncherFactory;
+        let browser_type = profile.browser_type.clone().unwrap_or_else(|| "chrome".to_string());
+        let launcher = LauncherFactory::create(&browser_type);
+        let data_dir = Self::resolve_data_dir(app, &profile)?;
+        
+        let pid = launcher.launch(&profile, app, &data_dir).await?;
+        
+        let _ = sqlx::query("UPDATE browser_profiles SET status = 'RUNNING', pid = ?, last_used_at = CURRENT_TIMESTAMP WHERE id = ?")
+            .bind(pid as i32)
+            .bind(id)
+            .execute(pool)
+            .await?;
+            
+        Self::monitor_process(pool.clone(), app.clone(), id.to_string(), pid);
+        
         Ok(())
     }
 

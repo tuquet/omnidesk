@@ -2,36 +2,9 @@ use serde::Deserialize;
 use sqlx::SqlitePool;
 use tauri::{State, command};
 
-use crate::db::models::browser_profile::BrowserProfile;
+use crate::db::models::browser_profile::{BrowserProfile, CreateBrowserProfilePayload, UpdateBrowserProfilePayload};
 use crate::services::browser_profile_service::BrowserProfileService;
 use crate::services::browser_launcher::LauncherFactory;
-
-#[derive(Debug, Deserialize)]
-pub struct CreateBrowserProfilePayload {
-    pub name: String,
-    pub browser_type: Option<String>,
-    pub data_dir_path: String,
-    pub group_id: Option<String>,
-    pub os: Option<String>,
-    pub status: Option<String>,
-    pub notes: Option<String>,
-    pub tags: Option<String>,
-    pub browser_version: Option<String>,
-}
-
-#[derive(Debug, Deserialize)]
-pub struct UpdateBrowserProfilePayload {
-    pub id: String,
-    pub name: String,
-    pub browser_type: Option<String>,
-    pub data_dir_path: String,
-    pub group_id: Option<String>,
-    pub os: Option<String>,
-    pub status: Option<String>,
-    pub notes: Option<String>,
-    pub tags: Option<String>,
-    pub browser_version: Option<String>,
-}
 
 #[command]
 pub async fn get_browser_profiles(
@@ -78,32 +51,28 @@ pub async fn launch_browser_profile(
     pool: State<'_, SqlitePool>,
     app: tauri::AppHandle,
 ) -> Result<(), String> {
-    // 1. Get profile from service
-    let profile = BrowserProfileService::get_by_id(&pool, &id)
+    BrowserProfileService::launch(&*pool, &app, &id)
         .await
-        .map_err(String::from)?;
+        .map_err(|e| String::from(e))
+}
 
-    // 2. Resolve Data Dir
-    let data_dir = BrowserProfileService::resolve_data_dir(&app, &profile)
-        .map_err(String::from)?;
+#[command]
+pub async fn stop_browser_profile(
+    pool: State<'_, SqlitePool>,
+    id: String,
+) -> Result<(), String> {
+    BrowserProfileService::stop(&*pool, &id)
+        .await
+        .map_err(|e| String::from(e))
+}
 
-    // 3. Delegate to Strategy/Factory
-    let browser_type = profile.browser_type.clone().unwrap_or_else(|| "chrome".to_string());
-    let launcher = LauncherFactory::create(&browser_type);
-    
-    let launch_result = launcher.launch(&profile, &app, &data_dir);
-    drop(launcher);
-
-    match launch_result {
-        Ok(pid) => {
-            let _ = sqlx::query("UPDATE browser_profiles SET status = 'RUNNING', pid = ? WHERE id = ?")
-                .bind(pid as i32)
-                .bind(&id)
-                .execute(&*pool)
-                .await;
-            BrowserProfileService::monitor_process((*pool).clone(), app.clone(), id.clone(), pid);
-            Ok(())
-        },
-        Err(e) => Err(String::from(e))
-    }
+pub fn get_handlers() -> impl Fn(tauri::ipc::Invoke) -> bool {
+    tauri::generate_handler![
+        get_browser_profiles,
+        create_browser_profile,
+        update_browser_profile,
+        delete_browser_profile,
+        launch_browser_profile,
+        stop_browser_profile,
+    ]
 }

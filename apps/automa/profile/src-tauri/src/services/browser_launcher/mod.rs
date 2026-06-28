@@ -6,28 +6,46 @@ use crate::db::models::browser_profile::BrowserProfile;
 pub mod chrome;
 pub mod edge;
 pub mod firefox;
+pub mod downloader;
 
-/// Strategy pattern for launching different browser engines
-pub trait BrowserLauncher {
+pub enum BrowserLauncher {
+    Chrome(chrome::ChromeLauncher),
+    Edge(edge::EdgeLauncher),
+    Firefox(firefox::FirefoxLauncher),
+}
+
+impl BrowserLauncher {
     /// Resolve the executable path for the browser
-    fn resolve_executable(&self, profile: &BrowserProfile) -> Result<String, AppError>;
+    pub async fn resolve_executable(&self, profile: &BrowserProfile, app: &tauri::AppHandle) -> Result<String, AppError> {
+        match self {
+            Self::Chrome(l) => l.resolve_executable(profile, app).await,
+            Self::Edge(l) => l.resolve_executable(profile, app).await,
+            Self::Firefox(l) => l.resolve_executable(profile, app).await,
+        }
+    }
     
     /// Build the std::process::Command with all necessary arguments
-    fn build_command(
+    pub async fn build_command(
         &self, 
         profile: &BrowserProfile, 
         app: &tauri::AppHandle,
         data_dir: &PathBuf
-    ) -> Result<Command, AppError>;
+    ) -> Result<Command, AppError> {
+        match self {
+            Self::Chrome(l) => l.build_command(profile, app, data_dir).await,
+            Self::Edge(l) => l.build_command(profile, app, data_dir).await,
+            Self::Firefox(l) => l.build_command(profile, app, data_dir).await,
+        }
+    }
 
     /// Launch the browser process detached
-    fn launch(
+    pub async fn launch(
         &self,
         profile: &BrowserProfile,
         app: &tauri::AppHandle,
         data_dir: &PathBuf
     ) -> Result<u32, AppError> {
-        let mut cmd = self.build_command(profile, app, data_dir)?;
+        let mut cmd = self.build_command(profile, app, data_dir).await?;
         
         println!("[Tauri] Launching browser via Strategy: {:?}", cmd);
         
@@ -40,13 +58,13 @@ pub struct LauncherFactory;
 
 impl LauncherFactory {
     /// Factory pattern to return the appropriate launcher strategy
-    pub fn create(browser_type: &str) -> Box<dyn BrowserLauncher> {
+    pub fn create(browser_type: &str) -> BrowserLauncher {
         match browser_type.to_lowercase().as_str() {
-            "chrome" => Box::new(chrome::ChromeLauncher),
-            "edge" => Box::new(edge::EdgeLauncher),
-            "firefox" => Box::new(firefox::FirefoxLauncher),
+            "chrome" => BrowserLauncher::Chrome(chrome::ChromeLauncher),
+            "edge" => BrowserLauncher::Edge(edge::EdgeLauncher),
+            "firefox" => BrowserLauncher::Firefox(firefox::FirefoxLauncher),
             // Default fallback to Chrome
-            _ => Box::new(chrome::ChromeLauncher),
+            _ => BrowserLauncher::Chrome(chrome::ChromeLauncher),
         }
     }
 }
