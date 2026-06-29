@@ -27,14 +27,24 @@ impl WorkflowExecutor {
         profile_id: &str,
         schedule_id: Option<&str>,
     ) -> Result<WorkflowRun, AppError> {
-        // 1. Verify workflow exists
-        let workflow_name: String = sqlx::query_scalar(
-            "SELECT name FROM workflows WHERE id = ?"
-        )
-        .bind(workflow_id)
-        .fetch_one(db)
-        .await
-        .map_err(|_| AppError::NotFound(format!("Workflow {} not found", workflow_id)))?;
+        // 1. Verify workflow exists by querying Omni Studio
+        let client = Client::new();
+        let studio_url = format!("http://127.0.0.1:1422/api/workflows/{}", workflow_id);
+        
+        let workflow_res = client.get(&studio_url).send().await;
+        
+        let workflow_name = match workflow_res {
+            Ok(res) if res.status().is_success() => {
+                let workflow: WorkflowResponse = res.json().await.map_err(|e| AppError::Internal(format!("Failed to parse workflow: {}", e)))?;
+                workflow.name
+            },
+            Ok(res) => {
+                return Err(AppError::NotFound(format!("Workflow {} not found (Studio returned {})", workflow_id, res.status())));
+            },
+            Err(e) => {
+                return Err(AppError::Internal(format!("Failed to connect to Omni Studio: {}", e)));
+            }
+        };
 
         println!("[Executor] Starting workflow '{}' ({})", workflow_name, workflow_id);
 

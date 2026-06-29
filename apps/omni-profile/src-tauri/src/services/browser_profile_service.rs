@@ -90,7 +90,7 @@ impl BrowserProfileService {
         Ok(())
     }
 
-    pub fn monitor_process(pool: SqlitePool, app: tauri::AppHandle, profile_id: String, pid: u32) {
+    pub fn monitor_process(pool: SqlitePool, app: tauri::AppHandle, profile_id: String, pid: u32, data_dir_path: String) {
         tokio::spawn(async move {
             let mut sys = sysinfo::System::new_all();
             let sys_pid = sysinfo::Pid::from_u32(pid);
@@ -112,6 +112,20 @@ impl BrowserProfileService {
                         .bind(&profile_id)
                         .execute(&pool)
                         .await;
+                    
+                    let data_dir = std::path::PathBuf::from(&data_dir_path);
+                    let zip_path = std::path::PathBuf::from(format!("{}.zip", data_dir.display()));
+                    
+                    if let Err(e) = crate::services::storage_optimizer::StorageOptimizer::clean_storage(&data_dir) {
+                        log::error!("Failed to clean storage: {:?}", e);
+                    }
+                    if let Err(e) = crate::services::storage_optimizer::StorageOptimizer::zip_dir(&data_dir, &zip_path) {
+                        log::error!("Failed to zip directory: {:?}", e);
+                    }
+                    
+                    if let Err(e) = std::fs::remove_dir_all(&data_dir) {
+                        log::error!("Failed to remove data dir: {}", e);
+                    }
                     
                     use tauri::Emitter;
                     let _ = app.emit("profile-status-changed", serde_json::json!({
@@ -232,6 +246,25 @@ impl BrowserProfileService {
         let browser_type = profile.browser_type.clone().unwrap_or_else(|| "chrome".to_string());
         let launcher = LauncherFactory::create(&browser_type);
         let data_dir = Self::resolve_data_dir(app, &profile)?;
+        let zip_path = std::path::PathBuf::from(format!("{}.zip", data_dir.display()));
+        
+        if data_dir.exists() {
+            log::warn!("Found existing unzipped data dir, assuming recovery from unexpected crash: {:?}", data_dir);
+        } else if zip_path.exists() {
+            let _ = sqlx::query("UPDATE browser_profiles SET status = 'PREPARING' WHERE id = ?").bind(id).execute(pool).await;
+            use tauri::Emitter;
+            let _ = app.emit("profile-status-changed", serde_json::json!({
+                "id": id,
+                "status": "PREPARING"
+            }));
+            
+            if let Err(e) = crate::services::storage_optimizer::StorageOptimizer::unzip_dir(&zip_path, &data_dir) {
+                log::error!("Failed to unzip profile: {:?}", e);
+            }
+        } else {
+            std::fs::create_dir_all(&data_dir)
+                .map_err(|e| crate::error::AppError::Internal(format!("Failed to create data dir: {}", e)))?;
+        }
         
         let pid = launcher.launch(&profile, app, &data_dir).await?;
         
@@ -241,7 +274,7 @@ impl BrowserProfileService {
             .execute(pool)
             .await?;
             
-        Self::monitor_process(pool.clone(), app.clone(), id.to_string(), pid);
+        Self::monitor_process(pool.clone(), app.clone(), id.to_string(), pid, data_dir.to_string_lossy().to_string());
         
         Ok(())
     }
@@ -252,13 +285,10 @@ impl BrowserProfileService {
             .map_err(|_| AppError::Internal("Failed to get storage path".to_string()))?;
         
         let data_dir = if profile.data_dir_path.contains(":") || profile.data_dir_path.starts_with("/") {
-            PathBuf::from(&profile.data_dir_path)
+            std::path::PathBuf::from(&profile.data_dir_path)
         } else {
             app_dir.join(&profile.data_dir_path)
         };
-
-        std::fs::create_dir_all(&data_dir)
-            .map_err(|e| AppError::Internal(format!("Failed to create data dir: {}", e)))?;
 
         Ok(data_dir)
     }

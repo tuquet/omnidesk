@@ -109,6 +109,7 @@ pub async fn serve(pool: SqlitePool, app_dir: PathBuf, port: u16, app_handle: Ap
         .route("/api/me", get(me))
         .nest("/api/automa", handlers::automa::router())
         .nest("/api/automa/schedules", handlers::schedules::router())
+        .nest("/api/engine/runs", handlers::runs::router())
         .nest("/api/marketplace/apps", handlers::apps::router())
         .route("/mcp/sse", get(handlers::mcp::mcp_sse))
         .route("/mcp/messages", post(handlers::mcp::mcp_messages))

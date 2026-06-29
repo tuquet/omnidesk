@@ -1,10 +1,87 @@
-<svg width="600" height="600" viewBox="0 0 600 600" fill="none" xmlns="http://www.w3.org/2000/svg">
-	<rect x="53" y="58" width="452" height="452" rx="80" stroke="context-fill" stroke-width="30" stroke-linejoin="round"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="24 21 453 453" width="100%" height="100%">
+  <defs>
+    <!-- Gradients Vàng kim Champagne Gold -->
+    <linearGradient id="top1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFFDF5" />
+      <stop offset="100%" stop-color="#FFEBB3" />
+    </linearGradient>
+    <linearGradient id="top2" x1="100%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFEBB3" />
+      <stop offset="100%" stop-color="#FCD34D" />
+    </linearGradient>
+    <linearGradient id="top3" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#FCD34D" />
+      <stop offset="100%" stop-color="#D97706" />
+    </linearGradient>
+    <linearGradient id="top4" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFEBB3" />
+      <stop offset="100%" stop-color="#D97706" />
+    </linearGradient>
 
-	<g fill-rule='evenodd' fill='context-fill'>
-		<path d="
-			M175 90h292A80 80 0 0 1 547 170v292A80 80 0 0 1 467 542h-292A80 80 0 0 1 95 462v-292A80 80 0 0 1 175 90M95 90M321 316
-			M293.667 220.666C304.723 198.554 336.277 198.554 347.333 220.666L432.308 390.616C444.814 415.628 419.067 443.212 392.87 433.428C363.012 422.277 332.936 412.348 320.5 412.348C308.064 412.348 277.988 422.277 248.13 433.428C221.933 443.212 196.186 415.628 208.692 390.616L293.667 220.666Z
-		" rx="80"/>
-	</g>
+    <linearGradient id="left1" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FCD34D" />
+      <stop offset="100%" stop-color="#D97706" />
+    </linearGradient>
+    <linearGradient id="left2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#D97706" />
+      <stop offset="100%" stop-color="#B45309" />
+    </linearGradient>
+    <linearGradient id="left3" x1="0%" y1="100%" x2="0%" y2="0%">
+      <stop offset="0%" stop-color="#B45309" />
+      <stop offset="100%" stop-color="#78350F" />
+    </linearGradient>
+    <linearGradient id="left4" x1="100%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#D97706" />
+      <stop offset="100%" stop-color="#78350F" />
+    </linearGradient>
+
+    <linearGradient id="right1" x1="100%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#D97706" />
+      <stop offset="100%" stop-color="#78350F" />
+    </linearGradient>
+    <linearGradient id="right2" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#B45309" />
+      <stop offset="100%" stop-color="#451A03" />
+    </linearGradient>
+    <linearGradient id="right3" x1="100%" y1="100%" x2="0%" y2="0%">
+      <stop offset="0%" stop-color="#451A03" />
+      <stop offset="100%" stop-color="#1C0A00" />
+    </linearGradient>
+    <linearGradient id="right4" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#78350F" />
+      <stop offset="100%" stop-color="#1C0A00" />
+    </linearGradient>
+  </defs>
+
+  <!-- B. Khối Lập Phương Champagne Gold (Nền Trong Suốt) -->
+  <g>
+    <!-- MẶT TRÊN -->
+    <polygon points="250,26 58,138 250,138" fill="url(#top1)" />
+    <polygon points="250,26 442,138 250,138" fill="url(#top2)" />
+    <polygon points="442,138 250,250 250,138" fill="url(#top3)" />
+    <polygon points="58,138 250,250 250,138" fill="url(#top4)" />
+
+    <!-- MẶT TRÁI -->
+    <polygon points="58,138 154,306 58,362" fill="url(#left1)" />
+    <polygon points="58,138 250,250 154,306" fill="url(#left2)" />
+    <polygon points="250,250 250,474 154,306" fill="url(#left3)" />
+    <polygon points="58,362 250,474 154,306" fill="url(#left4)" />
+
+    <!-- MẶT PHẢI -->
+    <polygon points="250,250 442,138 346,306" fill="url(#right1)" />
+    <polygon points="442,138 442,362 346,306" fill="url(#right2)" />
+    <polygon points="442,362 250,474 346,306" fill="url(#right3)" />
+    <polygon points="250,250 250,474 346,306" fill="url(#right4)" />
+
+    <!-- HIGHLIGHTS ĐÓN SÁNG -->
+    <line x1="250" y1="29" x2="250" y2="138" stroke="#FFFDF5" stroke-width="1.5" stroke-linecap="round" opacity="0.65" />
+    <line x1="61" y1="138" x2="250" y2="138" stroke="#FFFDF5" stroke-width="1.2" stroke-linecap="round" opacity="0.4" />
+    <line x1="61" y1="143.25" x2="154" y2="306" stroke="#FFFDF5" stroke-width="1.2" stroke-linecap="round" opacity="0.4" />
+    <line x1="250" y1="250" x2="154" y2="306" stroke="#FFFDF5" stroke-width="1.2" stroke-linecap="round" opacity="0.45" />
+
+    <!-- SHADOW LINES KHUẤT SÁNG -->
+    <line x1="439" y1="143.25" x2="346" y2="306" stroke="#3A1702" stroke-width="1.2" stroke-linecap="round" opacity="0.5" />
+    <line x1="250" y1="250" x2="346" y2="306" stroke="#3A1702" stroke-width="1.2" stroke-linecap="round" opacity="0.5" />
+    <line x1="439" y1="138" x2="250" y2="138" stroke="#78350F" stroke-width="1.2" stroke-linecap="round" opacity="0.25" />
+  </g>
 </svg>

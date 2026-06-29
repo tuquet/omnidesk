@@ -60,27 +60,48 @@ async fn handle_socket(socket: WebSocket, state: AppState) {
                 use tauri::Emitter;
                 let _ = app_clone.emit("e2e-log", format!("[AUTOMA] Received event: {}", event.event_type));
 
-                // Forward events to Omni Studio via REST API
+                // Process events directly in Engine DB
+                let db = state.db.clone();
                 match event.event_type.as_str() {
                     "run_started" => {
-                        let _ = client.post(format!("{}/api/automa/workflows/runs", studio_url))
-                            .json(&event.payload)
-                            .send()
-                            .await;
+                        let _ = app_clone.emit("e2e-log", "Run started (tracked in engine DB)");
                     },
                     "run_finished" => {
                         if let Some(run_id) = event.payload.get("run_id").and_then(|v| v.as_str()) {
-                            let _ = client.put(format!("{}/api/automa/workflows/runs/{}", studio_url, run_id))
-                                .json(&event.payload)
-                                .send()
+                            let status = event.payload.get("status").and_then(|v| v.as_str()).unwrap_or("COMPLETED");
+                            let now = chrono::Utc::now().timestamp_millis();
+                            let _ = sqlx::query("UPDATE workflow_runs SET status = ?, updated_at = ?, finished_at = ? WHERE id = ?")
+                                .bind(status)
+                                .bind(now)
+                                .bind(now)
+                                .bind(run_id)
+                                .execute(&db)
                                 .await;
+                            let _ = app_clone.emit("e2e-log", "Run finished (saved to engine DB)");
                         }
                     },
                     "log_added" => {
                         if let Some(run_id) = event.payload.get("run_id").and_then(|v| v.as_str()) {
-                            let _ = client.post(format!("{}/api/automa/workflows/runs/{}/logs", studio_url, run_id))
-                                .json(&event.payload)
-                                .send()
+                            let block_id = event.payload.get("block_id").and_then(|v| v.as_str()).unwrap_or("");
+                            let block_label = event.payload.get("block_label").and_then(|v| v.as_str()).unwrap_or("");
+                            let status = event.payload.get("status").and_then(|v| v.as_str()).unwrap_or("SUCCESS");
+                            let log_id = uuid::Uuid::new_v4().to_string();
+                            let now = chrono::Utc::now().timestamp_millis();
+                            
+                            // Optional data parsing
+                            let duration_ms = event.payload.get("duration_ms").and_then(|v| v.as_i64());
+                            let data = event.payload.get("data").and_then(|v| v.as_str());
+
+                            let _ = sqlx::query("INSERT INTO workflow_logs (id, run_id, block_id, block_label, status, duration_ms, data, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)")
+                                .bind(log_id)
+                                .bind(run_id)
+                                .bind(block_id)
+                                .bind(block_label)
+                                .bind(status)
+                                .bind(duration_ms)
+                                .bind(data)
+                                .bind(now)
+                                .execute(&db)
                                 .await;
                         }
                     },

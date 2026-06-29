@@ -38,8 +38,8 @@ pub fn run() {
         })
         .setup(|app| {
             // Setup System Tray
-            let quit_i = MenuItem::with_id(app, "quit", "Quit OmniDesk", true, None::<&str>)?;
-            let toggle_i = MenuItem::with_id(app, "toggle", "Show/Hide OmniDesk", true, None::<&str>)?;
+            let quit_i = MenuItem::with_id(app, "quit", "Quit Omni Profile", true, None::<&str>)?;
+            let toggle_i = MenuItem::with_id(app, "toggle", "Show/Hide Omni Profile", true, None::<&str>)?;
             let menu = Menu::with_items(app, &[&toggle_i, &quit_i])?;
 
             let _tray = TrayIconBuilder::new()

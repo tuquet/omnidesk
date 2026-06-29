@@ -1,4 +1,4 @@
-﻿use axum::{
+use axum::{
     extract::{Path, Query, State},
     routing::{get, post, put},
     Json, Router,
@@ -14,9 +14,8 @@ pub fn router() -> Router<AppState> {
         .route("/", get(list_workflows).post(create_workflow))
         .route("/:id", get(get_workflow).put(update_workflow).delete(delete_workflow))
         .route("/runs", post(create_workflow_run))
-        .route("/runs/:run_id", put(finish_workflow_run))
-        .route("/runs/:run_id/logs", get(get_run_logs).post(add_workflow_log))
         .route("/:id/runs", get(get_workflow_runs))
+        .route("/runs/:run_id/logs", get(get_run_logs))
 }
 
 // ─── Workflow CRUD ───────────────────────────────────────────
@@ -128,7 +127,7 @@ async fn delete_workflow(
 
 // ─── Workflow Runs ───────────────────────────────────────────
 
-#[derive(Deserialize, utoipa::ToSchema)]
+#[derive(serde::Deserialize, serde::Serialize, utoipa::ToSchema)]
 pub struct CreateRunPayload {
     pub workflow_id: String,
     pub profile_id: Option<String>,
@@ -144,52 +143,27 @@ pub struct CreateRunPayload {
     tag = "workflows"
 )]
 async fn create_workflow_run(
-    State(state): State<AppState>,
     Json(payload): Json<CreateRunPayload>,
-) -> Result<Json<WorkflowRun>, AppError> {
-    let run = WorkflowService::create_run(
-        &state.db,
-        &payload.workflow_id,
-        payload.profile_id.as_deref(),
-        payload.schedule_id.as_deref(),
-    )
-    .await?;
-    Ok(Json(run))
-}
-
-#[derive(Deserialize, utoipa::ToSchema)]
-pub struct FinishRunPayload {
-    pub status: String,
-    pub error_message: Option<String>,
-    pub summary: Option<String>,
-}
-
-#[utoipa::path(
-    put,
-    path = "/api/automa/workflows/runs/{run_id}",
-    responses(
-        (status = 200, description = "Run finished")
-    ),
-    params(
-        ("run_id" = String, Path, description = "Run ID")
-    ),
-    tag = "workflows"
-)]
-async fn finish_workflow_run(
-    State(state): State<AppState>,
-    Path(run_id): Path<String>,
-    Json(payload): Json<FinishRunPayload>,
 ) -> Result<Json<serde_json::Value>, AppError> {
-    WorkflowService::finish_run(
-        &state.db,
-        &run_id,
-        &payload.status,
-        payload.error_message.as_deref(),
-        payload.summary.as_deref(),
-    )
-    .await?;
-    Ok(Json(serde_json::json!({ "success": true })))
+    let client = reqwest::Client::new();
+    let engine_url = "http://127.0.0.1:1423/api/engine/runs";
+    
+    let res = client.post(engine_url).json(&payload).send().await;
+    
+    match res {
+        Ok(r) if r.status().is_success() => {
+            let run: serde_json::Value = r.json().await.map_err(|e| AppError::Internal(format!("Failed to parse run: {}", e)))?;
+            Ok(Json(run))
+        },
+        Ok(r) => {
+            Err(AppError::Internal(format!("Engine returned {}", r.status())))
+        },
+        Err(e) => {
+            Err(AppError::Internal(format!("Failed to connect to Omni Engine: {}", e)))
+        }
+    }
 }
+
 
 #[utoipa::path(
     get,
@@ -203,58 +177,33 @@ async fn finish_workflow_run(
     tag = "workflows"
 )]
 async fn get_workflow_runs(
-    State(state): State<AppState>,
     Path(id): Path<String>,
-) -> Result<Json<Vec<WorkflowRun>>, AppError> {
-    let runs = WorkflowService::get_runs_by_workflow(&state.db, &id).await?;
-    Ok(Json(runs))
+) -> Result<Json<Vec<serde_json::Value>>, AppError> {
+    let client = reqwest::Client::new();
+    let engine_url = format!("http://127.0.0.1:1423/api/engine/runs?workflow_id={}", id);
+    
+    let res = client.get(&engine_url).send().await;
+    
+    match res {
+        Ok(r) if r.status().is_success() => {
+            let runs: Vec<serde_json::Value> = r.json().await.map_err(|e| AppError::Internal(format!("Failed to parse runs: {}", e)))?;
+            Ok(Json(runs))
+        },
+        Ok(r) => {
+            Err(AppError::Internal(format!("Engine returned {}", r.status())))
+        },
+        Err(e) => {
+            Err(AppError::Internal(format!("Failed to connect to Omni Engine: {}", e)))
+        }
+    }
 }
 
-// ─── Workflow Logs ───────────────────────────────────────────
-
-#[derive(Deserialize, utoipa::ToSchema)]
-pub struct AddLogPayload {
-    pub block_id: String,
-    pub block_label: String,
-    pub status: String,
-    pub duration_ms: Option<i64>,
-    pub data: Option<String>,
-}
-
-#[utoipa::path(
-    post,
-    path = "/api/automa/workflows/runs/{run_id}/logs",
-    responses(
-        (status = 201, description = "Log added")
-    ),
-    params(
-        ("run_id" = String, Path, description = "Run ID")
-    ),
-    tag = "workflows"
-)]
-async fn add_workflow_log(
-    State(state): State<AppState>,
-    Path(run_id): Path<String>,
-    Json(payload): Json<AddLogPayload>,
-) -> Result<Json<serde_json::Value>, AppError> {
-    WorkflowService::add_log(
-        &state.db,
-        &run_id,
-        &payload.block_id,
-        &payload.block_label,
-        &payload.status,
-        payload.duration_ms,
-        payload.data.as_deref(),
-    )
-    .await?;
-    Ok(Json(serde_json::json!({ "success": true })))
-}
 
 #[utoipa::path(
     get,
     path = "/api/automa/workflows/runs/{run_id}/logs",
     responses(
-        (status = 200, description = "List logs for a specific run")
+        (status = 200, description = "List workflow logs")
     ),
     params(
         ("run_id" = String, Path, description = "Run ID")
@@ -262,9 +211,23 @@ async fn add_workflow_log(
     tag = "workflows"
 )]
 async fn get_run_logs(
-    State(state): State<AppState>,
     Path(run_id): Path<String>,
-) -> Result<Json<Vec<WorkflowLog>>, AppError> {
-    let logs = WorkflowService::get_logs_by_run(&state.db, &run_id).await?;
-    Ok(Json(logs))
+) -> Result<Json<Vec<serde_json::Value>>, AppError> {
+    let client = reqwest::Client::new();
+    let engine_url = format!("http://127.0.0.1:1423/api/engine/logs?run_id={}", run_id);
+    
+    let res = client.get(&engine_url).send().await;
+    
+    match res {
+        Ok(r) if r.status().is_success() => {
+            let logs: Vec<serde_json::Value> = r.json().await.map_err(|e| AppError::Internal(format!("Failed to parse logs: {}", e)))?;
+            Ok(Json(logs))
+        },
+        Ok(r) => {
+            Err(AppError::Internal(format!("Engine returned {}", r.status())))
+        },
+        Err(e) => {
+            Err(AppError::Internal(format!("Failed to connect to Omni Engine: {}", e)))
+        }
+    }
 }
