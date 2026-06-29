@@ -1,6 +1,6 @@
 {
   "name": "@omnidesk/omni-extension",
-  "version": "1.30.00",
+  "version": "0.1.0",
   "description": "An extension for automating your browser by connecting blocks",
   "repository": {
     "type": "git",

@@ -7,6 +7,7 @@ use axum::{
     Router,
 };
 use std::fs;
+#[cfg(debug_assertions)]
 use std::path::PathBuf;
 use serde_json::Value;
 
