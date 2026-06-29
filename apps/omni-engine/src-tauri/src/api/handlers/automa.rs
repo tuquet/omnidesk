@@ -35,6 +35,7 @@ pub async fn ws_handler(ws: WebSocketUpgrade, State(state): State<AppState>) -> 
 async fn handle_socket(socket: WebSocket, state: AppState) {
     let (mut sender, mut receiver) = socket.split();
     let mut rx = state.automa_ws_tx.subscribe();
+    let app_clone = state.app_handle.clone();
 
     // Spawn a task to receive messages from the broadcast channel and send to the WebSocket client
     let mut send_task = tokio::spawn(async move {
@@ -49,11 +50,42 @@ async fn handle_socket(socket: WebSocket, state: AppState) {
 
     // Spawn a task to receive messages from the WebSocket client and process them
     let mut recv_task = tokio::spawn(async move {
+        let client = reqwest::Client::new();
+        let studio_url = "http://127.0.0.1:1422";
+        
         while let Some(Ok(Message::Text(text))) = receiver.next().await {
             if let Ok(event) = serde_json::from_str::<AutomaEvent>(&text) {
                 println!("Received event from Automa Extension: {}", event.event_type);
-                // Here we can handle events coming FROM the browser extension
-                // For example, workflow_finished, logs, etc.
+                
+                use tauri::Emitter;
+                let _ = app_clone.emit("e2e-log", format!("[AUTOMA] Received event: {}", event.event_type));
+
+                // Forward events to Omni Studio via REST API
+                match event.event_type.as_str() {
+                    "run_started" => {
+                        let _ = client.post(format!("{}/api/automa/workflows/runs", studio_url))
+                            .json(&event.payload)
+                            .send()
+                            .await;
+                    },
+                    "run_finished" => {
+                        if let Some(run_id) = event.payload.get("run_id").and_then(|v| v.as_str()) {
+                            let _ = client.put(format!("{}/api/automa/workflows/runs/{}", studio_url, run_id))
+                                .json(&event.payload)
+                                .send()
+                                .await;
+                        }
+                    },
+                    "log_added" => {
+                        if let Some(run_id) = event.payload.get("run_id").and_then(|v| v.as_str()) {
+                            let _ = client.post(format!("{}/api/automa/workflows/runs/{}/logs", studio_url, run_id))
+                                .json(&event.payload)
+                                .send()
+                                .await;
+                        }
+                    },
+                    _ => {}
+                }
             }
         }
     });

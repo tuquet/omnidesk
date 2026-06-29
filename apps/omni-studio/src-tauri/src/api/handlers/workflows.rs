@@ -1,6 +1,6 @@
 use axum::{
     extract::{Path, Query, State},
-    routing::get,
+    routing::{get, post, put},
     Json, Router,
 };
 use serde::Deserialize;
@@ -13,8 +13,10 @@ pub fn router() -> Router<AppState> {
     Router::new()
         .route("/", get(list_workflows).post(create_workflow))
         .route("/:id", get(get_workflow).put(update_workflow).delete(delete_workflow))
+        .route("/runs", post(create_workflow_run))
+        .route("/runs/:run_id", put(finish_workflow_run))
+        .route("/runs/:run_id/logs", get(get_run_logs).post(add_workflow_log))
         .route("/:id/runs", get(get_workflow_runs))
-        .route("/runs/:run_id/logs", get(get_run_logs))
 }
 
 // ─── Workflow CRUD ───────────────────────────────────────────
@@ -127,6 +129,69 @@ async fn delete_workflow(
 
 // ─── Workflow Runs ───────────────────────────────────────────
 
+#[derive(Deserialize)]
+pub struct CreateRunPayload {
+    pub workflow_id: String,
+    pub profile_id: Option<String>,
+    pub schedule_id: Option<String>,
+}
+
+#[utoipa::path(
+    post,
+    path = "/api/automa/workflows/runs",
+    responses(
+        (status = 201, description = "Run created")
+    ),
+    tag = "workflows"
+)]
+async fn create_workflow_run(
+    State(state): State<AppState>,
+    Json(payload): Json<CreateRunPayload>,
+) -> Result<Json<WorkflowRun>, AppError> {
+    let run = WorkflowService::create_run(
+        &state.db,
+        &payload.workflow_id,
+        payload.profile_id.as_deref(),
+        payload.schedule_id.as_deref(),
+    )
+    .await?;
+    Ok(Json(run))
+}
+
+#[derive(Deserialize)]
+pub struct FinishRunPayload {
+    pub status: String,
+    pub error_message: Option<String>,
+    pub summary: Option<String>,
+}
+
+#[utoipa::path(
+    put,
+    path = "/api/automa/workflows/runs/{run_id}",
+    responses(
+        (status = 200, description = "Run finished")
+    ),
+    params(
+        ("run_id" = String, Path, description = "Run ID")
+    ),
+    tag = "workflows"
+)]
+async fn finish_workflow_run(
+    State(state): State<AppState>,
+    Path(run_id): Path<String>,
+    Json(payload): Json<FinishRunPayload>,
+) -> Result<Json<serde_json::Value>, AppError> {
+    WorkflowService::finish_run(
+        &state.db,
+        &run_id,
+        &payload.status,
+        payload.error_message.as_deref(),
+        payload.summary.as_deref(),
+    )
+    .await?;
+    Ok(Json(serde_json::json!({ "success": true })))
+}
+
 #[utoipa::path(
     get,
     path = "/api/automa/workflows/{id}/runs",
@@ -147,6 +212,44 @@ async fn get_workflow_runs(
 }
 
 // ─── Workflow Logs ───────────────────────────────────────────
+
+#[derive(Deserialize)]
+pub struct AddLogPayload {
+    pub block_id: String,
+    pub block_label: String,
+    pub status: String,
+    pub duration_ms: Option<i64>,
+    pub data: Option<String>,
+}
+
+#[utoipa::path(
+    post,
+    path = "/api/automa/workflows/runs/{run_id}/logs",
+    responses(
+        (status = 201, description = "Log added")
+    ),
+    params(
+        ("run_id" = String, Path, description = "Run ID")
+    ),
+    tag = "workflows"
+)]
+async fn add_workflow_log(
+    State(state): State<AppState>,
+    Path(run_id): Path<String>,
+    Json(payload): Json<AddLogPayload>,
+) -> Result<Json<serde_json::Value>, AppError> {
+    WorkflowService::add_log(
+        &state.db,
+        &run_id,
+        &payload.block_id,
+        &payload.block_label,
+        &payload.status,
+        payload.duration_ms,
+        payload.data.as_deref(),
+    )
+    .await?;
+    Ok(Json(serde_json::json!({ "success": true })))
+}
 
 #[utoipa::path(
     get,
