@@ -42,7 +42,7 @@ function CommandCenterPage() {
       .catch(console.error);
 
     // Fetch Profiles from Omni Profile API
-    fetch('http://localhost:1423/api/browser-profiles')
+    fetch('http://localhost:1421/api/browser-profiles')
       .then((res) => res.json())
       .then((data) => {
         if (Array.isArray(data)) {
@@ -107,7 +107,7 @@ function CommandCenterPage() {
         setLogs((l) => [...l, `[SYSTEM] Requesting launch for Profile: ${profile.name}...`]);
         try {
           const res = await fetch(
-            `http://localhost:1423/api/browser-profiles/${profile.id}/launch`,
+            `http://localhost:1421/api/browser-profiles/${profile.id}/launch`,
             {
               method: 'POST',
             },

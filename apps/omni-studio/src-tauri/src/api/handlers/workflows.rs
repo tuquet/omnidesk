@@ -1,4 +1,4 @@
-use axum::{
+﻿use axum::{
     extract::{Path, Query, State},
     routing::{get, post, put},
     Json, Router,
@@ -23,7 +23,6 @@ pub fn router() -> Router<AppState> {
 
 #[derive(Deserialize)]
 pub struct ListWorkflowsQuery {
-    /// If set, returns workflows changed since this ISO timestamp (for sync catch-up)
     pub since: Option<String>,
 }
 
@@ -31,7 +30,7 @@ pub struct ListWorkflowsQuery {
     get,
     path = "/api/automa/workflows",
     params(
-        ("since" = Option<String>, Query, description = "ISO timestamp — return only workflows changed after this time")
+        ("since" = Option<String>, Query, description = "ISO timestamp - return only workflows changed after this time")
     ),
     responses(
         (status = 200, description = "List all workflows (or changed since timestamp)")
@@ -129,7 +128,7 @@ async fn delete_workflow(
 
 // ─── Workflow Runs ───────────────────────────────────────────
 
-#[derive(Deserialize)]
+#[derive(Deserialize, utoipa::ToSchema)]
 pub struct CreateRunPayload {
     pub workflow_id: String,
     pub profile_id: Option<String>,
@@ -158,7 +157,7 @@ async fn create_workflow_run(
     Ok(Json(run))
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, utoipa::ToSchema)]
 pub struct FinishRunPayload {
     pub status: String,
     pub error_message: Option<String>,
@@ -213,7 +212,7 @@ async fn get_workflow_runs(
 
 // ─── Workflow Logs ───────────────────────────────────────────
 
-#[derive(Deserialize)]
+#[derive(Deserialize, utoipa::ToSchema)]
 pub struct AddLogPayload {
     pub block_id: String,
     pub block_label: String,
