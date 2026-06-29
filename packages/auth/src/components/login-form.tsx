@@ -19,7 +19,7 @@ export function LoginForm({
   className,
   platformApi,
   ...props
-}: React.ComponentPropsWithoutRef<'div'> & { platformApi?: unknown }) {
+}: React.ComponentPropsWithoutRef<'div'> & { platformApi?: any }) {
   const navigate = useNavigate();
 
   const form = useForm({

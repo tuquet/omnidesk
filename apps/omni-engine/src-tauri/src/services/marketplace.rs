@@ -17,7 +17,7 @@ pub async fn get_marketplace_apps() -> Result<Vec<Value>, AppError> {
     let client = Client::new();
     
     // Fetch apps from Supabase REST API
-    let res = client.get(&format!("{}/rest/v1/marketplace_apps?select=*&order=sort_order.asc", url))
+    let res = client.get(format!("{}/rest/v1/marketplace_apps?select=*&order=sort_order.asc", url))
         .header("apikey", &anon_key)
         .header("Authorization", format!("Bearer {}", anon_key)) // Anonymous read
         .send()
@@ -33,7 +33,7 @@ pub async fn get_marketplace_apps() -> Result<Vec<Value>, AppError> {
         .map_err(|e| AppError::Internal(format!("Failed to parse apps: {}", e)))?;
         
     // Filter out mock apps
-    let mock_ids = vec!["lifecycle", "analytics", "projects", "documents", "showcase", "error-pages", "wordpress-sync", "file-browser"];
+    let mock_ids = ["lifecycle", "analytics", "projects", "documents", "showcase", "error-pages", "wordpress-sync", "file-browser"];
     apps.retain(|app| {
         app.get("id")
             .and_then(|id| id.as_str())
@@ -120,7 +120,7 @@ struct AppMetadata {
 async fn fetch_app_metadata_from_supabase(app_id: &str) -> Result<AppMetadata, AppError> {
     let (url, anon_key) = get_supabase_config()?;
     let client = Client::new();
-    let res = client.get(&format!("{}/rest/v1/marketplace_apps?id=eq.{}&select=current_version,download_url,package_hash", url, app_id))
+    let res = client.get(format!("{}/rest/v1/marketplace_apps?id=eq.{}&select=current_version,download_url,package_hash", url, app_id))
         .header("apikey", &anon_key)
         .header("Authorization", format!("Bearer {}", anon_key))
         .send()

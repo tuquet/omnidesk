@@ -50,22 +50,18 @@ pub async fn run_e2e_orchestrator(app: AppHandle) -> Result<(), String> {
     let app_handle_out = app.clone();
     thread::spawn(move || {
         let reader = BufReader::new(stdout);
-        for line in reader.lines() {
-            if let Ok(line) = line {
-                println!("[E2E OUT] {}", line);
-                let _ = app_handle_out.emit("e2e-log", line);
-            }
+        for line in reader.lines().flatten() {
+            println!("[E2E OUT] {}", line);
+            let _ = app_handle_out.emit("e2e-log", line);
         }
     });
     
     let app_handle_err = app.clone();
     thread::spawn(move || {
         let reader = BufReader::new(stderr);
-        for line in reader.lines() {
-            if let Ok(line) = line {
-                println!("[E2E ERR] {}", line);
-                let _ = app_handle_err.emit("e2e-log", format!("ERROR: {}", line));
-            }
+        for line in reader.lines().flatten() {
+            println!("[E2E ERR] {}", line);
+            let _ = app_handle_err.emit("e2e-log", format!("ERROR: {}", line));
         }
     });
     

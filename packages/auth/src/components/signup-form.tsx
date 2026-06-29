@@ -19,7 +19,7 @@ export function SignupForm({
   className,
   platformApi,
   ...props
-}: React.ComponentPropsWithoutRef<'form'> & { platformApi?: unknown }) {
+}: React.ComponentPropsWithoutRef<'form'> & { platformApi?: any }) {
   const form = useForm({
     defaultValues: {
       name: '',

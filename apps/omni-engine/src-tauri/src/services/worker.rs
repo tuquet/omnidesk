@@ -79,7 +79,7 @@ pub fn start_background_worker(pool: SqlitePool) {
                     
                     if job.action == "INSTALL_APP" {
                         if let Ok(payload) = serde_json::from_str::<Value>(&decrypted_payload) {
-                            let res = client.post(&format!("{}/rest/v1/user_installed_apps", url))
+                            let res = client.post(format!("{}/rest/v1/user_installed_apps", url))
                                 .header("apikey", &anon_key)
                                 .header("X-OmniDesk-Signature", &signature)
                                 .header("X-OmniDesk-User", &job.user_id)
@@ -100,7 +100,7 @@ pub fn start_background_worker(pool: SqlitePool) {
                     } else if job.action == "UNINSTALL_APP" {
                         if let Ok(payload) = serde_json::from_str::<Value>(&decrypted_payload) {
                             if let (Some(user_id), Some(app_id)) = (payload.get("user_id").and_then(|v| v.as_str()), payload.get("app_id").and_then(|v| v.as_str())) {
-                                let res = client.delete(&format!("{}/rest/v1/user_installed_apps?user_id=eq.{}&app_id=eq.{}", url, user_id, app_id))
+                                let res = client.delete(format!("{}/rest/v1/user_installed_apps?user_id=eq.{}&app_id=eq.{}", url, user_id, app_id))
                                     .header("apikey", &anon_key)
                                     .header("X-OmniDesk-Signature", &signature)
                                     .header("X-OmniDesk-User", &job.user_id)
@@ -118,7 +118,7 @@ pub fn start_background_worker(pool: SqlitePool) {
                         }
                     } else if job.action == "UPDATE_PREFERENCES" {
                         if let Ok(payload) = serde_json::from_str::<Value>(&decrypted_payload) {
-                            let res = client.post(&format!("{}/rest/v1/user_preferences", url))
+                            let res = client.post(format!("{}/rest/v1/user_preferences", url))
                                 .header("apikey", &anon_key)
                                 .header("X-OmniDesk-Signature", &signature)
                                 .header("X-OmniDesk-User", &job.user_id)

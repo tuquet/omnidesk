@@ -1,4 +1,3 @@
-import { useTranslation } from 'react-i18next';
 import { usePlatform } from '../providers/platform-provider';
 import { useAppConfig } from '../providers/config-provider';
 import { Button } from '@omnidesk/ui';

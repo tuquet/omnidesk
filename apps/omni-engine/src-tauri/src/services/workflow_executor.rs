@@ -21,7 +21,7 @@ pub struct WorkflowExecutor;
 impl WorkflowExecutor {
     pub async fn execute(
         db: &SqlitePool,
-        app: &AppHandle,
+        _app: &AppHandle,
         ws_tx: &Sender<AutomaEvent>,
         workflow_id: &str,
         profile_id: &str,

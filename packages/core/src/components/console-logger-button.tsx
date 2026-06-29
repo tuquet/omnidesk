@@ -116,8 +116,7 @@ export function ConsoleLoggerButton() {
             </div>
           ) : (
             <div className="flex flex-col" style={{ padding: '4px' }}>
-              {logs.map(
-                (log: { id?: string; level?: string; message?: string; timestamp?: string }) => (
+              {logs.map((log: any) => (
                   <div
                     key={log.id}
                     className={`flex flex-col gap-1 rounded-md ${(log.level || 'info') === 'error' ? 'bg-destructive/5' : ''}`}

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import {
   SidebarProvider,
   ResizablePanelGroup,
@@ -10,8 +10,6 @@ import { useLayoutStore } from '../stores/use-layout-store';
 import { useDevStore } from '../stores/use-dev-store';
 import { DevToolsPane } from './dev-tools-pane';
 import { RouteProgressBar } from './route-progress-bar';
-import type { ImperativePanelHandle } from 'react-resizable-panels';
-
 export interface OmniLayoutProps {
   sidebarContent?: React.ReactNode;
   children: React.ReactNode;

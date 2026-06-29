@@ -160,16 +160,14 @@ pub async fn get_local_apps(
         
     if installed_apps_dir.exists() {
         if let Ok(entries) = fs::read_dir(installed_apps_dir) {
-            for entry in entries {
-                if let Ok(entry) = entry {
-                    let path = entry.path();
-                    if path.is_dir() {
-                        let manifest_path = path.join("manifest.json");
-                        if manifest_path.exists() {
-                            if let Ok(content) = fs::read_to_string(&manifest_path) {
-                                if let Ok(json) = serde_json::from_str::<Value>(&content) {
-                                    apps.push(json);
-                                }
+            for entry in entries.flatten() {
+                let path = entry.path();
+                if path.is_dir() {
+                    let manifest_path = path.join("manifest.json");
+                    if manifest_path.exists() {
+                        if let Ok(content) = fs::read_to_string(&manifest_path) {
+                            if let Ok(json) = serde_json::from_str::<Value>(&content) {
+                                apps.push(json);
                             }
                         }
                     }
