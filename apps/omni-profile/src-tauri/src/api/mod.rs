@@ -40,8 +40,10 @@ pub struct AppState {
         handlers::browser_profiles::clean_profile_storage,
         handlers::browser_profiles::delete_browser_engine,
         handlers::browser_profiles::get_download_status,
-        handlers::browser_profiles::get_available_versions,
         handlers::browser_profiles::get_engine_status,
+        handlers::workflows::list_workflows,
+        handlers::workflows::upsert_workflow,
+        handlers::workflows::delete_workflow,
     ),
     components(
         schemas(
@@ -49,12 +51,14 @@ pub struct AppState {
             crate::db::models::browser_profile::CreateBrowserProfilePayload,
             crate::db::models::browser_profile::UpdateBrowserProfilePayload,
             handlers::browser_profiles::BrowserVersion,
-            handlers::browser_profiles::EngineStatusResponse
+            handlers::browser_profiles::EngineStatusResponse,
+            crate::db::models::workflow::Workflow
         )
     ),
     tags(
         (name = "health", description = "Health check endpoints"),
-        (name = "profiles", description = "Browser profile management endpoints")
+        (name = "profiles", description = "Browser profile management endpoints"),
+        (name = "workflows", description = "Automa Workflows management endpoints")
     )
 )]
 pub struct ApiDoc;
@@ -77,6 +81,7 @@ pub async fn serve(pool: SqlitePool, app_dir: PathBuf, port: u16, app_handle: Ap
         .route("/updates/latest.json", get(latest_update))
         // Profile App: only browser profile endpoints
         .nest("/api/browser-profiles", handlers::browser_profiles::router())
+        .nest("/api/workflows", handlers::workflows::router())
         .layer(CorsLayer::permissive())
         .with_state(state);
 

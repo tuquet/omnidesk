@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
 import { API_BASE_URL } from '@omnidesk/core';
-import { useBrowserProfileStore } from '@omnidesk/browser-profiles';
+import { browserProfileStore } from '@omnidesk/browser-profiles';
 
 export function useBrowserEvents() {
-  const { fetchProfiles } = useBrowserProfileStore();
+  // No longer extracting fetchProfiles as it is unused
   const [downloadProgress, setDownloadProgress] = useState<{
     status: string;
     percent: number | null;
@@ -65,7 +65,25 @@ export function useBrowserEvents() {
       .then(({ listen }) => {
         listen('profile-status-changed', (event) => {
           console.warn('Profile status changed event received', event);
-          fetchProfiles();
+          const payload = event.payload as { id: string; status: string; last_used_at?: string };
+
+          if (payload && payload.id) {
+            browserProfileStore.setState((s) => ({
+              ...s,
+              profiles: s.profiles.map((p) =>
+                p.id === payload.id
+                  ? {
+                      ...p,
+                      status: payload.status,
+                      last_used_at:
+                        payload.last_used_at ||
+                        (payload.status === 'RUNNING' ? new Date().toISOString() : p.last_used_at),
+                      pid: payload.status === 'RUNNING' ? 1 : null,
+                    }
+                  : p,
+              ),
+            }));
+          }
         }).then((u) => {
           unlisten = u;
         });
@@ -77,7 +95,7 @@ export function useBrowserEvents() {
     return () => {
       if (unlisten) unlisten();
     };
-  }, [fetchProfiles]);
+  }, []);
 
   return { downloadProgress };
 }

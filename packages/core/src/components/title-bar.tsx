@@ -77,7 +77,7 @@ export function TitleBar() {
       await platformApi.invoke('toggle_always_on_top', { alwaysOnTop: newState });
       setIsPinned(newState);
       toast.success(newState ? 'Window pinned to top' : 'Window unpinned');
-    } catch (e) {
+    } catch {
       toast.error('Could not toggle pin state');
     }
   };
@@ -208,7 +208,7 @@ export function TitleBar() {
             <Button
               variant="ghost"
               size="sm"
-              className="h-7 px-2 text-xs font-semibold tracking-wide text-foreground hover:bg-muted"
+              className="h-7 px-2 text-xs font-semibold tracking-wide text-foreground hover:bg-muted hidden sm:inline-flex"
             >
               My Workspace <ChevronDown className="ml-1 h-3 w-3 text-muted-foreground" />
             </Button>
@@ -221,7 +221,7 @@ export function TitleBar() {
       </div>
 
       {/* ── Center Section: Logo & App Name ── */}
-      <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center justify-center gap-2 pointer-events-none">
+      <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 items-center justify-center gap-2 pointer-events-none hidden md:flex">
         <img
           src={config.logoSrc || '/logo-gold.svg'}
           alt={`${config.appName || 'OmniDesk'} Logo`}
@@ -256,7 +256,7 @@ export function TitleBar() {
         <Button
           variant="outline"
           size="sm"
-          className="h-6 px-2 mr-1 text-[10px] uppercase font-bold tracking-wider text-muted-foreground bg-transparent border-dashed hover:text-foreground"
+          className="h-6 px-2 mr-1 text-[10px] uppercase font-bold tracking-wider text-muted-foreground bg-transparent border-dashed hover:text-foreground hidden lg:inline-flex"
         >
           <GitBranch className="h-3 w-3 mr-1.5" />
           Initialize Git
@@ -266,7 +266,7 @@ export function TitleBar() {
         <Button
           variant="ghost"
           size="icon"
-          className="h-7 w-7 text-muted-foreground hover:text-foreground"
+          className="h-7 w-7 text-muted-foreground hover:text-foreground hidden sm:inline-flex"
           title="Runner"
         >
           <Play className="h-4 w-4" />
@@ -276,7 +276,7 @@ export function TitleBar() {
         <Button
           variant="ghost"
           size="icon"
-          className="h-7 w-7 text-muted-foreground hover:text-foreground"
+          className="h-7 w-7 text-muted-foreground hover:text-foreground hidden sm:inline-flex"
           title="Security"
         >
           <Shield className="h-4 w-4" />
@@ -288,7 +288,7 @@ export function TitleBar() {
             <Button
               variant="outline"
               size="sm"
-              className="h-6 px-2 mx-1 text-xs text-muted-foreground bg-transparent border-border hover:bg-muted"
+              className="h-6 px-2 mx-1 text-xs text-muted-foreground bg-transparent border-border hover:bg-muted hidden md:inline-flex"
             >
               No Environment <ChevronDown className="ml-1 h-3 w-3" />
             </Button>
@@ -307,7 +307,7 @@ export function TitleBar() {
           variant="ghost"
           size="icon"
           onClick={toggleDevMode}
-          className={`h-7 w-7 ${isDevMode ? 'bg-muted text-primary hover:bg-primary/20' : 'text-muted-foreground hover:bg-muted hover:text-foreground'}`}
+          className={`h-7 w-7 hidden sm:inline-flex ${isDevMode ? 'bg-muted text-primary hover:bg-primary/20' : 'text-muted-foreground hover:bg-muted hover:text-foreground'}`}
           title={isDevMode ? 'Dev Tools (Active)' : 'Dev Tools'}
         >
           <TerminalSquare className="h-4 w-4" />
@@ -318,7 +318,7 @@ export function TitleBar() {
           variant="ghost"
           size="icon"
           onClick={handleTogglePin}
-          className={`h-7 w-7 mr-2 ${isPinned ? 'bg-muted text-primary hover:bg-primary/20' : 'text-muted-foreground hover:bg-muted hover:text-foreground'}`}
+          className={`h-7 w-7 mr-2 hidden sm:inline-flex ${isPinned ? 'bg-muted text-primary hover:bg-primary/20' : 'text-muted-foreground hover:bg-muted hover:text-foreground'}`}
           title={isPinned ? 'Unpin Window' : 'Pin to Top'}
         >
           <Pin className="h-4 w-4" />

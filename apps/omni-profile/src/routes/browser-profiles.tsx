@@ -56,20 +56,16 @@ function BrowserProfilesPage() {
   };
 
   const handleLaunch = async (id: string) => {
-    toast.info('Launching profile...');
     try {
       await launchProfile(id);
-      toast.success('Browser launched successfully');
     } catch (e: unknown) {
       toast.error(e instanceof Error ? e.message : String(e));
     }
   };
 
   const handleStop = async (id: string) => {
-    toast.info('Stopping profile...');
     try {
       await stopProfile(id);
-      toast.success('Browser stopped successfully');
     } catch (e: unknown) {
       toast.error(e instanceof Error ? e.message : String(e));
     }

@@ -5,12 +5,14 @@ import { authActions, authStore } from '@omnidesk/auth';
 import type { ApiResponse, ApiError } from '@omnidesk/types';
 import { ERROR_CODES } from '@omnidesk/types';
 
+import { WORKFLOW_API_URL } from '@omnidesk/core';
+
 const client = createClient({});
 
 // ─── Config ────────────────────────────────────────────────────────────────────
 
 client.setConfig({
-  baseUrl: 'http://localhost:1422', // Tauri Axum backend
+  baseUrl: WORKFLOW_API_URL, // Tauri Axum backend
   throwOnError: true,
 });
 
@@ -38,7 +40,8 @@ function toastErrorWithCopy(message: string, description?: string) {
     action: {
       label: i18n.t('common.copy', 'Copy'),
       onClick: () => {
-        navigator.clipboard.writeText(fullText)
+        navigator.clipboard
+          .writeText(fullText)
           .then(() => toast.success(i18n.t('common.copied', 'Copied to clipboard')))
           .catch(() => {});
       },

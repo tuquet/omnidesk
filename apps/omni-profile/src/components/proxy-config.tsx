@@ -6,6 +6,7 @@ import {
   SelectTrigger,
   SelectValue,
   Switch,
+  Input,
 } from '@omnidesk/ui';
 import { ShieldIcon } from 'lucide-react';
 
@@ -24,16 +25,6 @@ interface ProxyConfigProps {
   onChange: (proxy: ProxyData) => void;
 }
 
-const COUNTRIES = [
-  { code: 'VN', name: 'Vietnam 🇻🇳' },
-  { code: 'US', name: 'United States 🇺🇸' },
-  { code: 'UK', name: 'United Kingdom 🇬🇧' },
-  { code: 'SG', name: 'Singapore 🇸🇬' },
-  { code: 'JP', name: 'Japan 🇯🇵' },
-  { code: 'KR', name: 'South Korea 🇰🇷' },
-  { code: 'AU', name: 'Australia 🇦🇺' },
-];
-
 export function ProxyConfig({ proxy, onChange }: ProxyConfigProps) {
   const update = (partial: Partial<ProxyData>) => {
     onChange({ ...proxy, ...partial });
@@ -44,7 +35,7 @@ export function ProxyConfig({ proxy, onChange }: ProxyConfigProps) {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <ShieldIcon className="h-4 w-4 text-muted-foreground" />
-          <Label className="text-sm font-medium">Smart Proxy</Label>
+          <Label className="text-sm font-medium">Use Custom Proxy</Label>
         </div>
         <Switch
           checked={proxy.enabled}
@@ -54,30 +45,68 @@ export function ProxyConfig({ proxy, onChange }: ProxyConfigProps) {
 
       {proxy.enabled && (
         <div className="space-y-4 rounded-lg border p-4 bg-muted/30 animate-in fade-in slide-in-from-top-2 duration-300">
-          <div className="space-y-2">
-            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-              Select Region
-            </Label>
-            <Select
-              value={proxy.country || 'VN'}
-              onValueChange={(v) => update({ country: v, type: 'AUTO' })}
-            >
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Select Country" />
-              </SelectTrigger>
-              <SelectContent>
-                {COUNTRIES.map((c) => (
-                  <SelectItem key={c.code} value={c.code}>
-                    {c.name}
-                  </SelectItem>
-                ))}
-                <SelectItem value="RANDOM">Random Region 🌍</SelectItem>
-              </SelectContent>
-            </Select>
-            <p className="text-xs text-muted-foreground pt-1">
-              IP Address will be automatically assigned from{' '}
-              {proxy.country === 'RANDOM' ? 'a random region' : 'this region'} when launching.
-            </p>
+          <div className="grid grid-cols-3 gap-4">
+            <div className="col-span-1 space-y-2">
+              <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                Protocol
+              </Label>
+              <Select
+                value={proxy.type && proxy.type !== 'AUTO' ? proxy.type : 'HTTP'}
+                onValueChange={(v: 'HTTP' | 'SOCKS5') => update({ type: v })}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="HTTP / SOCKS5" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="HTTP">HTTP(s)</SelectItem>
+                  <SelectItem value="SOCKS5">SOCKS5</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="col-span-1 space-y-2">
+              <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                Host / IP
+              </Label>
+              <Input
+                placeholder="192.168.1.1"
+                value={proxy.host || ''}
+                onChange={(e) => update({ host: e.target.value })}
+              />
+            </div>
+            <div className="col-span-1 space-y-2">
+              <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                Port
+              </Label>
+              <Input
+                placeholder="8080"
+                value={proxy.port || ''}
+                onChange={(e) => update({ port: e.target.value })}
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                Username (Optional)
+              </Label>
+              <Input
+                placeholder="Username"
+                value={proxy.username || ''}
+                onChange={(e) => update({ username: e.target.value })}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                Password (Optional)
+              </Label>
+              <Input
+                type="password"
+                placeholder="Password"
+                value={proxy.password || ''}
+                onChange={(e) => update({ password: e.target.value })}
+              />
+            </div>
           </div>
         </div>
       )}

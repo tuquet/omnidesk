@@ -1,5 +1,4 @@
 use tauri::{AppHandle, Manager};
-use std::path::PathBuf;
 
 #[tauri::command]
 pub async fn open_app_folder(app: AppHandle) -> Result<(), String> {

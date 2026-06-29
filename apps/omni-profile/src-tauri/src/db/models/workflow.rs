@@ -21,9 +21,7 @@ pub struct Workflow {
     pub source: Option<String>,
     pub created_at: Option<String>,
     pub updated_at: Option<String>,
-    /// Soft delete — set instead of hard DELETE
     pub deleted_at: Option<String>,
-    /// Who initiated the delete: 'extension' | 'file_watcher' | 'api'
     pub delete_source: Option<String>,
 }
 

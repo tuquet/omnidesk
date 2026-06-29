@@ -28,7 +28,7 @@ enum McpCommands {
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let cli = Cli::parse();
-    let base_url = "http://localhost:1422"; // Updated to use kernel port
+    let base_url = omni_tauri_core::constants::get_workflow_api_url();
 
     match &cli.command {
         Commands::Health => {

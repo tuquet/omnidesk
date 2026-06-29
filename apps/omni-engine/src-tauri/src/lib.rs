@@ -131,7 +131,7 @@ pub fn run() {
                                 
                                 // Only run Axum if not disabled
                                 if std::env::var("OMNIDESK_DISABLE_API").is_err() {
-                                    api::serve(pool, app_dir, 1423, app_handle_clone).await;
+                                    api::serve(pool, app_dir, omni_tauri_core::constants::RUNTIME_PORT, app_handle_clone).await;
                                 }
                             });
                         }

@@ -1,4 +1,4 @@
-use tauri::{AppHandle, Manager, Window};
+use tauri::Window;
 
 #[tauri::command]
 pub fn toggle_always_on_top(window: Window, always_on_top: bool) -> Result<(), String> {

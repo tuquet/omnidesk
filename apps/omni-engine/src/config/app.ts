@@ -8,12 +8,14 @@
 // ─── Branding ────────────────────────────────────────────────────────────────
 export const APP_NAME = 'Omni Engine';
 export const APP_DESCRIPTION = 'Workflow Execution Engine';
-export const LOGO_SRC = '/logo-purple.svg';
+export const LOGO_SRC = '/favicon.svg';
 
 // ─── External URLs ───────────────────────────────────────────────────────────
+import { API_BASE_URL } from '@omnidesk/core';
+
 export const GITHUB_REPO = 'https://github.com/tuquet/omnidesk';
 export const GITHUB_ISSUES = `${GITHUB_REPO}/issues`;
-export const API_DOCS_URL = 'http://127.0.0.1:1423/scalar';
+export const API_DOCS_URL = `${API_BASE_URL}/scalar`;
 
 // ─── Default User (mock) ────────────────────────────────────────────────────
 export const DEFAULT_USER = {

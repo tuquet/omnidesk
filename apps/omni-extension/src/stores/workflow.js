@@ -13,6 +13,29 @@ import { defineStore } from 'pinia';
 import browser from 'webextension-polyfill';
 import { useUserStore } from './user';
 
+// LOCAL-FIRST BACKEND SYNC HELPERS
+const syncWorkflowToBackend = async (workflow) => {
+  try {
+    await fetch(`http://localhost:1421/api/workflows/${workflow.id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(workflow),
+    });
+  } catch (err) {
+    console.warn(`[Local Sync] Failed to sync workflow ${workflow.id}`, err);
+  }
+};
+
+const deleteWorkflowFromBackend = async (id) => {
+  try {
+    await fetch(`http://localhost:1421/api/workflows/${id}`, {
+      method: 'DELETE',
+    });
+  } catch (err) {
+    console.warn(`[Local Sync] Failed to delete workflow ${id}`, err);
+  }
+};
+
 const defaultWorkflow = (data = null, options = {}) => {
   let workflowData = {
     id: nanoid(),
@@ -118,7 +141,22 @@ export const useWorkflowStore = defineStore('workflow', {
         'isFirstTime',
       ]);
 
+      let backendWorkflows = {};
+      try {
+        const res = await fetch('http://localhost:1421/api/workflows');
+        if (res.ok) {
+          const arr = await res.json();
+          backendWorkflows = convertWorkflowsToObject(arr);
+        }
+      } catch (err) {
+        console.warn('[Local Sync] Failed to fetch workflows', err);
+      }
+
       let localWorkflows = workflows || {};
+      
+      // Merge with backend - backend is the source of truth
+      localWorkflows = { ...localWorkflows, ...backendWorkflows };
+      await browser.storage.local.set({ workflows: localWorkflows });
 
       if (isFirstTime) {
         localWorkflows = firstWorkflows.map((workflow) =>
@@ -162,6 +200,11 @@ export const useWorkflowStore = defineStore('workflow', {
       }
 
       await this.saveToStorage('workflows');
+
+      // Sync inserts to backend
+      for (const wf of Object.values(insertedWorkflows)) {
+        await syncWorkflowToBackend(wf);
+      }
 
       return insertedWorkflows;
     },
@@ -210,6 +253,11 @@ export const useWorkflowStore = defineStore('workflow', {
 
       await this.saveToStorage('workflows');
 
+      // Sync updates to backend
+      for (const wf of Object.values(updatedWorkflows)) {
+        await syncWorkflowToBackend(wf);
+      }
+
       return updatedWorkflows;
     },
     async insertOrUpdate(
@@ -242,15 +290,22 @@ export const useWorkflowStore = defineStore('workflow', {
 
       await this.saveToStorage('workflows');
 
+      // Sync updates to backend
+      for (const wf of Object.values(insertedData)) {
+        await syncWorkflowToBackend(wf);
+      }
+
       return insertedData;
     },
     async delete(id) {
       if (Array.isArray(id)) {
         id.forEach((workflowId) => {
           delete this.workflows[workflowId];
+          deleteWorkflowFromBackend(workflowId);
         });
       } else {
         delete this.workflows[id];
+        deleteWorkflowFromBackend(id);
       }
 
       await cleanWorkflowTriggers(id);

@@ -545,6 +545,9 @@ importers:
       '@intlify/vue-i18n-loader':
         specifier: ^4.2.0
         version: 4.2.0(vue-i18n@9.14.5(vue@3.4.38(typescript@6.0.3)))(vue@3.4.38(typescript@6.0.3))
+      '@tailwindcss/nesting':
+        specifier: 0.0.0-insiders.565cd3e
+        version: 0.0.0-insiders.565cd3e(postcss@8.5.16)
       '@tailwindcss/typography':
         specifier: ^0.5.1
         version: 0.5.20(tailwindcss@3.4.19(yaml@2.9.0))
@@ -626,6 +629,9 @@ importers:
       postcss-loader:
         specifier: ^7.0.0
         version: 7.3.4(postcss@8.5.16)(typescript@6.0.3)(webpack@5.76.0)
+      postcss-nesting:
+        specifier: ^14.0.0
+        version: 14.0.0(postcss@8.5.16)
       prettier:
         specifier: ^2.8.2
         version: 2.8.8
@@ -2792,6 +2798,18 @@ packages:
     resolution: {integrity: sha512-QxULHAm7cNu72w97JUNCBFODFaXpbDg+dP8b/oWFAZ2MTRppA3U00Y2L1HqaS4J6yBqxwa/Y3nMBaxVKbB/NsA==}
     engines: {node: '>=20.19.0'}
 
+  '@csstools/selector-resolve-nested@4.0.0':
+    resolution: {integrity: sha512-9vAPxmp+Dx3wQBIUwc1v7Mdisw1kbbaGqXUM8QLTgWg7SoPGYtXBsMXvsFs/0Bn5yoFhcktzxNZGNaUt0VjgjA==}
+    engines: {node: '>=20.19.0'}
+    peerDependencies:
+      postcss-selector-parser: ^7.1.1
+
+  '@csstools/selector-specificity@6.0.0':
+    resolution: {integrity: sha512-4sSgl78OtOXEX/2d++8A83zHNTgwCJMaR24FvsYL7Uf/VS8HZk9PTwR51elTbGqMuwH3szLvvOXEaVnqn0Z3zA==}
+    engines: {node: '>=20.19.0'}
+    peerDependencies:
+      postcss-selector-parser: ^7.1.1
+
   '@discoveryjs/json-ext@0.5.7':
     resolution: {integrity: sha512-dBVuXR082gk3jsFp7Rd/JI4kytwGHecnCoTtXFb7DB6CNHp4rg5k1bhg0nWdLGLnOV71lmDzGQaLMy8iPLY0pw==}
     engines: {node: '>=10.0.0'}
@@ -4609,6 +4627,11 @@ packages:
 
   '@tabler/icons@3.44.0':
     resolution: {integrity: sha512-Wn0AOZG9sg0L+bjfMqq4eNhC6pQjIrk94LvvWYNYkY8KH8wC3YILRzQlrnVJc4FUeMxH/AK97QsYCX35H3LndA==}
+
+  '@tailwindcss/nesting@0.0.0-insiders.565cd3e':
+    resolution: {integrity: sha512-WhHoFBx19TnH/c+xLwT/sxei6+4RpdfiyG3MYXfmLaMsADmVqBkF7B6lDalgZD9YdM459MF7DtxVbWkOrV7IaQ==}
+    peerDependencies:
+      postcss: ^8.2.15
 
   '@tailwindcss/node@4.3.1':
     resolution: {integrity: sha512-6NDaqRoAMSXD1mr/RXu0HBvNE9a2n5tHPsxu9XHLws8o4Twes5rBM2205SUUiJ9goAtadrN6xTGX0UDEwp/N4A==}
@@ -9237,11 +9260,23 @@ packages:
     peerDependencies:
       postcss: ^8.1.0
 
+  postcss-nested@5.0.6:
+    resolution: {integrity: sha512-rKqm2Fk0KbA8Vt3AdGN0FB9OBOMDVajMG6ZCf/GoHgdxUJ4sBFp0A/uMIRm+MJUdo33YXEtjqIz8u7DAp8B7DA==}
+    engines: {node: '>=12.0'}
+    peerDependencies:
+      postcss: ^8.2.14
+
   postcss-nested@6.2.0:
     resolution: {integrity: sha512-HQbt28KulC5AJzG+cZtj9kvKB93CFCdLvog1WFLf1D+xmMvPGlBstkpTEZfK5+AN9hfJocyBFCNiqyS48bpgzQ==}
     engines: {node: '>=12.0'}
     peerDependencies:
       postcss: ^8.2.14
+
+  postcss-nesting@14.0.0:
+    resolution: {integrity: sha512-YGFOfVrjxYfeGTS5XctP1WCI5hu8Lr9SmntjfRC+iX5hCihEO+QZl9Ra+pkjqkgoVdDKvb2JccpElcowhZtzpw==}
+    engines: {node: '>=20.19.0'}
+    peerDependencies:
+      postcss: ^8.4
 
   postcss-selector-parser@6.0.10:
     resolution: {integrity: sha512-IQ7TZdoaqbT+LCpShg46jnZVlhWD2w6iQYAcYXfHARZ7X1t/UGhhceQDs5X0cGqKvYlHNOuv7Oa1xmb0oQuA3w==}
@@ -12155,6 +12190,14 @@ snapshots:
 
   '@csstools/css-tokenizer@4.0.0': {}
 
+  '@csstools/selector-resolve-nested@4.0.0(postcss-selector-parser@7.1.4)':
+    dependencies:
+      postcss-selector-parser: 7.1.4
+
+  '@csstools/selector-specificity@6.0.0(postcss-selector-parser@7.1.4)':
+    dependencies:
+      postcss-selector-parser: 7.1.4
+
   '@discoveryjs/json-ext@0.5.7': {}
 
   '@dnd-kit/accessibility@3.1.1(react@19.2.7)':
@@ -13883,6 +13926,11 @@ snapshots:
       react: 19.2.7
 
   '@tabler/icons@3.44.0': {}
+
+  '@tailwindcss/nesting@0.0.0-insiders.565cd3e(postcss@8.5.16)':
+    dependencies:
+      postcss: 8.5.16
+      postcss-nested: 5.0.6(postcss@8.5.16)
 
   '@tailwindcss/node@4.3.1':
     dependencies:
@@ -18944,10 +18992,22 @@ snapshots:
       icss-utils: 5.1.0(postcss@8.5.16)
       postcss: 8.5.16
 
+  postcss-nested@5.0.6(postcss@8.5.16):
+    dependencies:
+      postcss: 8.5.16
+      postcss-selector-parser: 6.1.4
+
   postcss-nested@6.2.0(postcss@8.5.16):
     dependencies:
       postcss: 8.5.16
       postcss-selector-parser: 6.1.4
+
+  postcss-nesting@14.0.0(postcss@8.5.16):
+    dependencies:
+      '@csstools/selector-resolve-nested': 4.0.0(postcss-selector-parser@7.1.4)
+      '@csstools/selector-specificity': 6.0.0(postcss-selector-parser@7.1.4)
+      postcss: 8.5.16
+      postcss-selector-parser: 7.1.4
 
   postcss-selector-parser@6.0.10:
     dependencies:

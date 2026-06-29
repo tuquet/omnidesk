@@ -11,7 +11,7 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
 } from '@omnidesk/ui';
-import { Activity, Workflow, Blocks, Clock } from 'lucide-react';
+import { Workflow, Blocks } from 'lucide-react';
 
 function StudioSidebar() {
   return (
@@ -32,22 +32,6 @@ function StudioSidebar() {
                   <Link to="/workflows">
                     <Blocks />
                     <span>My Workflows</span>
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                <SidebarMenuButton className="text-xs" asChild>
-                  <Link to="/executions">
-                    <Activity />
-                    <span>Executions</span>
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                <SidebarMenuButton className="text-xs" asChild>
-                  <Link to="/schedules">
-                    <Clock />
-                    <span>Schedules & Run</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>

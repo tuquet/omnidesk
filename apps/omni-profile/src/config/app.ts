@@ -8,7 +8,7 @@
 // ─── Branding ────────────────────────────────────────────────────────────────
 export const APP_NAME = 'Omni Profile';
 export const APP_DESCRIPTION = 'Browser Profile Management';
-export const LOGO_SRC = '/logo-cyan.svg';
+export const LOGO_SRC = '/favicon.svg';
 
 // ─── External URLs ───────────────────────────────────────────────────────────
 export const GITHUB_REPO = 'https://github.com/tuquet/omnidesk';
