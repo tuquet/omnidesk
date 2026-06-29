@@ -21,13 +21,16 @@ function BrowserProfilesPage() {
   const [formMode, setFormMode] = useState<'create' | 'edit'>('create');
   const [selectedProfile, setSelectedProfile] = useState<BrowserProfile | null>(null);
 
+  const [sortBy, setSortBy] = useState<string>('created_at');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
+
   const { downloadProgress } = useBrowserEvents();
 
   const filters = useProfileFilters(profiles);
 
   useEffect(() => {
-    fetchProfiles();
-  }, [fetchProfiles]);
+    fetchProfiles(sortBy, sortOrder);
+  }, [fetchProfiles, sortBy, sortOrder]);
 
   const handleCreate = () => {
     setFormMode('create');
@@ -124,6 +127,16 @@ function BrowserProfilesPage() {
           onEdit={handleEdit}
           onDelete={handleDelete}
           onCreate={handleCreate}
+          sortBy={sortBy}
+          sortOrder={sortOrder}
+          onSortChange={(newSortBy) => {
+            if (sortBy === newSortBy) {
+              setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+            } else {
+              setSortBy(newSortBy);
+              setSortOrder('desc');
+            }
+          }}
         />
       </div>
 

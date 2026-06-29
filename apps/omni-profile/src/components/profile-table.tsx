@@ -13,8 +13,18 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@omnidesk/ui';
-import { PlayIcon, EditIcon, TrashIcon, SquareIcon, GhostIcon } from 'lucide-react';
+import {
+  PlayIcon,
+  EditIcon,
+  TrashIcon,
+  SquareIcon,
+  GhostIcon,
+  ArrowUpIcon,
+  ArrowDownIcon,
+  ArrowUpDownIcon,
+} from 'lucide-react';
 import type { BrowserProfile } from '@omnidesk/browser-profiles';
+import { InlineTagEditor } from './inline-tag-editor';
 
 interface ProfileTableProps {
   profiles: BrowserProfile[];
@@ -24,6 +34,9 @@ interface ProfileTableProps {
   onEdit: (profile: BrowserProfile) => void;
   onDelete: (id: string) => void;
   onCreate?: () => void;
+  sortBy?: string;
+  sortOrder?: 'asc' | 'desc';
+  onSortChange?: (column: string) => void;
 }
 
 export function ProfileTable({
@@ -34,18 +47,54 @@ export function ProfileTable({
   onEdit,
   onDelete,
   onCreate,
+  sortBy,
+  sortOrder,
+  onSortChange,
 }: ProfileTableProps) {
+  const renderSortIcon = (column: string) => {
+    if (sortBy !== column) return <ArrowUpDownIcon className="ml-1 h-3 w-3 opacity-30" />;
+    return sortOrder === 'asc' ? (
+      <ArrowUpIcon className="ml-1 h-3 w-3" />
+    ) : (
+      <ArrowDownIcon className="ml-1 h-3 w-3" />
+    );
+  };
+
+  const handleSort = (column: string) => {
+    onSortChange?.(column);
+  };
+
   return (
     <TooltipProvider delayDuration={300}>
       <div className="rounded-md border bg-card shadow-sm">
         <Table data-testid="table-profile-list">
           <TableHeader>
             <TableRow>
-              <TableHead className="w-[250px]">Profile Name</TableHead>
-              <TableHead>Browser</TableHead>
-              <TableHead>Status</TableHead>
+              <TableHead
+                className="w-[250px] cursor-pointer hover:bg-muted/50 transition-colors"
+                onClick={() => handleSort('name')}
+              >
+                <div className="flex items-center">Profile Name {renderSortIcon('name')}</div>
+              </TableHead>
+              <TableHead
+                className="cursor-pointer hover:bg-muted/50 transition-colors"
+                onClick={() => handleSort('browser_type')}
+              >
+                <div className="flex items-center">Browser {renderSortIcon('browser_type')}</div>
+              </TableHead>
+              <TableHead
+                className="cursor-pointer hover:bg-muted/50 transition-colors"
+                onClick={() => handleSort('status')}
+              >
+                <div className="flex items-center">Status {renderSortIcon('status')}</div>
+              </TableHead>
               <TableHead>Proxy</TableHead>
-              <TableHead>Tags</TableHead>
+              <TableHead
+                className="cursor-pointer hover:bg-muted/50 transition-colors"
+                onClick={() => handleSort('tags')}
+              >
+                <div className="flex items-center">Tags {renderSortIcon('tags')}</div>
+              </TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -136,17 +185,7 @@ export function ProfileTable({
                       {profile.proxy || 'None'}
                     </TableCell>
                     <TableCell>
-                      <div className="flex gap-1.5 flex-wrap">
-                        {parsedTags.length > 0 ? (
-                          parsedTags.map((tag) => (
-                            <Badge key={tag} variant="outline" className="text-xs bg-muted/30">
-                              {tag}
-                            </Badge>
-                          ))
-                        ) : (
-                          <span className="text-muted-foreground text-xs italic">No tags</span>
-                        )}
-                      </div>
+                      <InlineTagEditor profile={profile} initialTags={parsedTags} />
                     </TableCell>
                     <TableCell className="text-right">
                       <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity focus-within:opacity-100 sm:opacity-100">

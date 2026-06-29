@@ -4,6 +4,14 @@ use futures_util::StreamExt;
 use std::io::Write;
 use reqwest::Client;
 use crate::error::AppError;
+use std::sync::OnceLock;
+use tokio::sync::Mutex;
+
+static DOWNLOAD_LOCK: OnceLock<Mutex<()>> = OnceLock::new();
+
+fn get_download_lock() -> &'static Mutex<()> {
+    DOWNLOAD_LOCK.get_or_init(|| Mutex::new(()))
+}
 
 pub async fn emit_progress(app: &AppHandle, progress: crate::DownloadProgress) {
     use tauri::Manager;
@@ -19,6 +27,14 @@ pub async fn download_browser_if_missing(
     exe_relative_path: &str
 ) -> Result<PathBuf, AppError> {
     let exe_path = browser_dir.join(exe_relative_path);
+    if exe_path.exists() {
+        return Ok(exe_path);
+    }
+
+    // Acquire global download lock to prevent concurrent downloads
+    let _lock = get_download_lock().lock().await;
+
+    // Double-check after acquiring lock in case another task just finished downloading
     if exe_path.exists() {
         return Ok(exe_path);
     }

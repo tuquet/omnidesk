@@ -1,8 +1,10 @@
-use sysinfo::{System, SystemExt, CpuExt};
-use std::sync::Mutex;
+use sysinfo::System;
+use std::sync::{Mutex, OnceLock};
 
-lazy_static::lazy_static! {
-    static ref SYS: Mutex<System> = Mutex::new(System::new_all());
+static SYS: OnceLock<Mutex<System>> = OnceLock::new();
+
+fn get_sys() -> &'static Mutex<System> {
+    SYS.get_or_init(|| Mutex::new(System::new_all()))
 }
 
 #[derive(serde::Serialize)]
@@ -14,11 +16,11 @@ pub struct HardwareUsage {
 
 #[tauri::command]
 pub fn get_hardware_usage() -> Result<HardwareUsage, String> {
-    let mut sys = SYS.lock().map_err(|_| "Failed to lock system info".to_string())?;
-    sys.refresh_cpu();
+    let mut sys = get_sys().lock().map_err(|_| "Failed to lock system info".to_string())?;
+    sys.refresh_cpu_all();
     sys.refresh_memory();
     
-    let cpu_percent = sys.global_cpu_info().cpu_usage();
+    let cpu_percent = sys.global_cpu_usage();
     let used_memory_kb = sys.used_memory();
     let total_memory_kb = sys.total_memory();
     

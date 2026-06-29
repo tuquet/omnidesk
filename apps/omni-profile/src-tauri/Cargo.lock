@@ -3332,6 +3332,7 @@ dependencies = [
  "jsonwebtoken",
  "keyring",
  "log",
+ "omni-tauri-core",
  "pkcs8",
  "rand",
  "reqwest 0.12.28",
@@ -3362,6 +3363,18 @@ dependencies = [
  "uuid",
  "walkdir",
  "zip 2.4.2",
+]
+
+[[package]]
+name = "omni-tauri-core"
+version = "0.1.0"
+dependencies = [
+ "log",
+ "reqwest 0.12.28",
+ "serde",
+ "serde_json",
+ "sysinfo",
+ "tauri",
 ]
 
 [[package]]
@@ -4043,6 +4056,7 @@ dependencies = [
  "base64 0.22.1",
  "bytes",
  "encoding_rs",
+ "futures-channel",
  "futures-core",
  "futures-util",
  "h2",

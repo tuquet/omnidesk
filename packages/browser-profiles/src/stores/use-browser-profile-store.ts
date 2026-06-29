@@ -92,10 +92,14 @@ async function fetchApi<T>(path: string, options: RequestInit = {}): Promise<T> 
 export function useBrowserProfileStore() {
   const state = useStore(browserProfileStore);
 
-  const fetchProfiles = useCallback(async () => {
+  const fetchProfiles = useCallback(async (sortBy?: string, sortOrder?: 'asc' | 'desc') => {
     browserProfileStore.setState((s) => ({ ...s, isLoading: true, error: null }));
     try {
-      const profiles = await fetchApi<BrowserProfile[]>('/api/browser-profiles');
+      let url = '/api/browser-profiles';
+      if (sortBy) {
+        url += `?sort_by=${sortBy}&sort_order=${sortOrder || 'desc'}`;
+      }
+      const profiles = await fetchApi<BrowserProfile[]>(url);
       browserProfileStore.setState((s) => ({ ...s, profiles, isLoading: false }));
     } catch (e) {
       browserProfileStore.setState((s) => ({

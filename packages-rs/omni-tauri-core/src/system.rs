@@ -3,7 +3,7 @@ use std::path::PathBuf;
 
 #[tauri::command]
 pub async fn open_app_folder(app: AppHandle) -> Result<(), String> {
-    if let Some(app_dir) = app.path().app_data_dir() {
+    if let Ok(app_dir) = app.path().app_data_dir() {
         if !app_dir.exists() {
             std::fs::create_dir_all(&app_dir).map_err(|e| e.to_string())?;
         }

@@ -1,5 +1,4 @@
 import {
-  Input,
   Label,
   Select,
   SelectContent,
@@ -7,23 +6,33 @@ import {
   SelectTrigger,
   SelectValue,
   Switch,
-  Separator,
 } from '@omnidesk/ui';
 import { ShieldIcon } from 'lucide-react';
 
 export interface ProxyData {
   enabled: boolean;
-  type: 'HTTP' | 'SOCKS5' | 'DIRECT';
+  type: 'HTTP' | 'SOCKS5' | 'DIRECT' | 'AUTO';
   host: string;
   port: string;
   username: string;
   password: string;
+  country?: string;
 }
 
 interface ProxyConfigProps {
   proxy: ProxyData;
   onChange: (proxy: ProxyData) => void;
 }
+
+const COUNTRIES = [
+  { code: 'VN', name: 'Vietnam 🇻🇳' },
+  { code: 'US', name: 'United States 🇺🇸' },
+  { code: 'UK', name: 'United Kingdom 🇬🇧' },
+  { code: 'SG', name: 'Singapore 🇸🇬' },
+  { code: 'JP', name: 'Japan 🇯🇵' },
+  { code: 'KR', name: 'South Korea 🇰🇷' },
+  { code: 'AU', name: 'Australia 🇦🇺' },
+];
 
 export function ProxyConfig({ proxy, onChange }: ProxyConfigProps) {
   const update = (partial: Partial<ProxyData>) => {
@@ -35,7 +44,7 @@ export function ProxyConfig({ proxy, onChange }: ProxyConfigProps) {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <ShieldIcon className="h-4 w-4 text-muted-foreground" />
-          <Label className="text-sm font-medium">Proxy</Label>
+          <Label className="text-sm font-medium">Smart Proxy</Label>
         </div>
         <Switch
           checked={proxy.enabled}
@@ -47,77 +56,29 @@ export function ProxyConfig({ proxy, onChange }: ProxyConfigProps) {
         <div className="space-y-4 rounded-lg border p-4 bg-muted/30 animate-in fade-in slide-in-from-top-2 duration-300">
           <div className="space-y-2">
             <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-              Type
+              Select Region
             </Label>
             <Select
-              value={proxy.type}
-              onValueChange={(v) => update({ type: v as ProxyData['type'] })}
+              value={proxy.country || 'VN'}
+              onValueChange={(v) => update({ country: v, type: 'AUTO' })}
             >
-              <SelectTrigger className="h-8">
-                <SelectValue />
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Select Country" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="HTTP">HTTP / HTTPS</SelectItem>
-                <SelectItem value="SOCKS5">SOCKS5</SelectItem>
-                <SelectItem value="DIRECT">Direct (No Proxy)</SelectItem>
+                {COUNTRIES.map((c) => (
+                  <SelectItem key={c.code} value={c.code}>
+                    {c.name}
+                  </SelectItem>
+                ))}
+                <SelectItem value="RANDOM">Random Region 🌍</SelectItem>
               </SelectContent>
             </Select>
+            <p className="text-xs text-muted-foreground pt-1">
+              IP Address will be automatically assigned from{' '}
+              {proxy.country === 'RANDOM' ? 'a random region' : 'this region'} when launching.
+            </p>
           </div>
-
-          {proxy.type !== 'DIRECT' && (
-            <>
-              <div className="grid grid-cols-3 gap-3">
-                <div className="col-span-2 space-y-2">
-                  <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                    Host
-                  </Label>
-                  <Input
-                    className="h-8"
-                    placeholder="proxy.example.com"
-                    value={proxy.host}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => update({ host: e.target.value })}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                    Port
-                  </Label>
-                  <Input
-                    className="h-8"
-                    placeholder="8080"
-                    value={proxy.port}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => update({ port: e.target.value })}
-                  />
-                </div>
-              </div>
-              <Separator />
-              <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-2">
-                  <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                    Username
-                  </Label>
-                  <Input
-                    className="h-8"
-                    placeholder="Optional"
-                    value={proxy.username}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => update({ username: e.target.value })}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                    Password
-                  </Label>
-                  <Input
-                    className="h-8"
-                    type="password"
-                    placeholder="Optional"
-                    value={proxy.password}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => update({ password: e.target.value })}
-                  />
-                </div>
-              </div>
-            </>
-          )}
         </div>
       )}
     </div>

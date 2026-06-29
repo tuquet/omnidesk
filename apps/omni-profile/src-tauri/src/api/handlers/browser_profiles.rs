@@ -1,11 +1,18 @@
 use axum::{
-    extract::{Path, State},
+    extract::{Path, State, Query},
     http::StatusCode,
     routing::{get, post},
     Json, Router,
 };
+use serde::Deserialize;
 use crate::db::models::browser_profile::BrowserProfile;
 use crate::api::AppState;
+
+#[derive(Deserialize)]
+pub struct ListProfilesQuery {
+    pub sort_by: Option<String>,
+    pub sort_order: Option<String>,
+}
 
 pub fn router() -> Router<AppState> {
     Router::new()
@@ -30,11 +37,12 @@ pub fn router() -> Router<AppState> {
 )]
 pub async fn list_profiles(
     State(state): State<AppState>,
+    Query(query): Query<ListProfilesQuery>,
 ) -> Result<Json<Vec<BrowserProfile>>, StatusCode> {
     use crate::services::browser_profile_service::BrowserProfileService;
     let pool = &state.db;
     
-    let profiles = BrowserProfileService::get_all(pool).await
+    let profiles = BrowserProfileService::get_all(pool, query.sort_by.as_deref(), query.sort_order.as_deref()).await
         .map_err(|e| {
             eprintln!("Error fetching profiles: {:?}", e);
             StatusCode::INTERNAL_SERVER_ERROR

@@ -7,14 +7,24 @@ use std::path::PathBuf;
 pub struct BrowserProfileService;
 
 impl BrowserProfileService {
-    pub async fn get_all(pool: &SqlitePool) -> Result<Vec<BrowserProfile>, AppError> {
-        let mut profiles = sqlx::query_as::<_, BrowserProfile>(
+    pub async fn get_all(pool: &SqlitePool, sort_by: Option<&str>, sort_order: Option<&str>) -> Result<Vec<BrowserProfile>, AppError> {
+        let valid_columns = ["name", "os", "browser_type", "status", "last_used_at", "created_at", "updated_at"];
+        let order_col = sort_by.unwrap_or("created_at");
+        let order_col = if valid_columns.contains(&order_col) { order_col } else { "created_at" };
+        
+        let order_dir = sort_order.unwrap_or("desc").to_uppercase();
+        let order_dir = if order_dir == "ASC" { "ASC" } else { "DESC" };
+
+        let query = format!(
             r#"
             SELECT id, name, group_id, os, browser_type, data_dir_path, status, CAST(last_used_at AS TEXT) as last_used_at, CAST(created_at AS TEXT) as created_at, CAST(updated_at AS TEXT) as updated_at, notes, tags, pid, cdp_url, browser_version
             FROM browser_profiles
-            ORDER BY created_at DESC
-            "#
-        )
+            ORDER BY {} {}
+            "#,
+            order_col, order_dir
+        );
+
+        let mut profiles = sqlx::query_as::<_, BrowserProfile>(&query)
         .fetch_all(pool)
         .await?;
 
