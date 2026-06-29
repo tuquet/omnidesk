@@ -1,158 +1,206 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { Card, CardHeader, CardTitle, CardContent } from '@omnidesk/ui';
-import { Activity, CheckCircle2, Clock, TerminalSquare, Server } from 'lucide-react';
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardContent,
+  CardDescription,
+  CardFooter,
+} from '@omnidesk/ui';
+import { Button } from '@omnidesk/ui';
+import { Play, CalendarClock, Globe, Blocks, TerminalSquare } from 'lucide-react';
+import { useState } from 'react';
 
 export const Route = createFileRoute('/')({
-  component: DashboardComponent,
+  component: CommandCenterPage,
 });
 
-function DashboardComponent() {
+function CommandCenterPage() {
+  const [isRunning, setIsRunning] = useState(false);
+  const [logs, setLogs] = useState<string[]>([]);
+
+  const handleRun = () => {
+    setIsRunning(true);
+    setLogs(['[SYSTEM] Initializing orchestration sequence...']);
+
+    setTimeout(
+      () => setLogs((l) => [...l, '[SYSTEM] Allocated 3 browser profiles: 9021, 9022, 9023']),
+      800,
+    );
+    setTimeout(() => setLogs((l) => [...l, '[PROFILE 9021] Browser launched successfully.']), 1500);
+    setTimeout(() => setLogs((l) => [...l, '[PROFILE 9022] Browser launched successfully.']), 1800);
+    setTimeout(
+      () =>
+        setLogs((l) => [
+          ...l,
+          '[PROFILE 9021] Automa extension active. Executing "Daily Scrape"...',
+        ]),
+      2200,
+    );
+    setTimeout(() => setLogs((l) => [...l, '[PROFILE 9023] Browser launched successfully.']), 2500);
+    setTimeout(() => {
+      setIsRunning(false);
+      setLogs((l) => [...l, '[SYSTEM] Orchestration complete.']);
+    }, 4000);
+  };
+
   return (
-    <div className="flex flex-1 flex-col gap-6 p-6 overflow-y-auto">
-      <div>
-        <h1 className="text-3xl font-heading font-bold tracking-tight mb-2">
-          Orchestrator Overview
+    <div className="flex flex-1 flex-col h-full overflow-hidden bg-background">
+      <div className="flex-none p-6 pb-4 border-b border-border/40 bg-card/50">
+        <h1 className="text-3xl font-heading font-bold tracking-tight mb-1 text-foreground">
+          Command Center
         </h1>
         <p className="text-muted-foreground text-sm">
-          Real-time automation engine metrics and execution logs.
+          Place execution orders to run Workflows across multiple isolated browser Profiles.
         </p>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-        <Card className="bg-card shadow-sm border-border/60">
-          <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-            <CardTitle className="text-sm font-medium">Total Executions</CardTitle>
-            <Activity className="h-4 w-4 text-primary" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold font-mono">1,248</div>
-            <p className="text-xs text-muted-foreground mt-1">+12% from last week</p>
-          </CardContent>
-        </Card>
-        <Card className="bg-card shadow-sm border-border/60">
-          <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-            <CardTitle className="text-sm font-medium">Success Rate</CardTitle>
-            <CheckCircle2 className="h-4 w-4 text-emerald-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold font-mono">98.5%</div>
-            <p className="text-xs text-muted-foreground mt-1">3 failed in last 24h</p>
-          </CardContent>
-        </Card>
-        <Card className="bg-card shadow-sm border-border/60">
-          <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-            <CardTitle className="text-sm font-medium">Active Profiles</CardTitle>
-            <Server className="h-4 w-4 text-accent" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold font-mono">14 / 20</div>
-            <p className="text-xs text-muted-foreground mt-1">6 available for jobs</p>
-          </CardContent>
-        </Card>
-      </div>
-
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-7">
-        <Card className="lg:col-span-4 bg-card shadow-sm border-border/60 flex flex-col min-h-[400px]">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <TerminalSquare className="h-5 w-5 text-primary" />
-              Live Execution Logs
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="flex-1 flex flex-col">
-            <div className="flex-1 rounded-md bg-[#0D1117] p-4 text-sm font-mono text-gray-300 overflow-y-auto max-h-[300px] border border-border/50">
-              <div className="flex flex-col gap-1.5">
-                <div className="text-blue-400">
-                  [10:42:01] INFO{' '}
-                  <span className="text-gray-300">Engine started orchestrating Workflow #42</span>
-                </div>
-                <div className="text-blue-400">
-                  [10:42:02] INFO{' '}
-                  <span className="text-gray-300">Allocated Browser Profile ID: 9021</span>
-                </div>
-                <div className="text-yellow-400">
-                  [10:42:03] WARN{' '}
-                  <span className="text-gray-300">Profile 9021 took 1.2s to initialize</span>
-                </div>
-                <div className="text-green-400">
-                  [10:42:04] SUCCESS{' '}
-                  <span className="text-gray-300">Automa injected. Executing blocks...</span>
-                </div>
-                <div className="text-blue-400">
-                  [10:42:05] INFO <span className="text-gray-300">Block "New Tab" completed</span>
-                </div>
-                <div className="text-blue-400">
-                  [10:42:06] INFO{' '}
-                  <span className="text-gray-300">Block "Extract Data" running...</span>
-                </div>
-                <div className="text-green-400">
-                  [10:42:08] SUCCESS{' '}
-                  <span className="text-gray-300">
-                    Block "Extract Data" completed. Found 12 items.
-                  </span>
-                </div>
-                <div className="text-emerald-500">
-                  [10:42:09] DONE{' '}
-                  <span className="text-gray-300">
-                    Workflow #42 completed successfully. Session closed.
-                  </span>
-                </div>
-                <div className="text-blue-400 animate-pulse mt-2">_</div>
+      <div className="flex flex-1 flex-col lg:flex-row gap-6 p-6 min-h-0 overflow-hidden">
+        {/* Left Form Panel - The "Order" Placement */}
+        <div className="flex-none w-full lg:w-[480px] overflow-y-auto pr-2 space-y-6">
+          <Card className="shadow-md border-border/60 bg-card">
+            <CardHeader className="pb-4 bg-muted/20 border-b border-border/40">
+              <CardTitle className="text-lg flex items-center gap-2">
+                <Play className="w-5 h-5 text-primary" fill="currentColor" />
+                Execution Order
+              </CardTitle>
+              <CardDescription>Select target workflow, environments, and schedule</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6 pt-6">
+              <div className="space-y-3">
+                <label className="text-sm font-semibold flex items-center gap-2 text-foreground">
+                  <Blocks className="w-4 h-4 text-primary" /> 1. Select Workflow
+                </label>
+                <select className="flex h-11 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 transition-colors">
+                  <option>E-commerce Price Scraper</option>
+                  <option>Social Media Auto-Poster</option>
+                  <option>Daily Health Check</option>
+                </select>
               </div>
-            </div>
-          </CardContent>
-        </Card>
 
-        <Card className="lg:col-span-3 bg-card shadow-sm border-border/60">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Clock className="h-5 w-5 text-accent" />
-              Active Schedules
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {[
-                {
-                  name: 'Daily Data Scrape',
-                  time: 'Every day at 00:00',
-                  status: 'Active',
-                  next: 'In 8 hours',
-                },
-                {
-                  name: 'Health Check Login',
-                  time: 'Every 30 minutes',
-                  status: 'Active',
-                  next: 'In 5 mins',
-                },
-                {
-                  name: 'Weekly Report Generator',
-                  time: 'Sunday at 23:59',
-                  status: 'Paused',
-                  next: '-',
-                },
-              ].map((item, i) => (
-                <div
-                  key={i}
-                  className="flex items-center justify-between border-b border-border/50 pb-3 last:border-0 last:pb-0"
-                >
-                  <div className="space-y-1">
-                    <p className="text-sm font-medium leading-none">{item.name}</p>
-                    <p className="text-xs text-muted-foreground font-mono">{item.time}</p>
-                  </div>
-                  <div className="text-right">
-                    <div
-                      className={`text-xs font-semibold ${item.status === 'Active' ? 'text-emerald-500' : 'text-muted-foreground'}`}
-                    >
-                      {item.status}
-                    </div>
-                    <div className="text-xs text-muted-foreground mt-0.5">{item.next}</div>
-                  </div>
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <label className="text-sm font-semibold flex items-center gap-2 text-foreground">
+                    <Globe className="w-4 h-4 text-primary" /> 2. Target Profiles
+                  </label>
+                  <span className="text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded-full">
+                    3 selected
+                  </span>
                 </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
+                <div className="border border-border/60 rounded-md p-1 space-y-1 max-h-48 overflow-y-auto bg-muted/10 shadow-inner">
+                  {[
+                    'Profile 9021 (US-East)',
+                    'Profile 9022 (UK-London)',
+                    'Profile 9023 (SG-Asia)',
+                    'Profile 9024 (US-West)',
+                    'Profile 9025 (JP-Tokyo)',
+                  ].map((p, i) => (
+                    <div
+                      key={i}
+                      className="flex items-center space-x-3 p-2 hover:bg-muted/30 rounded transition-colors cursor-pointer"
+                    >
+                      <input
+                        type="checkbox"
+                        id={`p-${i}`}
+                        className="rounded border-primary/50 text-primary focus:ring-primary h-4 w-4 cursor-pointer"
+                        defaultChecked={i < 3}
+                      />
+                      <label
+                        htmlFor={`p-${i}`}
+                        className="text-sm font-medium leading-none cursor-pointer flex-1"
+                      >
+                        {p}
+                      </label>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="space-y-3">
+                <label className="text-sm font-semibold flex items-center gap-2 text-foreground">
+                  <CalendarClock className="w-4 h-4 text-primary" /> 3. Schedule Type
+                </label>
+                <div className="grid grid-cols-2 gap-3">
+                  <label className="border-2 border-primary bg-primary/5 rounded-lg p-3 flex flex-col items-center justify-center cursor-pointer transition-all hover:bg-primary/10">
+                    <input type="radio" name="schedule" className="sr-only" defaultChecked />
+                    <Play className="w-6 h-6 mb-2 text-primary" fill="currentColor" />
+                    <span className="text-sm font-bold text-primary">Run Now</span>
+                  </label>
+                  <label className="border-2 border-border/60 hover:border-primary/40 hover:bg-muted/50 rounded-lg p-3 flex flex-col items-center justify-center cursor-pointer transition-all">
+                    <input type="radio" name="schedule" className="sr-only" />
+                    <CalendarClock className="w-6 h-6 mb-2 text-muted-foreground" />
+                    <span className="text-sm font-medium text-muted-foreground">Cron Job</span>
+                  </label>
+                </div>
+              </div>
+            </CardContent>
+            <CardFooter className="pt-2 pb-6 px-6">
+              <Button
+                onClick={handleRun}
+                disabled={isRunning}
+                size="lg"
+                className="w-full bg-accent hover:bg-accent/90 text-accent-foreground shadow-lg h-14 text-lg font-bold flex gap-2 items-center transition-all active:scale-[0.98]"
+              >
+                {isRunning ? (
+                  <>
+                    <div className="h-5 w-5 animate-spin rounded-full border-b-2 border-current"></div>
+                    Executing Order...
+                  </>
+                ) : (
+                  <>
+                    <Play className="w-6 h-6" fill="currentColor" />
+                    EXECUTE WORKFLOW
+                  </>
+                )}
+              </Button>
+            </CardFooter>
+          </Card>
+        </div>
+
+        {/* Right Terminal Panel - Live Logs */}
+        <div className="flex-1 flex flex-col overflow-hidden">
+          <Card className="flex flex-col h-full bg-[#0D1117] border-border/40 shadow-xl overflow-hidden rounded-xl">
+            <CardHeader className="bg-[#161B22] border-b border-border/10 py-3 px-4 flex flex-row items-center justify-between space-y-0">
+              <div className="flex items-center gap-2">
+                <TerminalSquare className="w-4 h-4 text-primary" />
+                <CardTitle className="text-sm font-mono text-gray-300 font-medium tracking-wide">
+                  Engine_Terminal_Logs
+                </CardTitle>
+              </div>
+              <div className="flex gap-2">
+                <div className="w-3 h-3 rounded-full bg-red-500/80 shadow-[0_0_8px_rgba(239,68,68,0.5)]"></div>
+                <div className="w-3 h-3 rounded-full bg-yellow-500/80 shadow-[0_0_8px_rgba(234,179,8,0.5)]"></div>
+                <div className="w-3 h-3 rounded-full bg-green-500/80 shadow-[0_0_8px_rgba(34,197,94,0.5)]"></div>
+              </div>
+            </CardHeader>
+            <CardContent className="flex-1 overflow-y-auto p-5 font-mono text-sm leading-relaxed">
+              {!isRunning && logs.length === 0 ? (
+                <div className="h-full flex flex-col items-center justify-center text-muted-foreground/40 gap-4">
+                  <TerminalSquare className="w-16 h-16 opacity-50" strokeWidth={1} />
+                  <p className="text-base">System standing by. Awaiting execution order.</p>
+                </div>
+              ) : (
+                <div className="flex flex-col gap-2 text-gray-300">
+                  {logs.map((log, i) => (
+                    <div
+                      key={i}
+                      className={`
+                      ${log.includes('INFO') ? 'text-blue-400' : ''}
+                      ${log.includes('SYSTEM') ? 'text-purple-400 font-bold' : ''}
+                      ${log.includes('PROFILE') ? 'text-emerald-400' : ''}
+                    `}
+                    >
+                      {log}
+                    </div>
+                  ))}
+                  {isRunning && (
+                    <div className="text-blue-400 animate-pulse mt-2 block w-2 h-4 bg-blue-400"></div>
+                  )}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </div>
   );
