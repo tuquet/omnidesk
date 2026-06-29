@@ -50,7 +50,7 @@ export function ProfileFormDialog({
 
   // Form state
   const [name, setName] = useState('');
-  const [browserType, setBrowserType] = useState('chrome');
+  const [browserType, setBrowserType] = useState('system-chrome');
   const [browserVersion, setBrowserVersion] = useState('latest');
   const [os, setOs] = useState('win');
   const [notes, setNotes] = useState('');
@@ -71,7 +71,7 @@ export function ProfileFormDialog({
   useEffect(() => {
     if (mode === 'edit' && profile) {
       setName(profile.name);
-      setBrowserType(profile.browser_type || 'chrome');
+      setBrowserType(profile.browser_type || 'system-chrome');
       setBrowserVersion(profile.browser_version || 'latest');
       setOs(profile.os || 'win');
       setNotes(profile.notes || '');
@@ -85,7 +85,7 @@ export function ProfileFormDialog({
     } else {
       // Reset for create
       setName('');
-      setBrowserType('chrome');
+      setBrowserType('system-chrome');
       setBrowserVersion('latest');
       setOs('win');
       setNotes('');
@@ -188,7 +188,8 @@ export function ProfileFormDialog({
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="chrome">Chromium (Built-in)</SelectItem>
+                  <SelectItem value="system-chrome">System Chrome</SelectItem>
+                  <SelectItem value="chrome">Chromium (Portable CfT)</SelectItem>
                   <SelectItem value="edge">System Edge</SelectItem>
                   <SelectItem value="firefox">Firefox</SelectItem>
                   <SelectItem value="webkit">WebKit (Playwright)</SelectItem>
@@ -238,7 +239,9 @@ export function ProfileFormDialog({
             <Input
               placeholder="Leave empty to auto-download / use default"
               value={executablePath}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setExecutablePath(e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                setExecutablePath(e.target.value)
+              }
             />
           </div>
 

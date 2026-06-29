@@ -4,12 +4,14 @@ use crate::error::AppError;
 use crate::db::models::browser_profile::BrowserProfile;
 
 pub mod chrome;
+pub mod system_chrome;
 pub mod edge;
 pub mod firefox;
 pub mod downloader;
 
 pub enum BrowserLauncher {
     Chrome(chrome::ChromeLauncher),
+    SystemChrome(system_chrome::SystemChromeLauncher),
     Edge(edge::EdgeLauncher),
     Firefox(firefox::FirefoxLauncher),
 }
@@ -19,6 +21,7 @@ impl BrowserLauncher {
     pub async fn resolve_executable(&self, profile: &BrowserProfile, app: &tauri::AppHandle) -> Result<String, AppError> {
         match self {
             Self::Chrome(l) => l.resolve_executable(profile, app).await,
+            Self::SystemChrome(l) => l.resolve_executable(profile, app).await,
             Self::Edge(l) => l.resolve_executable(profile, app).await,
             Self::Firefox(l) => l.resolve_executable(profile, app).await,
         }
@@ -33,6 +36,7 @@ impl BrowserLauncher {
     ) -> Result<Command, AppError> {
         match self {
             Self::Chrome(l) => l.build_command(profile, app, data_dir).await,
+            Self::SystemChrome(l) => l.build_command(profile, app, data_dir).await,
             Self::Edge(l) => l.build_command(profile, app, data_dir).await,
             Self::Firefox(l) => l.build_command(profile, app, data_dir).await,
         }
@@ -61,6 +65,7 @@ impl LauncherFactory {
     pub fn create(browser_type: &str) -> BrowserLauncher {
         match browser_type.to_lowercase().as_str() {
             "chrome" => BrowserLauncher::Chrome(chrome::ChromeLauncher),
+            "system-chrome" => BrowserLauncher::SystemChrome(system_chrome::SystemChromeLauncher),
             "edge" => BrowserLauncher::Edge(edge::EdgeLauncher),
             "firefox" => BrowserLauncher::Firefox(firefox::FirefoxLauncher),
             // Default fallback to Chrome
