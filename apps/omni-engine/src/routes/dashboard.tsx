@@ -1,211 +1,207 @@
 import { createFileRoute } from '@tanstack/react-router';
 import {
-  PageContainer,
-  PageHeader,
-  PageTitle,
-  PageDescription,
   Card,
   CardHeader,
   CardTitle,
   CardContent,
-  ScrollArea,
+  CardDescription,
+  CardFooter,
 } from '@omnidesk/ui';
-import {
-  ActivityIcon,
-  CpuIcon,
-  MemoryStickIcon,
-  TerminalIcon,
-  ServerCrashIcon,
-} from 'lucide-react';
-import { LineChart, Line, ResponsiveContainer } from 'recharts';
+import { Button } from '@omnidesk/ui';
+import { Play, CalendarClock, Globe, Blocks, TerminalSquare } from 'lucide-react';
+import { useState } from 'react';
 
 export const Route = createFileRoute('/dashboard')({
-  component: DashboardPage,
+  component: CommandCenterPage,
 });
 
-function DashboardPage() {
-  const logs = [
-    {
-      time: '18:42:01',
-      level: 'INFO',
-      message: 'Runtime Engine started successfully on port 1421',
-    },
-    { time: '18:42:05', level: 'DEBUG', message: 'Connected to local SQLite database' },
-    { time: '18:42:10', level: 'WARN', message: 'Realtime sync queue is empty' },
-    { time: '18:45:00', level: 'INFO', message: 'Scheduler trigger: [Scrape Daily News]' },
-    { time: '18:45:01', level: 'INFO', message: 'Allocating browser profile #12 (Proxy: US-NY-1)' },
-    {
-      time: '18:45:03',
-      level: 'INFO',
-      message: 'WebSocket connection established with Extension Bridge',
-    },
-  ];
+function CommandCenterPage() {
+  const [isRunning, setIsRunning] = useState(false);
+  const [logs, setLogs] = useState<string[]>([]);
 
-  const cpuData = [
-    { value: 10 },
-    { value: 15 },
-    { value: 12 },
-    { value: 18 },
-    { value: 14 },
-    { value: 20 },
-    { value: 16 },
-    { value: 12 },
-    { value: 22 },
-    { value: 12 },
-  ];
+  const handleRun = () => {
+    setIsRunning(true);
+    setLogs(['[SYSTEM] Initializing orchestration sequence...']);
 
-  const memData = [
-    { value: 1.0 },
-    { value: 1.0 },
-    { value: 1.1 },
-    { value: 1.1 },
-    { value: 1.15 },
-    { value: 1.2 },
-    { value: 1.2 },
-    { value: 1.2 },
-    { value: 1.2 },
-    { value: 1.2 },
-  ];
+    setTimeout(
+      () => setLogs((l) => [...l, '[SYSTEM] Allocated 3 browser profiles: 9021, 9022, 9023']),
+      800,
+    );
+    setTimeout(() => setLogs((l) => [...l, '[PROFILE 9021] Browser launched successfully.']), 1500);
+    setTimeout(() => setLogs((l) => [...l, '[PROFILE 9022] Browser launched successfully.']), 1800);
+    setTimeout(
+      () =>
+        setLogs((l) => [
+          ...l,
+          '[PROFILE 9021] Automa extension active. Executing "Daily Scrape"...',
+        ]),
+      2200,
+    );
+    setTimeout(() => setLogs((l) => [...l, '[PROFILE 9023] Browser launched successfully.']), 2500);
+    setTimeout(() => {
+      setIsRunning(false);
+      setLogs((l) => [...l, '[SYSTEM] Orchestration complete.']);
+    }, 4000);
+  };
 
   return (
-    <PageContainer>
-      <PageHeader>
-        <div className="flex items-center justify-between">
-          <div>
-            <PageTitle>Control Center</PageTitle>
-            <PageDescription>Monitor system resources and active engine processes.</PageDescription>
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="relative flex h-3 w-3">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
-            </span>
-            <span className="text-sm font-medium text-green-500">Engine Online</span>
-          </div>
-        </div>
-      </PageHeader>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <Card className="bg-card overflow-hidden">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">CPU Usage</CardTitle>
-            <CpuIcon className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent className="pb-2">
-            <div className="text-2xl font-bold">12%</div>
-            <p className="text-xs text-muted-foreground">Normal load</p>
-            <div className="h-[40px] mt-2 -mx-2">
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={cpuData}>
-                  <Line
-                    type="monotone"
-                    dataKey="value"
-                    stroke="currentColor"
-                    strokeWidth={2}
-                    dot={false}
-                    className="text-primary"
-                  />
-                </LineChart>
-              </ResponsiveContainer>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-card overflow-hidden">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Memory (RAM)</CardTitle>
-            <MemoryStickIcon className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent className="pb-2">
-            <div className="text-2xl font-bold">1.2 GB</div>
-            <p className="text-xs text-muted-foreground">Out of 16 GB</p>
-            <div className="h-[40px] mt-2 -mx-2">
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={memData}>
-                  <Line
-                    type="stepAfter"
-                    dataKey="value"
-                    stroke="currentColor"
-                    strokeWidth={2}
-                    dot={false}
-                    className="text-blue-500"
-                  />
-                </LineChart>
-              </ResponsiveContainer>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-card">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Active Jobs</CardTitle>
-            <ActivityIcon className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">1</div>
-            <p className="text-xs text-muted-foreground">+3 in queue</p>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-card">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Failed Tasks</CardTitle>
-            <ServerCrashIcon className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">0</div>
-            <p className="text-xs text-muted-foreground">Last 24 hours</p>
-          </CardContent>
-        </Card>
+    <div className="flex flex-1 flex-col h-full overflow-hidden bg-background">
+      <div className="flex-none p-6 pb-4 border-b border-border/40 bg-card/50">
+        <h1 className="text-3xl font-heading font-bold tracking-tight mb-1 text-foreground">
+          Command Center
+        </h1>
+        <p className="text-muted-foreground text-sm">
+          Place execution orders to run Workflows across multiple isolated browser Profiles.
+        </p>
       </div>
 
-      <div className="flex-1 min-h-0 flex flex-col mt-4">
-        <div className="flex items-center gap-2 mb-2">
-          <TerminalIcon className="h-4 w-4 text-muted-foreground" />
-          <h3 className="text-sm font-semibold tracking-tight">Realtime Engine Logs</h3>
-        </div>
-        <Card className="flex-1 bg-[#0d1117] border-zinc-800 text-zinc-300 font-mono text-xs overflow-hidden shadow-2xl flex flex-col rounded-xl">
-          <div className="bg-[#161b22] border-b border-zinc-800 px-4 py-2 flex items-center gap-2">
-            <div className="flex gap-1.5">
-              <div className="h-3 w-3 rounded-full bg-red-500/80"></div>
-              <div className="h-3 w-3 rounded-full bg-yellow-500/80"></div>
-              <div className="h-3 w-3 rounded-full bg-green-500/80"></div>
-            </div>
-            <div className="mx-auto text-[10px] text-zinc-500 uppercase tracking-widest font-sans font-medium">
-              Engine Terminal
-            </div>
-            <div className="w-10"></div>
-          </div>
-          <ScrollArea className="flex-1 w-full">
-            <div className="p-4 space-y-1">
-              {logs.map((log, i) => (
-                <div
-                  key={i}
-                  className="flex items-start hover:bg-white/5 px-1 py-0.5 rounded transition-colors group"
-                >
-                  <span className="text-zinc-600 mr-3 shrink-0 group-hover:text-zinc-400 transition-colors">
-                    [{log.time}]
-                  </span>
-                  <span
-                    className={`shrink-0 w-12 font-medium ${log.level === 'INFO' ? 'text-blue-400' : log.level === 'WARN' ? 'text-yellow-400' : log.level === 'ERROR' ? 'text-red-400' : 'text-zinc-400'}`}
-                  >
-                    {log.level}
-                  </span>
-                  <span className="ml-2 text-zinc-300 break-words">{log.message}</span>
-                </div>
-              ))}
-              <div className="flex items-start px-1 py-1 animate-pulse">
-                <span className="text-zinc-600 mr-3 shrink-0">
-                  [{new Date().toLocaleTimeString('en-GB', { hour12: false })}]
-                </span>
-                <span className="text-zinc-500">
-                  Waiting for events<span className="animate-[ping_1.5s_infinite]">...</span>
-                </span>
+      <div className="flex flex-1 flex-col lg:flex-row gap-6 p-6 min-h-0 overflow-hidden">
+        {/* Left Form Panel - The "Order" Placement */}
+        <div className="flex-none w-full lg:w-[480px] overflow-y-auto pr-2 space-y-6">
+          <Card className="shadow-md border-border/60 bg-card">
+            <CardHeader className="pb-4 bg-muted/20 border-b border-border/40">
+              <CardTitle className="text-lg flex items-center gap-2">
+                <Play className="w-5 h-5 text-primary" fill="currentColor" />
+                Execution Order
+              </CardTitle>
+              <CardDescription>Select target workflow, environments, and schedule</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6 pt-6">
+              <div className="space-y-3">
+                <label className="text-sm font-semibold flex items-center gap-2 text-foreground">
+                  <Blocks className="w-4 h-4 text-primary" /> 1. Select Workflow
+                </label>
+                <select className="flex h-11 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 transition-colors">
+                  <option>E-commerce Price Scraper</option>
+                  <option>Social Media Auto-Poster</option>
+                  <option>Daily Health Check</option>
+                </select>
               </div>
-            </div>
-          </ScrollArea>
-        </Card>
+
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <label className="text-sm font-semibold flex items-center gap-2 text-foreground">
+                    <Globe className="w-4 h-4 text-primary" /> 2. Target Profiles
+                  </label>
+                  <span className="text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded-full">
+                    3 selected
+                  </span>
+                </div>
+                <div className="border border-border/60 rounded-md p-1 space-y-1 max-h-48 overflow-y-auto bg-muted/10 shadow-inner">
+                  {[
+                    'Profile 9021 (US-East)',
+                    'Profile 9022 (UK-London)',
+                    'Profile 9023 (SG-Asia)',
+                    'Profile 9024 (US-West)',
+                    'Profile 9025 (JP-Tokyo)',
+                  ].map((p, i) => (
+                    <div
+                      key={i}
+                      className="flex items-center space-x-3 p-2 hover:bg-muted/30 rounded transition-colors cursor-pointer"
+                    >
+                      <input
+                        type="checkbox"
+                        id={`p-${i}`}
+                        className="rounded border-primary/50 text-primary focus:ring-primary h-4 w-4 cursor-pointer"
+                        defaultChecked={i < 3}
+                      />
+                      <label
+                        htmlFor={`p-${i}`}
+                        className="text-sm font-medium leading-none cursor-pointer flex-1"
+                      >
+                        {p}
+                      </label>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="space-y-3">
+                <label className="text-sm font-semibold flex items-center gap-2 text-foreground">
+                  <CalendarClock className="w-4 h-4 text-primary" /> 3. Schedule Type
+                </label>
+                <div className="grid grid-cols-2 gap-3">
+                  <label className="border-2 border-primary bg-primary/5 rounded-lg p-3 flex flex-col items-center justify-center cursor-pointer transition-all hover:bg-primary/10">
+                    <input type="radio" name="schedule" className="sr-only" defaultChecked />
+                    <Play className="w-6 h-6 mb-2 text-primary" fill="currentColor" />
+                    <span className="text-sm font-bold text-primary">Run Now</span>
+                  </label>
+                  <label className="border-2 border-border/60 hover:border-primary/40 hover:bg-muted/50 rounded-lg p-3 flex flex-col items-center justify-center cursor-pointer transition-all">
+                    <input type="radio" name="schedule" className="sr-only" />
+                    <CalendarClock className="w-6 h-6 mb-2 text-muted-foreground" />
+                    <span className="text-sm font-medium text-muted-foreground">Cron Job</span>
+                  </label>
+                </div>
+              </div>
+            </CardContent>
+            <CardFooter className="pt-2 pb-6 px-6">
+              <Button
+                onClick={handleRun}
+                disabled={isRunning}
+                size="lg"
+                className="w-full bg-accent hover:bg-accent/90 text-accent-foreground shadow-lg h-14 text-lg font-bold flex gap-2 items-center transition-all active:scale-[0.98]"
+              >
+                {isRunning ? (
+                  <>
+                    <div className="h-5 w-5 animate-spin rounded-full border-b-2 border-current"></div>
+                    Executing Order...
+                  </>
+                ) : (
+                  <>
+                    <Play className="w-6 h-6" fill="currentColor" />
+                    EXECUTE WORKFLOW
+                  </>
+                )}
+              </Button>
+            </CardFooter>
+          </Card>
+        </div>
+
+        {/* Right Terminal Panel - Live Logs */}
+        <div className="flex-1 flex flex-col overflow-hidden">
+          <Card className="flex flex-col h-full bg-[#0D1117] border-border/40 shadow-xl overflow-hidden rounded-xl">
+            <CardHeader className="bg-[#161B22] border-b border-border/10 py-3 px-4 flex flex-row items-center justify-between space-y-0">
+              <div className="flex items-center gap-2">
+                <TerminalSquare className="w-4 h-4 text-primary" />
+                <CardTitle className="text-sm font-mono text-gray-300 font-medium tracking-wide">
+                  Engine_Terminal_Logs
+                </CardTitle>
+              </div>
+              <div className="flex gap-2">
+                <div className="w-3 h-3 rounded-full bg-red-500/80 shadow-[0_0_8px_rgba(239,68,68,0.5)]"></div>
+                <div className="w-3 h-3 rounded-full bg-yellow-500/80 shadow-[0_0_8px_rgba(234,179,8,0.5)]"></div>
+                <div className="w-3 h-3 rounded-full bg-green-500/80 shadow-[0_0_8px_rgba(34,197,94,0.5)]"></div>
+              </div>
+            </CardHeader>
+            <CardContent className="flex-1 overflow-y-auto p-5 font-mono text-sm leading-relaxed">
+              {!isRunning && logs.length === 0 ? (
+                <div className="h-full flex flex-col items-center justify-center text-muted-foreground/40 gap-4">
+                  <TerminalSquare className="w-16 h-16 opacity-50" strokeWidth={1} />
+                  <p className="text-base">System standing by. Awaiting execution order.</p>
+                </div>
+              ) : (
+                <div className="flex flex-col gap-2 text-gray-300">
+                  {logs.map((log, i) => (
+                    <div
+                      key={i}
+                      className={`
+                      ${log.includes('INFO') ? 'text-blue-400' : ''}
+                      ${log.includes('SYSTEM') ? 'text-purple-400 font-bold' : ''}
+                      ${log.includes('PROFILE') ? 'text-emerald-400' : ''}
+                    `}
+                    >
+                      {log}
+                    </div>
+                  ))}
+                  {isRunning && (
+                    <div className="text-blue-400 animate-pulse mt-2 block w-2 h-4 bg-blue-400"></div>
+                  )}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
       </div>
-    </PageContainer>
+    </div>
   );
 }

@@ -1,4 +1,4 @@
-import { Outlet, useRouterState } from '@tanstack/react-router';
+import { Outlet, useRouterState, Link } from '@tanstack/react-router';
 import { OmniLayout } from '@omnidesk/core';
 import {
   Sidebar,
@@ -19,7 +19,7 @@ function EngineSidebar() {
       <SidebarHeader>
         <div className="flex items-center gap-2 px-2 py-1.5 font-semibold text-sm">
           <MonitorPlay className="h-4 w-4" />
-          <span>Orchestrator</span>
+          <span>Command Center</span>
         </div>
       </SidebarHeader>
       <SidebarContent>
@@ -28,21 +28,27 @@ function EngineSidebar() {
           <SidebarGroupContent>
             <SidebarMenu>
               <SidebarMenuItem>
-                <SidebarMenuButton className="text-xs">
-                  <Terminal />
-                  <span>Runtimes</span>
+                <SidebarMenuButton className="text-xs" asChild>
+                  <Link to="/dashboard">
+                    <Terminal />
+                    <span>Execute Order</span>
+                  </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <SidebarMenuButton className="text-xs">
-                  <Zap />
-                  <span>Triggers</span>
+                <SidebarMenuButton className="text-xs" asChild>
+                  <Link to="/active-jobs">
+                    <Zap />
+                    <span>Triggers</span>
+                  </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <SidebarMenuButton className="text-xs">
-                  <Settings />
-                  <span>Settings</span>
+                <SidebarMenuButton className="text-xs" asChild>
+                  <Link to="/settings">
+                    <Settings />
+                    <span>Settings</span>
+                  </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
             </SidebarMenu>
