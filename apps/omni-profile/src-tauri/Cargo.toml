@@ -1,7 +1,7 @@
 [package]
 name = "omni-profile"
 default-run = "omni-profile"
-version = "0.1.0"
+version = "0.1.1"
 description = "Premium B2B Enterprise Platform with App Marketplace"
 authors = ["OmniDesk Team"]
 edition = "2021"
