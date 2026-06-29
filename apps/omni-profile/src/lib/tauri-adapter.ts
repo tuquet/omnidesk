@@ -96,7 +96,7 @@ export const tauriAdapter: PlatformAdapter = {
     },
     startResizeDragging: async (direction: number) => {
       const win = getCurrentWindow();
-      await win.startResizeDragging(direction as unknown as number);
+      await win.startResizeDragging(direction as any);
     },
     resetSize: async (width: number, height: number) => {
       const { LogicalSize } = await import('@tauri-apps/api/dpi');

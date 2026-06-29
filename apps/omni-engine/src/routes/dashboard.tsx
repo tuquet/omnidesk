@@ -36,7 +36,6 @@ function DashboardPage() {
     { time: '18:45:01', level: 'INFO', message: 'Allocating browser profile #12 (Proxy: US-NY-1)' },
     {
       time: '18:45:03',
-      time: '18:45:03',
       level: 'INFO',
       message: 'WebSocket connection established with Extension Bridge',
     },
