@@ -1,7 +1,7 @@
 [package]
 name = "omni-engine"
 default-run = "omni-engine"
-version = "0.1.1"
+version = "0.1.3"
 description = "Premium B2B Enterprise Platform with App Marketplace"
 authors = ["OmniDesk Team"]
 edition = "2021"
