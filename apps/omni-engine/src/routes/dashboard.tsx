@@ -46,7 +46,8 @@ function CommandCenterPage() {
         if (Array.isArray(data)) {
           const workflowsData = data as { id: string; name: string }[];
           setWorkflows(workflowsData);
-          if (workflowsData.length > 0) setSelectedWorkflow(workflowsData[0].id);
+          if (workflowsData.length > 0 && workflowsData[0])
+            setSelectedWorkflow(workflowsData[0].id);
         }
       })
       .catch(console.error);

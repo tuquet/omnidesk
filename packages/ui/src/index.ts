@@ -33,6 +33,7 @@ export * from './components/ui/input-group';
 export * from './components/ui/page-header';
 export * from './components/ui/switch';
 export * from './components/ui/resizable';
+export * from './components/ui/alert';
 export { cn } from './lib/utils';
 export * from './blocks/auth/login-form';
 export * from './blocks/auth/signup-form';
@@ -57,3 +58,4 @@ export * from './components/landing/desktop-landing';
 export * from './components/landing/web-landing';
 
 // Landing Components
+export * from './components/ui/alert';

@@ -256,10 +256,10 @@ export function ProfileTable({
   });
 
   const virtualRows = virtualizer.getVirtualItems();
-  const paddingTop = virtualRows.length > 0 ? virtualRows[0].start : 0;
+  const paddingTop = virtualRows.length > 0 ? (virtualRows[0]?.start ?? 0) : 0;
   const paddingBottom =
     virtualRows.length > 0
-      ? virtualizer.getTotalSize() - virtualRows[virtualRows.length - 1].end
+      ? virtualizer.getTotalSize() - (virtualRows[virtualRows.length - 1]?.end ?? 0)
       : 0;
 
   return (
