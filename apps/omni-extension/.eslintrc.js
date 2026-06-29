@@ -50,13 +50,9 @@ module.exports = {
         endOfLine: 'auto',
       },
     ],
-    'import/extensions': [
-      'error',
-      'always',
-      {
-        js: 'never',
-      },
-    ],
+    'import/extensions': 'off',
+    'import/no-unresolved': 'off',
+    'no-use-before-define': 'off',
     // disallow reassignment of function parameters
     // disallow parameter object manipulation except for specific exclusions
     'no-param-reassign': 'off',
