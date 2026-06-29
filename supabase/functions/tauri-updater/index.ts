@@ -1,5 +1,14 @@
-import { serve } from "std/http/server.ts";
-import { gt } from "std/semver/mod.ts";
+function gt(latest: string, current: string) {
+  const l = latest.replace(/[^0-9.]/g, '').split('.').map(Number);
+  const c = current.replace(/[^0-9.]/g, '').split('.').map(Number);
+  for (let i = 0; i < Math.max(l.length, c.length); i++) {
+    const vL = l[i] || 0;
+    const vC = c[i] || 0;
+    if (vL > vC) return true;
+    if (vL < vC) return false;
+  }
+  return false;
+}
 
 const GITHUB_REPO = "tuquet/omnidesk";
 const GITHUB_API_URL = `https://api.github.com/repos/${GITHUB_REPO}/releases`;
@@ -10,7 +19,7 @@ const corsHeaders = {
   "Access-Control-Allow-Methods": "GET, OPTIONS",
 };
 
-serve(async (req: Request) => {
+Deno.serve(async (req: Request) => {
   // 1. Handle CORS preflight
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
