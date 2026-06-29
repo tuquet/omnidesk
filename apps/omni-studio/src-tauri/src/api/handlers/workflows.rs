@@ -3,11 +3,90 @@ use axum::{
     routing::{get, post},
     Json, Router,
 };
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
+use utoipa::ToSchema;
 use crate::api::AppState;
 use crate::db::models::workflow::Workflow;
 use crate::error::AppError;
 use crate::services::workflow_service::WorkflowService;
+
+#[derive(Serialize, Deserialize, ToSchema)]
+pub struct ApiWorkflow {
+    pub id: String,
+    pub name: String,
+    pub icon: Option<String>,
+    pub folder_id: Option<String>,
+    pub description: Option<String>,
+    #[schema(value_type = Object)]
+    pub drawflow: serde_json::Value,
+    #[schema(value_type = Object)]
+    pub settings: serde_json::Value,
+    #[schema(value_type = Option<Object>)]
+    pub trigger: Option<serde_json::Value>,
+    #[schema(value_type = Option<Object>)]
+    pub global_data: Option<serde_json::Value>,
+    #[schema(value_type = Option<Object>)]
+    pub table_data: Option<serde_json::Value>,
+    #[schema(value_type = Option<Object>)]
+    pub data_columns: Option<serde_json::Value>,
+    pub version: Option<String>,
+    pub is_disabled: Option<i64>,
+    pub source: Option<String>,
+    pub created_at: Option<String>,
+    pub updated_at: Option<String>,
+    pub deleted_at: Option<String>,
+    pub delete_source: Option<String>,
+}
+
+impl From<Workflow> for ApiWorkflow {
+    fn from(w: Workflow) -> Self {
+        ApiWorkflow {
+            id: w.id,
+            name: w.name,
+            icon: w.icon,
+            folder_id: w.folder_id,
+            description: w.description,
+            drawflow: serde_json::from_str(&w.drawflow).unwrap_or_else(|_| serde_json::json!({})),
+            settings: serde_json::from_str(&w.settings).unwrap_or_else(|_| serde_json::json!({})),
+            trigger: w.trigger.and_then(|s| serde_json::from_str(&s).ok()),
+            global_data: w.global_data.and_then(|s| serde_json::from_str(&s).ok()),
+            table_data: w.table_data.and_then(|s| serde_json::from_str(&s).ok()),
+            data_columns: w.data_columns.and_then(|s| serde_json::from_str(&s).ok()),
+            version: w.version,
+            is_disabled: w.is_disabled,
+            source: w.source,
+            created_at: w.created_at,
+            updated_at: w.updated_at,
+            deleted_at: w.deleted_at,
+            delete_source: w.delete_source,
+        }
+    }
+}
+
+impl From<ApiWorkflow> for Workflow {
+    fn from(aw: ApiWorkflow) -> Self {
+        Workflow {
+            id: aw.id,
+            name: aw.name,
+            icon: aw.icon,
+            folder_id: aw.folder_id,
+            description: aw.description,
+            drawflow: serde_json::to_string(&aw.drawflow).unwrap_or_else(|_| "{}".to_string()),
+            settings: serde_json::to_string(&aw.settings).unwrap_or_else(|_| "{}".to_string()),
+            trigger: aw.trigger.map(|v| serde_json::to_string(&v).unwrap_or_default()),
+            global_data: aw.global_data.map(|v| serde_json::to_string(&v).unwrap_or_default()),
+            table_data: aw.table_data.map(|v| serde_json::to_string(&v).unwrap_or_default()),
+            data_columns: aw.data_columns.map(|v| serde_json::to_string(&v).unwrap_or_default()),
+            version: aw.version,
+            is_disabled: aw.is_disabled,
+            source: aw.source,
+            created_at: aw.created_at,
+            updated_at: aw.updated_at,
+            deleted_at: aw.deleted_at,
+            delete_source: aw.delete_source,
+        }
+    }
+}
 
 pub fn router() -> Router<AppState> {
     Router::new()
@@ -46,13 +125,13 @@ pub struct ListWorkflowsQuery {
 async fn list_workflows(
     State(state): State<AppState>,
     Query(params): Query<ListWorkflowsQuery>,
-) -> Result<Json<Vec<Workflow>>, AppError> {
+) -> Result<Json<Vec<ApiWorkflow>>, AppError> {
     let workflows = if let Some(since) = params.since {
         WorkflowService::get_changed_since(&state.db, &since).await?
     } else {
         WorkflowService::get_all(&state.db).await?
     };
-    Ok(Json(workflows))
+    Ok(Json(workflows.into_iter().map(ApiWorkflow::from).collect()))
 }
 
 #[utoipa::path(
@@ -70,9 +149,9 @@ async fn list_workflows(
 async fn get_workflow(
     State(state): State<AppState>,
     Path(id): Path<String>,
-) -> Result<Json<Workflow>, AppError> {
+) -> Result<Json<ApiWorkflow>, AppError> {
     let workflow = WorkflowService::get_by_id(&state.db, &id).await?;
-    Ok(Json(workflow))
+    Ok(Json(ApiWorkflow::from(workflow)))
 }
 
 #[utoipa::path(
@@ -85,10 +164,11 @@ async fn get_workflow(
 )]
 async fn create_workflow(
     State(state): State<AppState>,
-    Json(workflow): Json<Workflow>,
-) -> Result<Json<Workflow>, AppError> {
+    Json(api_workflow): Json<ApiWorkflow>,
+) -> Result<Json<ApiWorkflow>, AppError> {
+    let workflow: Workflow = api_workflow.into();
     let created = WorkflowService::create(&state.db, &workflow).await?;
-    Ok(Json(created))
+    Ok(Json(ApiWorkflow::from(created)))
 }
 
 #[utoipa::path(
@@ -106,11 +186,12 @@ async fn create_workflow(
 async fn update_workflow(
     State(state): State<AppState>,
     Path(id): Path<String>,
-    Json(mut workflow): Json<Workflow>,
-) -> Result<Json<Workflow>, AppError> {
-    workflow.id = id;
+    Json(api_workflow): Json<ApiWorkflow>,
+) -> Result<Json<ApiWorkflow>, AppError> {
+    let mut workflow: Workflow = api_workflow.into();
+    workflow.id = id.clone();
     let updated = WorkflowService::upsert(&state.db, &workflow).await?;
-    Ok(Json(updated))
+    Ok(Json(ApiWorkflow::from(updated)))
 }
 
 #[utoipa::path(
@@ -129,7 +210,25 @@ async fn delete_workflow(
     State(state): State<AppState>,
     Path(id): Path<String>,
 ) -> Result<Json<serde_json::Value>, AppError> {
+    // Delete from SQLite
     WorkflowService::delete(&state.db, &id).await?;
+
+    // Delete from Local File
+    let watch_dir = state.app_dir.join("automa-workflows");
+    let file_path = watch_dir.join(format!("{}.json", id));
+    if file_path.exists() {
+        if let Err(e) = std::fs::remove_file(&file_path) {
+            eprintln!("Failed to delete workflow file {:?}: {}", file_path, e);
+        }
+    }
+
+    // Broadcast to WebSocket so Extension deletes it
+    let event = crate::api::handlers::sync_ws::SyncEvent {
+        event_type: "workflow_deleted".to_string(),
+        payload: serde_json::json!({ "id": id, "source": "studio" }),
+    };
+    let _ = state.sync_tx.send(event);
+
     Ok(Json(serde_json::json!({ "deleted": true })))
 }
 
@@ -140,6 +239,7 @@ pub struct CreateRunPayload {
     pub workflow_id: String,
     pub profile_id: Option<String>,
     pub schedule_id: Option<String>,
+    pub variables: Option<serde_json::Value>,
 }
 
 #[utoipa::path(

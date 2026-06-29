@@ -159,9 +159,10 @@ export const useWorkflowStore = defineStore('workflow', {
       await browser.storage.local.set({ workflows: localWorkflows });
 
       if (isFirstTime) {
-        localWorkflows = firstWorkflows.map((workflow) =>
-          defaultWorkflow(workflow)
-        );
+        // Tạm thời bỏ init default workflows theo yêu cầu
+        // localWorkflows = firstWorkflows.map((workflow) =>
+        //   defaultWorkflow(workflow)
+        // );
         await browser.storage.local.set({
           isFirstTime: false,
           workflows: localWorkflows,
@@ -316,19 +317,23 @@ export const useWorkflowStore = defineStore('workflow', {
       const backupIndex = userStore.backupIds.indexOf(id);
 
       if (hostedWorkflow || backupIndex !== -1) {
-        const response = await fetchApi(`/me/workflows?id=${id}`, {
-          auth: true,
-          method: 'DELETE',
-        });
-        const result = await response.json();
+        try {
+          const response = await fetchApi(`/me/workflows?id=${id}`, {
+            auth: true,
+            method: 'DELETE',
+          });
+          const result = await response.json();
 
-        if (!response.ok) {
-          throw new Error(result.message);
-        }
+          if (!response.ok) {
+            console.warn('[Cloud Sync] Failed to delete workflow from cloud:', result.message);
+          }
 
-        if (backupIndex !== -1) {
-          userStore.backupIds.splice(backupIndex, 1);
-          await browser.storage.local.set({ backupIds: userStore.backupIds });
+          if (backupIndex !== -1) {
+            userStore.backupIds.splice(backupIndex, 1);
+            await browser.storage.local.set({ backupIds: userStore.backupIds });
+          }
+        } catch (error) {
+          console.error('[Cloud Sync] Error deleting workflow from cloud:', error);
         }
       }
 
