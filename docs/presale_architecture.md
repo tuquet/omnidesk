@@ -102,20 +102,37 @@ sequenceDiagram
 
 ## 5. Lộ trình Phát triển (Roadmap)
 
-### Giai đoạn 1: Triển khai Nền tảng Local-First & Quản lý Trình duyệt
+Để hiện thực hóa tầm nhìn chiến lược, OmniDesk thiết lập lộ trình phát triển được bóc tách rõ ràng qua 4 giai đoạn, tương ứng với việc hoàn thiện 4 phân hệ/dịch vụ (services) cốt lõi của nền tảng:
 
-- [x] Tích hợp Automa Extension vào môi trường cách ly (Omni Profile).
-- [x] Xây dựng cơ sở dữ liệu gốc (SQLite) và luồng đồng bộ kịch bản từ extension xuống máy trạm.
+### Giai đoạn 1: Nền tảng Cách ly & Thiết kế (Omni Profile + Automa Extension)
 
-### Giai đoạn 2: Trình điều phối Thực thi & Phân tích (Execution Orchestrator)
+_Mục tiêu: Đảm bảo môi trường thực thi độc lập và công cụ thiết kế trực quan._
 
-- [ ] Xây dựng giao diện Điều phối (Orchestration UI) trên Omni Studio cho phép: **chọn Workflow, chọn 1 hoặc nhiều Profiles, thiết lập lịch chạy (One-time/Recurring) và nhấn "Run"**.
-- [ ] Hoàn thiện **Omni Engine** làm nhiệm vụ điều phối API: gọi sang Omni Profile để tự động mở trình duyệt và đồng bộ với Automa.
-- [ ] Xây dựng hệ thống thu thập Logs tập trung trên Omni Engine từ Automa truyền về.
-- [ ] Xây dựng giao diện hiển thị báo cáo, phân tích các phiên chạy (Sessions) trên Omni Studio.
+- [x] **Omni Profile**: Xây dựng Core quản lý và khởi tạo hàng ngàn môi trường trình duyệt cách ly (Anti-detect browser).
+- [x] **Automa**: Tích hợp trực tiếp Extension thiết kế Workflow (kéo-thả) vào các profile.
+- [x] **Local DB**: Khởi tạo SQLite làm Nguồn dữ liệu gốc (Source of Truth) lưu trữ tạm thời các kịch bản.
 
-### Giai đoạn 3: Hệ sinh thái Đám mây & AI (Cloud Marketplace & AI-Driven)
+### Giai đoạn 2: Quản trị Trung tâm (Omni Studio)
 
-- [ ] Tích hợp hệ thống phân quyền Supabase Auth, quản lý "Upload to Cloud" (kèm `author_id`).
-- [ ] Tích hợp **AI Agent** để tự động tạo kịch bản từ ngôn ngữ tự nhiên (Prompt).
-- [ ] Chuyển đổi OmniDesk thành một nền tảng tự động hóa Zero-Code toàn diện.
+_Mục tiêu: Quản lý toàn diện vòng đời của kịch bản và dữ liệu người dùng tại máy trạm._
+
+- [ ] **Omni Studio (UI)**: Xây dựng Dashboard Desktop App cho phép người dùng quản lý (CRUD) hàng loạt kịch bản, phân loại theo thư mục và môi trường.
+- [ ] **Sync Protocol**: Tự động hóa luồng đồng bộ: Kịch bản được lưu ở Studio (SQLite) sẽ tự động được tải xuống extension Automa mỗi khi mở Profile mới.
+- [ ] Xây dựng cơ chế xuất/nhập (Import/Export) dữ liệu kịch bản an toàn.
+
+### Giai đoạn 3: Trình điều phối Thực thi & Phân tích (Omni Engine)
+
+_Mục tiêu: Tự động hóa toàn trình, điều phối diện rộng và thu thập dữ liệu (Logs)._
+
+- [ ] **Orchestration UI (Studio)**: Giao diện cho phép chọn 1 Workflow, gắn vào 1 hoặc nhiều Profiles, thiết lập lịch chạy (Run Once/Cronjob).
+- [ ] **Omni Engine (Orchestrator)**: Đóng vai trò nhạc trưởng, nhận lệnh "Run" từ Studio, tự động gọi API của Profile để mở trình duyệt tương ứng.
+- [ ] **Log Collection**: Automa trong trình duyệt tự động thực thi kịch bản và bắn Real-time Logs (Lỗi, Tiến trình) về Engine.
+- [ ] **Analytics Dashboard**: Omni Engine phân tích các phiên chạy (Sessions) và đẩy dữ liệu lên Studio để hiển thị biểu đồ báo cáo.
+
+### Giai đoạn 4: Hệ sinh thái Đám mây & AI (Supabase Cloud & AI Agent)
+
+_Mục tiêu: Thương mại hóa, phân quyền và tự động hóa không chạm (Zero-Code)._
+
+- [ ] **Cloud Marketplace**: Tích hợp Supabase Auth, cho phép người dùng "Upload to Cloud" kịch bản lên máy chủ trung tâm kèm theo quyền sở hữu (`author_id`).
+- [ ] Phân phối và thương mại hóa kịch bản giữa các người dùng hoặc đội nhóm.
+- [ ] **AI-Driven**: Tích hợp AI Agent, cho phép người dùng nhập yêu cầu bằng ngôn ngữ tự nhiên (Prompt) để hệ thống tự động sinh ra các khối lệnh (blocks) Workflow trong Automa.
