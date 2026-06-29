@@ -21,6 +21,9 @@ import { NotificationButton } from './notification-button';
 import { GlobalSearch } from './global-search';
 import { ThemeToggle } from './theme-toggle';
 import { LanguageSwitcher } from './language-switcher';
+import { HardwareMonitor } from './hardware-monitor';
+import { NetworkStatus } from './network-status';
+import { AppVersion } from './app-version';
 
 export function StatusBar() {
   const platformApi = usePlatform();
@@ -144,6 +147,13 @@ export function StatusBar() {
           }
         />
 
+        <div className="h-4 w-px bg-border mx-1" />
+
+        <NetworkStatus />
+        <HardwareMonitor />
+
+        <div className="h-4 w-px bg-border mx-1" />
+
         <Button
           variant="ghost"
           size="sm"
@@ -167,7 +177,7 @@ export function StatusBar() {
 
         <div className="h-4 w-px bg-border mx-1" />
 
-        <span className="px-2 cursor-default opacity-70">v1.0.0</span>
+        <AppVersion />
       </div>
     </div>
   );

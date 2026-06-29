@@ -1,4 +1,5 @@
 import { toast } from 'sonner';
+import { useState } from 'react';
 import { useTheme } from 'next-themes';
 import { useTranslation } from 'react-i18next';
 import { usePlatform } from '../providers/platform-provider';
@@ -33,6 +34,8 @@ import {
   Play,
   Shield,
   TerminalSquare,
+  Pin,
+  FolderOpen,
 } from 'lucide-react';
 import { WindowControls } from './window-controls';
 
@@ -43,6 +46,7 @@ export function TitleBar() {
   const { config } = useAppConfig();
   const { toggleSidebar, sidebarOpen } = useLayoutStore();
   const { toggleDevMode, isDevMode } = useDevStore();
+  const [isPinned, setIsPinned] = useState(false);
 
   if (platformApi.platform !== 'desktop') return null;
 
@@ -67,6 +71,17 @@ export function TitleBar() {
     }
   };
 
+  const handleTogglePin = async () => {
+    try {
+      const newState = !isPinned;
+      await platformApi.invoke('toggle_always_on_top', { alwaysOnTop: newState });
+      setIsPinned(newState);
+      toast.success(newState ? 'Window pinned to top' : 'Window unpinned');
+    } catch (e) {
+      toast.error('Could not toggle pin state');
+    }
+  };
+
   return (
     <div className="flex h-[38px] shrink-0 items-center justify-between border-b bg-background select-none relative z-50">
       {/* ── Left Section: Menu & Workspace ── */}
@@ -84,13 +99,14 @@ export function TitleBar() {
                   <MenubarItem
                     onClick={async () => {
                       try {
-                        await platformApi.invoke('open_data_folder');
+                        await platformApi.invoke('open_app_folder');
                       } catch (e) {
-                        toast.error('Could not open data folder: ' + String(e));
+                        toast.error('Could not open app folder: ' + String(e));
                       }
                     }}
                   >
-                    Open Data Folder
+                    <FolderOpen className="mr-2 h-4 w-4" />
+                    Open App Folder
                   </MenubarItem>
                   <MenubarSeparator />
                   <MenubarItem onClick={() => platformApi.quitApp()}>
@@ -295,6 +311,17 @@ export function TitleBar() {
           title={isDevMode ? 'Dev Tools (Active)' : 'Dev Tools'}
         >
           <TerminalSquare className="h-4 w-4" />
+        </Button>
+
+        {/* Pin (Always on top) */}
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={handleTogglePin}
+          className={`h-7 w-7 mr-2 ${isPinned ? 'bg-muted text-primary hover:bg-primary/20' : 'text-muted-foreground hover:bg-muted hover:text-foreground'}`}
+          title={isPinned ? 'Unpin Window' : 'Pin to Top'}
+        >
+          <Pin className="h-4 w-4" />
         </Button>
 
         <WindowControls />
