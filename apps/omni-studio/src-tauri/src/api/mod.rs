@@ -83,6 +83,7 @@ pub async fn serve(pool: SqlitePool, app_dir: PathBuf, port: u16, app_handle: Ap
         // Workflow App: workflow CRUD + sync endpoints
         .nest("/api/automa/workflows", handlers::workflows::router())
         .nest("/api/automa/workflows/sync", handlers::sync::router())
+        .nest("/api/git", handlers::git::router())
         .route("/api/automa/ws/sync", get(handlers::sync_ws::ws_sync_handler))
         .layer(CorsLayer::permissive())
         .with_state(state);

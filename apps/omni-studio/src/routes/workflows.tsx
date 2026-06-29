@@ -24,7 +24,8 @@ import {
   TrashIcon,
   WorkflowIcon,
   Loader2Icon,
-  RefreshCwIcon,
+  DownloadIcon,
+  UploadCloudIcon,
 } from 'lucide-react';
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -78,6 +79,29 @@ function WorkflowsPage() {
     },
   });
 
+  const pullMutation = useMutation({
+    mutationFn: async () => {
+      const res = await fetch(workflowApiUrl('/api/git/pull'), { method: 'POST' });
+      if (!res.ok) throw new Error('Git pull failed');
+      return (await res.json()) as unknown;
+    },
+    onSuccess: () => {
+      toast.success('Pulled latest workflows from Git');
+      queryClient.invalidateQueries({ queryKey: ['workflows'] });
+    },
+    onError: (err) => toast.error(err.message),
+  });
+
+  const pushMutation = useMutation({
+    mutationFn: async () => {
+      const res = await fetch(workflowApiUrl('/api/git/push'), { method: 'POST' });
+      if (!res.ok) throw new Error('Git push failed');
+      return (await res.json()) as unknown;
+    },
+    onSuccess: () => toast.success('Committed and Pushed workflows to Git'),
+    onError: (err) => toast.error(err.message),
+  });
+
   return (
     <PageContainer>
       <PageHeader>
@@ -92,11 +116,23 @@ function WorkflowsPage() {
           <div className="flex gap-2">
             <Button
               variant="outline"
-              onClick={() => queryClient.invalidateQueries({ queryKey: ['workflows'] })}
-              disabled={isLoading}
+              onClick={() => pullMutation.mutate()}
+              disabled={pullMutation.isPending}
             >
-              <RefreshCwIcon className={`mr-2 h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
-              Sync Now
+              <DownloadIcon
+                className={`mr-2 h-4 w-4 ${pullMutation.isPending ? 'animate-bounce' : ''}`}
+              />
+              Git Pull
+            </Button>
+            <Button
+              variant="default"
+              onClick={() => pushMutation.mutate()}
+              disabled={pushMutation.isPending}
+            >
+              <UploadCloudIcon
+                className={`mr-2 h-4 w-4 ${pushMutation.isPending ? 'animate-pulse' : ''}`}
+              />
+              Git Push
             </Button>
           </div>
         </div>

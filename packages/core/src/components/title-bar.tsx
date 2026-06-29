@@ -1,5 +1,6 @@
 import { toast } from 'sonner';
 import { useState } from 'react';
+import { open } from '@tauri-apps/plugin-dialog';
 import { useTheme } from 'next-themes';
 import { useTranslation } from 'react-i18next';
 import { usePlatform } from '../providers/platform-provider';
@@ -24,6 +25,15 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
   DropdownMenuSeparator,
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  Input,
+  Label,
 } from '@omnidesk/ui';
 import {
   Menu,
@@ -47,6 +57,13 @@ export function TitleBar() {
   const { toggleSidebar, sidebarOpen } = useLayoutStore();
   const { toggleDevMode, isDevMode } = useDevStore();
   const [isPinned, setIsPinned] = useState(false);
+
+  // Git Init state
+  const [gitUrl, setGitUrl] = useState('');
+  const [gitFolder, setGitFolder] = useState('');
+  const [isGitLoading, setIsGitLoading] = useState(false);
+  const [gitDialogOpen, setGitDialogOpen] = useState(false);
+  const [gitInstallGuide, setGitInstallGuide] = useState(false);
 
   if (platformApi.platform !== 'desktop') return null;
 
@@ -79,6 +96,45 @@ export function TitleBar() {
       toast.success(newState ? 'Window pinned to top' : 'Window unpinned');
     } catch {
       toast.error('Could not toggle pin state');
+    }
+  };
+
+  const handleSelectFolder = async () => {
+    try {
+      const selected = await open({
+        directory: true,
+        multiple: false,
+        title: 'Select Workspace Folder',
+      });
+      if (selected && typeof selected === 'string') {
+        setGitFolder(selected);
+      }
+    } catch (e) {
+      toast.error('Failed to open folder picker');
+    }
+  };
+
+  const handleInitGit = async () => {
+    if (!gitUrl || !gitFolder) return;
+    setIsGitLoading(true);
+    setGitInstallGuide(false);
+    try {
+      const msg = await platformApi.invoke('init_git_repository', {
+        repoUrl: gitUrl,
+        destinationPath: gitFolder,
+      });
+      toast.success(msg as string);
+      setGitDialogOpen(false);
+      setGitUrl('');
+      setGitFolder('');
+    } catch (e) {
+      if (String(e).includes('GIT_NOT_FOUND')) {
+        setGitInstallGuide(true);
+      } else {
+        toast.error(String(e));
+      }
+    } finally {
+      setIsGitLoading(false);
     }
   };
 
@@ -253,14 +309,87 @@ export function TitleBar() {
       {/* ── Right Section: View Toggles & Window Controls ── */}
       <div className="flex items-center gap-1 z-10 pr-2" data-tauri-drag-region>
         {/* Initialize Git */}
-        <Button
-          variant="outline"
-          size="sm"
-          className="h-6 px-2 mr-1 text-[10px] uppercase font-bold tracking-wider text-muted-foreground bg-transparent border-dashed hover:text-foreground hidden lg:inline-flex"
-        >
-          <GitBranch className="h-3 w-3 mr-1.5" />
-          Initialize Git
-        </Button>
+        <Dialog open={gitDialogOpen} onOpenChange={setGitDialogOpen}>
+          <DialogTrigger asChild>
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-6 px-2 mr-1 text-[10px] uppercase font-bold tracking-wider text-muted-foreground bg-transparent border-dashed hover:text-foreground hidden lg:inline-flex"
+            >
+              <GitBranch className="h-3 w-3 mr-1.5" />
+              Initialize Git
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-[425px]">
+            <DialogHeader>
+              <DialogTitle>Initialize Git Repository</DialogTitle>
+              <DialogDescription>
+                Clone a workflow repository into your local workspace.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="grid gap-4 py-4">
+              {gitInstallGuide && (
+                <div className="bg-destructive/10 text-destructive text-xs p-3 rounded border border-destructive/20 mb-2">
+                  <p className="font-semibold mb-1">Git CLI is not installed!</p>
+                  <p>Open PowerShell and run the following command to install via Scoop:</p>
+                  <code className="block bg-background p-2 mt-1 rounded text-[10px] break-all">
+                    scoop install git
+                  </code>
+                  <p className="mt-2 text-muted-foreground">
+                    If you don't have Scoop, install it first:
+                  </p>
+                  <code className="block bg-background p-2 mt-1 rounded text-[10px] break-all">
+                    Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser;
+                    Invoke-RestMethod -Uri https://get.scoop.sh | Invoke-Expression
+                  </code>
+                </div>
+              )}
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="repo-url" className="text-right text-xs">
+                  Repo URL
+                </Label>
+                <Input
+                  id="repo-url"
+                  placeholder="https://github.com/user/repo.git"
+                  value={gitUrl}
+                  onChange={(e) => setGitUrl(e.target.value)}
+                  className="col-span-3 text-sm h-8"
+                  autoComplete="off"
+                />
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label className="text-right text-xs">Destination</Label>
+                <div className="col-span-3 flex gap-2">
+                  <Input
+                    readOnly
+                    placeholder="Select folder..."
+                    value={gitFolder}
+                    className="text-sm h-8 flex-1"
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="h-8 px-3"
+                    onClick={handleSelectFolder}
+                  >
+                    <FolderOpen className="h-3 w-3" />
+                  </Button>
+                </div>
+              </div>
+            </div>
+            <DialogFooter>
+              <Button
+                type="button"
+                onClick={handleInitGit}
+                disabled={isGitLoading || !gitUrl || !gitFolder}
+                size="sm"
+              >
+                {isGitLoading ? 'Cloning...' : 'Clone Repository'}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
 
         {/* Runner / Terminal */}
         <Button

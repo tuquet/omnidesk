@@ -25,6 +25,7 @@ pub fn run() {
         .plugin(tauri_plugin_deep_link::init())
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_store::Builder::default().build())
+        .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_shell::init())
         .plugin(tauri_plugin_updater::Builder::new().build())
         .plugin(tauri_plugin_process::init())
@@ -156,6 +157,7 @@ pub fn run() {
             commands::storage::get_storage_info,
             commands::storage::update_storage_location,
             commands::e2e::run_e2e_orchestrator,
+            commands::git::init_git_repository,
         ])
         .run(tauri::generate_context!())
         .expect("error while running OmniDesk");

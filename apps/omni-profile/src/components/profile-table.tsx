@@ -236,7 +236,7 @@ export function ProfileTable({
         enableResizing: false,
       }),
     ],
-    [sortBy, sortOrder, onLaunch, onStop, onEdit, onDelete],
+    [sortBy, sortOrder, onLaunch, onStop, onEdit, onDelete, renderSortIcon],
   );
 
   const table = useReactTable({

@@ -1749,6 +1749,9 @@ importers:
       '@tanstack/zod-form-adapter':
         specifier: ^0.42.1
         version: 0.42.1(zod@4.4.3)
+      '@tauri-apps/plugin-dialog':
+        specifier: '2'
+        version: 2.7.1
       clsx:
         specifier: ^2.1.1
         version: 2.1.1
