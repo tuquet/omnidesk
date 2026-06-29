@@ -9,6 +9,7 @@ import { AppConfigProvider } from '@omnidesk/core';
 import * as config from '@/config';
 import { useRBAC } from '@/hooks/use-rbac';
 import { ResizeHandles } from '@omnidesk/core';
+import { AutoUpdater } from '@omnidesk/features';
 
 interface MyRouterContext {
   auth: AuthState;
@@ -99,6 +100,7 @@ function RootComponent() {
         }}
         rbac={rbac}
       >
+        <AutoUpdater />
         <ResizeHandles />
         <TitleBar />
         <div className="flex-1 flex flex-col min-h-0">

@@ -5,6 +5,7 @@
   "description": "Tauri + React + Axum monorepo boilerplate",
   "scripts": {
     "dev": "turbo run dev --filter=@omnidesk/web-portal --filter=@omnidesk/app-*",
+    "version-bump": "changeset version && node scripts/sync-native-versions.js",
     "build": "turbo run build",
     "lint": "turbo run lint",
     "typecheck": "turbo run typecheck",

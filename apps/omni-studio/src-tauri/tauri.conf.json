@@ -54,7 +54,7 @@
       "schemes": ["omnidesk-workflow"]
     },
     "updater": {
-      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDk0MkYzRjlERDEyNjgzNEQKUldSTmd5YlJuVDh2bE9wVi9aSVpOTlFId2h1bnpIZytHZ1YrMlJJR3ZkUXU0dXYyM0xlSjYrbjgK",
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDk0QUZERkU4REY5NEZFN0IKUldSNy9wVGY2Tit2bEpzcWk3aWcremJsTEp1Q0dFenJESWhKUitaTVlVc3RQSTh0VVBXelRGQjEK",
       "endpoints": [
         "http://127.0.0.1:1422/updates/latest.json",
         "https://github.com/tuquet/omnidesk/releases/latest/download/latest.json"
