@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { PageContainer, PageHeader, PageTitle, Button } from '@omnidesk/ui';
+import { PageContainer, PageHeader, PageTitle, Button, RunWorkflowModal } from '@omnidesk/ui';
 import { useState, useEffect } from 'react';
 import { useBrowserProfileStore, type BrowserProfile } from '@omnidesk/browser-profiles';
 import { XCircleIcon, LayoutGrid } from 'lucide-react';
@@ -21,6 +21,7 @@ function BrowserProfilesPage() {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [formMode, setFormMode] = useState<'create' | 'edit'>('create');
   const [selectedProfile, setSelectedProfile] = useState<BrowserProfile | null>(null);
+  const [profileToRunWorkflow, setProfileToRunWorkflow] = useState<string | null>(null);
 
   const [sortBy, setSortBy] = useState<string>('created_at');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
@@ -119,6 +120,7 @@ function BrowserProfilesPage() {
           onStop={handleStop}
           onEdit={handleEdit}
           onDelete={handleDelete}
+          onRunWorkflow={setProfileToRunWorkflow}
           onCreate={handleCreate}
           sortBy={sortBy}
           sortOrder={sortOrder}
@@ -137,8 +139,14 @@ function BrowserProfilesPage() {
         open={isFormOpen}
         onOpenChange={setIsFormOpen}
         mode={formMode}
-        profile={selectedProfile}
+        profile={selectedProfile || undefined}
         onSuccess={fetchProfiles}
+      />
+
+      <RunWorkflowModal
+        isOpen={!!profileToRunWorkflow}
+        profileId={profileToRunWorkflow}
+        onClose={() => setProfileToRunWorkflow(null)}
       />
     </PageContainer>
   );

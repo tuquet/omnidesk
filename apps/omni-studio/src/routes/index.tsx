@@ -13,6 +13,7 @@ import {
   Alert,
   AlertTitle,
   AlertDescription,
+  RunWorkflowModal,
 } from '@omnidesk/ui';
 import { WorkflowIcon, FolderOpenIcon, AlertCircleIcon, Loader2Icon, DownloadIcon, UploadCloudIcon } from 'lucide-react';
 import { useState, useMemo } from 'react';
@@ -21,7 +22,6 @@ import { toast } from 'sonner';
 import { client } from '@/lib/api-client';
 import { useWorkspaceStore } from '@omnidesk/core';
 import { open } from '@tauri-apps/plugin-dialog';
-
 import { WorkflowsTable, type Workflow } from '../components/workflows-table';
 import { WorkflowsToolbar } from '../components/workflows-toolbar';
 
@@ -35,6 +35,8 @@ function WorkflowsPage() {
   const [sortBy, setSortBy] = useState<string>('updated_at');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
   const [workflowToDelete, setWorkflowToDelete] = useState<string | null>(null);
+  const [workflowToRun, setWorkflowToRun] = useState<string | null>(null);
+  const [rowSelection, setRowSelection] = useState<Record<string, boolean>>({});
 
   const queryClient = useQueryClient();
 
@@ -86,6 +88,34 @@ function WorkflowsPage() {
     },
     onError: () => {
       setWorkflowToDelete(null);
+    },
+  });
+
+  const bulkDeleteMutation = useMutation({
+    mutationFn: async (ids: string[]) => {
+      await Promise.all(ids.map(id => client.request({ url: `/api/automa/workflows/${id}`, method: 'DELETE' })));
+    },
+    onSuccess: () => {
+      toast.success('Workflows deleted successfully');
+      setRowSelection({});
+      queryClient.invalidateQueries({ queryKey: ['workflows', selectedWorkspacePath] });
+    },
+  });
+
+  const bulkUpdateStatusMutation = useMutation({
+    mutationFn: async ({ ids, isDisabled }: { ids: string[], isDisabled: number }) => {
+      // First, we need to fetch each workflow and then update it, or if we have it in cache, we use that
+      const selectedWfs = workflows.filter(wf => ids.includes(wf.id));
+      await Promise.all(selectedWfs.map(wf => client.request({
+        url: `/api/automa/workflows/${wf.id}`,
+        method: 'PUT',
+        body: { ...wf, is_disabled: isDisabled }
+      })));
+    },
+    onSuccess: () => {
+      toast.success('Workflows status updated');
+      setRowSelection({});
+      queryClient.invalidateQueries({ queryKey: ['workflows', selectedWorkspacePath] });
     },
   });
 
@@ -248,20 +278,42 @@ function WorkflowsPage() {
 
       {isWorkspaceSelected && (
         <div className="flex flex-col gap-4">
-          <WorkflowsToolbar
-            searchQuery={searchQuery}
-            setSearchQuery={setSearchQuery}
-          />
+          <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center justify-between">
+            <WorkflowsToolbar
+              searchQuery={searchQuery}
+              onSearchChange={setSearchQuery}
+            />
+            {Object.keys(rowSelection).length > 0 && (
+              <div className="flex items-center gap-2 bg-muted/50 p-1.5 rounded-md border border-border/50 text-sm">
+                <span className="px-2 text-muted-foreground">{Object.keys(rowSelection).length} selected</span>
+                <Button variant="secondary" size="sm" onClick={() => bulkUpdateStatusMutation.mutate({ ids: Object.keys(rowSelection), isDisabled: 0 })} disabled={bulkUpdateStatusMutation.isPending}>
+                  Enable
+                </Button>
+                <Button variant="secondary" size="sm" onClick={() => bulkUpdateStatusMutation.mutate({ ids: Object.keys(rowSelection), isDisabled: 1 })} disabled={bulkUpdateStatusMutation.isPending}>
+                  Disable
+                </Button>
+                <Button variant="destructive" size="sm" onClick={() => {
+                  if (confirm('Are you sure you want to delete selected workflows?')) {
+                    bulkDeleteMutation.mutate(Object.keys(rowSelection));
+                  }
+                }} disabled={bulkDeleteMutation.isPending}>
+                  Delete
+                </Button>
+              </div>
+            )}
+          </div>
           
           <WorkflowsTable
             workflows={filteredWorkflows}
             isLoading={isLoading || isRefetching}
             onEdit={(wf) => toast.info(`Edit ${wf.name}`)}
             onDelete={(id) => setWorkflowToDelete(id)}
-            onRun={(id) => toast.info(`Running ${id}`)}
+            onRun={(id) => setWorkflowToRun(id)}
             sortBy={sortBy}
             sortOrder={sortOrder}
             onSortChange={handleSortChange}
+            rowSelection={rowSelection}
+            onRowSelectionChange={setRowSelection}
           />
         </div>
       )}
@@ -290,6 +342,14 @@ function WorkflowsPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Run Modal */}
+      <RunWorkflowModal
+        isOpen={!!workflowToRun}
+        workflowId={workflowToRun}
+        onClose={() => setWorkflowToRun(null)}
+        onRunSuccess={() => setRowSelection({})}
+      />
 
     </PageContainer>
   );

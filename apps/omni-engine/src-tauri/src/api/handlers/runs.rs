@@ -30,6 +30,7 @@ pub struct CreateRunPayload {
     pub workflow_id: String,
     pub profile_id: Option<String>,
     pub schedule_id: Option<String>,
+    pub variables: Option<serde_json::Value>,
 }
 
 #[utoipa::path(
@@ -52,7 +53,7 @@ async fn create_run(
     let p_id = payload.profile_id.unwrap_or_else(|| "default".to_string());
     
     match crate::services::workflow_executor::WorkflowExecutor::execute(
-        &db, &app, &ws_tx, &payload.workflow_id, &p_id, payload.schedule_id.as_deref()
+        &db, &app, &ws_tx, &payload.workflow_id, &p_id, payload.schedule_id.as_deref(), payload.variables
     ).await {
         Ok(run) => Ok(Json(serde_json::json!({ "id": run.id, "status": run.status }))),
         Err(e) => {

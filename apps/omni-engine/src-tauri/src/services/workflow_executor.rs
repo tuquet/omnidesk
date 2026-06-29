@@ -26,6 +26,7 @@ impl WorkflowExecutor {
         workflow_id: &str,
         profile_id: &str,
         schedule_id: Option<&str>,
+        variables: Option<serde_json::Value>,
     ) -> Result<WorkflowRun, AppError> {
         // 1. Verify workflow exists by querying Omni Studio
         let client = Client::new();
@@ -104,7 +105,8 @@ impl WorkflowExecutor {
             "workflow": {
                 "id": workflow_id,
                 "name": workflow_name
-            }
+            },
+            "variables": variables
         });
         
         let event = AutomaEvent {

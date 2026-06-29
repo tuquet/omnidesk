@@ -183,9 +183,53 @@ async fn sync_local(
                 Ok(c) => c,
                 Err(_) => continue,
             };
+            
+            // First try to parse as strict Workflow (for backups made by Studio)
             if let Ok(workflow) = serde_json::from_str::<Workflow>(&content) {
                 if WorkflowService::upsert(&state.db, &workflow).await.is_ok() {
                     count += 1;
+                }
+            } else if let Ok(mut value) = serde_json::from_str::<serde_json::Value>(&content) {
+                // Try parsing as raw Automa export format
+                if let Some(obj) = value.as_object_mut() {
+                    let name_str = obj.get("name").and_then(|v| v.as_str()).unwrap_or("Untitled Workflow");
+                    let id = obj.get("id").and_then(|v| v.as_str()).map(|s| s.to_string()).unwrap_or_else(|| {
+                        uuid::Uuid::new_v5(&uuid::Uuid::NAMESPACE_OID, name_str.as_bytes()).to_string()
+                    });
+                    let name = name_str.to_string();
+                    let icon = obj.get("icon").and_then(|v| v.as_str()).map(|s| s.to_string());
+                    let description = obj.get("description").and_then(|v| v.as_str()).map(|s| s.to_string());
+                    let drawflow = obj.get("drawflow").map(|v| v.to_string()).unwrap_or_else(|| "{}".to_string());
+                    let settings = obj.get("settings").map(|v| v.to_string()).unwrap_or_else(|| "{}".to_string());
+                    let global_data = obj.get("globalData").map(|v| {
+                        if v.is_string() { v.as_str().unwrap().to_string() } else { v.to_string() }
+                    });
+                    let version = obj.get("version").and_then(|v| v.as_str()).map(|s| s.to_string());
+                    
+                    let workflow = Workflow {
+                        id,
+                        name,
+                        icon,
+                        folder_id: None,
+                        description,
+                        drawflow,
+                        settings,
+                        trigger: None,
+                        global_data,
+                        table_data: None,
+                        data_columns: None,
+                        version,
+                        is_disabled: Some(0),
+                        source: Some("local_sync".to_string()),
+                        created_at: None,
+                        updated_at: None,
+                        deleted_at: None,
+                        delete_source: None,
+                    };
+
+                    if WorkflowService::upsert(&state.db, &workflow).await.is_ok() {
+                        count += 1;
+                    }
                 }
             }
         }

@@ -101,7 +101,7 @@ impl SchedulerService {
                 .await;
 
                 // Execute the workflow
-                match WorkflowExecutor::execute(&db, &app_handle, &ws_tx, &workflow_id, &profile_id, Some(&schedule_id)).await {
+                match WorkflowExecutor::execute(&db, &app_handle, &ws_tx, &workflow_id, &profile_id, Some(&schedule_id), None).await {
                     Ok(run) => {
                         println!("[Scheduler] Run {} completed with status: {}", run.id, run.status);
                     }
@@ -173,6 +173,6 @@ impl SchedulerService {
         .await;
 
         // Execute
-        WorkflowExecutor::execute(db, &self.app_handle, &self.automa_ws_tx, &schedule.workflow_id, &schedule.profile_id, Some(&schedule.id)).await
+        WorkflowExecutor::execute(db, &self.app_handle, &self.automa_ws_tx, &schedule.workflow_id, &schedule.profile_id, Some(&schedule.id), None).await
     }
 }

@@ -68,7 +68,7 @@ function SchedulerPage() {
               Select Workflow
             </label>
             <Select 
-              value={selectedWorkflow} 
+              value={selectedWorkflow || undefined} 
               onValueChange={dashboardActions.setSelectedWorkflow}
               disabled={isLoading}
             >

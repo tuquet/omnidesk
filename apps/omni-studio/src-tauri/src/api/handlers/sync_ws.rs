@@ -26,27 +26,49 @@ pub struct ExtensionMessage {
     pub payload: Option<serde_json::Value>,
 }
 
-/// WebSocket upgrade handler for sync
-pub async fn ws_sync_handler(ws: WebSocketUpgrade, State(state): State<AppState>) -> impl IntoResponse {
-    println!("[SyncWS] Extension connecting...");
-    ws.on_upgrade(|socket| handle_sync_socket(socket, state))
+#[derive(serde::Deserialize)]
+pub struct SyncQuery {
+    pub profile_id: Option<String>,
 }
 
-async fn handle_sync_socket(socket: WebSocket, state: AppState) {
+/// WebSocket upgrade handler for sync
+pub async fn ws_sync_handler(
+    ws: WebSocketUpgrade,
+    axum::extract::Query(query): axum::extract::Query<SyncQuery>,
+    State(state): State<AppState>,
+) -> impl IntoResponse {
+    println!("[SyncWS] Extension connecting... (profile_id: {:?})", query.profile_id);
+    ws.on_upgrade(move |socket| handle_sync_socket(socket, state, query.profile_id))
+}
+
+async fn handle_sync_socket(socket: WebSocket, state: AppState, profile_id: Option<String>) {
     let (mut sender, mut receiver) = socket.split();
     let mut rx = state.sync_tx.subscribe();
 
-    println!("[SyncWS] Extension connected. Sending full sync...");
+    println!("[SyncWS] Extension connected. Preparing sync payload...");
 
     // Send initial full sync on connect
-    if let Ok(workflows) = WorkflowService::get_all(&state.db).await {
-        let event = SyncEvent {
-            event_type: "full_sync".to_string(),
-            payload: serde_json::to_value(&workflows).unwrap_or_default(),
-        };
-        if let Ok(msg) = serde_json::to_string(&event) {
-            let _ = sender.send(Message::Text(msg)).await;
+    let workflows_to_sync = if let Some(ref pid) = profile_id {
+        // Worker Mode: Selective Sync
+        if let Ok(Some(run)) = WorkflowService::get_active_run_by_profile(&state.db, pid).await {
+            println!("[SyncWS] Worker profile {} is running workflow {}. Extracting dependencies...", pid, run.workflow_id);
+            WorkflowService::get_workflows_for_run(&state.db, &run.workflow_id).await.unwrap_or_default()
+        } else {
+            // No active run found for this profile, send empty
+            println!("[SyncWS] Worker profile {} has no active run.", pid);
+            vec![]
         }
+    } else {
+        // Master Mode: Full Sync
+        WorkflowService::get_all(&state.db).await.unwrap_or_default()
+    };
+
+    let event = SyncEvent {
+        event_type: "full_sync".to_string(),
+        payload: serde_json::to_value(&workflows_to_sync).unwrap_or_default(),
+    };
+    if let Ok(msg) = serde_json::to_string(&event) {
+        let _ = sender.send(Message::Text(msg)).await;
     }
 
     // Task 1: broadcast channel → WS client (push to Extension)
@@ -64,12 +86,13 @@ async fn handle_sync_socket(socket: WebSocket, state: AppState) {
     let db = state.db.clone();
     let sync_tx = state.sync_tx.clone();
     let app_dir = state.app_dir.clone();
+    let profile_id_clone = profile_id.clone();
     let mut recv_task = tokio::spawn(async move {
         while let Some(Ok(msg)) = receiver.next().await {
             match msg {
                 Message::Text(text) => {
                     if let Ok(ext_msg) = serde_json::from_str::<ExtensionMessage>(&text) {
-                        handle_extension_message(&db, &sync_tx, &app_dir, ext_msg).await;
+                        handle_extension_message(&db, &sync_tx, &app_dir, ext_msg, profile_id_clone.as_deref()).await;
                     }
                 }
                 Message::Ping(data) => {
@@ -100,9 +123,15 @@ async fn handle_extension_message(
     sync_tx: &tokio::sync::broadcast::Sender<SyncEvent>,
     app_dir: &std::path::Path,
     msg: ExtensionMessage,
+    profile_id: Option<&str>,
 ) {
     match msg.msg_type.as_str() {
         "push_workflows" => {
+            if profile_id.is_some() {
+                println!("[SyncWS] Ignoring push_workflows from worker profile {}", profile_id.unwrap());
+                return;
+            }
+
             if let Some(payload) = msg.payload {
                 if let Ok(workflows) = serde_json::from_value::<Vec<Workflow>>(payload) {
                     let watch_dir = app_dir.join("automa-workflows");

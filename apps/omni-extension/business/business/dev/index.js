@@ -29,7 +29,9 @@ let pendingHttpWorkflows = {};
 //  WebSocket Client (WFA → Extension direction)
 // ──────────────────────────────────────────────
 
-function connectWebSocket() {
+let isWorkerMode = false;
+
+async function connectWebSocket() {
   if (
     ws &&
     (ws.readyState === WebSocket.CONNECTING || ws.readyState === WebSocket.OPEN)
@@ -38,7 +40,17 @@ function connectWebSocket() {
   }
 
   try {
-    ws = new WebSocket(SYNC_WS_URL);
+    const result = await browser.storage.local.get('profile_id');
+    let wsUrl = SYNC_WS_URL;
+    if (result.profile_id) {
+      isWorkerMode = true;
+      wsUrl = `${SYNC_WS_URL}?profile_id=${result.profile_id}`;
+      console.log(`[SyncBridge] Worker Mode Active. Profile ID: ${result.profile_id}`);
+    } else {
+      isWorkerMode = false;
+    }
+
+    ws = new WebSocket(wsUrl);
   } catch (err) {
     console.debug('[SyncBridge] WS creation failed:', err.message);
     scheduleReconnect();
@@ -159,6 +171,16 @@ async function handleSyncEvent(syncEvent) {
           `[SyncBridge] Workflow ${id} was removed from OneDrive (soft-deleted in WFA)`
         );
         // Could show a notification to user here
+      } else if (source === 'studio') {
+        // Hard delete initiated from Omni Studio UI — delete from Extension too
+        console.log(`[SyncBridge] Studio deleted workflow ${id}. Removing from local storage...`);
+        browser.storage.local.get('workflows').then((result) => {
+          const workflows = result.workflows || {};
+          if (workflows[id]) {
+            delete workflows[id];
+            browser.storage.local.set({ workflows });
+          }
+        });
       }
       break;
     }
@@ -278,6 +300,11 @@ async function pushViaHttp(workflows) {
  * Debounced push — tries WS first, falls back to HTTP
  */
 function schedulePush(workflows) {
+  if (isWorkerMode) {
+    console.debug('[SyncBridge] Worker Mode: Ignoring push request.');
+    return;
+  }
+
   pendingHttpWorkflows = { ...pendingHttpWorkflows, ...workflows };
   if (httpSyncTimer) clearTimeout(httpSyncTimer);
   httpSyncTimer = setTimeout(async () => {
@@ -337,6 +364,7 @@ export default function (context, message) {
   browser.storage.onChanged.addListener((changes, areaName) => {
     if (areaName !== 'local') return;
     if (!changes.workflows) return;
+    if (isWorkerMode) return; // Worker profile should NEVER push changes back to Studio
 
     const { oldValue, newValue } = changes.workflows;
     

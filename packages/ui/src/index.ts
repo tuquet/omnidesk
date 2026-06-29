@@ -48,10 +48,11 @@ export * from './blocks/dashboard-01/section-cards';
 export * from './blocks/dashboard-01/site-header';
 
 // Shared Components
-export * from './components/shared/confirm-dialog';
-export * from './components/shared/env-setup-warning';
 export * from './components/shared/error-boundary';
+export * from './components/shared/env-setup-warning';
+export * from './components/shared/confirm-dialog';
 export * from './components/shared/progress-bar';
+export * from './components/shared/run-workflow-modal';
 
 // Landing Components
 export * from './components/landing/desktop-landing';

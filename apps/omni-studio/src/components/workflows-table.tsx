@@ -13,6 +13,7 @@ import {
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
+  Checkbox,
 } from '@omnidesk/ui';
 import {
   PlayIcon,
@@ -48,6 +49,8 @@ interface WorkflowsTableProps {
   sortBy?: string;
   sortOrder?: 'asc' | 'desc';
   onSortChange?: (column: string) => void;
+  rowSelection?: Record<string, boolean>;
+  onRowSelectionChange?: (updater: any) => void;
 }
 
 const columnHelper = createColumnHelper<Workflow>();
@@ -61,6 +64,8 @@ export function WorkflowsTable({
   sortBy,
   sortOrder,
   onSortChange,
+  rowSelection = {},
+  onRowSelectionChange,
 }: WorkflowsTableProps) {
   const renderSortIcon = (column: string) => {
     if (sortBy !== column)
@@ -74,12 +79,39 @@ export function WorkflowsTable({
 
   const columns = useMemo(
     () => [
+      columnHelper.display({
+        id: 'select',
+        header: ({ table }) => (
+          <Checkbox
+            checked={table.getIsAllPageRowsSelected()}
+            onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+            aria-label="Select all"
+            className="translate-y-[2px]"
+          />
+        ),
+        cell: ({ row }) => (
+          <Checkbox
+            checked={row.getIsSelected()}
+            onCheckedChange={(value) => row.toggleSelected(!!value)}
+            aria-label="Select row"
+            className="translate-y-[2px]"
+          />
+        ),
+        size: 40,
+        enableResizing: false,
+      }),
       columnHelper.accessor('name', {
         header: () => (
           <div className="flex items-center">Workflow Name {renderSortIcon('name')}</div>
         ),
         cell: (info) => <div className="font-medium truncate">{info.getValue() || 'Untitled'}</div>,
         size: 250,
+        enableResizing: true,
+      }),
+      columnHelper.accessor('id', {
+        header: () => <div className="flex items-center">ID {renderSortIcon('id')}</div>,
+        cell: (info) => <div className="text-muted-foreground truncate text-xs font-mono">{info.getValue()}</div>,
+        size: 150,
         enableResizing: true,
       }),
       columnHelper.accessor('description', {
@@ -206,6 +238,11 @@ export function WorkflowsTable({
     columns,
     getCoreRowModel: getCoreRowModel(),
     columnResizeMode: 'onChange',
+    getRowId: (row) => row.id,
+    state: {
+      rowSelection,
+    },
+    onRowSelectionChange,
   });
 
   const parentRef = useRef<HTMLDivElement>(null);

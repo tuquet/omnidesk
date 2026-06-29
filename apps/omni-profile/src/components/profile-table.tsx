@@ -23,6 +23,7 @@ import {
   ArrowUpIcon,
   ArrowDownIcon,
   ArrowUpDownIcon,
+  WorkflowIcon,
 } from 'lucide-react';
 import type { BrowserProfile } from '@omnidesk/browser-profiles';
 import { InlineTagEditor } from './inline-tag-editor';
@@ -41,6 +42,7 @@ interface ProfileTableProps {
   onStop: (id: string) => void;
   onEdit: (profile: BrowserProfile) => void;
   onDelete: (id: string) => void;
+  onRunWorkflow?: (id: string) => void;
   onCreate?: () => void;
   sortBy?: string;
   sortOrder?: 'asc' | 'desc';
@@ -56,6 +58,7 @@ export function ProfileTable({
   onStop,
   onEdit,
   onDelete,
+  onRunWorkflow,
   onCreate,
   sortBy,
   sortOrder,
@@ -194,6 +197,26 @@ export function ProfileTable({
                 </Tooltip>
               )}
 
+              {onRunWorkflow && (
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8 text-blue-600 hover:text-blue-700 hover:bg-blue-500/10 dark:text-blue-400 dark:hover:bg-blue-500/20 transition-colors shrink-0"
+                      data-testid={`btn-run-workflow-${profile.id}`}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onRunWorkflow(profile.id);
+                      }}
+                    >
+                      <WorkflowIcon className="h-4 w-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>Run Workflow</TooltipContent>
+                </Tooltip>
+              )}
+
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Button
@@ -236,7 +259,7 @@ export function ProfileTable({
         enableResizing: false,
       }),
     ],
-    [sortBy, sortOrder, onLaunch, onStop, onEdit, onDelete, renderSortIcon],
+    [sortBy, sortOrder, onLaunch, onStop, onEdit, onDelete, onRunWorkflow, renderSortIcon],
   );
 
   const table = useReactTable({

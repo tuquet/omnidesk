@@ -32,15 +32,15 @@ export const dashboardActions = {
       // Wait, omni-engine's API is on 1422? No, the engine dashboard fetched workflows from 1422 and profiles from 1421.
       // This is part of what needs to be solved.
       const [workflowsRes, profilesRes] = await Promise.all([
-        fetch('http://localhost:1422/api/automa/workflows').then(r => r.json()).catch(() => []),
-        fetch('http://localhost:1421/api/browser-profiles').then(r => r.json()).catch(() => []),
+        fetch('http://localhost:1422/api/automa/workflows').then(r => r.json() as Promise<{ id: string; name: string }[]>).catch(() => []),
+        fetch('http://localhost:1421/api/browser-profiles').then(r => r.json() as Promise<{ id: string; name: string }[]>).catch(() => []),
       ]);
 
       const workflows = Array.isArray(workflowsRes) ? workflowsRes : [];
       const profiles = Array.isArray(profilesRes) ? profilesRes : [];
 
       const initialSelection: Record<string, boolean> = {};
-      profiles.slice(0, 3).forEach((p: any) => {
+      profiles.slice(0, 3).forEach((p) => {
         initialSelection[p.id] = true;
       });
 
@@ -129,8 +129,8 @@ export const dashboardActions = {
           logs: [...s.logs, '[SYSTEM] Orchestration complete.'],
         }));
       }, 3000);
-    } catch (e: any) {
-      dashboardActions.appendLog(`[SYSTEM] ERROR: ${e?.message || String(e)}`);
+    } catch (e: unknown) {
+      dashboardActions.appendLog(`[SYSTEM] ERROR: ${e instanceof Error ? e.message : String(e)}`);
       dashboardStore.setState((s) => ({ ...s, isRunning: false }));
     }
   },

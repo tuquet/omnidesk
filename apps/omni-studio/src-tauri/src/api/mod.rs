@@ -65,12 +65,22 @@ pub struct ApiDoc;
 pub async fn serve(pool: SqlitePool, app_dir: PathBuf, port: u16, app_handle: AppHandle) {
     let (sync_tx, _rx) = tokio::sync::broadcast::channel(100);
     let state = AppState { 
-        db: pool,
+        db: pool.clone(),
         mcp_sessions: Arc::new(RwLock::new(HashMap::new())),
         app_dir: app_dir.clone(),
         app_handle,
-        sync_tx,
+        sync_tx: sync_tx.clone(),
     };
+
+    let watch_dir = app_dir.join("automa-workflows");
+    let pool_clone = pool.clone();
+    let sync_tx_clone = sync_tx.clone();
+    tokio::spawn(async move {
+        let watcher = crate::services::file_watcher::FileWatcherService::new(watch_dir, pool_clone, sync_tx_clone);
+        if let Err(e) = watcher.start().await {
+            eprintln!("FileWatcher failed to start: {:?}", e);
+        }
+    });
 
     let app = Router::new()
         .route("/", get(|| async { axum::response::Redirect::temporary("/scalar") }))

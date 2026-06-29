@@ -221,6 +221,92 @@ impl WorkflowService {
         Ok(workflows)
     }
 
+    // ─── Dependency Graph ────────────────────────────────────────
+
+    /// Extracts dependencies recursively by parsing the `drawflow` JSON
+    pub async fn get_dependencies(pool: &SqlitePool, root_id: &str) -> Result<std::collections::HashSet<String>, AppError> {
+        let mut deps = std::collections::HashSet::new();
+        let mut queue = vec![root_id.to_string()];
+        
+        while let Some(current_id) = queue.pop() {
+            if deps.contains(&current_id) {
+                continue;
+            }
+            
+            // Mark as visited/required
+            deps.insert(current_id.clone());
+
+            // Fetch the workflow JSON
+            let wf = match Self::get_by_id(pool, &current_id).await {
+                Ok(w) => w,
+                Err(_) => continue, // If missing, ignore
+            };
+
+            // Parse drawflow to find execute-workflow nodes
+            if let Ok(value) = serde_json::from_str::<serde_json::Value>(&wf.drawflow) {
+                // Format 1: drawflow.Home.data
+                if let Some(nodes) = value.pointer("/drawflow/Home/data").and_then(|v| v.as_object()) {
+                    for (_, node) in nodes {
+                        if let Some(name) = node.get("name").and_then(|v| v.as_str()) {
+                            if name == "execute-workflow" {
+                                if let Some(dep_id) = node.pointer("/data/workflowId").and_then(|v| v.as_str()) {
+                                    if !deps.contains(dep_id) {
+                                        queue.push(dep_id.to_string());
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                
+                // Format 2: nodes array
+                if let Some(nodes) = value.get("nodes").and_then(|v| v.as_array()) {
+                    for node in nodes {
+                        if let Some(label) = node.get("label").and_then(|v| v.as_str()) {
+                            if label == "execute-workflow" {
+                                if let Some(dep_id) = node.pointer("/data/workflowId").and_then(|v| v.as_str()) {
+                                    if !deps.contains(dep_id) {
+                                        queue.push(dep_id.to_string());
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        
+        Ok(deps)
+    }
+
+    /// Fetches only the required workflows for a specific root workflow (Selective Sync)
+    pub async fn get_workflows_for_run(pool: &SqlitePool, root_id: &str) -> Result<Vec<Workflow>, AppError> {
+        let deps = Self::get_dependencies(pool, root_id).await?;
+        if deps.is_empty() {
+            return Ok(vec![]);
+        }
+
+        let ids_csv = deps.into_iter().map(|s| format!("'{}'", s.replace("'", "''"))).collect::<Vec<_>>().join(",");
+        let query_str = format!(
+            r#"
+            SELECT id, name, icon, folder_id, description, drawflow, settings, trigger,
+                   global_data, table_data, data_columns, version, is_disabled, source,
+                   CAST(created_at AS TEXT) as created_at, CAST(updated_at AS TEXT) as updated_at,
+                   CAST(deleted_at AS TEXT) as deleted_at, delete_source
+            FROM workflows
+            WHERE deleted_at IS NULL AND id IN ({})
+            ORDER BY updated_at DESC
+            "#,
+            ids_csv
+        );
+
+        let workflows = sqlx::query_as::<_, Workflow>(&query_str)
+            .fetch_all(pool)
+            .await?;
+
+        Ok(workflows)
+    }
+
     // ─── Workflow Runs ───────────────────────────────────────────
 
     pub async fn create_run(pool: &SqlitePool, workflow_id: &str, profile_id: Option<&str>, schedule_id: Option<&str>) -> Result<WorkflowRun, AppError> {
@@ -281,6 +367,27 @@ impl WorkflowService {
         .await?;
 
         Ok(runs)
+    }
+
+    pub async fn get_active_run_by_profile(pool: &SqlitePool, profile_id: &str) -> Result<Option<WorkflowRun>, AppError> {
+        let run = sqlx::query_as::<_, WorkflowRun>(
+            r#"
+            SELECT id, workflow_id, profile_id, schedule_id, status,
+                   CAST(started_at AS TEXT) as started_at,
+                   CAST(finished_at AS TEXT) as finished_at,
+                   error_message, summary,
+                   CAST(created_at AS TEXT) as created_at
+            FROM workflow_runs
+            WHERE profile_id = ? AND status = 'RUNNING'
+            ORDER BY created_at DESC
+            LIMIT 1
+            "#
+        )
+        .bind(profile_id)
+        .fetch_optional(pool)
+        .await?;
+
+        Ok(run)
     }
 
     pub async fn finish_run(pool: &SqlitePool, id: &str, status: &str, error: Option<&str>, summary: Option<&str>) -> Result<(), AppError> {
