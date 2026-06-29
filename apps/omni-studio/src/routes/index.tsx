@@ -14,7 +14,7 @@ import {
   AlertTitle,
   AlertDescription,
 } from '@omnidesk/ui';
-import { WorkflowIcon, FolderOpenIcon, AlertCircleIcon, Loader2Icon } from 'lucide-react';
+import { WorkflowIcon, FolderOpenIcon, AlertCircleIcon, Loader2Icon, DownloadIcon, UploadCloudIcon } from 'lucide-react';
 import { useState, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
@@ -218,8 +218,27 @@ function WorkflowsPage() {
               {selectedWorkspacePath ? selectedWorkspacePath.split(/[/\\]/).pop() : 'Select Folder'}
             </span>
           </Button>
-          <Button size="sm" disabled={!isWorkspaceSelected}>
-            Create Workflow
+          
+          <div className="h-8 w-px bg-border mx-1 hidden sm:block"></div>
+          
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => pullMutation.mutate()}
+            disabled={pullMutation.isPending || pushMutation.isPending || !isWorkspaceSelected}
+          >
+            <DownloadIcon className={`mr-2 h-4 w-4 ${pullMutation.isPending ? 'animate-bounce' : ''}`} />
+            Git Pull
+          </Button>
+          <Button
+            variant="default"
+            size="sm"
+            className="bg-sky-500 hover:bg-sky-600 text-white"
+            onClick={() => pushMutation.mutate()}
+            disabled={pullMutation.isPending || pushMutation.isPending || !isWorkspaceSelected}
+          >
+            <UploadCloudIcon className={`mr-2 h-4 w-4 ${pushMutation.isPending ? 'animate-pulse' : ''}`} />
+            Git Push
           </Button>
         </div>
       </PageHeader>
@@ -229,10 +248,6 @@ function WorkflowsPage() {
           <WorkflowsToolbar
             searchQuery={searchQuery}
             setSearchQuery={setSearchQuery}
-            onPull={() => pullMutation.mutate()}
-            onPush={() => pushMutation.mutate()}
-            isPulling={pullMutation.isPending}
-            isPushing={pushMutation.isPending}
           />
           
           <WorkflowsTable

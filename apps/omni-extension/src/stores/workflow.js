@@ -16,7 +16,7 @@ import { useUserStore } from './user';
 // LOCAL-FIRST BACKEND SYNC HELPERS
 const syncWorkflowToBackend = async (workflow) => {
   try {
-    await fetch(`http://localhost:1421/api/workflows/${workflow.id}`, {
+    await fetchApi(`/workflows/${workflow.id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(workflow),
@@ -28,7 +28,7 @@ const syncWorkflowToBackend = async (workflow) => {
 
 const deleteWorkflowFromBackend = async (id) => {
   try {
-    await fetch(`http://localhost:1421/api/workflows/${id}`, {
+    await fetchApi(`/workflows/${id}`, {
       method: 'DELETE',
     });
   } catch (err) {
@@ -143,7 +143,7 @@ export const useWorkflowStore = defineStore('workflow', {
 
       let backendWorkflows = {};
       try {
-        const res = await fetch('http://localhost:1421/api/workflows');
+        const res = await fetchApi('/workflows');
         if (res.ok) {
           const arr = await res.json();
           backendWorkflows = convertWorkflowsToObject(arr);
