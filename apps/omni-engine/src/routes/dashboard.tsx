@@ -9,7 +9,10 @@ import {
 } from '@omnidesk/ui';
 import { Button } from '@omnidesk/ui';
 import { Play, CalendarClock, Globe, Blocks, TerminalSquare } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { invoke } from '@tauri-apps/api/core';
+import type { UnlistenFn } from '@tauri-apps/api/event';
+import { listen } from '@tauri-apps/api/event';
 
 export const Route = createFileRoute('/dashboard')({
   component: CommandCenterPage,
@@ -19,29 +22,122 @@ function CommandCenterPage() {
   const [isRunning, setIsRunning] = useState(false);
   const [logs, setLogs] = useState<string[]>([]);
 
-  const handleRun = () => {
+  const [workflows, setWorkflows] = useState<{ id: string; name: string }[]>([]);
+  const [profiles, setProfiles] = useState<{ id: string; name: string }[]>([]);
+
+  const [selectedWorkflow, setSelectedWorkflow] = useState('');
+  const [selectedProfiles, setSelectedProfiles] = useState<Record<string, boolean>>({});
+
+  useEffect(() => {
+    // Fetch Workflows from Omni Studio API
+    fetch('http://localhost:1422/api/automa/workflows')
+      .then((res) => res.json())
+      .then((data) => {
+        if (Array.isArray(data)) {
+          const workflowsData = data as { id: string; name: string }[];
+          setWorkflows(workflowsData);
+          if (workflowsData.length > 0) setSelectedWorkflow(workflowsData[0].id);
+        }
+      })
+      .catch(console.error);
+
+    // Fetch Profiles from Omni Profile API
+    fetch('http://localhost:1423/api/browser-profiles')
+      .then((res) => res.json())
+      .then((data) => {
+        if (Array.isArray(data)) {
+          const profilesData = data as { id: string; name: string }[];
+          setProfiles(profilesData);
+          const initialSelection: Record<string, boolean> = {};
+          profilesData.slice(0, 3).forEach((p) => {
+            initialSelection[p.id] = true;
+          });
+          setSelectedProfiles(initialSelection);
+        }
+      })
+      .catch(console.error);
+  }, []);
+
+  useEffect(() => {
+    let unlistenLog: UnlistenFn;
+
+    listen<string>('e2e-log', (event) => {
+      setLogs((l) => [...l, event.payload]);
+    }).then((fn) => {
+      unlistenLog = fn;
+    });
+
+    return () => {
+      if (unlistenLog) unlistenLog();
+    };
+  }, []);
+
+  const handleProfileToggle = (id: string) => {
+    setSelectedProfiles((prev) => ({ ...prev, [id]: !prev[id] }));
+  };
+
+  const selectedCount = Object.values(selectedProfiles).filter(Boolean).length;
+
+  const handleRun = async () => {
     setIsRunning(true);
     setLogs(['[SYSTEM] Initializing orchestration sequence...']);
 
-    setTimeout(
-      () => setLogs((l) => [...l, '[SYSTEM] Allocated 3 browser profiles: 9021, 9022, 9023']),
-      800,
-    );
-    setTimeout(() => setLogs((l) => [...l, '[PROFILE 9021] Browser launched successfully.']), 1500);
-    setTimeout(() => setLogs((l) => [...l, '[PROFILE 9022] Browser launched successfully.']), 1800);
-    setTimeout(
-      () =>
-        setLogs((l) => [
-          ...l,
-          '[PROFILE 9021] Automa extension active. Executing "Daily Scrape"...',
-        ]),
-      2200,
-    );
-    setTimeout(() => setLogs((l) => [...l, '[PROFILE 9023] Browser launched successfully.']), 2500);
-    setTimeout(() => {
+    const activeProfiles = profiles.filter((p) => selectedProfiles[p.id]);
+
+    if (!selectedWorkflow) {
+      setLogs((l) => [...l, '[SYSTEM] ERROR: No workflow selected.']);
       setIsRunning(false);
-      setLogs((l) => [...l, '[SYSTEM] Orchestration complete.']);
-    }, 4000);
+      return;
+    }
+
+    if (activeProfiles.length === 0) {
+      setLogs((l) => [...l, '[SYSTEM] ERROR: No profiles selected.']);
+      setIsRunning(false);
+      return;
+    }
+
+    try {
+      // 1. Ensure Automa Extension is unpacked
+      await invoke('ensure_automa_extension');
+
+      setLogs((l) => [...l, `[SYSTEM] Allocated ${activeProfiles.length} browser profile(s).`]);
+
+      // 2. Launch profiles sequentially or in parallel
+      for (const profile of activeProfiles) {
+        setLogs((l) => [...l, `[SYSTEM] Requesting launch for Profile: ${profile.name}...`]);
+        try {
+          const res = await fetch(
+            `http://localhost:1423/api/browser-profiles/${profile.id}/launch`,
+            {
+              method: 'POST',
+            },
+          );
+
+          if (res.ok) {
+            setLogs((l) => [...l, `[PROFILE ${profile.name}] Browser launched successfully.`]);
+          } else {
+            setLogs((l) => [...l, `[PROFILE ${profile.name}] ERROR: Failed to launch browser.`]);
+          }
+        } catch {
+          setLogs((l) => [...l, `[PROFILE ${profile.name}] ERROR: API unreachable.`]);
+        }
+      }
+
+      setLogs((l) => [...l, '[SYSTEM] Triggering workflow execution via WebSockets... (Pending)']);
+
+      // Simulate workflow completion for now
+      setTimeout(() => {
+        setIsRunning(false);
+        setLogs((l) => [...l, '[SYSTEM] Orchestration complete.']);
+      }, 3000);
+    } catch (e: unknown) {
+      if (e instanceof Error) {
+        setLogs((l) => [...l, `[SYSTEM] ERROR: ${e.message}`]);
+      } else {
+        setLogs((l) => [...l, `[SYSTEM] ERROR: ${String(e)}`]);
+      }
+      setIsRunning(false);
+    }
   };
 
   return (
@@ -71,10 +167,20 @@ function CommandCenterPage() {
                 <label className="text-sm font-semibold flex items-center gap-2 text-foreground">
                   <Blocks className="w-4 h-4 text-primary" /> 1. Select Workflow
                 </label>
-                <select className="flex h-11 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 transition-colors">
-                  <option>E-commerce Price Scraper</option>
-                  <option>Social Media Auto-Poster</option>
-                  <option>Daily Health Check</option>
+                <select
+                  className="flex h-11 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 transition-colors"
+                  value={selectedWorkflow}
+                  onChange={(e) => setSelectedWorkflow(e.target.value)}
+                >
+                  <option value="" disabled>
+                    -- Choose a Workflow --
+                  </option>
+                  {workflows.map((wf) => (
+                    <option key={wf.id} value={wf.id}>
+                      {wf.name}
+                    </option>
+                  ))}
+                  {workflows.length === 0 && <option disabled>Loading workflows...</option>}
                 </select>
               </div>
 
@@ -84,32 +190,30 @@ function CommandCenterPage() {
                     <Globe className="w-4 h-4 text-primary" /> 2. Target Profiles
                   </label>
                   <span className="text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded-full">
-                    3 selected
+                    {selectedCount} selected
                   </span>
                 </div>
                 <div className="border border-border/60 rounded-md p-1 space-y-1 max-h-48 overflow-y-auto bg-muted/10 shadow-inner">
-                  {[
-                    'Profile 9021 (US-East)',
-                    'Profile 9022 (UK-London)',
-                    'Profile 9023 (SG-Asia)',
-                    'Profile 9024 (US-West)',
-                    'Profile 9025 (JP-Tokyo)',
-                  ].map((p, i) => (
+                  {profiles.length === 0 && (
+                    <div className="p-3 text-sm text-muted-foreground">Loading profiles...</div>
+                  )}
+                  {profiles.map((p) => (
                     <div
-                      key={i}
+                      key={p.id}
                       className="flex items-center space-x-3 p-2 hover:bg-muted/30 rounded transition-colors cursor-pointer"
                     >
                       <input
                         type="checkbox"
-                        id={`p-${i}`}
+                        id={`p-${p.id}`}
                         className="rounded border-primary/50 text-primary focus:ring-primary h-4 w-4 cursor-pointer"
-                        defaultChecked={i < 3}
+                        checked={!!selectedProfiles[p.id]}
+                        onChange={() => handleProfileToggle(p.id)}
                       />
                       <label
-                        htmlFor={`p-${i}`}
+                        htmlFor={`p-${p.id}`}
                         className="text-sm font-medium leading-none cursor-pointer flex-1"
                       >
-                        {p}
+                        {p.name}
                       </label>
                     </div>
                   ))}
@@ -188,6 +292,7 @@ function CommandCenterPage() {
                       ${log.includes('INFO') ? 'text-blue-400' : ''}
                       ${log.includes('SYSTEM') ? 'text-purple-400 font-bold' : ''}
                       ${log.includes('PROFILE') ? 'text-emerald-400' : ''}
+                      ${log.includes('ERROR') ? 'text-red-400' : ''}
                     `}
                     >
                       {log}

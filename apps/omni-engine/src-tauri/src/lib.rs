@@ -157,6 +157,7 @@ pub fn run() {
             commands::storage::get_storage_info,
             commands::storage::update_storage_location,
             commands::e2e::run_e2e_orchestrator,
+            commands::orchestrator::ensure_automa_extension,
         ])
         .run(tauri::generate_context!())
         .expect("error while running OmniDesk");
