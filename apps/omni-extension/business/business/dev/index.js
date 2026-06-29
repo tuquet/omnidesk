@@ -52,6 +52,14 @@ function connectWebSocket() {
       clearTimeout(reconnectTimer);
       reconnectTimer = null;
     }
+    
+    // Auto-push all local workflows to Studio Backend when connection is established
+    browser.storage.local.get('workflows').then((result) => {
+      if (result.workflows && Object.keys(result.workflows).length > 0) {
+        console.log(`[SyncBridge] Reconnected! Pushing ${Object.keys(result.workflows).length} local workflows to Studio`);
+        schedulePush(result.workflows);
+      }
+    });
   };
 
   ws.onmessage = (event) => {
@@ -330,7 +338,25 @@ export default function (context, message) {
     if (areaName !== 'local') return;
     if (!changes.workflows) return;
 
-    const { newValue } = changes.workflows;
+    const { oldValue, newValue } = changes.workflows;
+    
+    // Detect deletions
+    if (oldValue && newValue) {
+      const oldKeys = Object.keys(oldValue);
+      const newKeys = Object.keys(newValue);
+      const deletedIds = oldKeys.filter(id => !newKeys.includes(id));
+      
+      deletedIds.forEach(id => {
+        console.log(`[SyncBridge] Workflow ${id} deleted from Extension. Notifying Backend...`);
+        if (ws && ws.readyState === WebSocket.OPEN) {
+          ws.send(JSON.stringify({
+            msg_type: 'delete_workflow',
+            payload: { id }
+          }));
+        }
+      });
+    }
+
     if (!newValue || typeof newValue !== 'object') return;
 
     // Skip echo: don't push back changes that came from the server

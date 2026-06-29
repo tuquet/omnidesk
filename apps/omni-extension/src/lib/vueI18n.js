@@ -29,10 +29,11 @@ export async function loadLocaleMessages(locale, location) {
         /* webpackChunkName: "locales/locale-[request]" */ `../locales/${locale}/${path}`
       );
 
+      const msgs = messages.default || messages;
       if (merge) {
-        i18n.global.mergeLocaleMessage(locale, messages.default);
+        i18n.global.mergeLocaleMessage(locale, msgs);
       } else {
-        i18n.global.setLocaleMessage(locale, messages.default);
+        i18n.global.setLocaleMessage(locale, msgs);
       }
     } catch (error) {
       console.error(error);
