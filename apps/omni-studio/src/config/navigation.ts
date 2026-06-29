@@ -44,10 +44,7 @@ export interface DocumentItem {
 // ─── Navigation Groups ──────────────────────────────────────────────────────
 
 export const NAV_MAIN: NavItem[] = [
-  { title: 'Workflows', url: '/workflows', icon: WorkflowIcon },
-  { title: 'Executions', url: '/executions', icon: ActivityIcon },
-  { title: 'Schedules', url: '/schedules', icon: CalendarClockIcon },
-  { title: 'Settings', url: '/settings', icon: SettingsIcon },
+  { title: 'Workflows Sync', url: '/', icon: WorkflowIcon },
 ];
 
 export const NAV_SHOWCASE: NavGroup = {

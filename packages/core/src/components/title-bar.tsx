@@ -7,6 +7,7 @@ import { usePlatform } from '../providers/platform-provider';
 import { useAppConfig } from '../providers/config-provider';
 import { useLayoutStore } from '../stores/use-layout-store';
 import { useDevStore } from '../stores/use-dev-store';
+import { useNavigate } from '@tanstack/react-router';
 
 import {
   Menubar,
@@ -61,6 +62,7 @@ export function TitleBar() {
   const { toggleSidebar, sidebarOpen } = useLayoutStore();
   const { toggleDevMode, isDevMode } = useDevStore();
   const [isPinned, setIsPinned] = useState(false);
+  const navigate = useNavigate();
 
   // Git Init state
   const [gitUrl, setGitUrl] = useState('');
@@ -258,6 +260,7 @@ export function TitleBar() {
         <Button
           variant="ghost"
           size="icon"
+          onClick={() => navigate({ to: '/' })}
           className="h-7 w-7 text-muted-foreground hover:bg-muted hover:text-foreground"
         >
           <Home className="h-4 w-4" />

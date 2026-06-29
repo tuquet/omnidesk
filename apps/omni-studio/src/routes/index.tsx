@@ -1,207 +1,278 @@
 import { createFileRoute } from '@tanstack/react-router';
 import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardContent,
-  CardDescription,
-  CardFooter,
+  PageContainer,
+  PageHeader,
+  PageTitle,
+  Button,
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+  Alert,
+  AlertTitle,
+  AlertDescription,
 } from '@omnidesk/ui';
-import { Button } from '@omnidesk/ui';
-import { Play, CalendarClock, Globe, Blocks, TerminalSquare } from 'lucide-react';
-import { useState } from 'react';
+import { WorkflowIcon, FolderOpenIcon, AlertCircleIcon, Loader2Icon } from 'lucide-react';
+import { useState, useMemo } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { toast } from 'sonner';
+import { client } from '@/lib/api-client';
+import { useWorkspaceStore } from '@omnidesk/core';
+import { open } from '@tauri-apps/plugin-dialog';
+
+import { WorkflowsTable, type Workflow } from '../components/workflows-table';
+import { WorkflowsToolbar } from '../components/workflows-toolbar';
 
 export const Route = createFileRoute('/')({
-  component: CommandCenterPage,
+  component: WorkflowsPage,
 });
 
-function CommandCenterPage() {
-  const [isRunning, setIsRunning] = useState(false);
-  const [logs, setLogs] = useState<string[]>([]);
+function WorkflowsPage() {
+  const { selectedWorkspacePath, setWorkspacePath } = useWorkspaceStore();
+  const [searchQuery, setSearchQuery] = useState('');
+  const [sortBy, setSortBy] = useState<string>('updated_at');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
+  const [workflowToDelete, setWorkflowToDelete] = useState<string | null>(null);
 
-  const handleRun = () => {
-    setIsRunning(true);
-    setLogs(['[SYSTEM] Initializing orchestration sequence...']);
+  const queryClient = useQueryClient();
 
-    setTimeout(
-      () => setLogs((l) => [...l, '[SYSTEM] Allocated 3 browser profiles: 9021, 9022, 9023']),
-      800,
-    );
-    setTimeout(() => setLogs((l) => [...l, '[PROFILE 9021] Browser launched successfully.']), 1500);
-    setTimeout(() => setLogs((l) => [...l, '[PROFILE 9022] Browser launched successfully.']), 1800);
-    setTimeout(
-      () =>
-        setLogs((l) => [
-          ...l,
-          '[PROFILE 9021] Automa extension active. Executing "Daily Scrape"...',
-        ]),
-      2200,
-    );
-    setTimeout(() => setLogs((l) => [...l, '[PROFILE 9023] Browser launched successfully.']), 2500);
-    setTimeout(() => {
-      setIsRunning(false);
-      setLogs((l) => [...l, '[SYSTEM] Orchestration complete.']);
-    }, 4000);
+  // If no workspace is selected, we block the UI
+  const isWorkspaceSelected = !!selectedWorkspacePath;
+
+  const {
+    data: workflows = [],
+    isLoading,
+    isRefetching,
+  } = useQuery<Workflow[]>({
+    queryKey: ['workflows', selectedWorkspacePath],
+    queryFn: async () => {
+      if (!selectedWorkspacePath) return [];
+      
+      // We first trigger a sync from local folder to SQLite
+      await client.request({
+        url: '/api/automa/workflows/sync/local',
+        method: 'POST',
+        data: { folder_path: selectedWorkspacePath },
+      });
+
+      // Then fetch from SQLite
+      const { data, error } = await client.request({
+        url: '/api/automa/workflows',
+        method: 'GET',
+      });
+      if (error) throw error;
+      return (data as Workflow[]) || [];
+    },
+    enabled: isWorkspaceSelected,
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await client.request({
+        url: `/api/automa/workflows/${id}`,
+        method: 'DELETE',
+      });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success('Workflow deleted successfully');
+      queryClient.invalidateQueries({ queryKey: ['workflows', selectedWorkspacePath] });
+      setWorkflowToDelete(null);
+    },
+    onError: () => {
+      setWorkflowToDelete(null);
+    },
+  });
+
+  const pullMutation = useMutation({
+    mutationFn: async () => {
+      // In future, this will call actual git pull on the selected workspace
+      const { data, error } = await client.request({
+        url: '/api/git/pull',
+        method: 'POST',
+        data: { path: selectedWorkspacePath },
+      });
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      toast.success('Pulled latest workflows from Git');
+      queryClient.invalidateQueries({ queryKey: ['workflows', selectedWorkspacePath] });
+    },
+  });
+
+  const pushMutation = useMutation({
+    mutationFn: async () => {
+      // In future, this will call actual git commit and push
+      const { data, error } = await client.request({
+        url: '/api/git/push',
+        method: 'POST',
+        data: { path: selectedWorkspacePath },
+      });
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => toast.success('Committed and Pushed workflows to Git'),
+  });
+
+  const filteredWorkflows = useMemo(() => {
+    return workflows.filter((wf) => {
+      if (!searchQuery) return true;
+      const q = searchQuery.toLowerCase();
+      return (
+        wf.name?.toLowerCase().includes(q) ||
+        wf.description?.toLowerCase().includes(q)
+      );
+    }).sort((a, b) => {
+      let aVal = a[sortBy as keyof Workflow] || '';
+      let bVal = b[sortBy as keyof Workflow] || '';
+      if (sortBy === 'is_disabled') {
+        aVal = a.is_disabled || 0;
+        bVal = b.is_disabled || 0;
+      }
+      
+      if (aVal < bVal) return sortOrder === 'asc' ? -1 : 1;
+      if (aVal > bVal) return sortOrder === 'asc' ? 1 : -1;
+      return 0;
+    });
+  }, [workflows, searchQuery, sortBy, sortOrder]);
+
+  const handleSelectWorkspace = async () => {
+    try {
+      const selected = await open({
+        directory: true,
+        multiple: false,
+        title: 'Select Workspace Folder',
+      });
+      if (selected && typeof selected === 'string') {
+        setWorkspacePath(selected);
+      }
+    } catch (e) {
+      toast.error('Failed to open folder picker');
+    }
+  };
+
+  const handleSortChange = (newSortBy: string) => {
+    if (sortBy === newSortBy) {
+      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortBy(newSortBy);
+      setSortOrder('desc');
+    }
   };
 
   return (
-    <div className="flex flex-1 flex-col h-full overflow-hidden bg-background">
-      <div className="flex-none p-6 pb-4 border-b border-border/40 bg-card/50">
-        <h1 className="text-3xl font-heading font-bold tracking-tight mb-1 text-foreground">
-          Command Center
-        </h1>
-        <p className="text-muted-foreground text-sm">
-          Place execution orders to run Workflows across multiple isolated browser Profiles.
-        </p>
-      </div>
-
-      <div className="flex flex-1 flex-col lg:flex-row gap-6 p-6 min-h-0 overflow-hidden">
-        {/* Left Form Panel - The "Order" Placement */}
-        <div className="flex-none w-full lg:w-[480px] overflow-y-auto pr-2 space-y-6">
-          <Card className="shadow-md border-border/60 bg-card">
-            <CardHeader className="pb-4 bg-muted/20 border-b border-border/40">
-              <CardTitle className="text-lg flex items-center gap-2">
-                <Play className="w-5 h-5 text-primary" fill="currentColor" />
-                Execution Order
-              </CardTitle>
-              <CardDescription>Select target workflow, environments, and schedule</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6 pt-6">
-              <div className="space-y-3">
-                <label className="text-sm font-semibold flex items-center gap-2 text-foreground">
-                  <Blocks className="w-4 h-4 text-primary" /> 1. Select Workflow
-                </label>
-                <select className="flex h-11 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 transition-colors">
-                  <option>E-commerce Price Scraper</option>
-                  <option>Social Media Auto-Poster</option>
-                  <option>Daily Health Check</option>
-                </select>
+    <PageContainer>
+      {/* Blocking Modal for Workspace Selection */}
+      <Dialog open={!isWorkspaceSelected}>
+        <DialogContent className="sm:max-w-[460px] p-0 overflow-hidden [&>button]:hidden" onInteractOutside={(e) => e.preventDefault()} onEscapeKeyDown={(e) => e.preventDefault()}>
+          <div className="bg-muted/50 px-6 py-4 border-b">
+            <DialogHeader>
+              <div className="mx-auto bg-primary/10 p-3 rounded-full w-12 h-12 flex items-center justify-center mb-2">
+                <FolderOpenIcon className="h-6 w-6 text-primary" />
               </div>
+              <DialogTitle className="text-center text-lg">Select Workspace</DialogTitle>
+              <DialogDescription className="text-center">
+                You must select a local folder to manage your workflows. This folder will act as your Git repository.
+              </DialogDescription>
+            </DialogHeader>
+          </div>
+          
+          <div className="p-6">
+            <Alert className="bg-muted/50 text-foreground border-primary/20 mb-6">
+              <AlertCircleIcon className="h-4 w-4 text-primary" />
+              <AlertTitle className="font-semibold text-primary">Why is this required?</AlertTitle>
+              <AlertDescription className="text-xs text-muted-foreground mt-2">
+                OmniDesk manages your workflows as `.json` files inside a local folder. This enables you to version control them using Git, and sync them effortlessly across devices.
+              </AlertDescription>
+            </Alert>
+            
+            <Button
+              className="w-full font-medium"
+              onClick={handleSelectWorkspace}
+            >
+              <FolderOpenIcon className="mr-2 h-4 w-4" />
+              Browse Folder...
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
 
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <label className="text-sm font-semibold flex items-center gap-2 text-foreground">
-                    <Globe className="w-4 h-4 text-primary" /> 2. Target Profiles
-                  </label>
-                  <span className="text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded-full">
-                    3 selected
-                  </span>
-                </div>
-                <div className="border border-border/60 rounded-md p-1 space-y-1 max-h-48 overflow-y-auto bg-muted/10 shadow-inner">
-                  {[
-                    'Profile 9021 (US-East)',
-                    'Profile 9022 (UK-London)',
-                    'Profile 9023 (SG-Asia)',
-                    'Profile 9024 (US-West)',
-                    'Profile 9025 (JP-Tokyo)',
-                  ].map((p, i) => (
-                    <div
-                      key={i}
-                      className="flex items-center space-x-3 p-2 hover:bg-muted/30 rounded transition-colors cursor-pointer"
-                    >
-                      <input
-                        type="checkbox"
-                        id={`p-${i}`}
-                        className="rounded border-primary/50 text-primary focus:ring-primary h-4 w-4 cursor-pointer"
-                        defaultChecked={i < 3}
-                      />
-                      <label
-                        htmlFor={`p-${i}`}
-                        className="text-sm font-medium leading-none cursor-pointer flex-1"
-                      >
-                        {p}
-                      </label>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div className="space-y-3">
-                <label className="text-sm font-semibold flex items-center gap-2 text-foreground">
-                  <CalendarClock className="w-4 h-4 text-primary" /> 3. Schedule Type
-                </label>
-                <div className="grid grid-cols-2 gap-3">
-                  <label className="border-2 border-primary bg-primary/5 rounded-lg p-3 flex flex-col items-center justify-center cursor-pointer transition-all hover:bg-primary/10">
-                    <input type="radio" name="schedule" className="sr-only" defaultChecked />
-                    <Play className="w-6 h-6 mb-2 text-primary" fill="currentColor" />
-                    <span className="text-sm font-bold text-primary">Run Now</span>
-                  </label>
-                  <label className="border-2 border-border/60 hover:border-primary/40 hover:bg-muted/50 rounded-lg p-3 flex flex-col items-center justify-center cursor-pointer transition-all">
-                    <input type="radio" name="schedule" className="sr-only" />
-                    <CalendarClock className="w-6 h-6 mb-2 text-muted-foreground" />
-                    <span className="text-sm font-medium text-muted-foreground">Cron Job</span>
-                  </label>
-                </div>
-              </div>
-            </CardContent>
-            <CardFooter className="pt-2 pb-6 px-6">
-              <Button
-                onClick={handleRun}
-                disabled={isRunning}
-                size="lg"
-                className="w-full bg-accent hover:bg-accent/90 text-accent-foreground shadow-lg h-14 text-lg font-bold flex gap-2 items-center transition-all active:scale-[0.98]"
-              >
-                {isRunning ? (
-                  <>
-                    <div className="h-5 w-5 animate-spin rounded-full border-b-2 border-current"></div>
-                    Executing Order...
-                  </>
-                ) : (
-                  <>
-                    <Play className="w-6 h-6" fill="currentColor" />
-                    EXECUTE WORKFLOW
-                  </>
-                )}
-              </Button>
-            </CardFooter>
-          </Card>
+      <PageHeader>
+        <PageTitle className="flex items-center gap-2 text-base md:text-lg">
+          <WorkflowIcon className="w-4 h-4 text-primary" />
+          Workflows Sync
+        </PageTitle>
+        <div className="flex gap-2">
+           <Button
+            variant="outline"
+            size="sm"
+            onClick={handleSelectWorkspace}
+            className="text-xs"
+            title={selectedWorkspacePath || 'Select Workspace'}
+          >
+            <FolderOpenIcon className="mr-2 h-3.5 w-3.5" />
+            <span className="truncate max-w-[150px]">
+              {selectedWorkspacePath ? selectedWorkspacePath.split(/[/\\]/).pop() : 'Select Folder'}
+            </span>
+          </Button>
+          <Button size="sm" disabled={!isWorkspaceSelected}>
+            Create Workflow
+          </Button>
         </div>
+      </PageHeader>
 
-        {/* Right Terminal Panel - Live Logs */}
-        <div className="flex-1 flex flex-col overflow-hidden">
-          <Card className="flex flex-col h-full bg-[#0D1117] border-border/40 shadow-xl overflow-hidden rounded-xl">
-            <CardHeader className="bg-[#161B22] border-b border-border/10 py-3 px-4 flex flex-row items-center justify-between space-y-0">
-              <div className="flex items-center gap-2">
-                <TerminalSquare className="w-4 h-4 text-primary" />
-                <CardTitle className="text-sm font-mono text-gray-300 font-medium tracking-wide">
-                  Engine_Terminal_Logs
-                </CardTitle>
-              </div>
-              <div className="flex gap-2">
-                <div className="w-3 h-3 rounded-full bg-red-500/80 shadow-[0_0_8px_rgba(239,68,68,0.5)]"></div>
-                <div className="w-3 h-3 rounded-full bg-yellow-500/80 shadow-[0_0_8px_rgba(234,179,8,0.5)]"></div>
-                <div className="w-3 h-3 rounded-full bg-green-500/80 shadow-[0_0_8px_rgba(34,197,94,0.5)]"></div>
-              </div>
-            </CardHeader>
-            <CardContent className="flex-1 overflow-y-auto p-5 font-mono text-sm leading-relaxed">
-              {!isRunning && logs.length === 0 ? (
-                <div className="h-full flex flex-col items-center justify-center text-muted-foreground/40 gap-4">
-                  <TerminalSquare className="w-16 h-16 opacity-50" strokeWidth={1} />
-                  <p className="text-base">System standing by. Awaiting execution order.</p>
-                </div>
-              ) : (
-                <div className="flex flex-col gap-2 text-gray-300">
-                  {logs.map((log, i) => (
-                    <div
-                      key={i}
-                      className={`
-                      ${log.includes('INFO') ? 'text-blue-400' : ''}
-                      ${log.includes('SYSTEM') ? 'text-purple-400 font-bold' : ''}
-                      ${log.includes('PROFILE') ? 'text-emerald-400' : ''}
-                    `}
-                    >
-                      {log}
-                    </div>
-                  ))}
-                  {isRunning && (
-                    <div className="text-blue-400 animate-pulse mt-2 block w-2 h-4 bg-blue-400"></div>
-                  )}
-                </div>
-              )}
-            </CardContent>
-          </Card>
+      {isWorkspaceSelected && (
+        <div className="flex flex-col gap-4">
+          <WorkflowsToolbar
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+            onPull={() => pullMutation.mutate()}
+            onPush={() => pushMutation.mutate()}
+            isPulling={pullMutation.isPending}
+            isPushing={pushMutation.isPending}
+          />
+          
+          <WorkflowsTable
+            workflows={filteredWorkflows}
+            isLoading={isLoading || isRefetching}
+            onEdit={(wf) => toast.info(`Edit ${wf.name}`)}
+            onDelete={(id) => setWorkflowToDelete(id)}
+            onRun={(id) => toast.info(`Running ${id}`)}
+            sortBy={sortBy}
+            sortOrder={sortOrder}
+            onSortChange={handleSortChange}
+          />
         </div>
-      </div>
-    </div>
+      )}
+
+      {/* Delete Confirmation */}
+      <Dialog open={!!workflowToDelete} onOpenChange={(open) => !open && setWorkflowToDelete(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete Workflow</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete this workflow? This will soft-delete it from the
+              database and remove it from all synced profiles.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="mt-4 flex gap-2 sm:justify-end">
+            <Button variant="outline" onClick={() => setWorkflowToDelete(null)}>
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={() => workflowToDelete && deleteMutation.mutate(workflowToDelete)}
+              disabled={deleteMutation.isPending}
+            >
+              {deleteMutation.isPending ? 'Deleting...' : 'Delete Workflow'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+    </PageContainer>
   );
 }

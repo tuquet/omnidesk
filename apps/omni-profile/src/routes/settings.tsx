@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { PageContainer, PageHeader, PageTitle, PageDescription } from '@omnidesk/ui';
+import { PageContainer, PageHeader, PageTitle } from '@omnidesk/ui';
 
 export const Route = createFileRoute('/settings')({
   component: SettingsPage,
@@ -10,8 +10,7 @@ function SettingsPage() {
     <PageContainer>
       <PageHeader>
         <PageTitle>Settings</PageTitle>
-        <PageDescription>Application preferences and defaults.</PageDescription>
-      </PageHeader>
+              </PageHeader>
     </PageContainer>
   );
 }

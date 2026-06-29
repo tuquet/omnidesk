@@ -49,7 +49,7 @@ export function AppLayout() {
 
   return (
     <OmniLayout sidebarContent={<StudioSidebar />}>
-      <div key={currentPath} className="page-transition flex flex-1 flex-col w-full h-full">
+      <div key={currentPath} className="page-transition flex flex-1 flex-col w-full min-h-full">
         <Outlet />
       </div>
     </OmniLayout>

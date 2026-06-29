@@ -45,9 +45,9 @@ export interface DocumentItem {
 // ─── Navigation Groups ──────────────────────────────────────────────────────
 
 export const NAV_MAIN: NavItem[] = [
-  { title: 'Dashboard', url: '/dashboard', icon: LayoutDashboardIcon },
-  { title: 'Job Scheduler', url: '/scheduler', icon: CalendarIcon },
-  { title: 'Active Jobs', url: '/active-jobs', icon: ActivityIcon },
+  { title: 'Scheduler', url: '/', icon: CalendarIcon },
+  { title: 'Batch Runners', url: '/runners', icon: ActivityIcon },
+  { title: 'Active Jobs', url: '/active-jobs', icon: LayoutDashboardIcon },
   { title: 'System Logs', url: '/system-logs', icon: TerminalIcon },
   { title: 'Settings', url: '/settings', icon: SettingsIcon },
 ];

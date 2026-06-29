@@ -48,7 +48,7 @@ pub fn start_background_worker(pool: SqlitePool) {
                     let mut success = false;
                     
                     // Decrypt Payload
-                    let (priv_key, _pub) = match crate::services::crypto::get_or_generate_keypair(&job.user_id) {
+                    let (priv_key, _pub) = match omni_shared::crypto::get_or_generate_keypair(&job.user_id) {
                         Ok(keys) => keys,
                         Err(e) => {
                             eprintln!("[Worker] Failed to get keypair for {}: {:?}", job.user_id, e);
@@ -56,7 +56,7 @@ pub fn start_background_worker(pool: SqlitePool) {
                         }
                     };
                     
-                    let decrypted_payload = match crate::services::crypto::decrypt_payload(&priv_key, &job.payload) {
+                    let decrypted_payload = match omni_shared::crypto::decrypt_payload(&priv_key, &job.payload) {
                         Ok(p) => p,
                         Err(e) => {
                             eprintln!("[Worker] Failed to decrypt job {}: {:?}. Deleting permanently from queue due to decryption error.", job.id, e);
@@ -69,7 +69,7 @@ pub fn start_background_worker(pool: SqlitePool) {
                     };
                     
                     // Sign Payload
-                    let signature = match crate::services::crypto::sign_payload(&priv_key, &decrypted_payload) {
+                    let signature = match omni_shared::crypto::sign_payload(&priv_key, &decrypted_payload) {
                         Ok(s) => s,
                         Err(e) => {
                             eprintln!("[Worker] Failed to sign job {}: {:?}", job.id, e);

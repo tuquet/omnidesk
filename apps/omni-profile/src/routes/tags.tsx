@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { PageContainer, PageHeader, PageTitle, PageDescription } from '@omnidesk/ui';
+import { PageContainer, PageHeader, PageTitle } from '@omnidesk/ui';
 
 export const Route = createFileRoute('/tags')({
   component: TagsPage,
@@ -10,8 +10,7 @@ function TagsPage() {
     <PageContainer>
       <PageHeader>
         <PageTitle>Tags & Folders</PageTitle>
-        <PageDescription>Organize your browser profiles.</PageDescription>
-      </PageHeader>
+              </PageHeader>
     </PageContainer>
   );
 }

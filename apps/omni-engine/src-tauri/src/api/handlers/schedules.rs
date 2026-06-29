@@ -9,6 +9,7 @@ use utoipa::ToSchema;
 use crate::api::AppState;
 use crate::db::models::workflow::Schedule;
 use crate::error::AppError;
+use crate::services::schedules_service;
 
 pub fn router() -> Router<AppState> {
     Router::new()
@@ -49,9 +50,7 @@ pub struct UpdateSchedulePayload {
 async fn list_schedules(
     State(state): State<AppState>,
 ) -> Result<Json<Vec<Schedule>>, AppError> {
-    let schedules = sqlx::query_as::<_, Schedule>("SELECT * FROM schedules ORDER BY created_at DESC")
-        .fetch_all(&state.db)
-        .await?;
+    let schedules = schedules_service::list_schedules(&state.db).await?;
     Ok(Json(schedules))
 }
 
@@ -67,27 +66,7 @@ async fn create_schedule(
     State(state): State<AppState>,
     Json(payload): Json<CreateSchedulePayload>,
 ) -> Result<Json<Schedule>, AppError> {
-    let id = uuid::Uuid::new_v4().to_string();
-    let now = chrono::Utc::now().timestamp_millis();
-    
-    sqlx::query(
-        "INSERT INTO schedules (id, name, workflow_id, profile_id, cron_expr, is_enabled, created_at, updated_at) 
-         VALUES (?, ?, ?, ?, ?, 1, ?, ?)"
-    )
-    .bind(&id)
-    .bind(&payload.name)
-    .bind(&payload.workflow_id)
-    .bind(&payload.profile_id)
-    .bind(&payload.cron_expr)
-    .bind(now)
-    .bind(now)
-    .execute(&state.db)
-    .await?;
-
-    let schedule = sqlx::query_as::<_, Schedule>("SELECT * FROM schedules WHERE id = ?")
-        .bind(&id)
-        .fetch_one(&state.db)
-        .await?;
+    let schedule = schedules_service::create_schedule(&state.db, &payload).await?;
 
     // Register with the live scheduler
     if let Some(scheduler) = &state.scheduler {
@@ -111,11 +90,7 @@ async fn get_schedule(
     State(state): State<AppState>,
     Path(id): Path<String>,
 ) -> Result<Json<Schedule>, AppError> {
-    let schedule = sqlx::query_as::<_, Schedule>("SELECT * FROM schedules WHERE id = ?")
-        .bind(&id)
-        .fetch_one(&state.db)
-        .await
-        .map_err(|_| AppError::NotFound(format!("Schedule {} not found", id)))?;
+    let schedule = schedules_service::get_schedule(&state.db, &id).await?;
     Ok(Json(schedule))
 }
 
@@ -134,31 +109,7 @@ async fn update_schedule(
     Path(id): Path<String>,
     Json(payload): Json<UpdateSchedulePayload>,
 ) -> Result<Json<Schedule>, AppError> {
-    let now = chrono::Utc::now().timestamp_millis();
-    let now_str = chrono::Utc::now().to_rfc3339();
-    let mut schedule = sqlx::query_as::<_, Schedule>("SELECT * FROM schedules WHERE id = ?")
-        .bind(&id)
-        .fetch_one(&state.db)
-        .await
-        .map_err(|_| AppError::NotFound(format!("Schedule {} not found", id)))?;
-
-    if let Some(n) = payload.name { schedule.name = n; }
-    if let Some(w) = payload.workflow_id { schedule.workflow_id = w; }
-    if let Some(p) = payload.profile_id { schedule.profile_id = p; }
-    if let Some(c) = payload.cron_expr { schedule.cron_expr = c; }
-    schedule.updated_at = Some(now_str);
-
-    sqlx::query(
-        "UPDATE schedules SET name = ?, workflow_id = ?, profile_id = ?, cron_expr = ?, updated_at = ? WHERE id = ?"
-    )
-    .bind(&schedule.name)
-    .bind(&schedule.workflow_id)
-    .bind(&schedule.profile_id)
-    .bind(&schedule.cron_expr)
-    .bind(now)
-    .bind(&id)
-    .execute(&state.db)
-    .await?;
+    let schedule = schedules_service::update_schedule(&state.db, &id, &payload).await?;
 
     // Re-register with the live scheduler
     if let Some(scheduler) = &state.scheduler {
@@ -187,15 +138,7 @@ async fn delete_schedule(
         scheduler.remove_schedule(&id).await;
     }
 
-    let rows_affected = sqlx::query("DELETE FROM schedules WHERE id = ?")
-        .bind(&id)
-        .execute(&state.db)
-        .await?
-        .rows_affected();
-        
-    if rows_affected == 0 {
-        return Err(AppError::NotFound(format!("Schedule {} not found", id)));
-    }
+    schedules_service::delete_schedule(&state.db, &id).await?;
     Ok(Json(serde_json::json!({ "deleted": id })))
 }
 
@@ -212,25 +155,7 @@ async fn toggle_schedule(
     State(state): State<AppState>,
     Path(id): Path<String>,
 ) -> Result<Json<Schedule>, AppError> {
-    let mut schedule = sqlx::query_as::<_, Schedule>("SELECT * FROM schedules WHERE id = ?")
-        .bind(&id)
-        .fetch_one(&state.db)
-        .await
-        .map_err(|_| AppError::NotFound(format!("Schedule {} not found", id)))?;
-
-    let new_val = if schedule.is_enabled == Some(1) { 0 } else { 1 };
-    let now = chrono::Utc::now().timestamp_millis();
-    let now_str = chrono::Utc::now().to_rfc3339();
-    
-    sqlx::query("UPDATE schedules SET is_enabled = ?, updated_at = ? WHERE id = ?")
-        .bind(new_val)
-        .bind(now)
-        .bind(&id)
-        .execute(&state.db)
-        .await?;
-        
-    schedule.is_enabled = Some(new_val);
-    schedule.updated_at = Some(now_str);
+    let schedule = schedules_service::toggle_schedule(&state.db, &id).await?;
 
     // Update live scheduler
     if let Some(scheduler) = &state.scheduler {
@@ -257,11 +182,7 @@ async fn run_now(
     State(state): State<AppState>,
     Path(id): Path<String>,
 ) -> Result<Json<serde_json::Value>, AppError> {
-    let schedule = sqlx::query_as::<_, Schedule>("SELECT * FROM schedules WHERE id = ?")
-        .bind(&id)
-        .fetch_one(&state.db)
-        .await
-        .map_err(|_| AppError::NotFound(format!("Schedule {} not found", id)))?;
+    let schedule = schedules_service::get_schedule(&state.db, &id).await?;
 
     // Trigger immediate execution via the executor
     if let Some(scheduler) = &state.scheduler {

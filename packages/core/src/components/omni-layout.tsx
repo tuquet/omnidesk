@@ -86,7 +86,7 @@ export function OmniLayout({ sidebarContent, children }: OmniLayoutProps) {
         {sidebarContent && sidebarOpen && <div className="w-px h-full bg-border flex-shrink-0" />}
 
         {/* Main Content Area */}
-        <div className="flex-1 min-w-0 flex flex-col relative bg-background">{children}</div>
+        <div className="flex-1 min-w-0 flex flex-col relative bg-background overflow-y-auto">{children}</div>
       </div>
     </SidebarProvider>
   );

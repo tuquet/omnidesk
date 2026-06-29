@@ -15,7 +15,6 @@ import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as MaintenanceRouteImport } from './routes/maintenance'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
-import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as ActiveJobsRouteImport } from './routes/active-jobs'
 import { Route as R503RouteImport } from './routes/503'
 import { Route as R500RouteImport } from './routes/500'
@@ -23,6 +22,8 @@ import { Route as R404RouteImport } from './routes/404'
 import { Route as R403RouteImport } from './routes/403'
 import { Route as R401RouteImport } from './routes/401'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as RunnersIndexRouteImport } from './routes/runners/index'
+import { Route as RunnersRunnerIdRouteImport } from './routes/runners/$runnerId'
 import { Route as AutomaAuthRouteImport } from './routes/automa.auth'
 import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
 
@@ -54,11 +55,6 @@ const LoginRoute = LoginRouteImport.update({
 const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
   id: '/forgot-password',
   path: '/forgot-password',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DashboardRoute = DashboardRouteImport.update({
-  id: '/dashboard',
-  path: '/dashboard',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ActiveJobsRoute = ActiveJobsRouteImport.update({
@@ -96,6 +92,16 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const RunnersIndexRoute = RunnersIndexRouteImport.update({
+  id: '/runners/',
+  path: '/runners/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RunnersRunnerIdRoute = RunnersRunnerIdRouteImport.update({
+  id: '/runners/$runnerId',
+  path: '/runners/$runnerId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AutomaAuthRoute = AutomaAuthRouteImport.update({
   id: '/automa/auth',
   path: '/automa/auth',
@@ -115,7 +121,6 @@ export interface FileRoutesByFullPath {
   '/500': typeof R500Route
   '/503': typeof R503Route
   '/active-jobs': typeof ActiveJobsRoute
-  '/dashboard': typeof DashboardRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
   '/maintenance': typeof MaintenanceRoute
@@ -124,6 +129,8 @@ export interface FileRoutesByFullPath {
   '/system-logs': typeof SystemLogsRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/automa/auth': typeof AutomaAuthRoute
+  '/runners/$runnerId': typeof RunnersRunnerIdRoute
+  '/runners/': typeof RunnersIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -133,7 +140,6 @@ export interface FileRoutesByTo {
   '/500': typeof R500Route
   '/503': typeof R503Route
   '/active-jobs': typeof ActiveJobsRoute
-  '/dashboard': typeof DashboardRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
   '/maintenance': typeof MaintenanceRoute
@@ -142,6 +148,8 @@ export interface FileRoutesByTo {
   '/system-logs': typeof SystemLogsRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/automa/auth': typeof AutomaAuthRoute
+  '/runners/$runnerId': typeof RunnersRunnerIdRoute
+  '/runners': typeof RunnersIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -152,7 +160,6 @@ export interface FileRoutesById {
   '/500': typeof R500Route
   '/503': typeof R503Route
   '/active-jobs': typeof ActiveJobsRoute
-  '/dashboard': typeof DashboardRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
   '/maintenance': typeof MaintenanceRoute
@@ -161,6 +168,8 @@ export interface FileRoutesById {
   '/system-logs': typeof SystemLogsRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/automa/auth': typeof AutomaAuthRoute
+  '/runners/$runnerId': typeof RunnersRunnerIdRoute
+  '/runners/': typeof RunnersIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -172,7 +181,6 @@ export interface FileRouteTypes {
     | '/500'
     | '/503'
     | '/active-jobs'
-    | '/dashboard'
     | '/forgot-password'
     | '/login'
     | '/maintenance'
@@ -181,6 +189,8 @@ export interface FileRouteTypes {
     | '/system-logs'
     | '/auth/callback'
     | '/automa/auth'
+    | '/runners/$runnerId'
+    | '/runners/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -190,7 +200,6 @@ export interface FileRouteTypes {
     | '/500'
     | '/503'
     | '/active-jobs'
-    | '/dashboard'
     | '/forgot-password'
     | '/login'
     | '/maintenance'
@@ -199,6 +208,8 @@ export interface FileRouteTypes {
     | '/system-logs'
     | '/auth/callback'
     | '/automa/auth'
+    | '/runners/$runnerId'
+    | '/runners'
   id:
     | '__root__'
     | '/'
@@ -208,7 +219,6 @@ export interface FileRouteTypes {
     | '/500'
     | '/503'
     | '/active-jobs'
-    | '/dashboard'
     | '/forgot-password'
     | '/login'
     | '/maintenance'
@@ -217,6 +227,8 @@ export interface FileRouteTypes {
     | '/system-logs'
     | '/auth/callback'
     | '/automa/auth'
+    | '/runners/$runnerId'
+    | '/runners/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -227,7 +239,6 @@ export interface RootRouteChildren {
   R500Route: typeof R500Route
   R503Route: typeof R503Route
   ActiveJobsRoute: typeof ActiveJobsRoute
-  DashboardRoute: typeof DashboardRoute
   ForgotPasswordRoute: typeof ForgotPasswordRoute
   LoginRoute: typeof LoginRoute
   MaintenanceRoute: typeof MaintenanceRoute
@@ -236,6 +247,8 @@ export interface RootRouteChildren {
   SystemLogsRoute: typeof SystemLogsRoute
   AuthCallbackRoute: typeof AuthCallbackRoute
   AutomaAuthRoute: typeof AutomaAuthRoute
+  RunnersRunnerIdRoute: typeof RunnersRunnerIdRoute
+  RunnersIndexRoute: typeof RunnersIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -280,13 +293,6 @@ declare module '@tanstack/react-router' {
       path: '/forgot-password'
       fullPath: '/forgot-password'
       preLoaderRoute: typeof ForgotPasswordRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/dashboard': {
-      id: '/dashboard'
-      path: '/dashboard'
-      fullPath: '/dashboard'
-      preLoaderRoute: typeof DashboardRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/active-jobs': {
@@ -338,6 +344,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/runners/': {
+      id: '/runners/'
+      path: '/runners'
+      fullPath: '/runners/'
+      preLoaderRoute: typeof RunnersIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/runners/$runnerId': {
+      id: '/runners/$runnerId'
+      path: '/runners/$runnerId'
+      fullPath: '/runners/$runnerId'
+      preLoaderRoute: typeof RunnersRunnerIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/automa/auth': {
       id: '/automa/auth'
       path: '/automa/auth'
@@ -363,7 +383,6 @@ const rootRouteChildren: RootRouteChildren = {
   R500Route: R500Route,
   R503Route: R503Route,
   ActiveJobsRoute: ActiveJobsRoute,
-  DashboardRoute: DashboardRoute,
   ForgotPasswordRoute: ForgotPasswordRoute,
   LoginRoute: LoginRoute,
   MaintenanceRoute: MaintenanceRoute,
@@ -372,6 +391,8 @@ const rootRouteChildren: RootRouteChildren = {
   SystemLogsRoute: SystemLogsRoute,
   AuthCallbackRoute: AuthCallbackRoute,
   AutomaAuthRoute: AutomaAuthRoute,
+  RunnersRunnerIdRoute: RunnersRunnerIdRoute,
+  RunnersIndexRoute: RunnersIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

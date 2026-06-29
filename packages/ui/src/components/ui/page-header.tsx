@@ -7,7 +7,7 @@ const PageContainer = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <div
     ref={ref}
-    className={cn("flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-8 overflow-y-auto", className)}
+    className={cn("flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-8", className)}
     {...props}
   />
 ))
@@ -19,7 +19,7 @@ const PageHeader = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <div
     ref={ref}
-    className={cn("flex flex-col gap-2", className)}
+    className={cn("flex items-center justify-between space-y-2", className)}
     {...props}
   />
 ))
@@ -43,7 +43,7 @@ const PageDescription = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <p
     ref={ref}
-    className={cn("text-muted-foreground", className)}
+    className={cn("sr-only", className)}
     {...props}
   />
 ))

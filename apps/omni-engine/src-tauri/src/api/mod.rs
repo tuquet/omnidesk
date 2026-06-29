@@ -44,12 +44,6 @@ pub struct AppState {
         handlers::schedules::delete_schedule,
         handlers::schedules::toggle_schedule,
         handlers::schedules::run_now,
-        handlers::apps::get_apps,
-        handlers::apps::get_local_apps,
-        handlers::apps::get_installed_apps,
-        handlers::apps::get_installed_details,
-        handlers::apps::install_app,
-        handlers::apps::uninstall_app,
     ),
     components(
         schemas(
@@ -112,7 +106,6 @@ pub async fn serve(pool: SqlitePool, app_dir: PathBuf, port: u16, app_handle: Ap
         .nest("/api/automa/schedules", handlers::schedules::router())
         .nest("/api/engine/runs", handlers::runs::router())
         .nest("/api/reports", handlers::reports::router())
-        .nest("/api/marketplace/apps", handlers::apps::router())
         .route("/mcp/sse", get(handlers::mcp::mcp_sse))
         .route("/mcp/messages", post(handlers::mcp::mcp_messages))
         .nest_service("/apps", ServeDir::new(apps_sandbox_dir))

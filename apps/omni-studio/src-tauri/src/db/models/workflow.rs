@@ -70,3 +70,5 @@ pub struct Schedule {
     pub created_at: Option<String>,
     pub updated_at: Option<String>,
 }
+
+

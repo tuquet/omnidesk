@@ -10,7 +10,7 @@ use tokio::sync::mpsc;
 use uuid::Uuid;
 use axum::http::StatusCode;
 
-use crate::api::AppState;
+use crate::{api::AppState, services::mcp_service};
 
 #[derive(Deserialize)]
 pub struct SessionQuery {
@@ -159,19 +159,7 @@ async fn handle_mcp_request(req: JsonRpcRequest, _db: sqlx::SqlitePool) -> JsonR
             if let Some(params) = req.params {
                 if let Some(uri) = params.get("uri").and_then(|u| u.as_str()) {
                     if uri == "sqlite://user_installed_apps" {
-                        let mut apps: Vec<String> = Vec::new();
-                        // Query actual installed apps from local SQLite DB
-                        if let Ok(rows) = sqlx::query("SELECT DISTINCT app_id FROM user_installed_apps")
-                            .fetch_all(&_db)
-                            .await
-                        {
-                            use sqlx::Row;
-                            for row in rows {
-                                if let Ok(app_id) = row.try_get::<String, _>("app_id") {
-                                    apps.push(app_id);
-                                }
-                            }
-                        }
+                        let apps = mcp_service::get_installed_apps(&_db).await.unwrap_or_default();
                         response.result = Some(serde_json::json!({
                             "contents": [
                                 {
@@ -225,37 +213,9 @@ async fn handle_mcp_request(req: JsonRpcRequest, _db: sqlx::SqlitePool) -> JsonR
                         let result_text = if cmd.is_empty() {
                             "Command must not be empty.".to_string()
                         } else {
-                            let job_id = uuid::Uuid::now_v7().to_string();
-                            let user_id = "mcp-system-user";
-                            
-                            let payload = serde_json::json!({
-                                "command": cmd,
-                                "target_device": target_device,
-                            }).to_string();
-                            
-                            match crate::services::crypto::get_or_generate_keypair(user_id) {
-                                Ok((_priv, pub_key)) => {
-                                    match crate::services::crypto::encrypt_payload(&pub_key, &payload) {
-                                        Ok(encrypted_payload) => {
-                                            let db_result = sqlx::query(
-                                                "INSERT INTO sync_queue (id, user_id, action, payload) VALUES (?, ?, ?, ?)"
-                                            )
-                                            .bind(&job_id)
-                                            .bind(user_id)
-                                            .bind("SYNC_COMMAND")
-                                            .bind(encrypted_payload)
-                                            .execute(&_db)
-                                            .await;
-                                            
-                                            match db_result {
-                                                Ok(_) => format!("Queued command '{}' (job_id: {}) to sync_queue successfully.", cmd, job_id),
-                                                Err(e) => format!("Failed to insert command into sync_queue: {}", e),
-                                            }
-                                        }
-                                        Err(e) => format!("Failed to encrypt command: {:?}", e),
-                                    }
-                                }
-                                Err(e) => format!("Failed to get/generate keypair for MCP user: {:?}", e),
+                            match mcp_service::queue_sync_command(&_db, cmd, target_device).await {
+                                Ok(job_id) => format!("Queued command '{}' (job_id: {}) to sync_queue successfully.", cmd, job_id),
+                                Err(e) => format!("Failed to queue command: {:?}", e),
                             }
                         };
                         

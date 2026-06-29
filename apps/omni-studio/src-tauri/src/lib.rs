@@ -65,25 +65,22 @@ pub fn run() {
                     }
                     _ => {}
                 })
-                .on_tray_icon_event(|tray, event| match event {
-                    TrayIconEvent::Click {
+                .on_tray_icon_event(|tray, event| if let TrayIconEvent::Click {
                         button: MouseButton::Left,
                         button_state: MouseButtonState::Up,
                         ..
-                    } => {
-                        let app = tray.app_handle();
-                        if let Some(window) = app.get_webview_window("main") {
-                            let _ = window.is_visible().map(|visible| {
-                                if visible {
-                                    let _ = window.hide();
-                                } else {
-                                    let _ = window.show();
-                                    let _ = window.set_focus();
-                                }
-                            });
-                        }
+                    } = event {
+                    let app = tray.app_handle();
+                    if let Some(window) = app.get_webview_window("main") {
+                        let _ = window.is_visible().map(|visible| {
+                            if visible {
+                                let _ = window.hide();
+                            } else {
+                                let _ = window.show();
+                                let _ = window.set_focus();
+                            }
+                        });
                     }
-                    _ => {}
                 })
                 .build(app)?;
 
@@ -121,13 +118,12 @@ pub fn run() {
                             // Manage state for Tauri commands before UI can call them
                             app_handle.manage(pool.clone());
                             
-                            let pool_for_rt = pool.clone();
+                            let _pool_for_rt = pool.clone();
                             let app_dir = app_handle.path().app_data_dir().unwrap_or_else(|_| PathBuf::from("."));
                             let app_handle_clone = app_handle.clone();
                             
                             tauri::async_runtime::spawn(async move {
-                                // Start Realtime WebSocket listener
-                                services::realtime::start_realtime_listener(app_handle_clone.clone(), pool_for_rt);
+                                // Realtime listener has been extracted/removed
                                 
                                 // Only run Axum if not disabled
                                 if std::env::var("OMNIDESK_DISABLE_API").is_err() {

@@ -38,18 +38,7 @@ export function StatusBar() {
         <Button variant="ghost" size="icon" className="h-6 w-6 hover:text-foreground">
           <Settings className="h-3.5 w-3.5" />
         </Button>
-        <ThemeToggle
-          triggerNode={
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-6 w-6 hover:text-foreground"
-              title="Toggle Theme"
-            >
-              <Monitor className="h-3.5 w-3.5" />
-            </Button>
-          }
-        />
+        <ThemeToggle />
         <LanguageSwitcher
           triggerNode={
             <Button
@@ -89,7 +78,7 @@ export function StatusBar() {
         <Button
           variant="ghost"
           size="icon"
-          className="h-6 w-6 hover:text-foreground text-cyan-500/80"
+          className="h-6 w-6 hover:text-foreground"
           onClick={() =>
             platformApi.openUrl(config.apiDocsUrl?.replace('/scalar', '/openapi.json') || '')
           }
@@ -100,7 +89,7 @@ export function StatusBar() {
         <Button
           variant="ghost"
           size="icon"
-          className="h-6 w-6 hover:text-foreground text-cyan-500/80"
+          className="h-6 w-6 hover:text-foreground"
           onClick={() => platformApi.openUrl(config.apiDocsUrl || '')}
           title="API Documentation (Scalar UI)"
         >
@@ -111,11 +100,11 @@ export function StatusBar() {
 
         <Button
           variant="ghost"
-          size="sm"
-          className="h-6 px-2 text-amber-500 hover:text-amber-400 hover:bg-amber-500/10 font-medium"
+          size="icon"
+          className="h-6 w-6 hover:text-foreground"
+          title="OmniDesk Pro"
         >
-          <Diamond className="h-3.5 w-3.5 mr-1.5 fill-current" />
-          OmniDesk Pro
+          <Diamond className="h-3.5 w-3.5 fill-current" />
         </Button>
       </div>
 
@@ -156,23 +145,21 @@ export function StatusBar() {
 
         <Button
           variant="ghost"
-          size="sm"
-          className="h-6 px-2 text-amber-500 hover:text-amber-400 hover:bg-amber-500/10"
+          size="icon"
+          className="h-6 w-6 hover:text-foreground"
+          title="System Status"
         >
-          <AlertTriangle className="h-3 w-3 mr-1.5" />
-          System Status
+          <AlertTriangle className="h-3.5 w-3.5" />
         </Button>
 
         <div className="h-4 w-px bg-border mx-1" />
 
-        <Button variant="ghost" size="sm" className="h-6 px-2 hover:text-foreground">
-          <Cookie className="h-3.5 w-3.5 mr-1.5" />
-          Cookies
+        <Button variant="ghost" size="icon" className="h-6 w-6 hover:text-foreground" title="Cookies">
+          <Cookie className="h-3.5 w-3.5" />
         </Button>
 
-        <Button variant="ghost" size="sm" className="h-6 px-2 hover:text-foreground">
-          <Wrench className="h-3.5 w-3.5 mr-1.5" />
-          Dev Tools
+        <Button variant="ghost" size="icon" className="h-6 w-6 hover:text-foreground" title="Dev Tools">
+          <Wrench className="h-3.5 w-3.5" />
         </Button>
 
         <div className="h-4 w-px bg-border mx-1" />

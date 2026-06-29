@@ -16,7 +16,6 @@ import { Route as ProxiesRouteImport } from './routes/proxies'
 import { Route as MaintenanceRouteImport } from './routes/maintenance'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
-import { Route as BrowserProfilesRouteImport } from './routes/browser-profiles'
 import { Route as R503RouteImport } from './routes/503'
 import { Route as R500RouteImport } from './routes/500'
 import { Route as R404RouteImport } from './routes/404'
@@ -59,11 +58,6 @@ const LoginRoute = LoginRouteImport.update({
 const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
   id: '/forgot-password',
   path: '/forgot-password',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const BrowserProfilesRoute = BrowserProfilesRouteImport.update({
-  id: '/browser-profiles',
-  path: '/browser-profiles',
   getParentRoute: () => rootRouteImport,
 } as any)
 const R503Route = R503RouteImport.update({
@@ -114,7 +108,6 @@ export interface FileRoutesByFullPath {
   '/404': typeof R404Route
   '/500': typeof R500Route
   '/503': typeof R503Route
-  '/browser-profiles': typeof BrowserProfilesRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
   '/maintenance': typeof MaintenanceRoute
@@ -132,7 +125,6 @@ export interface FileRoutesByTo {
   '/404': typeof R404Route
   '/500': typeof R500Route
   '/503': typeof R503Route
-  '/browser-profiles': typeof BrowserProfilesRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
   '/maintenance': typeof MaintenanceRoute
@@ -151,7 +143,6 @@ export interface FileRoutesById {
   '/404': typeof R404Route
   '/500': typeof R500Route
   '/503': typeof R503Route
-  '/browser-profiles': typeof BrowserProfilesRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
   '/maintenance': typeof MaintenanceRoute
@@ -171,7 +162,6 @@ export interface FileRouteTypes {
     | '/404'
     | '/500'
     | '/503'
-    | '/browser-profiles'
     | '/forgot-password'
     | '/login'
     | '/maintenance'
@@ -189,7 +179,6 @@ export interface FileRouteTypes {
     | '/404'
     | '/500'
     | '/503'
-    | '/browser-profiles'
     | '/forgot-password'
     | '/login'
     | '/maintenance'
@@ -207,7 +196,6 @@ export interface FileRouteTypes {
     | '/404'
     | '/500'
     | '/503'
-    | '/browser-profiles'
     | '/forgot-password'
     | '/login'
     | '/maintenance'
@@ -226,7 +214,6 @@ export interface RootRouteChildren {
   R404Route: typeof R404Route
   R500Route: typeof R500Route
   R503Route: typeof R503Route
-  BrowserProfilesRoute: typeof BrowserProfilesRoute
   ForgotPasswordRoute: typeof ForgotPasswordRoute
   LoginRoute: typeof LoginRoute
   MaintenanceRoute: typeof MaintenanceRoute
@@ -287,13 +274,6 @@ declare module '@tanstack/react-router' {
       path: '/forgot-password'
       fullPath: '/forgot-password'
       preLoaderRoute: typeof ForgotPasswordRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/browser-profiles': {
-      id: '/browser-profiles'
-      path: '/browser-profiles'
-      fullPath: '/browser-profiles'
-      preLoaderRoute: typeof BrowserProfilesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/503': {
@@ -362,7 +342,6 @@ const rootRouteChildren: RootRouteChildren = {
   R404Route: R404Route,
   R500Route: R500Route,
   R503Route: R503Route,
-  BrowserProfilesRoute: BrowserProfilesRoute,
   ForgotPasswordRoute: ForgotPasswordRoute,
   LoginRoute: LoginRoute,
   MaintenanceRoute: MaintenanceRoute,

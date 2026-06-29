@@ -3,7 +3,6 @@ use axum::{
     routing::post,
     Json, Router,
 };
-use std::sync::Arc;
 use serde_json::{json, Value};
 use crate::{api::AppState, error::AppError, services::git_service::GitService};
 

@@ -53,7 +53,7 @@ export function NetworkStatus() {
           <Button
             variant="ghost"
             size="icon"
-            className={`h-6 w-6 ${isOnline ? 'text-green-500/80 hover:text-green-400' : 'text-destructive hover:text-destructive'}`}
+            className={`h-6 w-6 ${isOnline ? 'text-muted-foreground hover:text-foreground' : 'text-destructive hover:text-destructive'}`}
           >
             {isOnline ? <Wifi className="h-3.5 w-3.5" /> : <WifiOff className="h-3.5 w-3.5" />}
           </Button>

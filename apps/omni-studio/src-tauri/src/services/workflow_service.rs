@@ -71,7 +71,7 @@ impl WorkflowService {
         .bind(&workflow.table_data)
         .bind(&workflow.data_columns)
         .bind(&workflow.version)
-        .bind(&workflow.is_disabled)
+        .bind(workflow.is_disabled)
         .bind(&workflow.source)
         .execute(pool)
         .await?;
@@ -100,7 +100,7 @@ impl WorkflowService {
         .bind(&workflow.table_data)
         .bind(&workflow.data_columns)
         .bind(&workflow.version)
-        .bind(&workflow.is_disabled)
+        .bind(workflow.is_disabled)
         .bind(&workflow.source)
         .bind(id)
         .execute(pool)
@@ -162,7 +162,7 @@ impl WorkflowService {
         .bind(&workflow.table_data)
         .bind(&workflow.data_columns)
         .bind(&workflow.version)
-        .bind(&workflow.is_disabled)
+        .bind(workflow.is_disabled)
         .bind(&workflow.source)
         .execute(pool)
         .await?;

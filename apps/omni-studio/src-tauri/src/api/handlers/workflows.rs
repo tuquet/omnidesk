@@ -1,11 +1,11 @@
 use axum::{
     extract::{Path, Query, State},
-    routing::{get, post, put},
+    routing::{get, post},
     Json, Router,
 };
 use serde::Deserialize;
 use crate::api::AppState;
-use crate::db::models::workflow::{Workflow, WorkflowRun, WorkflowLog};
+use crate::db::models::workflow::Workflow;
 use crate::error::AppError;
 use crate::services::workflow_service::WorkflowService;
 

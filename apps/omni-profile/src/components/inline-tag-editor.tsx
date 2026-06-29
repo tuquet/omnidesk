@@ -47,10 +47,9 @@ export function InlineTagEditor({ profile, initialTags }: InlineTagEditorProps) 
         tags: JSON.stringify(newTagsArray),
       });
       toast.success('Tags updated');
-    } catch (_e) {
-      toast.error('Failed to update tags');
+    } finally {
+      setIsEditing(false);
     }
-    setIsEditing(false);
   };
 
   if (isEditing) {

@@ -17,7 +17,7 @@ pub async fn init_db(app_dir: PathBuf) -> Result<SqlitePool, sqlx::Error> {
         .await?;
         
     // Run migrations automatically on startup
-    sqlx::migrate!("./migrations").run(&pool).await?;
+    sqlx::migrate!("../../../packages-rs/omni-shared/migrations").run(&pool).await?;
         
     Ok(pool)
 }

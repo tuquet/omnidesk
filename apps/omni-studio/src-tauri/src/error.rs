@@ -69,3 +69,16 @@ impl From<AppError> for String {
         }
     }
 }
+
+
+impl From<omni_shared::error::AppError> for AppError {
+    fn from(err: omni_shared::error::AppError) -> Self {
+        match err {
+            omni_shared::error::AppError::Database(e) => AppError::Database(e),
+            omni_shared::error::AppError::Unauthorized(msg) => AppError::Unauthorized(msg),
+            omni_shared::error::AppError::NotFound(msg) => AppError::NotFound(msg),
+            omni_shared::error::AppError::BadRequest(msg) => AppError::BadRequest(msg),
+            omni_shared::error::AppError::Internal(msg) => AppError::Internal(msg),
+        }
+    }
+}

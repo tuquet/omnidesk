@@ -118,7 +118,7 @@ pub fn run() {
                             app_handle.manage(pool.clone());
                             
                             let pool_for_worker = pool.clone();
-                            let pool_for_rt = pool.clone();
+
                             let app_dir = app_handle.path().app_data_dir().unwrap_or_else(|_| PathBuf::from("."));
                             let app_handle_clone = app_handle.clone();
                             
@@ -126,8 +126,7 @@ pub fn run() {
                                 // Start Background Worker for Offline Queue
                                 services::worker::start_background_worker(pool_for_worker);
                                 
-                                // Start Realtime WebSocket listener
-                                services::realtime::start_realtime_listener(app_handle_clone.clone(), pool_for_rt);
+                                // Realtime listener has been extracted/removed
                                 
                                 // Only run Axum if not disabled
                                 if std::env::var("OMNIDESK_DISABLE_API").is_err() {

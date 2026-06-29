@@ -17,12 +17,18 @@ pub fn router() -> Router<AppState> {
         .route("/export/:id", get(export_workflow))
         .route("/import", post(import_workflow))
         .route("/status", get(sync_status))
+        .route("/local", post(sync_local))
 }
 
 /// Request payload for pushing workflows from the Extension
 #[derive(Debug, Deserialize, ToSchema)]
 pub struct PushWorkflowsPayload {
     pub workflows: Vec<Workflow>,
+}
+
+#[derive(Debug, Deserialize, ToSchema)]
+pub struct SyncLocalPayload {
+    pub folder_path: String,
 }
 
 /// Response for sync status
@@ -145,4 +151,48 @@ async fn sync_status(
         workflow_count: workflows.len(),
         last_sync: None, // TODO: track last sync timestamp
     }))
+}
+
+/// POST /api/automa/workflows/sync/local
+/// Reads workflows from a given local folder path and upserts to DB
+#[utoipa::path(
+    post,
+    path = "/api/automa/workflows/sync/local",
+    responses(
+        (status = 200, description = "Local folder synced successfully")
+    ),
+    tag = "sync"
+)]
+async fn sync_local(
+    State(state): State<AppState>,
+    Json(payload): Json<SyncLocalPayload>,
+) -> Result<Json<serde_json::Value>, AppError> {
+    let watch_dir = std::path::PathBuf::from(payload.folder_path);
+    if !watch_dir.exists() || !watch_dir.is_dir() {
+        return Err(AppError::BadRequest("Invalid folder path".to_string()));
+    }
+
+    let entries = std::fs::read_dir(&watch_dir)
+        .map_err(|e| AppError::Internal(format!("Failed to read dir: {}", e)))?;
+
+    let mut count = 0;
+    for entry in entries.flatten() {
+        let path = entry.path();
+        if path.extension().is_some_and(|ext| ext == "json") {
+            let content = match std::fs::read_to_string(&path) {
+                Ok(c) => c,
+                Err(_) => continue,
+            };
+            if let Ok(workflow) = serde_json::from_str::<Workflow>(&content) {
+                if WorkflowService::upsert(&state.db, &workflow).await.is_ok() {
+                    count += 1;
+                }
+            }
+        }
+    }
+
+    Ok(Json(serde_json::json!({
+        "synced": count,
+        "status": "ok"
+    })))
 }

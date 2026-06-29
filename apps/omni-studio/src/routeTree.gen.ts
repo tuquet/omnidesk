@@ -9,14 +9,10 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as WorkflowsRouteImport } from './routes/workflows'
 import { Route as SignupRouteImport } from './routes/signup'
-import { Route as SettingsRouteImport } from './routes/settings'
-import { Route as SchedulesRouteImport } from './routes/schedules'
 import { Route as MaintenanceRouteImport } from './routes/maintenance'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
-import { Route as ExecutionsRouteImport } from './routes/executions'
 import { Route as R503RouteImport } from './routes/503'
 import { Route as R500RouteImport } from './routes/500'
 import { Route as R404RouteImport } from './routes/404'
@@ -26,24 +22,9 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AutomaAuthRouteImport } from './routes/automa.auth'
 import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
 
-const WorkflowsRoute = WorkflowsRouteImport.update({
-  id: '/workflows',
-  path: '/workflows',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const SignupRoute = SignupRouteImport.update({
   id: '/signup',
   path: '/signup',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SettingsRoute = SettingsRouteImport.update({
-  id: '/settings',
-  path: '/settings',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SchedulesRoute = SchedulesRouteImport.update({
-  id: '/schedules',
-  path: '/schedules',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MaintenanceRoute = MaintenanceRouteImport.update({
@@ -59,11 +40,6 @@ const LoginRoute = LoginRouteImport.update({
 const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
   id: '/forgot-password',
   path: '/forgot-password',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ExecutionsRoute = ExecutionsRouteImport.update({
-  id: '/executions',
-  path: '/executions',
   getParentRoute: () => rootRouteImport,
 } as any)
 const R503Route = R503RouteImport.update({
@@ -114,14 +90,10 @@ export interface FileRoutesByFullPath {
   '/404': typeof R404Route
   '/500': typeof R500Route
   '/503': typeof R503Route
-  '/executions': typeof ExecutionsRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
   '/maintenance': typeof MaintenanceRoute
-  '/schedules': typeof SchedulesRoute
-  '/settings': typeof SettingsRoute
   '/signup': typeof SignupRoute
-  '/workflows': typeof WorkflowsRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/automa/auth': typeof AutomaAuthRoute
 }
@@ -132,14 +104,10 @@ export interface FileRoutesByTo {
   '/404': typeof R404Route
   '/500': typeof R500Route
   '/503': typeof R503Route
-  '/executions': typeof ExecutionsRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
   '/maintenance': typeof MaintenanceRoute
-  '/schedules': typeof SchedulesRoute
-  '/settings': typeof SettingsRoute
   '/signup': typeof SignupRoute
-  '/workflows': typeof WorkflowsRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/automa/auth': typeof AutomaAuthRoute
 }
@@ -151,14 +119,10 @@ export interface FileRoutesById {
   '/404': typeof R404Route
   '/500': typeof R500Route
   '/503': typeof R503Route
-  '/executions': typeof ExecutionsRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
   '/maintenance': typeof MaintenanceRoute
-  '/schedules': typeof SchedulesRoute
-  '/settings': typeof SettingsRoute
   '/signup': typeof SignupRoute
-  '/workflows': typeof WorkflowsRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/automa/auth': typeof AutomaAuthRoute
 }
@@ -171,14 +135,10 @@ export interface FileRouteTypes {
     | '/404'
     | '/500'
     | '/503'
-    | '/executions'
     | '/forgot-password'
     | '/login'
     | '/maintenance'
-    | '/schedules'
-    | '/settings'
     | '/signup'
-    | '/workflows'
     | '/auth/callback'
     | '/automa/auth'
   fileRoutesByTo: FileRoutesByTo
@@ -189,14 +149,10 @@ export interface FileRouteTypes {
     | '/404'
     | '/500'
     | '/503'
-    | '/executions'
     | '/forgot-password'
     | '/login'
     | '/maintenance'
-    | '/schedules'
-    | '/settings'
     | '/signup'
-    | '/workflows'
     | '/auth/callback'
     | '/automa/auth'
   id:
@@ -207,14 +163,10 @@ export interface FileRouteTypes {
     | '/404'
     | '/500'
     | '/503'
-    | '/executions'
     | '/forgot-password'
     | '/login'
     | '/maintenance'
-    | '/schedules'
-    | '/settings'
     | '/signup'
-    | '/workflows'
     | '/auth/callback'
     | '/automa/auth'
   fileRoutesById: FileRoutesById
@@ -226,46 +178,21 @@ export interface RootRouteChildren {
   R404Route: typeof R404Route
   R500Route: typeof R500Route
   R503Route: typeof R503Route
-  ExecutionsRoute: typeof ExecutionsRoute
   ForgotPasswordRoute: typeof ForgotPasswordRoute
   LoginRoute: typeof LoginRoute
   MaintenanceRoute: typeof MaintenanceRoute
-  SchedulesRoute: typeof SchedulesRoute
-  SettingsRoute: typeof SettingsRoute
   SignupRoute: typeof SignupRoute
-  WorkflowsRoute: typeof WorkflowsRoute
   AuthCallbackRoute: typeof AuthCallbackRoute
   AutomaAuthRoute: typeof AutomaAuthRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/workflows': {
-      id: '/workflows'
-      path: '/workflows'
-      fullPath: '/workflows'
-      preLoaderRoute: typeof WorkflowsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/signup': {
       id: '/signup'
       path: '/signup'
       fullPath: '/signup'
       preLoaderRoute: typeof SignupRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/settings': {
-      id: '/settings'
-      path: '/settings'
-      fullPath: '/settings'
-      preLoaderRoute: typeof SettingsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/schedules': {
-      id: '/schedules'
-      path: '/schedules'
-      fullPath: '/schedules'
-      preLoaderRoute: typeof SchedulesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/maintenance': {
@@ -287,13 +214,6 @@ declare module '@tanstack/react-router' {
       path: '/forgot-password'
       fullPath: '/forgot-password'
       preLoaderRoute: typeof ForgotPasswordRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/executions': {
-      id: '/executions'
-      path: '/executions'
-      fullPath: '/executions'
-      preLoaderRoute: typeof ExecutionsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/503': {
@@ -362,14 +282,10 @@ const rootRouteChildren: RootRouteChildren = {
   R404Route: R404Route,
   R500Route: R500Route,
   R503Route: R503Route,
-  ExecutionsRoute: ExecutionsRoute,
   ForgotPasswordRoute: ForgotPasswordRoute,
   LoginRoute: LoginRoute,
   MaintenanceRoute: MaintenanceRoute,
-  SchedulesRoute: SchedulesRoute,
-  SettingsRoute: SettingsRoute,
   SignupRoute: SignupRoute,
-  WorkflowsRoute: WorkflowsRoute,
   AuthCallbackRoute: AuthCallbackRoute,
   AutomaAuthRoute: AutomaAuthRoute,
 }

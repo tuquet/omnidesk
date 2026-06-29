@@ -45,7 +45,7 @@ async fn handle_sync_socket(socket: WebSocket, state: AppState) {
             payload: serde_json::to_value(&workflows).unwrap_or_default(),
         };
         if let Ok(msg) = serde_json::to_string(&event) {
-            let _ = sender.send(Message::Text(msg.into())).await;
+            let _ = sender.send(Message::Text(msg)).await;
         }
     }
 
@@ -53,7 +53,7 @@ async fn handle_sync_socket(socket: WebSocket, state: AppState) {
     let mut send_task = tokio::spawn(async move {
         while let Ok(event) = rx.recv().await {
             if let Ok(msg) = serde_json::to_string(&event) {
-                if sender.send(Message::Text(msg.into())).await.is_err() {
+                if sender.send(Message::Text(msg)).await.is_err() {
                     break;
                 }
             }

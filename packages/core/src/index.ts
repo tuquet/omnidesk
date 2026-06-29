@@ -24,6 +24,7 @@ export * from './hooks/use-deep-link-auth';
 export * from './stores/use-console-store';
 export * from './stores/use-dev-store';
 export * from './stores/use-layout-store';
+export * from './stores/use-workspace-store';
 export * from './stores/utils';
 
 export * from './providers/config-provider';

@@ -1,4 +1,4 @@
-use tauri::{AppHandle, Emitter, command, Manager};
+use tauri::{AppHandle, Emitter, command};
 use std::fs;
 use std::io::Cursor;
 use reqwest;
@@ -48,7 +48,7 @@ pub async fn ensure_automa_extension(app: AppHandle) -> Result<String, String> {
         } else {
             if let Some(p) = outpath.parent() {
                 if !p.exists() {
-                    fs::create_dir_all(&p).map_err(|e| e.to_string())?;
+                    fs::create_dir_all(p).map_err(|e| e.to_string())?;
                 }
             }
             let mut outfile = fs::File::create(&outpath).map_err(|e| e.to_string())?;

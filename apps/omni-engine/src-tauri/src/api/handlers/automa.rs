@@ -50,8 +50,8 @@ async fn handle_socket(socket: WebSocket, state: AppState) {
 
     // Spawn a task to receive messages from the WebSocket client and process them
     let mut recv_task = tokio::spawn(async move {
-        let client = reqwest::Client::new();
-        let studio_url = "http://127.0.0.1:1422";
+        let _client = reqwest::Client::new();
+        let _studio_url = "http://127.0.0.1:1422";
         
         while let Some(Ok(Message::Text(text))) = receiver.next().await {
             if let Ok(event) = serde_json::from_str::<AutomaEvent>(&text) {
@@ -69,14 +69,7 @@ async fn handle_socket(socket: WebSocket, state: AppState) {
                     "run_finished" => {
                         if let Some(run_id) = event.payload.get("run_id").and_then(|v| v.as_str()) {
                             let status = event.payload.get("status").and_then(|v| v.as_str()).unwrap_or("COMPLETED");
-                            let now = chrono::Utc::now().timestamp_millis();
-                            let _ = sqlx::query("UPDATE workflow_runs SET status = ?, updated_at = ?, finished_at = ? WHERE id = ?")
-                                .bind(status)
-                                .bind(now)
-                                .bind(now)
-                                .bind(run_id)
-                                .execute(&db)
-                                .await;
+                            let _ = crate::services::automa_service::mark_run_finished(&db, run_id, status).await;
                             let _ = app_clone.emit("e2e-log", "Run finished (saved to engine DB)");
                         }
                     },
@@ -85,26 +78,15 @@ async fn handle_socket(socket: WebSocket, state: AppState) {
                             let block_id = event.payload.get("block_id").and_then(|v| v.as_str()).unwrap_or("");
                             let block_label = event.payload.get("block_label").and_then(|v| v.as_str()).unwrap_or("");
                             let status = event.payload.get("status").and_then(|v| v.as_str()).unwrap_or("SUCCESS");
-                            let log_id = uuid::Uuid::new_v4().to_string();
-                            let now = chrono::Utc::now().timestamp_millis();
                             
                             // Optional data parsing
                             let duration_ms = event.payload.get("duration_ms").and_then(|v| v.as_i64());
                             let data = event.payload.get("data").and_then(|v| v.as_str());
 
-                            let _ = sqlx::query("INSERT INTO workflow_logs (id, run_id, block_id, block_label, status, duration_ms, data, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)")
-                                .bind(log_id)
-                                .bind(run_id)
-                                .bind(block_id)
-                                .bind(block_label)
-                                .bind(status)
-                                .bind(duration_ms)
-                                .bind(data)
-                                .bind(now)
-                                .execute(&db)
-                                .await;
+                            let _ = crate::services::automa_service::add_run_log(&db, run_id, block_id, block_label, status, duration_ms, data).await;
                         }
                     },
+
                     _ => {}
                 }
             }

@@ -44,7 +44,7 @@ export interface DocumentItem {
 // ─── Navigation Groups ──────────────────────────────────────────────────────
 
 export const NAV_MAIN: NavItem[] = [
-  { title: 'Browser Profiles', url: '/browser-profiles', icon: LayoutDashboardIcon },
+  { title: 'Browser Profiles', url: '/', icon: LayoutDashboardIcon },
   { title: 'Proxies', url: '/proxies', icon: GlobeIcon },
   { title: 'Tags & Folders', url: '/tags', icon: TagsIcon },
   { title: 'Settings', url: '/settings', icon: SettingsIcon },

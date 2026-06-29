@@ -8,7 +8,7 @@
 // ─── Branding ────────────────────────────────────────────────────────────────
 export const APP_NAME = 'Omni Engine';
 export const APP_DESCRIPTION = 'Workflow Execution Engine';
-export const LOGO_SRC = '/logo-purple.svg';
+export const LOGO_SRC = '/logo.png';
 
 // ─── External URLs ───────────────────────────────────────────────────────────
 import { API_BASE_URL } from '@omnidesk/core';

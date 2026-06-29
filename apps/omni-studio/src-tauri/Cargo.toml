@@ -15,6 +15,8 @@ tauri-build = { version = "2", features = [] }
 
 [dependencies]
 tauri = { version = "2", features = ["protocol-asset", "macos-private-api", "tray-icon"] }
+omni-tauri-core = { version = "0.1.0", path = "../../../packages-rs/omni-tauri-core" }
+omni-shared = { path = "../../../packages-rs/omni-shared" }
 tauri-plugin-single-instance = { version = "2", features = ["deep-link"] }
 tauri-plugin-opener = "2"
 tauri-plugin-store = "2"
@@ -53,7 +55,6 @@ async-stream = "0.3.6"
 tauri-plugin-log = "2"
 notify = { version = "7", features = ["macos_kqueue"] }
 globset = "0.4"
-omni-tauri-core = { version = "0.1.0", path = "../../../packages-rs/omni-tauri-core" }
 tauri-plugin-dialog = "2.2.0"
 
 [[bin]]

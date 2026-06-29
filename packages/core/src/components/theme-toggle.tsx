@@ -1,37 +1,45 @@
 import { useTheme } from 'next-themes';
 import { Button } from '@omnidesk/ui';
+import { Moon, Sun } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
 export function ThemeToggle({ triggerNode }: { triggerNode?: React.ReactNode }) {
   const { resolvedTheme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) {
+    return (
+      <Button variant="ghost" size="icon" className="h-6 w-6 hover:text-foreground" title="Toggle Theme">
+        <span className="sr-only">Toggle theme</span>
+      </Button>
+    );
+  }
+
+  const isDark = resolvedTheme === 'dark';
 
   return (
     <>
       {triggerNode ? (
-        <div onClick={() => setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')}>{triggerNode}</div>
+        <div onClick={() => setTheme(isDark ? 'light' : 'dark')} className="cursor-pointer">
+          {triggerNode}
+        </div>
       ) : (
         <Button
-          variant="outline"
+          variant="ghost"
           size="icon"
-          className="h-9 w-9"
-          onClick={() => setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')}
+          className="h-6 w-6 hover:text-foreground"
+          onClick={() => setTheme(isDark ? 'light' : 'dark')}
+          title={isDark ? "Switch to Light Mode" : "Switch to Dark Mode"}
         >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className="h-4 w-4"
-          >
-            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-            <path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" />
-            <path d="M12 3l0 18" />
-            <path d="M12 9l4.65 -4.65" />
-            <path d="M12 14.3l7.37 -7.37" />
-            <path d="M12 19.6l8.85 -8.85" />
-          </svg>
+          {isDark ? (
+            <Moon className="h-3.5 w-3.5" />
+          ) : (
+            <Sun className="h-3.5 w-3.5" />
+          )}
           <span className="sr-only">Toggle theme</span>
         </Button>
       )}

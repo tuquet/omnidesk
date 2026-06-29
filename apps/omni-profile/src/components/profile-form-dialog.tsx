@@ -150,7 +150,7 @@ export function ProfileFormDialog({
       onOpenChange(false);
       onSuccess?.();
     } catch {
-      toast.error(mode === 'create' ? 'Failed to create profile' : 'Failed to update profile');
+      // error shown by interceptor
     } finally {
       setIsSubmitting(false);
     }

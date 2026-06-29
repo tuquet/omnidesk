@@ -8,10 +8,13 @@ export interface LayoutState {
 }
 
 export const layoutStore = createPersistentStore<LayoutState>('omnidesk-layout-state', {
-  sidebarOpen: true,
+  sidebarOpen: false,
   theme: 'system',
   panelSizes: [20, 80],
 });
+
+// Always default to false on app load, regardless of localStorage
+layoutStore.setState((state) => ({ ...state, sidebarOpen: false }));
 
 export const layoutActions = {
   setSidebarOpen: (open: boolean | ((val: boolean) => boolean)) => {

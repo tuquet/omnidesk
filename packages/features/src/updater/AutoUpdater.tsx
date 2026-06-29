@@ -3,6 +3,7 @@ import { check } from '@tauri-apps/plugin-updater';
 import { relaunch } from '@tauri-apps/plugin-process';
 import type { Update } from '@tauri-apps/plugin-updater';
 import { Download, Rocket, X } from 'lucide-react';
+import { Button } from '@omnidesk/ui';
 
 export function AutoUpdater() {
   const [update, setUpdate] = useState<Update | null>(null);
@@ -72,17 +73,17 @@ export function AutoUpdater() {
     : 0;
 
   return (
-    <div className="fixed bottom-6 right-6 z-50 w-80 animate-in slide-in-from-bottom-5 fade-in duration-300">
-      <div className="overflow-hidden rounded-xl border bg-card text-card-foreground shadow-lg">
-        <div className="p-5">
+    <div className="fixed bottom-12 right-6 z-50 w-72 animate-in slide-in-from-bottom-5 fade-in duration-300">
+      <div className="overflow-hidden rounded-md border bg-popover text-popover-foreground shadow-md">
+        <div className="p-4">
           <div className="flex items-start justify-between">
             <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10">
-                <Rocket className="h-5 w-5 text-primary" />
+              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10">
+                <Rocket className="h-4 w-4 text-primary" />
               </div>
               <div>
-                <h3 className="font-semibold leading-none tracking-tight">Cập nhật mới!</h3>
-                <p className="mt-1.5 text-sm text-muted-foreground">
+                <h3 className="font-semibold leading-none tracking-tight text-sm">Cập nhật mới!</h3>
+                <p className="mt-1 text-xs text-muted-foreground">
                   Phiên bản {update.version} đã sẵn sàng.
                 </p>
               </div>
@@ -109,7 +110,7 @@ export function AutoUpdater() {
             </div>
           )}
 
-          <div className="mt-5">
+          <div className="mt-4">
             {isUpdating ? (
               <div className="space-y-2">
                 <div className="flex items-center justify-between text-xs font-medium">
@@ -124,13 +125,14 @@ export function AutoUpdater() {
                 </div>
               </div>
             ) : (
-              <button
+              <Button
                 onClick={handleUpdate}
-                className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+                className="w-full"
+                size="sm"
               >
-                <Download className="h-4 w-4" />
+                <Download className="mr-2 h-4 w-4" />
                 Cập nhật và Khởi động lại
-              </button>
+              </Button>
             )}
           </div>
         </div>

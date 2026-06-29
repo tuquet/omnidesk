@@ -93,7 +93,7 @@ impl FileWatcherService {
     async fn handle_event(&self, pool: &SqlitePool, event: &Event) {
         for path in &event.paths {
             // Only care about .json files
-            if !path.extension().is_some_and(|ext| ext == "json") {
+            if path.extension().is_none_or(|ext| ext != "json") {
                 continue;
             }
 

@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { PageContainer, PageHeader, PageTitle, PageDescription, Table, TableBody, TableCell, TableHead, TableHeader, TableRow, Button, Badge } from '@omnidesk/ui';
+import { PageContainer, PageHeader, PageTitle, Table, TableBody, TableCell, TableHead, TableHeader, TableRow, Button, Badge } from '@omnidesk/ui';
 import { XCircleIcon } from 'lucide-react';
 
 export const Route = createFileRoute('/active-jobs')({
@@ -16,8 +16,7 @@ function ActiveJobsPage() {
     <PageContainer>
       <PageHeader>
         <PageTitle>Active Jobs & Queue</PageTitle>
-        <PageDescription>Monitor workflows currently running in the engine.</PageDescription>
-      </PageHeader>
+              </PageHeader>
       
       <div className="rounded-md border bg-card">
         <Table data-testid="table-active-jobs">

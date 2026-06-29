@@ -1,63 +1,63 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="24 21 453 453" width="100%" height="100%">
   <defs>
-    <!-- Gradients Tím thạch anh Obsidian -->
+    <!-- Gradients Xanh lơ Neon Cyan -->
     <linearGradient id="top1" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#F3E8FF" />
-      <stop offset="100%" stop-color="#D8B4FE" />
+      <stop offset="0%" stop-color="#ECFEFF" />
+      <stop offset="100%" stop-color="#A5F3FC" />
     </linearGradient>
     <linearGradient id="top2" x1="100%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" stop-color="#E9D5FF" />
-      <stop offset="100%" stop-color="#C084FC" />
+      <stop offset="0%" stop-color="#A5F3FC" />
+      <stop offset="100%" stop-color="#67E8F9" />
     </linearGradient>
     <linearGradient id="top3" x1="0%" y1="100%" x2="100%" y2="0%">
-      <stop offset="0%" stop-color="#C084FC" />
-      <stop offset="100%" stop-color="#7C3AED" />
+      <stop offset="0%" stop-color="#67E8F9" />
+      <stop offset="100%" stop-color="#0891B2" />
     </linearGradient>
     <linearGradient id="top4" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#D8B4FE" />
-      <stop offset="100%" stop-color="#7C3AED" />
+      <stop offset="0%" stop-color="#A5F3FC" />
+      <stop offset="100%" stop-color="#0891B2" />
     </linearGradient>
 
     <linearGradient id="left1" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" stop-color="#C084FC" />
-      <stop offset="100%" stop-color="#7C3AED" />
+      <stop offset="0%" stop-color="#67E8F9" />
+      <stop offset="100%" stop-color="#0891B2" />
     </linearGradient>
     <linearGradient id="left2" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#7C3AED" />
-      <stop offset="100%" stop-color="#5B21B6" />
+      <stop offset="0%" stop-color="#0891B2" />
+      <stop offset="100%" stop-color="#0E7490" />
     </linearGradient>
     <linearGradient id="left3" x1="0%" y1="100%" x2="0%" y2="0%">
-      <stop offset="0%" stop-color="#5B21B6" />
-      <stop offset="100%" stop-color="#4C1D95" />
+      <stop offset="0%" stop-color="#0E7490" />
+      <stop offset="100%" stop-color="#164E63" />
     </linearGradient>
     <linearGradient id="left4" x1="100%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" stop-color="#7C3AED" />
-      <stop offset="100%" stop-color="#4C1D95" />
+      <stop offset="0%" stop-color="#0891B2" />
+      <stop offset="100%" stop-color="#164E63" />
     </linearGradient>
 
     <linearGradient id="right1" x1="100%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" stop-color="#7C3AED" />
-      <stop offset="100%" stop-color="#4C1D95" />
+      <stop offset="0%" stop-color="#0891B2" />
+      <stop offset="100%" stop-color="#164E63" />
     </linearGradient>
     <linearGradient id="right2" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" stop-color="#5B21B6" />
-      <stop offset="100%" stop-color="#3B0764" />
+      <stop offset="0%" stop-color="#0E7490" />
+      <stop offset="100%" stop-color="#083344" />
     </linearGradient>
     <linearGradient id="right3" x1="100%" y1="100%" x2="0%" y2="0%">
-      <stop offset="0%" stop-color="#3B0764" />
-      <stop offset="100%" stop-color="#1E1B4B" />
+      <stop offset="0%" stop-color="#083344" />
+      <stop offset="100%" stop-color="#04151C" />
     </linearGradient>
     <linearGradient id="right4" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#4C1D95" />
-      <stop offset="100%" stop-color="#1E1B4B" />
+      <stop offset="0%" stop-color="#164E63" />
+      <stop offset="100%" stop-color="#04151C" />
     </linearGradient>
   </defs>
 
-  <!-- B. Khối Lập Phương Obsidian Purple (Nền Trong Suốt) -->
+  <!-- B. Khối Lập Phương Neon Cyan (Nền Trong Suốt) -->
   <g>
     <!-- MẶT TRÊN -->
-    <polygon points="250,21 58,138 250,138" fill="url(#top1)" />
-    <polygon points="250,21 442,138 250,138" fill="url(#top2)" />
+    <polygon points="250,26 58,138 250,138" fill="url(#top1)" />
+    <polygon points="250,26 442,138 250,138" fill="url(#top2)" />
     <polygon points="442,138 250,250 250,138" fill="url(#top3)" />
     <polygon points="58,138 250,250 250,138" fill="url(#top4)" />
 
@@ -74,14 +74,14 @@
     <polygon points="250,250 250,474 346,306" fill="url(#right4)" />
 
     <!-- HIGHLIGHTS ĐÓN SÁNG -->
-    <line x1="250" y1="29" x2="250" y2="138" stroke="#FFFFFF" stroke-width="1.5" stroke-linecap="round" opacity="0.65" />
-    <line x1="61" y1="138" x2="250" y2="138" stroke="#FFFFFF" stroke-width="1.2" stroke-linecap="round" opacity="0.4" />
-    <line x1="61" y1="143.25" x2="154" y2="306" stroke="#FFFFFF" stroke-width="1.2" stroke-linecap="round" opacity="0.4" />
-    <line x1="250" y1="250" x2="154" y2="306" stroke="#FFFFFF" stroke-width="1.2" stroke-linecap="round" opacity="0.45" />
+    <line x1="250" y1="29" x2="250" y2="138" stroke="#ECFEFF" stroke-width="1.5" stroke-linecap="round" opacity="0.65" />
+    <line x1="61" y1="138" x2="250" y2="138" stroke="#ECFEFF" stroke-width="1.2" stroke-linecap="round" opacity="0.4" />
+    <line x1="61" y1="143.25" x2="154" y2="306" stroke="#ECFEFF" stroke-width="1.2" stroke-linecap="round" opacity="0.4" />
+    <line x1="250" y1="250" x2="154" y2="306" stroke="#ECFEFF" stroke-width="1.2" stroke-linecap="round" opacity="0.45" />
 
     <!-- SHADOW LINES KHUẤT SÁNG -->
-    <line x1="439" y1="143.25" x2="346" y2="306" stroke="#120224" stroke-width="1.2" stroke-linecap="round" opacity="0.5" />
-    <line x1="250" y1="250" x2="346" y2="306" stroke="#120224" stroke-width="1.2" stroke-linecap="round" opacity="0.5" />
-    <line x1="439" y1="138" x2="250" y2="138" stroke="#4C1D95" stroke-width="1.2" stroke-linecap="round" opacity="0.25" />
+    <line x1="439" y1="143.25" x2="346" y2="306" stroke="#03202E" stroke-width="1.2" stroke-linecap="round" opacity="0.5" />
+    <line x1="250" y1="250" x2="346" y2="306" stroke="#03202E" stroke-width="1.2" stroke-linecap="round" opacity="0.5" />
+    <line x1="439" y1="138" x2="250" y2="138" stroke="#164E63" stroke-width="1.2" stroke-linecap="round" opacity="0.25" />
   </g>
 </svg>
