@@ -53,7 +53,10 @@
     </linearGradient>
   </defs>
 
-  <!-- B. Khối Lập Phương Sapphire Blue (Nền Trong Suốt) -->
+  <!-- Nền tối Charcoal chuẩn Obsidian (#171717) -->
+  <rect width="500" height="500" rx="100" fill="#171717" />
+
+  <!-- B. Khối Lập Phương Sapphire Blue -->
   <g>
     <!-- MẶT TRÊN -->
     <polygon points="250,26 58,138 250,138" fill="url(#top1)" />

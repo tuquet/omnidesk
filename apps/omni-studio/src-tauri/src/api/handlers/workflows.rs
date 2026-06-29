@@ -12,10 +12,17 @@ use crate::services::workflow_service::WorkflowService;
 pub fn router() -> Router<AppState> {
     Router::new()
         .route("/", get(list_workflows).post(create_workflow))
+        .route("/shared", get(get_empty_list))
+        .route("/hosted", get(get_empty_list))
+        .route("/backup", get(get_empty_list))
         .route("/:id", get(get_workflow).put(update_workflow).delete(delete_workflow))
         .route("/runs", post(create_workflow_run))
         .route("/:id/runs", get(get_workflow_runs))
         .route("/runs/:run_id/logs", get(get_run_logs))
+}
+
+async fn get_empty_list() -> Result<Json<Vec<serde_json::Value>>, AppError> {
+    Ok(Json(vec![]))
 }
 
 // ─── Workflow CRUD ───────────────────────────────────────────
@@ -99,9 +106,10 @@ async fn create_workflow(
 async fn update_workflow(
     State(state): State<AppState>,
     Path(id): Path<String>,
-    Json(workflow): Json<Workflow>,
+    Json(mut workflow): Json<Workflow>,
 ) -> Result<Json<Workflow>, AppError> {
-    let updated = WorkflowService::update(&state.db, &id, &workflow).await?;
+    workflow.id = id;
+    let updated = WorkflowService::upsert(&state.db, &workflow).await?;
     Ok(Json(updated))
 }
 

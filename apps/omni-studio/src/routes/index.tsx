@@ -54,7 +54,10 @@ function WorkflowsPage() {
       await client.request({
         url: '/api/automa/workflows/sync/local',
         method: 'POST',
-        data: { folder_path: selectedWorkspacePath },
+        body: { folder_path: selectedWorkspacePath },
+        headers: {
+          'Content-Type': 'application/json'
+        }
       });
 
       // Then fetch from SQLite

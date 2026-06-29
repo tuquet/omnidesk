@@ -82,6 +82,8 @@ pub async fn serve(pool: SqlitePool, app_dir: PathBuf, port: u16, app_handle: Ap
         .route("/updates/latest.json", get(latest_update))
         // Workflow App: workflow CRUD + sync endpoints
         .nest("/api/automa/workflows", handlers::workflows::router())
+        .nest("/api/workflows", handlers::workflows::router()) // Alias for Automa Extension
+        .nest("/api/me/workflows", handlers::workflows::router()) // Alias for Automa Extension's /me/workflows
         .nest("/api/automa/workflows/sync", handlers::sync::router())
         .nest("/api/git", handlers::git::router())
         .route("/api/automa/ws/sync", get(handlers::sync_ws::ws_sync_handler))
@@ -107,13 +109,23 @@ async fn health_check() -> impl IntoResponse {
 async fn ping() -> &'static str { "pong" }
 
 #[utoipa::path(get, path = "/api/me", responses((status = 200, description = "User info")))]
-async fn me(claims: Claims) -> impl IntoResponse {
-    Json(serde_json::json!({
-        "user_id": claims.user_id(),
-        "email": claims.email,
-        "is_admin": claims.is_admin(),
-        "role": claims.role,
-    }))
+async fn me(claims: Option<Claims>) -> impl IntoResponse {
+    if let Some(claims) = claims {
+        Json(serde_json::json!({
+            "user_id": claims.user_id(),
+            "email": claims.email,
+            "is_admin": claims.is_admin(),
+            "role": claims.role,
+        })).into_response()
+    } else {
+        // Dummy local user for Automa Extension so it bypasses auth
+        Json(serde_json::json!({
+            "user_id": "local-studio-user",
+            "email": "local@omnidesk.app",
+            "is_admin": true,
+            "role": "ADMIN",
+        })).into_response()
+    }
 }
 
 #[utoipa::path(
