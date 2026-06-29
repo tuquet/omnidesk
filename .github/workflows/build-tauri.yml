@@ -61,6 +61,12 @@ jobs:
         with:
           targets: ${{ matrix.os == 'ubuntu-latest' && 'x86_64-unknown-linux-gnu' || 'x86_64-pc-windows-msvc' }}
 
+      - name: Force default host target by removing local GNU config
+        if: steps.check_tauri.outputs.is_tauri == 'true'
+        run: rm -f apps/${{ steps.extract.outputs.app }}/src-tauri/.cargo/config.toml
+        shell: bash
+
+
       - name: Rust cache
         if: steps.check_tauri.outputs.is_tauri == 'true'
         uses: swatinem/rust-cache@v2
