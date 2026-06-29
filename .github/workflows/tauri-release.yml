@@ -2,6 +2,8 @@ name: 'Tauri Release'
 
 on:
   push:
+    branches:
+      - main
     tags:
       - 'v*'
   workflow_dispatch:
@@ -14,6 +16,7 @@ jobs:
       fail-fast: false
       matrix:
         platform: [macos-latest, ubuntu-22.04, windows-latest]
+        app: [omni-engine, omni-profile, omni-studio]
     runs-on: ${{ matrix.platform }}
     env:
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
@@ -36,7 +39,7 @@ jobs:
         uses: dtolnay/rust-toolchain@stable
 
       - name: Force default host target by removing local GNU config
-        run: rm -f apps/omni-engine/src-tauri/.cargo/config.toml
+        run: rm -f apps/${{ matrix.app }}/src-tauri/.cargo/config.toml
         shell: bash
 
       - name: Install dependencies (Ubuntu only)
@@ -53,7 +56,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          projectPath: './apps/omni-engine'
+          projectPath: './apps/${{ matrix.app }}'
           tauriScript: 'pnpm tauri'
           tagName: v__VERSION__
           releaseName: 'OmniDesk v__VERSION__'

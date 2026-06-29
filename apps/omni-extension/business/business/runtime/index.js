@@ -24,7 +24,7 @@ let profileId = null;
 let currentRunId = null;
 
 // The WorkflowEngine injected by the background script
-let engineRef = null;
+const engineRef = null;
 
 export default function (context, message) {
   if (context !== 'background') return;
@@ -33,7 +33,10 @@ export default function (context, message) {
 
   // 1. Listen for the Init Tab (Runtime App spawns Browser with this URL)
   browser.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
-    if (changeInfo.url && changeInfo.url.includes(`localhost:${RUNTIME_APP_PORT}/init?profile_id=`)) {
+    if (
+      changeInfo.url &&
+      changeInfo.url.includes(`localhost:${RUNTIME_APP_PORT}/init?profile_id=`)
+    ) {
       const url = new URL(changeInfo.url);
       profileId = url.searchParams.get('profile_id');
       console.log(`[RuntimeBridge] Captured profile_id: ${profileId}`);
@@ -50,7 +53,11 @@ export default function (context, message) {
   if (typeof chrome !== 'undefined' && chrome.alarms) {
     chrome.alarms.create('runtime-keepalive', { periodInMinutes: 0.5 });
     chrome.alarms.onAlarm.addListener((alarm) => {
-      if (alarm.name === 'runtime-keepalive' && ws && ws.readyState === WebSocket.OPEN) {
+      if (
+        alarm.name === 'runtime-keepalive' &&
+        ws &&
+        ws.readyState === WebSocket.OPEN
+      ) {
         ws.send(JSON.stringify({ event_type: 'ping', payload: {} }));
       }
     });
@@ -65,7 +72,7 @@ export default function (context, message) {
       sendToRuntime('block_started', {
         run_id: currentRunId,
         block_id: e.detail.blockId,
-        label: e.detail.label
+        label: e.detail.label,
       });
     });
 
@@ -75,7 +82,7 @@ export default function (context, message) {
         run_id: currentRunId,
         block_id: e.detail.blockId,
         duration_ms: e.detail.durationMs,
-        data: e.detail.data || null
+        data: e.detail.data || null,
       });
     });
 
@@ -84,7 +91,7 @@ export default function (context, message) {
       sendToRuntime('workflow_finished', {
         run_id: currentRunId,
         status: e.detail.status,
-        error: e.detail.error
+        error: e.detail.error,
       });
       currentRunId = null;
     });
@@ -92,7 +99,11 @@ export default function (context, message) {
 }
 
 function connectToRuntime() {
-  if (ws && (ws.readyState === WebSocket.CONNECTING || ws.readyState === WebSocket.OPEN)) return;
+  if (
+    ws &&
+    (ws.readyState === WebSocket.CONNECTING || ws.readyState === WebSocket.OPEN)
+  )
+    return;
 
   try {
     ws = new WebSocket(RUNTIME_WS_URL);
@@ -125,26 +136,30 @@ function connectToRuntime() {
 
 function sendToRuntime(eventType, payload) {
   if (ws && ws.readyState === WebSocket.OPEN) {
-    ws.send(JSON.stringify({
-      event_type: eventType,
-      payload
-    }));
+    ws.send(
+      JSON.stringify({
+        event_type: eventType,
+        payload,
+      })
+    );
   }
 }
 
 function handleExecuteWorkflow(payload) {
   const { run_id, workflow } = payload;
   currentRunId = run_id;
-  console.log(`[RuntimeBridge] Executing workflow: ${workflow.name} (Run ID: ${run_id})`);
+  console.log(
+    `[RuntimeBridge] Executing workflow: ${workflow.name} (Run ID: ${run_id})`
+  );
 
   // TODO: Trigger WorkflowEngine here
   // In Automa, workflows are usually triggered via BackgroundWorkflowTriggers
   // or by creating a new execution context.
-  
+
   // Emit event to background script to actually run it
   if (typeof window !== 'undefined') {
     const event = new CustomEvent('automa:execute-remote', {
-      detail: { workflow, run_id }
+      detail: { workflow, run_id },
     });
     window.dispatchEvent(event);
   }

@@ -30,7 +30,10 @@ let pendingHttpWorkflows = {};
 // ──────────────────────────────────────────────
 
 function connectWebSocket() {
-  if (ws && (ws.readyState === WebSocket.CONNECTING || ws.readyState === WebSocket.OPEN)) {
+  if (
+    ws &&
+    (ws.readyState === WebSocket.CONNECTING || ws.readyState === WebSocket.OPEN)
+  ) {
     return; // Already connected or connecting
   }
 
@@ -106,14 +109,21 @@ async function handleSyncEvent(syncEvent) {
           console.log(`[SyncBridge] ← New workflow: ${wf.name} (${wf.id})`);
         } else {
           // Conflict resolution: compare updatedAt, newer wins
-          const serverTime = wf.updated_at ? new Date(wf.updated_at).getTime() : 0;
+          const serverTime = wf.updated_at
+            ? new Date(wf.updated_at).getTime()
+            : 0;
           const localTime = existing.updatedAt || 0;
 
           if (serverTime > localTime) {
             // Server is newer — update local
-            currentWorkflows[wf.id] = mergeWorkflow(existing, serverToExtension(wf));
+            currentWorkflows[wf.id] = mergeWorkflow(
+              existing,
+              serverToExtension(wf)
+            );
             changed = true;
-            console.log(`[SyncBridge] ← Updated workflow: ${wf.name} (server newer)`);
+            console.log(
+              `[SyncBridge] ← Updated workflow: ${wf.name} (server newer)`
+            );
           }
         }
       }
@@ -126,7 +136,9 @@ async function handleSyncEvent(syncEvent) {
       }
 
       if (event_type === 'full_sync') {
-        console.log(`[SyncBridge] Full sync complete: ${payload.length} workflows`);
+        console.log(
+          `[SyncBridge] Full sync complete: ${payload.length} workflows`
+        );
       }
       break;
     }
@@ -135,7 +147,9 @@ async function handleSyncEvent(syncEvent) {
       const { id, source } = payload;
       if (source === 'file_watcher') {
         // Soft delete from OneDrive — notify but don't auto-delete from Extension
-        console.warn(`[SyncBridge] Workflow ${id} was removed from OneDrive (soft-deleted in WFA)`);
+        console.warn(
+          `[SyncBridge] Workflow ${id} was removed from OneDrive (soft-deleted in WFA)`
+        );
         // Could show a notification to user here
       }
       break;
@@ -225,7 +239,9 @@ function pushViaWs(workflows) {
       payload: Object.values(workflows).map(extensionToServer),
     };
     ws.send(JSON.stringify(msg));
-    console.log(`[SyncBridge] → Pushed ${Object.keys(workflows).length} workflows via WS`);
+    console.log(
+      `[SyncBridge] → Pushed ${Object.keys(workflows).length} workflows via WS`
+    );
     return true;
   }
   return false;
@@ -276,7 +292,9 @@ function schedulePush(workflows) {
 
 function setupKeepalive() {
   if (typeof chrome !== 'undefined' && chrome.alarms) {
-    chrome.alarms.create('sync-keepalive', { periodInMinutes: KEEPALIVE_INTERVAL / 60 });
+    chrome.alarms.create('sync-keepalive', {
+      periodInMinutes: KEEPALIVE_INTERVAL / 60,
+    });
     chrome.alarms.onAlarm.addListener((alarm) => {
       if (alarm.name === 'sync-keepalive') {
         // Re-establish WS if disconnected
@@ -324,7 +342,11 @@ export default function (context, message) {
   // 4. Initial full sync on startup
   browser.storage.local.get('workflows').then((result) => {
     if (result.workflows && Object.keys(result.workflows).length > 0) {
-      console.log(`[SyncBridge] Startup: ${Object.keys(result.workflows).length} workflows`);
+      console.log(
+        `[SyncBridge] Startup: ${
+          Object.keys(result.workflows).length
+        } workflows`
+      );
       // Don't push immediately — wait for WS connection to send via WS
       setTimeout(() => schedulePush(result.workflows), 3000);
     }
