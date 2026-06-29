@@ -37,7 +37,7 @@ module.exports = {
     'no-await-in-loop': 'off',
     'no-alert': 'off',
     'import/no-import-module-exports': 'off',
-    'no-console': ['warn', { allow: ['warn', 'error'] }],
+    'no-console': 'off',
     'no-underscore-dangle': 'off',
     'func-names': 'off',
     'vue/v-on-event-hyphenation': 'off',
