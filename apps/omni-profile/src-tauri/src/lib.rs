@@ -168,6 +168,13 @@ pub fn run() {
             browser_profiles::update_browser_profile,
             browser_profiles::delete_browser_profile,
             browser_profiles::launch_browser_profile,
+            omni_tauri_core::system::open_app_folder,
+            omni_tauri_core::system::get_app_version,
+            omni_tauri_core::window::toggle_always_on_top,
+            omni_tauri_core::window::flash_taskbar,
+            omni_tauri_core::hardware::get_hardware_usage,
+            omni_tauri_core::network::check_real_network,
+            omni_tauri_core::fs::reveal_in_explorer
         ])
         .run(tauri::generate_context!())
         .expect("error while running OmniDesk");

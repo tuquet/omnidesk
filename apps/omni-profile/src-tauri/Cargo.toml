@@ -15,6 +15,7 @@ tauri-build = { version = "2", features = [] }
 
 [dependencies]
 tauri = { version = "2", features = ["protocol-asset", "macos-private-api", "tray-icon"] }
+omni-tauri-core = { path = "../../../packages-rs/omni-tauri-core" }
 tauri-plugin-single-instance = { version = "2", features = ["deep-link"] }
 tauri-plugin-opener = "2"
 tauri-plugin-store = "2"
