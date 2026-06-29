@@ -1,73 +1,77 @@
-# Hướng Dẫn Sử Dụng Tính Năng Auto-Updater
+# Tài Liệu Đặc Tả Tính Năng Auto-Updater (PO Perspective)
 
-Tài liệu này hướng dẫn bạn cách thức hoạt động của hệ thống **Tauri Auto-Updater** và cách dùng thử (test) giao diện cập nhật ngay trên môi trường Local Development (Dev Server) mà không cần phải thực sự tạo Release trên GitHub.
+**Dự án:** OmniDesk Ecosystem (Monorepo)
+**Vai trò tài liệu:** Product Owner (PO) / Quản lý Sản phẩm
 
----
+Tính năng Tự động Cập nhật (Auto-Updater) không chỉ đơn thuần là một công cụ tải file, mà là **trái tim của trải nghiệm người dùng xuyên suốt (Seamless UX)**. Đối với một hệ sinh thái sản phẩm B2B doanh nghiệp lớn như OmniDesk—nơi chúng ta đóng gói nhiều ứng dụng độc lập (Omni Engine, Omni Studio, Omni Profile) vào cùng một Monorepo—việc nâng cấp kiến trúc cập nhật đòi hỏi sự tinh tế để đảm bảo tính mở rộng, tính bảo mật và giảm thiểu ma sát cho khách hàng.
 
-## 1. Cơ Chế Hoạt Động Của Updater
-
-### Flow trên Môi Trường Thực Tế (Production)
-1. GitHub Actions (CI/CD) tự động biên dịch App, ký số (sign) file `.zip` bằng Private Key (`TAURI_PRIVATE_KEY`).
-2. Tự động sinh ra file `latest.json` (chứa phiên bản mới nhất, chữ ký và URL tải file) đính kèm vào mục **GitHub Releases**.
-3. Người dùng mở app -> App tải file `latest.json` từ GitHub.
-4. Nếu phiên bản trên `latest.json` **lớn hơn** phiên bản hiện tại, App hiện bảng thông báo (UI Popup).
-5. Người dùng bấm "Cập nhật" -> App tự động tải file zip, giải mã, cài đè lên phiên bản cũ và khởi động lại (`relaunch()`).
-
-### Flow trên Môi Trường Local (Mock Server)
-Mỗi App (`omni-engine`, `omni-studio`, `omni-profile`) đều được cấu hình 2 endpoint (URL) cập nhật trong file `tauri.conf.json`:
-1. Môi trường Dev (Ví dụ: `http://127.0.0.1:1423/updates/latest.json`)
-2. Môi trường Prod (Ví dụ: `https://github.com/.../latest.json`)
-
-Khi chạy môi trường Dev, thay vì chờ đợi tải file từ GitHub, Backend Rust sẽ tự động kích hoạt một **API Giả Lập** trả về version luôn là `0.1.1` (luôn lớn hơn phiên bản bạn đang dev). Nhờ đó bảng thông báo Update sẽ xuất hiện **ngay lập tức**!
+Dưới đây là bức tranh toàn cảnh về cách chúng ta đã thiết kế và triển khai hệ thống này.
 
 ---
 
-## 2. Hướng Dẫn "Chơi" Với Auto Updater Ở Local
+## 1. Tầm Nhìn & Vấn Đề (The "Why")
 
-Bạn có thể chỉnh sửa giao diện của bảng Update tuỳ ý và test nó ngay lập tức.
+### Nỗi Đau Của Kiến Trúc Monorepo Cũ
 
-### Bước 1: Mở Server 
-Truy cập vào ứng dụng bạn muốn test, ví dụ:
-```bash
-# Chọn 1 trong 3 ứng dụng
-pnpm --filter @omnidesk/omni-engine dev
-# HOẶC
-pnpm --filter @omnidesk/omni-studio dev
-```
+Khi chúng ta gộp nhiều ứng dụng vào một GitHub Repository duy nhất, GitHub chỉ lưu trữ một trạng thái `latest` (Mới nhất) cho toàn bộ Repo.
+Nếu chúng ta dùng giải pháp mặc định của Tauri trỏ thẳng về GitHub (`/releases/latest`), một lỗi chí mạng về mặt sản phẩm sẽ xảy ra: **Khách hàng đang dùng Omni Engine nhưng lại bị tải nhầm bản cập nhật của Omni Profile** (do Omni Profile vừa được release sau cùng). Điều này phá hủy hoàn toàn trải nghiệm khách hàng và tính toàn vẹn của sản phẩm.
 
-### Bước 2: Tận hưởng kết quả
-App sẽ khởi động lên. Khoảng 3 giây sau, **Mock Server** ở backend sẽ đánh lừa Frontend rằng có bản cập nhật `0.1.1`. Một cửa sổ thông báo Update đẹp mắt sẽ trượt từ dưới lên ở góc phải màn hình!
+### Tầm Nhìn Sản Phẩm
 
-### Bước 3: Tuỳ biến Giao diện Update (UI/UX)
-Bảng thông báo Update là một React Component hoàn toàn có thể tái sử dụng.
-- File mã nguồn: `packages/features/src/updater/AutoUpdater.tsx`
-- Công nghệ: React, TailwindCSS, Lucide Icons, `@tauri-apps/plugin-updater`.
+Chúng ta cần một "Người phân luồng giao thông" (Traffic Router) thông minh, đứng giữa người dùng và kho lưu trữ. Hệ thống này phải:
 
-Bạn có thể sửa màu sắc, thêm hiệu ứng pháo hoa, đổi layout thoả thích ở file `AutoUpdater.tsx`. Ngay khi bạn lưu file (Ctrl+S), Vite HMR sẽ hot-reload và bảng thông báo sẽ tự động làm mới giao diện ngay trong app Tauri.
+1. **Hoàn toàn ẩn danh với người dùng:** Không yêu cầu người dùng phải tự chọn file tải về.
+2. **Định tuyến chính xác 100%:** App nào hỏi thì trả về đúng file cập nhật của app đó.
+3. **Mượt mà trong khâu phát triển:** Lập trình viên phải có môi trường test UI/UX cập nhật nhanh chóng mà không cần đợi quy trình Build & Release mất hàng chục phút.
 
 ---
 
-## 3. Câu Hỏi Thường Gặp (FAQ)
+## 2. Giải Pháp Kiến Trúc (The "How")
 
-**Q: Tại sao tôi bấm nút "Cập nhật và Khởi động lại" trên môi trường Dev lại báo lỗi?**
-> A: Hoàn toàn bình thường! Vì đây là môi trường giả lập (Mock Server), đường link tải file `.zip` là link ảo (`http://127.0.0.1:1424/downloads/update.zip`). Do đó app không tải được file zip. Mục đích của Mock Server chỉ là để test **Hiển thị Giao Diện (UI)**. Để test luồng tải xuống thực tế, bạn cần build app thật.
+Để hiện thực hóa tầm nhìn trên, chúng ta đã thiết kế hệ thống bao gồm 2 thành phần lõi:
 
-**Q: Làm sao để thay đổi nội dung Changelog (Ghi chú phiên bản) lúc hiển thị ở local?**
-> A: Bạn mở file `src-tauri/src/api/mod.rs` của từng app tương ứng, tìm đến hàm `latest_update()` và sửa nội dung `"notes": "Test update from Dev Server"`. Bảng thông báo sẽ hiển thị y hệt những gì bạn viết!
+### A. Môi Trường Thực Tế (Production): Supabase Edge Function Router
 
-**Q: Private Key và Public Key được cấu hình ra sao?**
-> A: Public key đã được lưu sẵn trong `tauri.conf.json` ở trường `"pubkey"`. Còn Private Key bắt buộc chỉ được lưu ở **GitHub Secrets** (tab Actions) với biến tên `TAURI_PRIVATE_KEY`. Tuyệt đối không lưu Private Key vào trong mã nguồn.
+Thay vì trỏ trực tiếp về GitHub, tất cả các app của OmniDesk đều trỏ về một **Update Server** tập trung được xây dựng trên **Supabase Edge Functions** (`tauri-updater`).
 
-**Q: Làm sao 1 repository (Monorepo) tạo ra nhiều file `.exe` cho nhiều app, mà lúc bật từng app lên nó lại biết chính xác cần download file `.exe` của app nào?**
-> A: Đây là một câu hỏi về kiến trúc rất hay!
-> Nếu dùng link `/releases/latest/...` mặc định của GitHub thì sẽ bị lỗi "App A tải nhầm App B" (vì GitHub chỉ tính 1 bản release được tạo gần nhất là "latest" chung cho cả Repo).
-> Do đó, trong môi trường thật (Production), endpoint ở `tauri.conf.json` sẽ không trỏ thẳng vào GitHub, mà sẽ trỏ vào một **Update Server** (VD: Supabase Edge Functions, Cloudflare Worker hoặc API Gateway).
-> 
-> Cơ chế phân luồng diễn ra tự động như sau:
-> 1. Khi bạn mở app **Omni Engine**, Tauri Updater sẽ gửi request lên Update Server. Trong request này, Tauri đã tự động nhúng header `User-Agent` chứa định danh của app (VD: `omni-engine/0.1.0 (windows/x86_64)`).
-> 2. **Update Server** đọc header `User-Agent`, ngay lập tức biết được request này đến từ app `omni-engine` và hệ điều hành `windows`.
-> 3. Update Server sẽ dùng API của GitHub để tìm đúng Tag release gần nhất có tiền tố `@omnidesk/omni-engine@...`, rồi trả về nội dung file `latest.json` của riêng app đó.
-> 
-> Nhờ cơ chế **"Định tuyến thông minh bằng User-Agent"** này, dù bạn có 100 app chung 1 repository và dùng chung 1 đường link API cập nhật, chúng sẽ không bao giờ tải nhầm file cài đặt của nhau!
+**Luồng hoạt động (Mượt mà & Tự động):**
 
-Chúc bạn code UI Updater thật ngầu! 🚀
+1. **Nhận diện danh tính:** Khi khách hàng mở app, app sẽ ngầm gửi một tín hiệu (Request) lên Update Server kèm theo "Căn cước công dân" (`User-Agent`, ví dụ: `omni-engine/0.1.0 (windows/x86_64)`).
+2. **Sàng lọc dữ liệu:** Update Server (đóng vai trò người phân luồng) đọc được tên App, lập tức gọi API của GitHub để tìm đúng Tag phiên bản gần nhất dành riêng cho app đó (ví dụ `@omnidesk/omni-engine@0.1.0`).
+3. **Quyết định thông minh:**
+   - Nếu phiên bản trên Cloud lớn hơn máy khách hàng: Trả về link tải an toàn, App sẽ hiển thị Popup siêu đẹp mắt.
+   - Nếu đã là bản mới nhất: Server âm thầm trả về `204 No Content`, người dùng tiếp tục làm việc mà không hề bị làm phiền.
+
+### B. Môi Trường Phát Triển (Local Dev): Mock Server API
+
+Đối với đội ngũ UI/UX và Developer, chúng ta không thể chờ 20 phút CI/CD chỉ để test một dòng CSS trên cái bảng thông báo Update.
+Do đó, chúng ta đã tích hợp sẵn một **Mock Server** (API Giả lập) trực tiếp vào thư mục Rust (`src-tauri/src/api/mod.rs`) của từng app.
+
+- Khi dev chạy app ở Local (VD: `pnpm dev`), app sẽ ưu tiên gọi API giả lập ở `localhost:142X`.
+- API này luôn "nói dối" rằng có bản cập nhật `0.1.1` mới nhất.
+- Ngay lập tức, bảng UI thông báo cập nhật sẽ hiện ra. Lập trình viên có thể tha hồ tùy biến CSS, layout v.v. với tính năng Hot-Reload (Vite HMR) ngay lập tức mà không cần kết nối Internet.
+
+---
+
+## 3. Quy Trình Vận Hành Dành Cho Đội Ngũ (Team Workflow)
+
+### Dành Cho Lập Trình Viên (Dev / UI / UX)
+
+- **Để thiết kế giao diện:** Sửa file `packages/features/src/updater/AutoUpdater.tsx`.
+- **Để test giao diện:** Chạy `pnpm --filter @omnidesk/omni-engine dev` (hoặc studio, profile). Bảng update sẽ hiện ra sau 3 giây.
+- **Để sửa nội dung Changelog lúc test:** Mở `src-tauri/src/api/mod.rs` của app tương ứng và sửa chuỗi JSON trong hàm `latest_update()`.
+
+### Dành Cho DevOps / Quản Lý Hệ Thống
+
+- **Quản lý Private Key:** File `updater.key` CHỈ được cấp phát 1 lần và cấu hình vào mục **Secrets** trên GitHub Actions (`TAURI_PRIVATE_KEY`). Tuyệt đối không lưu vào mã nguồn.
+- **Cập nhật Edge Function:** Khi có sửa đổi logic trên Update Server (file `index.ts`), kỹ sư chỉ cần chạy 1 lệnh duy nhất để đưa lên Cloud:
+  ```bash
+  supabase functions deploy tauri-updater --no-verify-jwt
+  ```
+  _(Lưu ý: Flag `--no-verify-jwt` cực kỳ quan trọng để mở quyền truy cập Public, vì khách hàng khi mở app chưa hề đăng nhập tài khoản)_.
+
+---
+
+## 4. Tổng Kết
+
+Với kiến trúc **Supabase Edge Function Router** kết hợp **Mock Server Local**, chúng ta đã giải quyết triệt để rào cản chí mạng của Monorepo. Đội ngũ giờ đây có thể scale hệ thống lên hàng chục app khác nhau mà vẫn đảm bảo tính độc lập tuyệt đối khi Release, đồng thời mang lại một trải nghiệm cập nhật hoàn toàn "vô hình" (invisible), an toàn và mượt mà cho khách hàng B2B của chúng ta. 🚀
