@@ -53,6 +53,7 @@ module.exports = {
     'import/extensions': 'off',
     'import/no-unresolved': 'off',
     'no-use-before-define': 'off',
+    'no-unused-vars': 'off',
     // disallow reassignment of function parameters
     // disallow parameter object manipulation except for specific exclusions
     'no-param-reassign': 'off',
