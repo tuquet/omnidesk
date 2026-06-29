@@ -2,7 +2,7 @@ import { createFileRoute } from '@tanstack/react-router';
 import { PageContainer, PageHeader, PageTitle, Button, RunWorkflowModal } from '@omnidesk/ui';
 import { useState, useEffect } from 'react';
 import { useBrowserProfileStore, type BrowserProfile } from '@omnidesk/browser-profiles';
-import { XCircleIcon, LayoutGrid } from 'lucide-react';
+import { LayoutGrid } from 'lucide-react';
 import { toast } from 'sonner';
 import { ProfileFormDialog } from '../components/profile-form-dialog';
 import { useBrowserEvents } from '../hooks/use-browser-events';

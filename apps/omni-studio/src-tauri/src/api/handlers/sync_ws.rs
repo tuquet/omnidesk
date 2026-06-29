@@ -127,8 +127,8 @@ async fn handle_extension_message(
 ) {
     match msg.msg_type.as_str() {
         "push_workflows" => {
-            if profile_id.is_some() {
-                println!("[SyncWS] Ignoring push_workflows from worker profile {}", profile_id.unwrap());
+            if let Some(pid) = profile_id {
+                println!("[SyncWS] Ignoring push_workflows from worker profile {}", pid);
                 return;
             }
 

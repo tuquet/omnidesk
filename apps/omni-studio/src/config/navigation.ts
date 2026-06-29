@@ -1,12 +1,6 @@
 import type { LucideIcon } from 'lucide-react';
 import type { Permission } from './rbac';
-import {
-  WorkflowIcon,
-  ActivityIcon,
-  CalendarClockIcon,
-  SettingsIcon,
-  StoreIcon,
-} from 'lucide-react';
+import { WorkflowIcon, StoreIcon } from 'lucide-react';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -43,9 +37,7 @@ export interface DocumentItem {
 
 // ─── Navigation Groups ──────────────────────────────────────────────────────
 
-export const NAV_MAIN: NavItem[] = [
-  { title: 'Workflows Sync', url: '/', icon: WorkflowIcon },
-];
+export const NAV_MAIN: NavItem[] = [{ title: 'Workflows Sync', url: '/', icon: WorkflowIcon }];
 
 export const NAV_SHOWCASE: NavGroup = {
   label: '',

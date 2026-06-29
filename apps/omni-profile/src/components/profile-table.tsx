@@ -1,4 +1,4 @@
-import { useRef, useMemo } from 'react';
+import { useRef, useMemo, useCallback } from 'react';
 import {
   Table,
   TableBody,
@@ -64,15 +64,18 @@ export function ProfileTable({
   sortOrder,
   onSortChange,
 }: ProfileTableProps) {
-  const renderSortIcon = (column: string) => {
-    if (sortBy !== column)
-      return <ArrowUpDownIcon className="ml-1 h-3 w-3 opacity-30 inline-block" />;
-    return sortOrder === 'asc' ? (
-      <ArrowUpIcon className="ml-1 h-3 w-3 inline-block" />
-    ) : (
-      <ArrowDownIcon className="ml-1 h-3 w-3 inline-block" />
-    );
-  };
+  const renderSortIcon = useCallback(
+    (column: string) => {
+      if (sortBy !== column)
+        return <ArrowUpDownIcon className="ml-1 h-3 w-3 opacity-30 inline-block" />;
+      return sortOrder === 'asc' ? (
+        <ArrowUpIcon className="ml-1 h-3 w-3 inline-block" />
+      ) : (
+        <ArrowDownIcon className="ml-1 h-3 w-3 inline-block" />
+      );
+    },
+    [sortBy, sortOrder],
+  );
 
   const columns = useMemo(
     () => [
@@ -259,7 +262,7 @@ export function ProfileTable({
         enableResizing: false,
       }),
     ],
-    [sortBy, sortOrder, onLaunch, onStop, onEdit, onDelete, onRunWorkflow, renderSortIcon],
+    [onLaunch, onStop, onEdit, onDelete, onRunWorkflow, renderSortIcon],
   );
 
   const table = useReactTable({

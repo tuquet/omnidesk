@@ -1,4 +1,4 @@
-import { useRef, useMemo } from 'react';
+import { useRef, useMemo, useCallback } from 'react';
 import {
   Table,
   TableBody,
@@ -29,6 +29,8 @@ import {
   getCoreRowModel,
   flexRender,
   createColumnHelper,
+  type Updater,
+  type RowSelectionState,
 } from '@tanstack/react-table';
 import { useVirtualizer } from '@tanstack/react-virtual';
 
@@ -50,7 +52,7 @@ interface WorkflowsTableProps {
   sortOrder?: 'asc' | 'desc';
   onSortChange?: (column: string) => void;
   rowSelection?: Record<string, boolean>;
-  onRowSelectionChange?: (updater: any) => void;
+  onRowSelectionChange?: (updater: Updater<RowSelectionState>) => void;
 }
 
 const columnHelper = createColumnHelper<Workflow>();
@@ -67,15 +69,18 @@ export function WorkflowsTable({
   rowSelection = {},
   onRowSelectionChange,
 }: WorkflowsTableProps) {
-  const renderSortIcon = (column: string) => {
-    if (sortBy !== column)
-      return <ArrowUpDownIcon className="ml-1 h-3 w-3 opacity-30 inline-block" />;
-    return sortOrder === 'asc' ? (
-      <ArrowUpIcon className="ml-1 h-3 w-3 inline-block" />
-    ) : (
-      <ArrowDownIcon className="ml-1 h-3 w-3 inline-block" />
-    );
-  };
+  const renderSortIcon = useCallback(
+    (column: string) => {
+      if (sortBy !== column)
+        return <ArrowUpDownIcon className="ml-1 h-3 w-3 opacity-30 inline-block" />;
+      return sortOrder === 'asc' ? (
+        <ArrowUpIcon className="ml-1 h-3 w-3 inline-block" />
+      ) : (
+        <ArrowDownIcon className="ml-1 h-3 w-3 inline-block" />
+      );
+    },
+    [sortBy, sortOrder],
+  );
 
   const columns = useMemo(
     () => [
@@ -110,18 +115,26 @@ export function WorkflowsTable({
       }),
       columnHelper.accessor('id', {
         header: () => <div className="flex items-center">ID {renderSortIcon('id')}</div>,
-        cell: (info) => <div className="text-muted-foreground truncate text-xs font-mono">{info.getValue()}</div>,
+        cell: (info) => (
+          <div className="text-muted-foreground truncate text-xs font-mono">{info.getValue()}</div>
+        ),
         size: 150,
         enableResizing: true,
       }),
       columnHelper.accessor('description', {
-        header: () => <div className="flex items-center">Description {renderSortIcon('description')}</div>,
-        cell: (info) => <div className="text-muted-foreground truncate">{info.getValue() || '-'}</div>,
+        header: () => (
+          <div className="flex items-center">Description {renderSortIcon('description')}</div>
+        ),
+        cell: (info) => (
+          <div className="text-muted-foreground truncate">{info.getValue() || '-'}</div>
+        ),
         size: 300,
         enableResizing: true,
       }),
       columnHelper.accessor('is_disabled', {
-        header: () => <div className="flex items-center">Status {renderSortIcon('is_disabled')}</div>,
+        header: () => (
+          <div className="flex items-center">Status {renderSortIcon('is_disabled')}</div>
+        ),
         cell: (info) => {
           const isDisabled = info.getValue() === 1;
           return !isDisabled ? (
@@ -133,7 +146,10 @@ export function WorkflowsTable({
               Active
             </Badge>
           ) : (
-            <Badge variant="secondary" className="text-muted-foreground whitespace-nowrap bg-amber-500/10 text-amber-600 border-amber-500/20 dark:text-amber-400">
+            <Badge
+              variant="secondary"
+              className="text-muted-foreground whitespace-nowrap bg-amber-500/10 text-amber-600 border-amber-500/20 dark:text-amber-400"
+            >
               Disabled
             </Badge>
           );
@@ -230,7 +246,7 @@ export function WorkflowsTable({
         enableResizing: false,
       }),
     ],
-    [sortBy, sortOrder, onRun, onEdit, onDelete, renderSortIcon],
+    [onRun, onEdit, onDelete, renderSortIcon],
   );
 
   const table = useReactTable({
@@ -279,7 +295,9 @@ export function WorkflowsTable({
                     key={header.id}
                     style={{ width: header.getSize() }}
                     className={`relative whitespace-nowrap overflow-hidden ${
-                      ['name', 'description', 'is_disabled', 'updated_at'].includes(header.column.id)
+                      ['name', 'description', 'is_disabled', 'updated_at'].includes(
+                        header.column.id,
+                      )
                         ? 'cursor-pointer hover:bg-muted/50 transition-colors'
                         : ''
                     }`}

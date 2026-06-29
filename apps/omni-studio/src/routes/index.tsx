@@ -15,7 +15,13 @@ import {
   AlertDescription,
   RunWorkflowModal,
 } from '@omnidesk/ui';
-import { WorkflowIcon, FolderOpenIcon, AlertCircleIcon, Loader2Icon, DownloadIcon, UploadCloudIcon } from 'lucide-react';
+import {
+  WorkflowIcon,
+  FolderOpenIcon,
+  AlertCircleIcon,
+  DownloadIcon,
+  UploadCloudIcon,
+} from 'lucide-react';
 import { useState, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
@@ -51,15 +57,15 @@ function WorkflowsPage() {
     queryKey: ['workflows', selectedWorkspacePath],
     queryFn: async () => {
       if (!selectedWorkspacePath) return [];
-      
+
       // We first trigger a sync from local folder to SQLite
       await client.request({
         url: '/api/automa/workflows/sync/local',
         method: 'POST',
         body: { folder_path: selectedWorkspacePath },
         headers: {
-          'Content-Type': 'application/json'
-        }
+          'Content-Type': 'application/json',
+        },
       });
 
       // Then fetch from SQLite
@@ -93,7 +99,9 @@ function WorkflowsPage() {
 
   const bulkDeleteMutation = useMutation({
     mutationFn: async (ids: string[]) => {
-      await Promise.all(ids.map(id => client.request({ url: `/api/automa/workflows/${id}`, method: 'DELETE' })));
+      await Promise.all(
+        ids.map((id) => client.request({ url: `/api/automa/workflows/${id}`, method: 'DELETE' })),
+      );
     },
     onSuccess: () => {
       toast.success('Workflows deleted successfully');
@@ -103,14 +111,18 @@ function WorkflowsPage() {
   });
 
   const bulkUpdateStatusMutation = useMutation({
-    mutationFn: async ({ ids, isDisabled }: { ids: string[], isDisabled: number }) => {
+    mutationFn: async ({ ids, isDisabled }: { ids: string[]; isDisabled: number }) => {
       // First, we need to fetch each workflow and then update it, or if we have it in cache, we use that
-      const selectedWfs = workflows.filter(wf => ids.includes(wf.id));
-      await Promise.all(selectedWfs.map(wf => client.request({
-        url: `/api/automa/workflows/${wf.id}`,
-        method: 'PUT',
-        body: { ...wf, is_disabled: isDisabled }
-      })));
+      const selectedWfs = workflows.filter((wf) => ids.includes(wf.id));
+      await Promise.all(
+        selectedWfs.map((wf) =>
+          client.request({
+            url: `/api/automa/workflows/${wf.id}`,
+            method: 'PUT',
+            body: { ...wf, is_disabled: isDisabled },
+          }),
+        ),
+      );
     },
     onSuccess: () => {
       toast.success('Workflows status updated');
@@ -151,30 +163,30 @@ function WorkflowsPage() {
   });
 
   const filteredWorkflows = useMemo(() => {
-    return workflows.filter((wf) => {
-      if (!searchQuery) return true;
-      const q = searchQuery.toLowerCase();
-      return (
-        wf.name?.toLowerCase().includes(q) ||
-        wf.description?.toLowerCase().includes(q)
-      );
-    }).sort((a, b) => {
-      let aVal = a[sortBy as keyof Workflow] || '';
-      let bVal = b[sortBy as keyof Workflow] || '';
-      if (sortBy === 'is_disabled') {
-        aVal = a.is_disabled || 0;
-        bVal = b.is_disabled || 0;
-      }
-      
-      if (aVal < bVal) return sortOrder === 'asc' ? -1 : 1;
-      if (aVal > bVal) return sortOrder === 'asc' ? 1 : -1;
-      return 0;
-    });
+    return workflows
+      .filter((wf) => {
+        if (!searchQuery) return true;
+        const q = searchQuery.toLowerCase();
+        return wf.name?.toLowerCase().includes(q) || wf.description?.toLowerCase().includes(q);
+      })
+      .sort((a, b) => {
+        let aVal = a[sortBy as keyof Workflow] || '';
+        let bVal = b[sortBy as keyof Workflow] || '';
+        if (sortBy === 'is_disabled') {
+          aVal = a.is_disabled || 0;
+          bVal = b.is_disabled || 0;
+        }
+
+        if (aVal < bVal) return sortOrder === 'asc' ? -1 : 1;
+        if (aVal > bVal) return sortOrder === 'asc' ? 1 : -1;
+        return 0;
+      });
   }, [workflows, searchQuery, sortBy, sortOrder]);
 
   const handleSelectWorkspace = async () => {
     try {
-      const selected = await open({
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+      const selected: unknown = await open({
         directory: true,
         multiple: false,
         title: 'Select Workspace Folder',
@@ -182,7 +194,7 @@ function WorkflowsPage() {
       if (selected && typeof selected === 'string') {
         setWorkspacePath(selected);
       }
-    } catch (e) {
+    } catch {
       toast.error('Failed to open folder picker');
     }
   };
@@ -200,7 +212,11 @@ function WorkflowsPage() {
     <PageContainer>
       {/* Blocking Modal for Workspace Selection */}
       <Dialog open={!isWorkspaceSelected}>
-        <DialogContent className="sm:max-w-[460px] p-0 overflow-hidden [&>button]:hidden" onInteractOutside={(e) => e.preventDefault()} onEscapeKeyDown={(e) => e.preventDefault()}>
+        <DialogContent
+          className="sm:max-w-[460px] p-0 overflow-hidden [&>button]:hidden"
+          onInteractOutside={(e) => e.preventDefault()}
+          onEscapeKeyDown={(e) => e.preventDefault()}
+        >
           <div className="bg-muted/50 px-6 py-4 border-b">
             <DialogHeader>
               <div className="mx-auto bg-primary/10 p-3 rounded-full w-12 h-12 flex items-center justify-center mb-2">
@@ -208,24 +224,23 @@ function WorkflowsPage() {
               </div>
               <DialogTitle className="text-center text-lg">Select Workspace</DialogTitle>
               <DialogDescription className="text-center">
-                You must select a local folder to manage your workflows. This folder will act as your Git repository.
+                You must select a local folder to manage your workflows. This folder will act as
+                your Git repository.
               </DialogDescription>
             </DialogHeader>
           </div>
-          
+
           <div className="p-6">
             <Alert className="bg-muted/50 text-foreground border-primary/20 mb-6">
               <AlertCircleIcon className="h-4 w-4 text-primary" />
               <AlertTitle className="font-semibold text-primary">Why is this required?</AlertTitle>
               <AlertDescription className="text-xs text-muted-foreground mt-2">
-                OmniDesk manages your workflows as `.json` files inside a local folder. This enables you to version control them using Git, and sync them effortlessly across devices.
+                OmniDesk manages your workflows as `.json` files inside a local folder. This enables
+                you to version control them using Git, and sync them effortlessly across devices.
               </AlertDescription>
             </Alert>
-            
-            <Button
-              className="w-full font-medium"
-              onClick={handleSelectWorkspace}
-            >
+
+            <Button className="w-full font-medium" onClick={handleSelectWorkspace}>
               <FolderOpenIcon className="mr-2 h-4 w-4" />
               Browse Folder...
             </Button>
@@ -239,7 +254,7 @@ function WorkflowsPage() {
           Workflows Sync
         </PageTitle>
         <div className="flex gap-2">
-           <Button
+          <Button
             variant="outline"
             size="sm"
             onClick={handleSelectWorkspace}
@@ -251,16 +266,18 @@ function WorkflowsPage() {
               {selectedWorkspacePath ? selectedWorkspacePath.split(/[/\\]/).pop() : 'Select Folder'}
             </span>
           </Button>
-          
+
           <div className="h-8 w-px bg-border mx-1 hidden sm:block"></div>
-          
+
           <Button
             variant="outline"
             size="sm"
             onClick={() => pullMutation.mutate()}
             disabled={pullMutation.isPending || pushMutation.isPending || !isWorkspaceSelected}
           >
-            <DownloadIcon className={`mr-2 h-4 w-4 ${pullMutation.isPending ? 'animate-bounce' : ''}`} />
+            <DownloadIcon
+              className={`mr-2 h-4 w-4 ${pullMutation.isPending ? 'animate-bounce' : ''}`}
+            />
             Git Pull
           </Button>
           <Button
@@ -270,7 +287,9 @@ function WorkflowsPage() {
             onClick={() => pushMutation.mutate()}
             disabled={pullMutation.isPending || pushMutation.isPending || !isWorkspaceSelected}
           >
-            <UploadCloudIcon className={`mr-2 h-4 w-4 ${pushMutation.isPending ? 'animate-pulse' : ''}`} />
+            <UploadCloudIcon
+              className={`mr-2 h-4 w-4 ${pushMutation.isPending ? 'animate-pulse' : ''}`}
+            />
             Git Push
           </Button>
         </div>
@@ -279,30 +298,54 @@ function WorkflowsPage() {
       {isWorkspaceSelected && (
         <div className="flex flex-col gap-4">
           <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center justify-between">
-            <WorkflowsToolbar
-              searchQuery={searchQuery}
-              onSearchChange={setSearchQuery}
-            />
+            <WorkflowsToolbar searchQuery={searchQuery} onSearchChange={setSearchQuery} />
             {Object.keys(rowSelection).length > 0 && (
               <div className="flex items-center gap-2 bg-muted/50 p-1.5 rounded-md border border-border/50 text-sm">
-                <span className="px-2 text-muted-foreground">{Object.keys(rowSelection).length} selected</span>
-                <Button variant="secondary" size="sm" onClick={() => bulkUpdateStatusMutation.mutate({ ids: Object.keys(rowSelection), isDisabled: 0 })} disabled={bulkUpdateStatusMutation.isPending}>
+                <span className="px-2 text-muted-foreground">
+                  {Object.keys(rowSelection).length} selected
+                </span>
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={() =>
+                    bulkUpdateStatusMutation.mutate({
+                      ids: Object.keys(rowSelection),
+                      isDisabled: 0,
+                    })
+                  }
+                  disabled={bulkUpdateStatusMutation.isPending}
+                >
                   Enable
                 </Button>
-                <Button variant="secondary" size="sm" onClick={() => bulkUpdateStatusMutation.mutate({ ids: Object.keys(rowSelection), isDisabled: 1 })} disabled={bulkUpdateStatusMutation.isPending}>
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={() =>
+                    bulkUpdateStatusMutation.mutate({
+                      ids: Object.keys(rowSelection),
+                      isDisabled: 1,
+                    })
+                  }
+                  disabled={bulkUpdateStatusMutation.isPending}
+                >
                   Disable
                 </Button>
-                <Button variant="destructive" size="sm" onClick={() => {
-                  if (confirm('Are you sure you want to delete selected workflows?')) {
-                    bulkDeleteMutation.mutate(Object.keys(rowSelection));
-                  }
-                }} disabled={bulkDeleteMutation.isPending}>
+                <Button
+                  variant="destructive"
+                  size="sm"
+                  onClick={() => {
+                    if (confirm('Are you sure you want to delete selected workflows?')) {
+                      bulkDeleteMutation.mutate(Object.keys(rowSelection));
+                    }
+                  }}
+                  disabled={bulkDeleteMutation.isPending}
+                >
                   Delete
                 </Button>
               </div>
             )}
           </div>
-          
+
           <WorkflowsTable
             workflows={filteredWorkflows}
             isLoading={isLoading || isRefetching}
@@ -350,7 +393,6 @@ function WorkflowsPage() {
         onClose={() => setWorkflowToRun(null)}
         onRunSuccess={() => setRowSelection({})}
       />
-
     </PageContainer>
   );
 }

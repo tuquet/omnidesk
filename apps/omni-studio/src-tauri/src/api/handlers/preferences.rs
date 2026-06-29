@@ -39,7 +39,7 @@ pub async fn update_home_layout(
     let pool = &state.db;
     let user_id = claims.user_id();
     
-    match preferences_service::update_home_layout(pool, &user_id, &payload.home_screen_order).await {
+    match preferences_service::update_home_layout(pool, user_id, &payload.home_screen_order).await {
         Ok(_) => Ok(StatusCode::OK),
         Err(e) => {
             eprintln!("Failed to update home screen order in DB: {:?}", e);
@@ -65,7 +65,7 @@ pub async fn get_home_layout(
     let pool = &state.db;
     let user_id = claims.user_id();
     
-    match preferences_service::get_home_layout(pool, &user_id).await {
+    match preferences_service::get_home_layout(pool, user_id).await {
         Ok(layout) => Ok(Json(layout)),
         Err(e) => {
             eprintln!("Failed to get home layout: {:?}", e);
