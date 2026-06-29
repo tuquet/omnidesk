@@ -38,6 +38,15 @@ const DEFAULT_PROXY: ProxyData = {
   password: '',
 };
 
+const getDetectedOs = () => {
+  if (typeof navigator !== 'undefined') {
+    const ua = navigator.userAgent.toLowerCase();
+    if (ua.includes('win')) return 'win';
+    if (ua.includes('mac')) return 'mac';
+  }
+  return 'lin';
+};
+
 export function ProfileFormDialog({
   open,
   onOpenChange,
@@ -52,7 +61,7 @@ export function ProfileFormDialog({
   const [name, setName] = useState('');
   const [browserType, setBrowserType] = useState('system-chrome');
   const [browserVersion, setBrowserVersion] = useState('latest');
-  const [os, setOs] = useState('win');
+  const [os, setOs] = useState(getDetectedOs());
   const [notes, setNotes] = useState('');
   const [tagsInput, setTagsInput] = useState('');
   const [proxy, setProxy] = useState<ProxyData>(DEFAULT_PROXY);
@@ -87,7 +96,7 @@ export function ProfileFormDialog({
       setName('');
       setBrowserType('system-chrome');
       setBrowserVersion('latest');
-      setOs('win');
+      setOs(getDetectedOs());
       setNotes('');
       setTagsInput('');
       setExecutablePath('');
@@ -179,7 +188,7 @@ export function ProfileFormDialog({
 
           {/* Browser + Version + OS */}
           <div className="grid grid-cols-12 gap-3">
-            <div className="col-span-5 space-y-2">
+            <div className="col-span-7 space-y-2">
               <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                 Browser Engine
               </Label>
@@ -196,7 +205,7 @@ export function ProfileFormDialog({
                 </SelectContent>
               </Select>
             </div>
-            <div className="col-span-4 space-y-2">
+            <div className="col-span-5 space-y-2">
               <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                 Version
               </Label>
@@ -211,21 +220,6 @@ export function ProfileFormDialog({
                       {v.browser_version}
                     </SelectItem>
                   ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="col-span-3 space-y-2">
-              <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                Platform
-              </Label>
-              <Select value={os} onValueChange={setOs}>
-                <SelectTrigger className="w-full">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="win">Windows</SelectItem>
-                  <SelectItem value="mac">macOS</SelectItem>
-                  <SelectItem value="lin">Linux</SelectItem>
                 </SelectContent>
               </Select>
             </div>
