@@ -42,7 +42,6 @@ impl SystemChromeLauncher {
         cmd.arg("--no-first-run");
         cmd.arg("--no-default-browser-check");
         cmd.arg("--disable-blink-features=AutomationControlled");
-        cmd.arg("--test-type");
         cmd.arg("--silent-debugger-extension-api");
         
         use crate::system::config::get_active_storage_path;
