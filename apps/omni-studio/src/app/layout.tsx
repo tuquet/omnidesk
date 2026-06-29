@@ -1,4 +1,4 @@
-import { Outlet, useRouterState } from '@tanstack/react-router';
+import { Outlet, useRouterState, Link } from '@tanstack/react-router';
 import { OmniLayout } from '@omnidesk/core';
 import {
   Sidebar,
@@ -28,21 +28,27 @@ function StudioSidebar() {
           <SidebarGroupContent>
             <SidebarMenu>
               <SidebarMenuItem>
-                <SidebarMenuButton className="text-xs">
-                  <Blocks />
-                  <span>My Workflows</span>
+                <SidebarMenuButton className="text-xs" asChild>
+                  <Link to="/workflows">
+                    <Blocks />
+                    <span>My Workflows</span>
+                  </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <SidebarMenuButton className="text-xs">
-                  <Activity />
-                  <span>Executions</span>
+                <SidebarMenuButton className="text-xs" asChild>
+                  <Link to="/executions">
+                    <Activity />
+                    <span>Executions</span>
+                  </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <SidebarMenuButton className="text-xs">
-                  <Clock />
-                  <span>Schedules</span>
+                <SidebarMenuButton className="text-xs" asChild>
+                  <Link to="/schedules">
+                    <Clock />
+                    <span>Schedules & Run</span>
+                  </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
             </SidebarMenu>
