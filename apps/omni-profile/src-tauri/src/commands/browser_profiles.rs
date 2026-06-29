@@ -8,7 +8,7 @@ use crate::services::browser_profile_service::BrowserProfileService;
 pub async fn get_browser_profiles(
     pool: State<'_, SqlitePool>,
 ) -> Result<Vec<BrowserProfile>, String> {
-    BrowserProfileService::get_all(&pool)
+    BrowserProfileService::get_all(&pool, None, None)
         .await
         .map_err(String::from)
 }

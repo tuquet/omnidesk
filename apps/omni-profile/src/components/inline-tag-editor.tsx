@@ -58,7 +58,6 @@ export function InlineTagEditor({ profile, initialTags }: InlineTagEditorProps) 
       <div className="flex items-center gap-1">
         <Input
           ref={inputRef}
-          size="sm"
           className="h-6 text-xs w-[150px]"
           value={tagInput}
           onChange={(e) => setTagInput(e.target.value)}

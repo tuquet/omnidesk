@@ -5,34 +5,52 @@ status: active
 tags: [presale, architecture, engine, profile, studio, automa]
 ---
 
-# Kiến trúc Nền tảng OmniDesk (Presale Documentation)
+# Kiến trúc Nền tảng OmniDesk
 
-Tài liệu này mô tả chi tiết về cách thức tương tác nghiệp vụ giữa các phân hệ cốt lõi của **OmniDesk**, bao gồm **Profile**, **Studio**, **Engine**, và lõi tự động hóa **Automa (Extension)**. Đây là tài liệu phục vụ mục đích Presale, giúp khách hàng doanh nghiệp hiểu rõ về mức độ bảo mật, khả năng mở rộng và luồng dữ liệu của hệ thống.
+Tài liệu này mô tả chi tiết về kiến trúc **Local-First** và luồng tương tác nghiệp vụ giữa các phân hệ cốt lõi của hệ sinh thái **OmniDesk**. Hệ thống được thiết kế nhằm tối ưu hóa trải nghiệm người dùng, đồng bộ dữ liệu theo thời gian thực và đảm bảo tiêu chuẩn bảo mật khắt khe nhất dành cho môi trường doanh nghiệp.
 
-## 1. Tổng quan các Phân hệ (Core Components)
+## 1. Tổng quan các Phân hệ Cốt lõi (Core Components)
 
-| Phân hệ                | Vai trò & Chức năng cốt lõi                                                                                                                                          | Công nghệ nền tảng              |
-| :--------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :------------------------------ |
-| **Omni Studio**        | Nơi người dùng thiết kế các kịch bản tự động hóa (Workflows) qua giao diện kéo-thả trực quan. Lưu trữ và đồng bộ kịch bản lên Cloud.                                 | React, Dnd-Kit, Supabase        |
-| **Omni Engine**        | Trái tim điều phối (Orchestrator). Quản lý hàng đợi (Active Jobs), lịch trình (Cron), và là cầu nối trung chuyển dữ liệu (Auth Bridge) cho Extension.                | React, Edge Functions           |
-| **Omni Profile**       | Quản lý môi trường trình duyệt cách ly (Anti-detect browser). Đảm bảo mỗi Profile có Proxy, Fingerprint riêng biệt. Tự động tiêm (inject) Extension vào trình duyệt. | Tauri, Rust Backend, Playwright |
-| **Automa (Extension)** | Lõi thực thi (Execution Core) chạy ẩn bên trong các trình duyệt do Profile tạo ra. Tự động nhận lệnh từ Engine và thao tác như người dùng thật.                      | Browser Extension (MV3)         |
+| Phân hệ                         | Vai trò & Chức năng                                                                                                                                                                                           | Công nghệ nền tảng                 |
+| :------------------------------ | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | :--------------------------------- |
+| **Automa (Extension Designer)** | Đóng vai trò là **Công cụ Thiết kế (Workflow Designer)** trực tiếp bên trong trình duyệt. Cho phép thao tác kéo-thả trực quan, lưu trữ tạm thời tại IndexedDB và tự động đồng bộ dữ liệu về ứng dụng Desktop. | Browser Extension (MV3), IndexedDB |
+| **Studio & Local DB (Tauri)**   | Đóng vai trò là **Bảng Điều khiển (Dashboard)** và là **Nguồn dữ liệu gốc (Source of Truth)** tại máy trạm. Quản lý tập trung toàn bộ dữ liệu kịch bản tại cơ sở dữ liệu SQLite cục bộ.                       | React, Tauri, Rust, SQLite         |
+| **Omni Profile**                | Quản lý môi trường trình duyệt cách ly độc lập (Anti-detect browser). Đảm nhiệm việc tự động cài đặt Extension vào trình duyệt và cấp mới dữ liệu từ SQLite.                                                  | Tauri, Rust Backend, Playwright    |
+| **Supabase Cloud**              | Cơ sở dữ liệu đám mây trung tâm phục vụ việc lưu trữ, chia sẻ và phân phối kịch bản (Marketplace). Quản lý hệ thống phân quyền và vai trò người dùng.                                                         | PostgreSQL, Edge Functions         |
+
+### Danh mục API Khả dụng (OpenAPI & Scalar UI)
+
+Để đảm bảo tính minh bạch và khả năng tích hợp linh hoạt cho đối tác, nền tảng OmniDesk cung cấp tài liệu API chuẩn OpenAPI cùng giao diện thử nghiệm Scalar UI tại các cổng (ports) độc lập:
+
+- **Omni Profile API (Cổng 1421):**
+  - OpenAPI: [http://localhost:1421/openapi.json](http://localhost:1421/openapi.json)
+  - Scalar UI: [http://localhost:1421/scalar](http://localhost:1421/scalar)
+
+- **Omni Engine API (Cổng 1422):**
+  - OpenAPI: [http://localhost:1422/openapi.json](http://localhost:1422/openapi.json)
+  - Scalar UI: [http://localhost:1422/scalar](http://localhost:1422/scalar)
+
+- **Omni Studio API (Cổng 1423):**
+  - OpenAPI: [http://localhost:1423/openapi.json](http://localhost:1423/openapi.json)
+  - Scalar UI: [http://localhost:1423/scalar](http://localhost:1423/scalar)
 
 ---
 
-## 2. Luồng trao đổi Nghiệp vụ (Business Logic Flow)
+## 2. Luồng Vận hành Nghiệp vụ (Business Logic Flow)
 
-Quá trình vận hành từ lúc thiết kế kịch bản đến lúc thực thi được khép kín và bảo mật hoàn toàn:
+Kiến trúc **Local-First** của OmniDesk xử lý toàn bộ vòng đời của một kịch bản tự động hóa thông qua 4 bước khép kín:
 
-1. **Thiết kế & Lưu trữ (Studio -> Cloud):** Người dùng tạo kịch bản tại Omni Studio. Kịch bản được mã hóa và lưu trữ an toàn tại hệ thống cơ sở dữ liệu trung tâm (Supabase).
-2. **Điều phối & Khởi tạo (Engine -> Profile):** Khi đến lịch chạy hoặc có lệnh từ người dùng, Omni Engine sẽ điều phối luồng công việc. Engine gọi Omni Profile để khởi động các môi trường trình duyệt cách ly.
-3. **Tiêm lõi Tự động hóa (Profile -> Automa):** Omni Profile khởi động Chromium/WebKit với bộ Fingerprint độc lập và gắn kèm Automa Extension vào bên trong.
-4. **Xác thực & Lấy lệnh (Automa <-> Engine):** Thông qua cơ chế **Auth Bridge** tại Engine (`automa.auth`), Automa Extension được cấp quyền truy cập để kéo (fetch) kịch bản từ Cloud về bộ nhớ cục bộ mà không lộ thông tin đăng nhập.
-5. **Thực thi & Báo cáo (Automa -> Cloud/Engine):** Automa chạy kịch bản trên các trang web đích. Mọi kết quả, ảnh chụp màn hình (screenshots), và log lỗi đều được đẩy ngược về Supabase và báo cáo trực tiếp trên bảng điều khiển của Engine.
+1. **Thiết kế Kịch bản (Automa Extension):** Người dùng thao tác trên trình duyệt, sử dụng giao diện kéo-thả chuyên nghiệp của Automa để xây dựng luồng tự động hóa. Dữ liệu ban đầu được ghi nhận tại IndexedDB của Extension.
+2. **Đồng bộ Dữ liệu (Automa -> Local SQLite):** Mã nguồn của Automa được tinh chỉnh để tự động giao tiếp qua giao thức API (HTTP POST/PUT) với `localhost:1421` (Tauri Backend). Dữ liệu được mã hóa và lưu trữ an toàn tại SQLite của ứng dụng Desktop.
+3. **Đồng nhất Môi trường (SQLite -> Đa Trình duyệt):** Với định hướng SQLite là Nguồn dữ liệu gốc (Source of Truth), mỗi khi hệ thống khởi tạo một Profile trình duyệt mới, Automa tại Profile đó sẽ tự động truy xuất kịch bản mới nhất từ SQLite. Cơ chế này đảm bảo tính đồng nhất dữ liệu trên quy mô hàng ngàn Profile mà không phát sinh thao tác thủ công.
+4. **Triển khai lên Đám mây (Tauri UI -> Supabase):**
+   - Phân hệ **Omni Studio** trên Desktop đóng vai trò là giao diện quản trị trung tâm.
+   - Sau khi người dùng thực hiện xác thực tài khoản, tính năng **"Upload to Cloud"** sẽ được kích hoạt.
+   - Quá trình tải lên sẽ chuyển dữ liệu từ SQLite lên Supabase Cloud, đồng thời ghi nhận Quyền Sở hữu (`author_id`), tạo tiền đề cho việc phân quyền nội bộ hoặc thương mại hóa trên hệ sinh thái OmniDesk.
 
 ---
 
-## 3. Sơ đồ Kiến trúc & Tương tác (Mermaid)
+## 3. Sơ đồ Kiến trúc Hệ thống
 
 ### Sơ đồ Kiến trúc Tổng thể (Architecture Diagram)
 
@@ -44,68 +62,91 @@ graph TD
     classDef cloud fill:#6366f1,stroke:#4f46e5,stroke-width:2px,color:#fff
     classDef browser fill:#f59e0b,stroke:#d97706,stroke-width:2px,color:#fff
 
-    subgraph UserInterface["UI & Control Plane (React)"]
-        Studio["Omni Studio\n(Workflow Designer)"]:::ui
-        Engine["Omni Engine\n(Job Manager & Auth)"]:::ui
+    subgraph NativeCore["OmniDesk Desktop App (Tauri / Rust)"]
+        Engine["Omni Engine\n(Port: 1422)"]:::backend
+        Dashboard["Omni Studio\n(Dashboard - Port: 1423)"]:::ui
+        Profile["Omni Profile\n(Browser Manager - Port: 1421)"]:::backend
+        SQLite[(Local SQLite DB\nSource of Truth)]:::backend
     end
 
-    subgraph NativeCore["Local Execution (Rust/Tauri)"]
-        Profile["Omni Profile\n(Browser & Fingerprint Manager)"]:::backend
-    end
-
-    subgraph ExecutionEnvironment["Isolated Browsers"]
-        Chrome["Chromium/WebKit\n(Anti-detect Session)"]:::browser
-        Automa["Automa Extension\n(Action Executor)"]:::browser
-        Chrome --- Automa
+    subgraph ExecutionEnvironment["Isolated Browser Sessions"]
+        Automa["Automa Extension\n(UI Designer & Executor)"]:::browser
+        IndexedDB[(Extension IndexedDB)]:::browser
+        Automa --- IndexedDB
     end
 
     subgraph CloudServices["Supabase Cloud"]
-        DB[(PostgreSQL DB)]:::cloud
-        Storage["Blob Storage\n(Logs/Screenshots)"]:::cloud
-        Edge["Edge Functions\n(API Gateway)"]:::cloud
+        CloudDB[(Marketplace DB\nCloud Workflows)]:::cloud
     end
 
     %% Mối liên kết
-    Studio -->|1. Save Workflows| Edge
-    Engine -->|2. Orchestrate & Schedule| Profile
-    Profile -->|3. Launch & Inject| Chrome
-    Automa <-->|4. Auth Bridge & Fetch Workflows| Engine
-    Automa -->|5. Push Execution Logs| Edge
-    Edge --- DB
-    Edge --- Storage
+    Profile -->|1. Khởi chạy và Tiêm Extension| Automa
+    Automa -->|2. Thiết kế và Đồng bộ qua API 1421| SQLite
+    SQLite -->|3. Cung cấp dữ liệu đồng nhất| Automa
+    Dashboard --- SQLite
+    Engine --- SQLite
+    Dashboard -->|4. Tải lên Đám mây với Quyền Sở hữu| CloudDB
 ```
 
-### Biểu đồ Tuần tự Thực thi (Sequence Diagram)
+### Biểu đồ Tuần tự (Sequence Diagram)
 
 ```mermaid
 sequenceDiagram
     autonumber
-    actor User as Khách hàng
-    participant Studio as Omni Studio
-    participant Engine as Omni Engine
+    actor User as Khách hàng / AI Agent
+    participant Automa as Automa Extension
+    participant Tauri as OmniDesk Desktop (Tauri)
+    participant SQLite as Local DB (SQLite)
     participant Cloud as Supabase (Cloud)
-    participant Profile as Omni Profile
-    participant Automa as Automa (Extension)
 
-    User->>Studio: Kéo thả thiết kế kịch bản UI/UX
-    Studio->>Cloud: Lưu kịch bản (JSON)
-    User->>Engine: Lên lịch chạy Campaign
-    Engine->>Cloud: Tạo Active Jobs
-    Engine->>Profile: Yêu cầu khởi tạo 100+ Browsers
-    Profile->>Profile: Tạo Fingerprints & Gán Proxies
-    Profile->>Automa: Khởi chạy Trình duyệt + Inject Extension
-    Automa->>Engine: Yêu cầu Token qua Auth Bridge
-    Engine-->>Automa: Trả về Access Token an toàn
-    Automa->>Cloud: Tải kịch bản tự động hóa bằng Token
-    Automa->>Automa: Thực thi thao tác trên Web đích
-    Automa->>Cloud: Cập nhật tiến độ & Tải lên Screenshots
-    Cloud-->>Engine: Stream Logs theo thời gian thực (SSE)
-    Engine-->>User: Hiển thị trạng thái hoàn thành trên Dashboard
+    User->>Automa: Thiết kế kịch bản qua Giao diện trực quan
+    Automa->>Automa: Lưu tạm thời vào IndexedDB
+    Automa->>Tauri: Gọi API đồng bộ thay đổi
+    Tauri->>SQLite: Cập nhật cơ sở dữ liệu gốc (Source of Truth)
+
+    Note over User, SQLite: Khởi tạo Phiên làm việc mới (New Profile)
+    Tauri->>Automa: Khởi chạy Trình duyệt và Extension
+    Automa->>Tauri: Yêu cầu truy xuất dữ liệu mới nhất
+    Tauri->>Automa: Phản hồi kịch bản từ SQLite
+
+    Note over User, Cloud: Quá trình Phân phối lên Đám mây
+    User->>Tauri: Đăng nhập vào Omni Studio (Dashboard)
+    Tauri->>Tauri: Xác thực thành công, hiển thị chức năng Upload
+    User->>Tauri: Thực thi lệnh "Upload to Cloud"
+    Tauri->>Cloud: Tải kịch bản lên hệ thống Đám mây (Kèm `author_id`)
+    Cloud-->>Tauri: Trả về trạng thái hoàn tất
 ```
 
-> [!TIP]
-> **Điểm nhấn Bán hàng (Unique Selling Points):**
->
-> - **Cách ly hoàn toàn:** Mỗi phiên (session) hoạt động trên một Profile độc lập (Proxy, IP, Device Fingerprint riêng), giúp bypass các hệ thống Anti-bot hiệu quả.
-> - **Bảo mật tuyệt đối:** Lõi Automa không chứa hard-code credentials. Xác thực được xử lý chéo thông qua cầu nối `automa.auth` của Engine và Supabase Edge Functions.
-> - **Khả năng mở rộng (Scalable):** Nhờ tách biệt Engine (điều phối) và Profile (khởi chạy), hệ thống có thể scale lên hàng ngàn tiến trình tự động hóa song song mà vẫn quản lý tập trung trên một Dashboard duy nhất.
+---
+
+## 4. Lợi thế Cạnh tranh (Unique Selling Points)
+
+- **Tối ưu hóa Chi phí (Cost Optimization):** Việc tích hợp sâu công cụ thiết kế của Automa giúp nền tảng cắt giảm đáng kể chi phí phát triển giao diện UI, từ đó tập trung nguồn lực đầu tư cho hạ tầng bảo mật và khả năng mở rộng hệ thống.
+- **Trải nghiệm Local-First Xuyên suốt:** Mọi thao tác vận hành và thiết kế đều được lưu trữ tức thời tại máy trạm cục bộ (SQLite). Hệ thống loại bỏ hoàn toàn rủi ro gián đoạn do độ trễ mạng internet.
+- **Đồng bộ Đa môi trường Tư động:** Cơ chế quản lý dữ liệu tập trung qua SQLite giúp đồng nhất cấu trúc dữ liệu trên hàng ngàn Profile trình duyệt khác nhau mà không yêu cầu xuất/nhập (export/import) thủ công.
+- **Minh bạch Quyền Sở hữu (Ownership):** Quy trình đẩy dữ liệu lên đám mây được quản lý nghiêm ngặt tại Desktop. Người dùng hoàn toàn kiểm soát tài sản số của mình, hỗ trợ phân quyền nội bộ hoặc thương mại hóa an toàn trên hệ sinh thái đám mây.
+
+---
+
+## 5. Lộ trình Phát triển (Roadmap)
+
+Để hiện thực hóa tầm nhìn chiến lược, OmniDesk thiết lập lộ trình phát triển qua 3 giai đoạn (Phases) cốt lõi:
+
+### Giai đoạn 1: Triển khai Nền tảng Local-First (Hoàn thiện Trải nghiệm Cốt lõi)
+
+- [ ] Tích hợp API đồng bộ (`localhost:1421/api/workflows`) trực tiếp vào mã nguồn của Automa Extension.
+- [ ] Khởi tạo kiến trúc bảng `local_workflows` bằng SQLite trong OmniDesk Desktop (Tauri).
+- [ ] Xây dựng cơ chế tự động hóa quy trình truy xuất dữ liệu từ SQLite xuống Automa khi khởi chạy Profile mới.
+
+### Giai đoạn 2: Hệ sinh thái Đám mây & Quản trị Tác giả (Marketplace Preparation)
+
+- [ ] Bổ sung tính năng Quản lý Kịch bản (Dashboard) chuyên sâu trên giao diện Desktop App.
+- [ ] Tích hợp hệ thống phân quyền Supabase Auth vào ứng dụng Desktop.
+- [ ] Hoàn thiện luồng "Upload to Cloud": Đẩy kịch bản lên Supabase, thiết lập cấu trúc Quyền sở hữu (`author_id`) và Cấu hình Riêng tư (Private/Public).
+
+### Giai đoạn 3: Tự động hóa bằng Trí tuệ Nhân tạo (AI-Driven Automation)
+
+- [ ] Tích hợp **AI Agent** trực tiếp vào luồng xử lý và tạo lập kịch bản.
+- [ ] Cung cấp giao diện tương tác bằng ngôn ngữ tự nhiên (Prompt): _"Tự động hóa luồng trích xuất dữ liệu trên nền tảng thương mại điện tử"_.
+- [ ] **AI Agent** sẽ đảm nhận việc biên dịch yêu cầu thành các khối lệnh (blocks) trong Automa, tự động lưu ngầm vào IndexedDB và đồng bộ về SQLite.
+- [ ] Chuyển đổi OmniDesk thành một nền tảng tự động hóa Zero-Code toàn diện, loại bỏ rào cản kỹ thuật cho người dùng cuối.
