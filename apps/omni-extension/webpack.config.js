@@ -8,6 +8,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
 const env = require('./utils/env');
+require('dotenv').config();
 
 const ASSET_PATH = process.env.ASSET_PATH || '/';
 
@@ -146,6 +147,8 @@ const options = {
     new VueLoaderPlugin(),
     new webpack.DefinePlugin({
       BROWSER_TYPE: JSON.stringify(env.BROWSER),
+      'process.env.VUE_APP_OMNI_STUDIO_API': JSON.stringify(process.env.VUE_APP_OMNI_STUDIO_API || 'http://localhost:1422'),
+      'process.env.VUE_APP_OMNI_ENGINE_API': JSON.stringify(process.env.VUE_APP_OMNI_ENGINE_API || 'http://localhost:1423'),
     }),
     new webpack.ProgressPlugin(),
     // clean the build folder
@@ -193,36 +196,6 @@ const options = {
         },
         {
           from: 'src/assets/images/icon-dev-128.png',
-          to: path.join(__dirname, 'build'),
-          force: true,
-        },
-        {
-          from: 'src/assets/images/icon-48.png',
-          to: path.join(__dirname, 'build'),
-          force: true,
-        },
-        {
-          from: 'src/assets/images/icon-dev-48.png',
-          to: path.join(__dirname, 'build'),
-          force: true,
-        },
-        {
-          from: 'src/assets/images/icon-32.png',
-          to: path.join(__dirname, 'build'),
-          force: true,
-        },
-        {
-          from: 'src/assets/images/icon-dev-32.png',
-          to: path.join(__dirname, 'build'),
-          force: true,
-        },
-        {
-          from: 'src/assets/images/icon-16.png',
-          to: path.join(__dirname, 'build'),
-          force: true,
-        },
-        {
-          from: 'src/assets/images/icon-dev-16.png',
           to: path.join(__dirname, 'build'),
           force: true,
         },

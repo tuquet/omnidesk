@@ -13,28 +13,85 @@ import { defineStore } from 'pinia';
 import browser from 'webextension-polyfill';
 import { useUserStore } from './user';
 
-// LOCAL-FIRST BACKEND SYNC HELPERS
-const syncWorkflowToBackend = async (workflow) => {
+// Transform Automa Workflow to Omni Studio Format
+const toStudioWorkflow = (workflow) => {
+  return {
+    id: workflow.id,
+    name: workflow.name,
+    icon: workflow.icon,
+    folder_id: workflow.folderId,
+    description: workflow.description,
+    drawflow: typeof workflow.drawflow === 'string' ? workflow.drawflow : JSON.stringify(workflow.drawflow),
+    settings: typeof workflow.settings === 'string' ? workflow.settings : JSON.stringify(workflow.settings),
+    trigger: typeof workflow.trigger === 'string' ? workflow.trigger : JSON.stringify(workflow.trigger),
+    global_data: typeof workflow.globalData === 'string' ? workflow.globalData : JSON.stringify(workflow.globalData),
+    table_data: typeof workflow.table === 'string' ? workflow.table : JSON.stringify(workflow.table),
+    data_columns: typeof workflow.dataColumns === 'string' ? workflow.dataColumns : JSON.stringify(workflow.dataColumns),
+    version: workflow.version,
+    is_disabled: workflow.isDisabled ? 1 : 0,
+    created_at: new Date(workflow.createdAt).toISOString(),
+    updated_at: new Date(workflow.updatedAt).toISOString(),
+  };
+};
+
+// Transform Omni Studio Format to Automa Workflow
+const fromStudioWorkflow = (workflow) => {
+  const parseJson = (str, fallback) => {
+    if (!str) return fallback;
+    try { return JSON.parse(str); } catch (e) { return fallback; }
+  };
+  
+  return {
+    id: workflow.id,
+    name: workflow.name,
+    icon: workflow.icon,
+    folderId: workflow.folder_id,
+    description: workflow.description,
+    drawflow: parseJson(workflow.drawflow, { nodes: [], edges: [], zoom: 1.3 }),
+    settings: parseJson(workflow.settings, {}),
+    trigger: parseJson(workflow.trigger, null),
+    globalData: workflow.global_data || '{\n\t"key": "value"\n}',
+    table: parseJson(workflow.table_data, []),
+    dataColumns: parseJson(workflow.data_columns, []),
+    version: workflow.version,
+    isDisabled: Boolean(workflow.is_disabled),
+    createdAt: workflow.created_at ? new Date(workflow.created_at).getTime() : Date.now(),
+    updatedAt: workflow.updated_at ? new Date(workflow.updated_at).getTime() : Date.now(),
+  };
+};
+
+const fetchFromOmniStudio = async () => {
   try {
-    await fetchApi(`/workflows/${workflow.id}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(workflow),
+    const baseUrl = process.env.VUE_APP_OMNI_STUDIO_API || 'http://localhost:1422';
+    const response = await fetch(`${baseUrl}/api/automa/workflows`);
+    if (response.ok) {
+      const data = await response.json();
+      return data.map(fromStudioWorkflow);
+    }
+  } catch (error) {
+    console.error('Failed to fetch workflows from Omni Studio', error);
+  }
+  return [];
+};
+
+
+const syncToOmniStudio = async (workflows) => {
+  try {
+    const payload = Array.isArray(workflows) ? workflows : [workflows];
+    const studioPayload = payload.map(toStudioWorkflow);
+    const baseUrl = process.env.VUE_APP_OMNI_STUDIO_API || 'http://localhost:1422';
+    await fetch(`${baseUrl}/api/automa/workflows/sync/push`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ workflows: studioPayload }),
     });
-  } catch (err) {
-    console.warn(`[Local Sync] Failed to sync workflow ${workflow.id}`, err);
+  } catch (error) {
+    console.error('Failed to sync workflows to Omni Studio', error);
   }
 };
 
-const deleteWorkflowFromBackend = async (id) => {
-  try {
-    await fetchApi(`/workflows/${id}`, {
-      method: 'DELETE',
-    });
-  } catch (err) {
-    console.warn(`[Local Sync] Failed to delete workflow ${id}`, err);
-  }
-};
 
 const defaultWorkflow = (data = null, options = {}) => {
   let workflowData = {
@@ -141,28 +198,22 @@ export const useWorkflowStore = defineStore('workflow', {
         'isFirstTime',
       ]);
 
-      let backendWorkflows = {};
-      try {
-        const res = await fetchApi('/workflows');
-        if (res.ok) {
-          const arr = await res.json();
-          backendWorkflows = convertWorkflowsToObject(arr);
-        }
-      } catch (err) {
-        console.warn('[Local Sync] Failed to fetch workflows', err);
+      let localWorkflows = workflows || {};
+
+      // Pull from Omni-Studio on Init
+      const studioWorkflows = await fetchFromOmniStudio();
+      if (studioWorkflows && studioWorkflows.length > 0) {
+        studioWorkflows.forEach(workflow => {
+          const w = defaultWorkflow(workflow, { duplicateId: false });
+          localWorkflows[w.id] = w;
+        });
+        await browser.storage.local.set({ workflows: localWorkflows });
       }
 
-      let localWorkflows = workflows || {};
-      
-      // Merge with backend - backend is the source of truth
-      localWorkflows = { ...localWorkflows, ...backendWorkflows };
-      await browser.storage.local.set({ workflows: localWorkflows });
-
       if (isFirstTime) {
-        // Tạm thời bỏ init default workflows theo yêu cầu
-        // localWorkflows = firstWorkflows.map((workflow) =>
-        //   defaultWorkflow(workflow)
-        // );
+        localWorkflows = firstWorkflows.map((workflow) =>
+          defaultWorkflow(workflow)
+        );
         await browser.storage.local.set({
           isFirstTime: false,
           workflows: localWorkflows,
@@ -201,11 +252,8 @@ export const useWorkflowStore = defineStore('workflow', {
       }
 
       await this.saveToStorage('workflows');
+      syncToOmniStudio(Object.values(insertedWorkflows));
 
-      // Sync inserts to backend
-      for (const wf of Object.values(insertedWorkflows)) {
-        await syncWorkflowToBackend(wf);
-      }
 
       return insertedWorkflows;
     },
@@ -253,11 +301,8 @@ export const useWorkflowStore = defineStore('workflow', {
       }
 
       await this.saveToStorage('workflows');
+      syncToOmniStudio(Object.values(updatedWorkflows));
 
-      // Sync updates to backend
-      for (const wf of Object.values(updatedWorkflows)) {
-        await syncWorkflowToBackend(wf);
-      }
 
       return updatedWorkflows;
     },
@@ -290,11 +335,8 @@ export const useWorkflowStore = defineStore('workflow', {
       });
 
       await this.saveToStorage('workflows');
+      syncToOmniStudio(Object.values(insertedData));
 
-      // Sync updates to backend
-      for (const wf of Object.values(insertedData)) {
-        await syncWorkflowToBackend(wf);
-      }
 
       return insertedData;
     },
@@ -302,11 +344,9 @@ export const useWorkflowStore = defineStore('workflow', {
       if (Array.isArray(id)) {
         id.forEach((workflowId) => {
           delete this.workflows[workflowId];
-          deleteWorkflowFromBackend(workflowId);
         });
       } else {
         delete this.workflows[id];
-        deleteWorkflowFromBackend(id);
       }
 
       await cleanWorkflowTriggers(id);
@@ -317,23 +357,19 @@ export const useWorkflowStore = defineStore('workflow', {
       const backupIndex = userStore.backupIds.indexOf(id);
 
       if (hostedWorkflow || backupIndex !== -1) {
-        try {
-          const response = await fetchApi(`/me/workflows?id=${id}`, {
-            auth: true,
-            method: 'DELETE',
-          });
-          const result = await response.json();
+        const response = await fetchApi(`/me/workflows?id=${id}`, {
+          auth: true,
+          method: 'DELETE',
+        });
+        const result = await response.json();
 
-          if (!response.ok) {
-            console.warn('[Cloud Sync] Failed to delete workflow from cloud:', result.message);
-          }
+        if (!response.ok) {
+          throw new Error(result.message);
+        }
 
-          if (backupIndex !== -1) {
-            userStore.backupIds.splice(backupIndex, 1);
-            await browser.storage.local.set({ backupIds: userStore.backupIds });
-          }
-        } catch (error) {
-          console.error('[Cloud Sync] Error deleting workflow from cloud:', error);
+        if (backupIndex !== -1) {
+          userStore.backupIds.splice(backupIndex, 1);
+          await browser.storage.local.set({ backupIds: userStore.backupIds });
         }
       }
 

@@ -10,6 +10,25 @@ class WorkflowLogger {
       dbLogs.items.add(logDetail),
       dbLogs.histories.add(history),
     ]);
+
+    // Send telemetry to Omni-Engine
+    try {
+      const baseUrl = process.env.VUE_APP_OMNI_ENGINE_API || 'http://localhost:1423';
+      await fetch(`${baseUrl}/api/reports`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          detail: logDetail,
+          history,
+          ctxData,
+          data,
+        }),
+      });
+    } catch (err) {
+      console.warn('Failed to send workflow report to Omni-Engine:', err);
+    }
   }
 }
 
