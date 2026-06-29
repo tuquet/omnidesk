@@ -5,6 +5,7 @@ use axum::{
 };
 use serde::{Deserialize, Serialize};
 use sqlx::Row;
+use utoipa::ToSchema;
 use crate::api::AppState;
 use crate::error::AppError;
 
@@ -25,7 +26,7 @@ pub fn router() -> Router<AppState> {
         .route("/logs", axum::routing::get(get_logs))
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, ToSchema)]
 pub struct CreateRunPayload {
     pub workflow_id: String,
     pub profile_id: Option<String>,
@@ -56,7 +57,7 @@ async fn create_run(
     ).await {
         Ok(run) => Ok(Json(serde_json::json!({ "id": run.id, "status": run.status }))),
         Err(e) => {
-            eprintln!("Failed to execute workflow: {}", e);
+            eprintln!("Failed to execute workflow: {:?}", e);
             Err(e)
         }
     }
