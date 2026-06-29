@@ -182,20 +182,18 @@ pub async fn get_local_apps(
         let workspace_apps_dir = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../apps");
         if workspace_apps_dir.exists() {
             if let Ok(entries) = fs::read_dir(workspace_apps_dir) {
-                for entry in entries {
-                    if let Ok(entry) = entry {
-                        let path = entry.path();
-                        if path.is_dir() {
-                            let manifest_path = path.join("manifest.json");
-                            if manifest_path.exists() {
-                                if let Ok(content) = fs::read_to_string(&manifest_path) {
-                                    if let Ok(mut json) = serde_json::from_str::<Value>(&content) {
-                                        // Inject local dev path to indicate it's a workspace app
-                                        if let Some(obj) = json.as_object_mut() {
-                                            obj.insert("devPath".to_string(), Value::String(path.to_string_lossy().to_string()));
-                                        }
-                                        apps.push(json);
+                for entry in entries.flatten() {
+                    let path = entry.path();
+                    if path.is_dir() {
+                        let manifest_path = path.join("manifest.json");
+                        if manifest_path.exists() {
+                            if let Ok(content) = fs::read_to_string(&manifest_path) {
+                                if let Ok(mut json) = serde_json::from_str::<Value>(&content) {
+                                    // Inject local dev path to indicate it's a workspace app
+                                    if let Some(obj) = json.as_object_mut() {
+                                        obj.insert("devPath".to_string(), Value::String(path.to_string_lossy().to_string()));
                                     }
+                                    apps.push(json);
                                 }
                             }
                         }
