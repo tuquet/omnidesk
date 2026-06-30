@@ -165,7 +165,9 @@ impl WorkflowService {
                 version = excluded.version,
                 is_disabled = excluded.is_disabled,
                 source = excluded.source,
-                updated_at = CURRENT_TIMESTAMP
+                updated_at = CURRENT_TIMESTAMP,
+                deleted_at = NULL,
+                delete_source = NULL
             "#
         )
         .bind(&workflow.id)

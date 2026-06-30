@@ -14,11 +14,8 @@ import {
   AlertTitle,
   AlertDescription,
   RunWorkflowModal,
-  Label,
-  Input,
-  DialogTrigger,
 } from '@omnidesk/ui';
-import { WorkflowIcon, FolderOpenIcon, AlertCircleIcon, Loader2 } from 'lucide-react';
+import { WorkflowIcon, FolderOpenIcon, AlertCircleIcon } from 'lucide-react';
 import { useState, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
@@ -27,6 +24,7 @@ import { useWorkspaceStore, usePlatform } from '@omnidesk/core';
 import { open } from '@tauri-apps/plugin-dialog';
 import { WorkflowsTable, type Workflow } from '../components/workflows-table';
 import { WorkflowsToolbar } from '../components/workflows-toolbar';
+import { WorkflowJsonEditorModal } from '../components/workflow-json-editor-modal';
 
 export const Route = createFileRoute('/')({
   component: WorkflowsPage,
@@ -41,6 +39,9 @@ function WorkflowsPage() {
   const [workflowToRun, setWorkflowToRun] = useState<string | null>(null);
   const [rowSelection, setRowSelection] = useState<Record<string, boolean>>({});
   const [viewMode, setViewMode] = useState<'active' | 'trash'>('active');
+  
+  const [isEditorOpen, setIsEditorOpen] = useState(false);
+  const [editorWorkflowId, setEditorWorkflowId] = useState<string | null>(null);
 
   const queryClient = useQueryClient();
 
@@ -325,6 +326,10 @@ function WorkflowsPage() {
               setSearchQuery={setSearchQuery}
               viewMode={viewMode}
               setViewMode={setViewMode}
+              onAdd={() => {
+                setEditorWorkflowId(null);
+                setIsEditorOpen(true);
+              }}
             />
             {Object.keys(rowSelection).length > 0 && (
               <div className="flex items-center gap-2 bg-muted/50 p-1.5 rounded-md border border-border/50 text-sm">
@@ -408,7 +413,10 @@ function WorkflowsPage() {
           <WorkflowsTable
             workflows={filteredWorkflows}
             isLoading={isLoading || isRefetching}
-            onEdit={(wf) => toast.info(`Edit ${wf.name}`)}
+            onEdit={(wf) => {
+              setEditorWorkflowId(wf.id);
+              setIsEditorOpen(true);
+            }}
             onDelete={(id) => setWorkflowToDelete(id)}
             onRun={(id) => setWorkflowToRun(id)}
             onDuplicate={(id) => duplicateMutation.mutate(id)}
@@ -463,6 +471,12 @@ function WorkflowsPage() {
         workflowId={workflowToRun}
         onClose={() => setWorkflowToRun(null)}
         onRunSuccess={() => setRowSelection({})}
+      />
+
+      <WorkflowJsonEditorModal
+        isOpen={isEditorOpen}
+        onClose={() => setIsEditorOpen(false)}
+        workflowId={editorWorkflowId}
       />
     </PageContainer>
   );

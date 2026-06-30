@@ -349,6 +349,9 @@ import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 import { useToast } from 'vue-toastification';
 import browser from 'webextension-polyfill';
+import { useOmniStudio } from '@/composable/useOmniStudio';
+
+const { isConnected } = useOmniStudio();
 
 const props = defineProps({
   isDataChanged: {
@@ -808,30 +811,38 @@ const modalActions = [
     icon: 'riSettings3Line',
   },
 ];
-const moreActions = [
-  {
-    id: 'export',
-    icon: 'riDownloadLine',
-    name: t('common.export'),
-    action: () => exportWorkflow(props.workflow),
-    hasAccess: props.isTeam ? props.canEdit : true,
-  },
-  {
-    id: 'rename',
-    icon: 'riPencilLine',
-    hasAccess: props.isTeam ? props.canEdit : true,
-    name: props.isTeam ? 'Edit detail' : t('common.rename'),
-    action: initRenameWorkflow,
-  },
-  {
-    id: 'delete',
-    hasAccess: true,
-    action: deleteWorkflow,
-    name: t('common.delete'),
-    icon: 'riDeleteBin7Line',
-    attrs: {
-      class: 'text-red-400 dark:text-red-500',
+const moreActions = computed(() => {
+  const baseActions = [
+    {
+      id: 'export',
+      icon: 'riDownloadLine',
+      name: t('common.export'),
+      action: () => exportWorkflow(props.workflow),
+      hasAccess: props.isTeam ? props.canEdit : true,
     },
-  },
-].filter((item) => item.hasAccess);
+    {
+      id: 'rename',
+      icon: 'riPencilLine',
+      hasAccess: props.isTeam ? props.canEdit : true,
+      name: props.isTeam ? 'Edit detail' : t('common.rename'),
+      action: initRenameWorkflow,
+    },
+    {
+      id: 'delete',
+      hasAccess: true,
+      action: deleteWorkflow,
+      name: t('common.delete'),
+      icon: 'riDeleteBin7Line',
+      attrs: {
+        class: 'text-red-400 dark:text-red-500',
+      },
+    },
+  ].filter((item) => item.hasAccess);
+
+  if (isConnected.value) {
+    return baseActions.filter((item) => item.id !== 'delete');
+  }
+  
+  return baseActions;
+});
 </script>

@@ -123,7 +123,10 @@ import { useWorkflowStore } from '@/stores/workflow';
 import { exportWorkflow } from '@/utils/workflowData';
 import { useSharedWorkflowStore } from '@/stores/sharedWorkflow';
 import RendererWorkflowService from '@/service/renderer/RendererWorkflowService';
+import { useOmniStudio } from '@/composable/useOmniStudio';
 import WorkflowsLocalCard from './WorkflowsLocalCard.vue';
+
+const { isConnected } = useOmniStudio();
 
 const props = defineProps({
   search: {
@@ -298,6 +301,7 @@ function deleteWorkflow({ name, id }) {
 function deleteSelectedWorkflows({ target, key }) {
   const excludeTags = ['INPUT', 'TEXTAREA', 'SELECT'];
   if (
+    isConnected.value ||
     excludeTags.includes(target.tagName) ||
     key !== 'Delete' ||
     state.selectedWorkflows.length === 0
@@ -366,48 +370,56 @@ function togglePinWorkflow(workflow) {
   });
 }
 
-const menu = [
-  {
-    id: 'copy-id',
-    name: 'Copy workflow id',
-    icon: 'riFileCopyLine',
-    action: (workflow) => {
-      navigator.clipboard.writeText(workflow.id).catch((error) => {
-        console.error(error);
+const menu = computed(() => {
+  const baseMenu = [
+    {
+      id: 'copy-id',
+      name: 'Copy workflow id',
+      icon: 'riFileCopyLine',
+      action: (workflow) => {
+        navigator.clipboard.writeText(workflow.id).catch((error) => {
+          console.error(error);
 
-        const textarea = document.createElement('textarea');
-        textarea.value = workflow.id;
-        textarea.select();
-        document.execCommand('copy');
-        textarea.blur();
-      });
+          const textarea = document.createElement('textarea');
+          textarea.value = workflow.id;
+          textarea.select();
+          document.execCommand('copy');
+          textarea.blur();
+        });
+      },
     },
-  },
-  {
-    id: 'duplicate',
-    name: t('common.duplicate'),
-    icon: 'riFileCopyLine',
-    action: duplicateWorkflow,
-  },
-  {
-    id: 'export',
-    name: t('common.export'),
-    icon: 'riDownloadLine',
-    action: exportWorkflow,
-  },
-  {
-    id: 'rename',
-    name: t('common.rename'),
-    icon: 'riPencilLine',
-    action: initRenameWorkflow,
-  },
-  {
-    id: 'delete',
-    name: t('common.delete'),
-    icon: 'riDeleteBin7Line',
-    action: deleteWorkflow,
-  },
-];
+    {
+      id: 'duplicate',
+      name: t('common.duplicate'),
+      icon: 'riFileCopyLine',
+      action: duplicateWorkflow,
+    },
+    {
+      id: 'export',
+      name: t('common.export'),
+      icon: 'riDownloadLine',
+      action: exportWorkflow,
+    },
+    {
+      id: 'rename',
+      name: t('common.rename'),
+      icon: 'riPencilLine',
+      action: initRenameWorkflow,
+    },
+    {
+      id: 'delete',
+      name: t('common.delete'),
+      icon: 'riDeleteBin7Line',
+      action: deleteWorkflow,
+    },
+  ];
+
+  if (isConnected.value) {
+    return baseMenu.filter((m) => m.id !== 'delete');
+  }
+
+  return baseMenu;
+});
 
 watch(
   () => props.folderId,

@@ -21,12 +21,12 @@ const toStudioWorkflow = (workflow) => {
     icon: workflow.icon,
     folder_id: workflow.folderId,
     description: workflow.description,
-    drawflow: typeof workflow.drawflow === 'string' ? workflow.drawflow : JSON.stringify(workflow.drawflow),
-    settings: typeof workflow.settings === 'string' ? workflow.settings : JSON.stringify(workflow.settings),
-    trigger: typeof workflow.trigger === 'string' ? workflow.trigger : JSON.stringify(workflow.trigger),
-    global_data: typeof workflow.globalData === 'string' ? workflow.globalData : JSON.stringify(workflow.globalData),
-    table_data: typeof workflow.table === 'string' ? workflow.table : JSON.stringify(workflow.table),
-    data_columns: typeof workflow.dataColumns === 'string' ? workflow.dataColumns : JSON.stringify(workflow.dataColumns),
+    drawflow: workflow.drawflow,
+    settings: workflow.settings,
+    trigger: workflow.trigger,
+    global_data: workflow.globalData,
+    table_data: workflow.table,
+    data_columns: workflow.dataColumns,
     version: workflow.version,
     is_disabled: workflow.isDisabled ? 1 : 0,
     created_at: new Date(workflow.createdAt).toISOString(),
@@ -34,11 +34,19 @@ const toStudioWorkflow = (workflow) => {
   };
 };
 
-// Transform Omni Studio Format to Automa Workflow
-const fromStudioWorkflow = (workflow) => {
-  const parseJson = (str, fallback) => {
-    if (!str) return fallback;
-    try { return JSON.parse(str); } catch (e) { return fallback; }
+export const fromStudioWorkflow = (workflow) => {
+  const parseJson = (val, fallback, fieldName) => {
+    if (!val) return fallback;
+    try {
+      let parsed = typeof val === 'string' ? JSON.parse(val) : val;
+      if (typeof parsed === 'string') {
+        parsed = JSON.parse(parsed); // Handle double-encoded strings
+      }
+      return parsed || fallback;
+    } catch (e) {
+      console.error(`[Workflow Validation Error] Failed to parse '${fieldName}' for workflow '${workflow.id || workflow.name}':`, e, '\nRaw value:', val);
+      return fallback;
+    }
   };
   
   return {
@@ -47,12 +55,12 @@ const fromStudioWorkflow = (workflow) => {
     icon: workflow.icon,
     folderId: workflow.folder_id,
     description: workflow.description,
-    drawflow: parseJson(workflow.drawflow, { nodes: [], edges: [], zoom: 1.3 }),
-    settings: parseJson(workflow.settings, {}),
-    trigger: parseJson(workflow.trigger, null),
+    drawflow: parseJson(workflow.drawflow, { nodes: [], edges: [], zoom: 1.3 }, 'drawflow'),
+    settings: parseJson(workflow.settings, {}, 'settings'),
+    trigger: parseJson(workflow.trigger, null, 'trigger'),
     globalData: workflow.global_data || '{\n\t"key": "value"\n}',
-    table: parseJson(workflow.table_data, []),
-    dataColumns: parseJson(workflow.data_columns, []),
+    table: parseJson(workflow.table_data, [], 'table_data'),
+    dataColumns: parseJson(workflow.data_columns, [], 'data_columns'),
     version: workflow.version,
     isDisabled: Boolean(workflow.is_disabled),
     createdAt: workflow.created_at ? new Date(workflow.created_at).getTime() : Date.now(),

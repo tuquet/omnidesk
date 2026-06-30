@@ -1,4 +1,4 @@
-import { SearchIcon } from 'lucide-react';
+import { SearchIcon, PlusIcon } from 'lucide-react';
 import { Input, Button } from '@omnidesk/ui';
 
 interface WorkflowsToolbarProps {
@@ -6,6 +6,7 @@ interface WorkflowsToolbarProps {
   setSearchQuery: (val: string) => void;
   viewMode: 'active' | 'trash';
   setViewMode: (mode: 'active' | 'trash') => void;
+  onAdd?: () => void;
 }
 
 export function WorkflowsToolbar({
@@ -13,9 +14,10 @@ export function WorkflowsToolbar({
   setSearchQuery,
   viewMode,
   setViewMode,
+  onAdd,
 }: WorkflowsToolbarProps) {
   return (
-    <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between bg-card p-4 rounded-lg border shadow-sm">
+    <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between bg-card p-4 rounded-lg border shadow-sm w-full">
       <div className="flex items-center gap-4 w-full sm:w-auto">
         <div className="flex bg-muted p-1 rounded-lg">
           <Button
@@ -43,6 +45,14 @@ export function WorkflowsToolbar({
           />
         </div>
       </div>
+      {onAdd && (
+        <div className="flex items-center">
+          <Button onClick={onAdd} size="sm" className="font-medium">
+            <PlusIcon className="mr-2 h-4 w-4" />
+            New Workflow
+          </Button>
+        </div>
+      )}
     </div>
   );
 }

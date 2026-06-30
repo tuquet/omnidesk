@@ -29,7 +29,7 @@ function StudioSidebar() {
             <SidebarMenu>
               <SidebarMenuItem>
                 <SidebarMenuButton className="text-xs" asChild>
-                  <Link to="/workflows">
+                  <Link to="/">
                     <Blocks />
                     <span>My Workflows</span>
                   </Link>

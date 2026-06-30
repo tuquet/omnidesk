@@ -11,7 +11,6 @@ import {
   Search,
   Cookie,
   Wrench,
-  Monitor,
   Languages,
   FileJson,
   BookOpen,

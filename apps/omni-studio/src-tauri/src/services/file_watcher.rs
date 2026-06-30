@@ -7,6 +7,9 @@ use crate::error::AppError;
 use crate::db::models::workflow::Workflow;
 use crate::services::workflow_service::WorkflowService;
 
+use std::collections::HashMap;
+use std::sync::{Arc, Mutex};
+
 /// FileWatcherService watches a local folder for .json workflow files.
 /// When a file is created/modified/deleted, it syncs with the SQLite database.
 /// The folder can be inside OneDrive for automatic cloud sync.
@@ -14,11 +17,12 @@ pub struct FileWatcherService {
     watch_dir: PathBuf,
     pool: SqlitePool,
     sync_tx: tokio::sync::broadcast::Sender<crate::api::handlers::sync_ws::SyncEvent>,
+    path_to_id: Arc<Mutex<HashMap<PathBuf, String>>>,
 }
 
 impl FileWatcherService {
     pub fn new(watch_dir: PathBuf, pool: SqlitePool, sync_tx: tokio::sync::broadcast::Sender<crate::api::handlers::sync_ws::SyncEvent>) -> Self {
-        Self { watch_dir, pool, sync_tx }
+        Self { watch_dir, pool, sync_tx, path_to_id: Arc::new(Mutex::new(HashMap::new())) }
     }
 
     /// Start watching the directory. Returns a handle to stop watching.
@@ -71,22 +75,54 @@ impl FileWatcherService {
         Ok(())
     }
 
-    /// Import all .json files from the watched directory into SQLite on startup
+    /// Import all .json files from the watched directory into SQLite on startup and reconcile deletions
     async fn import_all_from_dir(&self) -> Result<(), AppError> {
+        // 1. Get all active workflows from DB
+        let active_workflows = WorkflowService::get_all(&self.pool).await?;
+        let db_ids: std::collections::HashSet<String> = active_workflows.into_iter().map(|w| w.id).collect();
+
+        // 2. Read the directory and upsert files
         let entries = std::fs::read_dir(&self.watch_dir)
             .map_err(|e| AppError::Internal(format!("Failed to read dir: {}", e)))?;
 
+        let mut file_ids = std::collections::HashSet::new();
         let mut count = 0;
         for entry in entries.flatten() {
             let path = entry.path();
             if path.extension().is_some_and(|ext| ext == "json") {
                 match self.import_workflow_file(&path).await {
-                    Ok(_) => count += 1,
+                    Ok(wf) => {
+                        let expected_filename = format!("{}.automa.json", wf.id);
+                        let mut final_path = path.clone();
+                        
+                        if path.file_name().and_then(|s| s.to_str()) != Some(&expected_filename) {
+                            let new_path = path.with_file_name(&expected_filename);
+                            if std::fs::rename(&path, &new_path).is_ok() {
+                                final_path = new_path;
+                                println!("FileWatcher: Auto-renamed {:?} to {:?}", path, final_path);
+                            }
+                        }
+                        
+                        self.path_to_id.lock().unwrap().insert(final_path, wf.id.clone());
+                        file_ids.insert(wf.id);
+                        count += 1;
+                    }
                     Err(e) => eprintln!("FileWatcher: Failed to import {:?}: {:?}", path, e),
                 }
             }
         }
-        println!("FileWatcher: Imported {} workflows from {:?}", count, self.watch_dir);
+
+        // 3. Reconcile: Soft-delete DB workflows not found in the filesystem
+        let mut deleted_count = 0;
+        for id in db_ids {
+            if !file_ids.contains(&id) {
+                if WorkflowService::soft_delete(&self.pool, &id, "reconciliation").await.is_ok() {
+                    deleted_count += 1;
+                }
+            }
+        }
+
+        println!("FileWatcher: Reconciled {:?} - Imported {}, Soft-deleted {} missing workflows", self.watch_dir, count, deleted_count);
         Ok(())
     }
 
@@ -103,6 +139,18 @@ impl FileWatcherService {
                     println!("FileWatcher: Detected change in {:?}", path);
                     match self.import_workflow_file(path).await {
                         Ok(wf) => {
+                            let expected_filename = format!("{}.automa.json", wf.id);
+                            let mut final_path = path.clone();
+                            
+                            if path.file_name().and_then(|s| s.to_str()) != Some(&expected_filename) {
+                                let new_path = path.with_file_name(&expected_filename);
+                                if std::fs::rename(path, &new_path).is_ok() {
+                                    final_path = new_path;
+                                    println!("FileWatcher: Auto-renamed {:?} to {:?}", path, final_path);
+                                }
+                            }
+                            
+                            self.path_to_id.lock().unwrap().insert(final_path, wf.id.clone());
                             println!("FileWatcher: Upserted workflow '{}' ({})", wf.name, wf.id);
                             // Broadcast change to WebSocket
                             let event = crate::api::handlers::sync_ws::SyncEvent {
@@ -116,7 +164,14 @@ impl FileWatcherService {
                 }
                 EventKind::Remove(_) => {
                     println!("FileWatcher: Detected deletion of {:?}", path);
-                    if let Some(id) = Self::extract_id_from_filename(path) {
+                    
+                    // Retrieve the ID associated with this path, fallback to filename parsing
+                    let id_opt = {
+                        let mut map = self.path_to_id.lock().unwrap();
+                        map.remove(path).or_else(|| Self::extract_id_from_filename(path))
+                    };
+
+                    if let Some(id) = id_opt {
                         // Soft delete — don't permanently remove, user may want to recover
                         match WorkflowService::soft_delete(pool, &id, "file_watcher").await {
                             Ok(_) => {
@@ -193,7 +248,7 @@ impl FileWatcherService {
 
     /// Export a workflow from the database to a .json file
     pub async fn export_workflow_file(watch_dir: &Path, workflow: &Workflow) -> Result<PathBuf, AppError> {
-        let filename = format!("{}.json", workflow.id);
+        let filename = format!("{}.automa.json", workflow.id);
         let path = watch_dir.join(&filename);
 
         let json = serde_json::to_string_pretty(workflow)
@@ -206,10 +261,15 @@ impl FileWatcherService {
         Ok(path)
     }
 
-    /// Extract workflow ID from filename: "uuid.json" → "uuid"
+    /// Helper to extract workflow ID from a filename (e.g. `uuid.automa.json` -> `uuid`)
     fn extract_id_from_filename(path: &Path) -> Option<String> {
-        path.file_stem()
-            .and_then(|s| s.to_str())
-            .map(|s| s.to_string())
+        let filename = path.file_name()?.to_str()?;
+        if filename.ends_with(".automa.json") {
+            Some(filename.trim_end_matches(".automa.json").to_string())
+        } else if filename.ends_with(".json") {
+            Some(filename.trim_end_matches(".json").to_string())
+        } else {
+            None
+        }
     }
 }
