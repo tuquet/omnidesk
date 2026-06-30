@@ -134,7 +134,7 @@ async fn handle_extension_message(
 
             if let Some(payload) = msg.payload {
                 if let Ok(workflows) = serde_json::from_value::<Vec<Workflow>>(payload) {
-                    let watch_dir = app_dir.join("automa-workflows");
+                    let watch_dir = app_dir.join("workflows");
                     let _ = std::fs::create_dir_all(&watch_dir);
 
                     let mut count = 0;
@@ -156,7 +156,7 @@ async fn handle_extension_message(
                     match WorkflowService::delete(db, id).await {
                         Ok(_) => {
                             // Remove JSON file too
-                            let file_path = app_dir.join("automa-workflows").join(format!("{}.json", id));
+                            let file_path = app_dir.join("workflows").join(format!("{}.json", id));
                             let _ = std::fs::remove_file(&file_path);
                             println!("[SyncWS] Deleted workflow {} (from Extension)", id);
                         }

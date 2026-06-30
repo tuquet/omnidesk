@@ -71,8 +71,8 @@ impl SharedWorkflowExecutor {
             let bridge_url = format!("http://127.0.0.1:{}/api/automa/bridge?run_id={}", server_port, run_id);
             println!("[SharedExecutor] Launching default browser: {}", bridge_url);
             
-            use tauri_plugin_shell::ShellExt;
-            if let Err(e) = app.shell().open(&bridge_url, None) {
+            use tauri_plugin_opener::OpenerExt;
+            if let Err(e) = app.opener().open_url(&bridge_url, None::<&str>) {
                 eprintln!("[SharedExecutor] Failed to open default browser: {}", e);
             }
         } else {

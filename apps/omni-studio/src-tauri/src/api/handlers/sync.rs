@@ -53,7 +53,7 @@ async fn push_workflows(
     State(state): State<AppState>,
     Json(payload): Json<PushWorkflowsPayload>,
 ) -> Result<Json<serde_json::Value>, AppError> {
-    let watch_dir = state.app_dir.join("automa-workflows");
+    let watch_dir = state.app_dir.join("workflows");
     std::fs::create_dir_all(&watch_dir)
         .map_err(|e| AppError::Internal(format!("Failed to create watch dir: {}", e)))?;
 
@@ -104,7 +104,7 @@ async fn export_workflow(
     let workflow = WorkflowService::get_by_id(&state.db, &id).await?;
 
     // Also write to the watch directory
-    let watch_dir = state.app_dir.join("automa-workflows");
+    let watch_dir = state.app_dir.join("workflows");
     std::fs::create_dir_all(&watch_dir)
         .map_err(|e| AppError::Internal(format!("Failed to create watch dir: {}", e)))?;
     FileWatcherService::export_workflow_file(&watch_dir, &workflow).await?;
@@ -143,7 +143,7 @@ async fn import_workflow(
 async fn sync_status(
     State(state): State<AppState>,
 ) -> Result<Json<SyncStatusResponse>, AppError> {
-    let watch_dir = state.app_dir.join("automa-workflows");
+    let watch_dir = state.app_dir.join("workflows");
     let workflows = WorkflowService::get_all(&state.db).await?;
 
     Ok(Json(SyncStatusResponse {
@@ -167,9 +167,15 @@ async fn sync_local(
     State(state): State<AppState>,
     Json(payload): Json<SyncLocalPayload>,
 ) -> Result<Json<serde_json::Value>, AppError> {
-    let watch_dir = std::path::PathBuf::from(payload.folder_path);
-    if !watch_dir.exists() || !watch_dir.is_dir() {
-        return Err(AppError::BadRequest("Invalid folder path".to_string()));
+    // Read from the 'workflows' subfolder of the workspace
+    let workspace_dir = std::path::PathBuf::from(payload.folder_path);
+    let watch_dir = workspace_dir.join("workflows");
+    
+    // Ensure the workflows directory exists before syncing
+    if !watch_dir.exists() {
+        if let Err(e) = std::fs::create_dir_all(&watch_dir) {
+            return Err(AppError::Internal(format!("Failed to create workflows folder: {}", e)));
+        }
     }
 
     let entries = std::fs::read_dir(&watch_dir)

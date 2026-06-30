@@ -72,7 +72,7 @@ pub async fn serve(pool: SqlitePool, app_dir: PathBuf, port: u16, app_handle: Ap
         sync_tx: sync_tx.clone(),
     };
 
-    let watch_dir = app_dir.join("automa-workflows");
+    let watch_dir = app_dir.join("workflows");
     let pool_clone = pool.clone();
     let sync_tx_clone = sync_tx.clone();
     tokio::spawn(async move {

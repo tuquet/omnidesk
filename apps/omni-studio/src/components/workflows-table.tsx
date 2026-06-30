@@ -23,6 +23,8 @@ import {
   ArrowUpIcon,
   ArrowDownIcon,
   ArrowUpDownIcon,
+  RotateCcw,
+  CopyIcon,
 } from 'lucide-react';
 import {
   useReactTable,
@@ -48,11 +50,15 @@ interface WorkflowsTableProps {
   onEdit: (workflow: Workflow) => void;
   onDelete: (id: string) => void;
   onRun: (id: string) => void;
+  onDuplicate?: (id: string) => void;
   sortBy?: string;
   sortOrder?: 'asc' | 'desc';
   onSortChange?: (column: string) => void;
   rowSelection?: Record<string, boolean>;
   onRowSelectionChange?: (updater: Updater<RowSelectionState>) => void;
+  viewMode?: 'active' | 'trash';
+  onRestore?: (id: string) => void;
+  onForceDelete?: (id: string) => void;
 }
 
 const columnHelper = createColumnHelper<Workflow>();
@@ -63,11 +69,15 @@ export function WorkflowsTable({
   onEdit,
   onDelete,
   onRun,
+  onDuplicate,
   sortBy,
   sortOrder,
   onSortChange,
   rowSelection = {},
   onRowSelectionChange,
+  viewMode = 'active',
+  onRestore,
+  onForceDelete,
 }: WorkflowsTableProps) {
   const renderSortIcon = useCallback(
     (column: string) => {
@@ -184,6 +194,47 @@ export function WorkflowsTable({
         header: () => <div className="text-right w-full">Actions</div>,
         cell: (info) => {
           const workflow = info.row.original;
+
+          if (viewMode === 'trash') {
+            return (
+              <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity focus-within:opacity-100 sm:opacity-100 min-w-[120px]">
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-500/10 transition-colors shrink-0"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onRestore?.(workflow.id);
+                      }}
+                    >
+                      <RotateCcw className="h-4 w-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>Restore Workflow</TooltipContent>
+                </Tooltip>
+
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10 transition-colors shrink-0"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onForceDelete?.(workflow.id);
+                      }}
+                    >
+                      <TrashIcon className="h-4 w-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>Permanently Delete</TooltipContent>
+                </Tooltip>
+              </div>
+            );
+          }
+
           return (
             <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity focus-within:opacity-100 sm:opacity-100 min-w-[120px]">
               <Tooltip>
@@ -227,6 +278,24 @@ export function WorkflowsTable({
                   <Button
                     variant="ghost"
                     size="icon"
+                    className="h-8 w-8 text-blue-500 hover:text-blue-600 hover:bg-blue-500/10 transition-colors shrink-0"
+                    data-testid={`btn-duplicate-workflow-${workflow.id}`}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onDuplicate?.(workflow.id);
+                    }}
+                  >
+                    <CopyIcon className="h-4 w-4" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>Duplicate Workflow</TooltipContent>
+              </Tooltip>
+
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
                     className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10 transition-colors shrink-0"
                     data-testid={`btn-delete-workflow-${workflow.id}`}
                     onClick={(e) => {
@@ -242,11 +311,11 @@ export function WorkflowsTable({
             </div>
           );
         },
-        size: 150,
+        size: 180,
         enableResizing: false,
       }),
     ],
-    [onRun, onEdit, onDelete, renderSortIcon],
+    [onRun, onEdit, onDelete, onDuplicate, onRestore, onForceDelete, renderSortIcon, viewMode],
   );
 
   const table = useReactTable({

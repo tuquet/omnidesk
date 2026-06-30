@@ -11,6 +11,12 @@ pub async fn init_db(app_dir: PathBuf) -> Result<SqlitePool, sqlx::Error> {
         .create_if_missing(true)
         .foreign_keys(true);
         
+    // Create .gitignore if not exists to avoid committing the DB
+    let gitignore_path = app_dir.join(".gitignore");
+    if !gitignore_path.exists() {
+        let _ = std::fs::write(&gitignore_path, "omnidesk.db*\n.env\n");
+    }
+        
     let pool = SqlitePoolOptions::new()
         .max_connections(5)
         .connect_with(options)

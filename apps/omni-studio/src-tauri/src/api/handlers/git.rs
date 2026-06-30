@@ -22,8 +22,7 @@ pub fn router() -> Router<AppState> {
 async fn git_pull(
     State(state): State<AppState>,
 ) -> Result<Json<Value>, AppError> {
-    let watch_dir = state.app_dir.join("automa-workflows");
-    let result = GitService::pull(&watch_dir)?;
+    let result = GitService::pull(&state.app_dir)?;
     Ok(Json(json!({ "message": "Pull successful", "output": result })))
 }
 
@@ -37,8 +36,7 @@ async fn git_pull(
 async fn git_push(
     State(state): State<AppState>,
 ) -> Result<Json<Value>, AppError> {
-    let watch_dir = state.app_dir.join("automa-workflows");
     let message = format!("Update workflows from Omni-Studio at {}", chrono::Local::now().format("%Y-%m-%d %H:%M:%S"));
-    let result = GitService::commit_and_push(&watch_dir, &message)?;
+    let result = GitService::commit_and_push(&state.app_dir, &message)?;
     Ok(Json(json!({ "message": "Push successful", "output": result })))
 }

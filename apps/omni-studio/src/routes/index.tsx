@@ -18,16 +18,7 @@ import {
   Input,
   DialogTrigger,
 } from '@omnidesk/ui';
-import {
-  WorkflowIcon,
-  FolderOpenIcon,
-  AlertCircleIcon,
-  DownloadIcon,
-  UploadCloudIcon,
-  GitBranch,
-  TerminalSquare,
-  Loader2,
-} from 'lucide-react';
+import { WorkflowIcon, FolderOpenIcon, AlertCircleIcon, Loader2 } from 'lucide-react';
 import { useState, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
@@ -49,6 +40,7 @@ function WorkflowsPage() {
   const [workflowToDelete, setWorkflowToDelete] = useState<string | null>(null);
   const [workflowToRun, setWorkflowToRun] = useState<string | null>(null);
   const [rowSelection, setRowSelection] = useState<Record<string, boolean>>({});
+  const [viewMode, setViewMode] = useState<'active' | 'trash'>('active');
 
   const queryClient = useQueryClient();
 
@@ -57,70 +49,30 @@ function WorkflowsPage() {
   // If no workspace is selected, we block the UI
   const isWorkspaceSelected = !!selectedWorkspacePath;
 
-  // Git Status Query
-  const { data: isGitInitialized = false, refetch: refetchGitStatus } = useQuery({
-    queryKey: ['gitStatus', selectedWorkspacePath],
-    queryFn: async () => {
-      if (!selectedWorkspacePath) return false;
-      return (await platformApi.invoke('check_git_status', {
-        path: selectedWorkspacePath,
-      })) as boolean;
-    },
-    enabled: isWorkspaceSelected,
-  });
-
-  // Git Init state
-  const [gitUrl, setGitUrl] = useState('');
-  const [isGitLoading, setIsGitLoading] = useState(false);
-  const [gitDialogOpen, setGitDialogOpen] = useState(false);
-  const [gitInstallGuide, setGitInstallGuide] = useState(false);
-
-  const handleInitGit = async () => {
-    if (!gitUrl || !selectedWorkspacePath) return;
-    setIsGitLoading(true);
-    setGitInstallGuide(false);
-    try {
-      const msg = await platformApi.invoke('init_git_repository', {
-        repoUrl: gitUrl,
-        destinationPath: selectedWorkspacePath,
-      });
-      toast.success(msg as string);
-      setGitDialogOpen(false);
-      setGitUrl('');
-      refetchGitStatus();
-    } catch (e) {
-      if (String(e).includes('GIT_NOT_FOUND')) {
-        setGitInstallGuide(true);
-      } else {
-        toast.error(String(e));
-      }
-    } finally {
-      setIsGitLoading(false);
-    }
-  };
-
   const {
     data: workflows = [],
     isLoading,
     isRefetching,
   } = useQuery<Workflow[]>({
-    queryKey: ['workflows', selectedWorkspacePath],
+    queryKey: ['workflows', selectedWorkspacePath, viewMode],
     queryFn: async () => {
       if (!selectedWorkspacePath) return [];
 
-      // We first trigger a sync from local folder to SQLite
-      await client.request({
-        url: '/api/automa/workflows/sync/local',
-        method: 'POST',
-        body: { folder_path: selectedWorkspacePath },
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
+      // We first trigger a sync from local folder to SQLite (only in active mode)
+      if (viewMode === 'active') {
+        await client.request({
+          url: '/api/automa/workflows/sync/local',
+          method: 'POST',
+          body: { folder_path: selectedWorkspacePath },
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+      }
 
       // Then fetch from SQLite
       const { data, error } = await client.request({
-        url: '/api/automa/workflows',
+        url: viewMode === 'trash' ? '/api/automa/workflows/trash' : '/api/automa/workflows',
         method: 'GET',
       });
       if (error) throw error;
@@ -147,6 +99,52 @@ function WorkflowsPage() {
     },
   });
 
+  const restoreMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await client.request({
+        url: `/api/automa/workflows/${id}/restore`,
+        method: 'POST',
+      });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success('Workflow restored successfully');
+      queryClient.invalidateQueries({ queryKey: ['workflows', selectedWorkspacePath] });
+    },
+  });
+
+  const forceDeleteMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await client.request({
+        url: `/api/automa/workflows/${id}/force`,
+        method: 'DELETE',
+      });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success('Workflow permanently deleted');
+      queryClient.invalidateQueries({ queryKey: ['workflows', selectedWorkspacePath] });
+      setWorkflowToDelete(null);
+    },
+    onError: () => {
+      setWorkflowToDelete(null);
+    },
+  });
+
+  const duplicateMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await client.request({
+        url: `/api/automa/workflows/${id}/duplicate`,
+        method: 'POST',
+      });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success('Workflow duplicated successfully');
+      queryClient.invalidateQueries({ queryKey: ['workflows', selectedWorkspacePath] });
+    },
+  });
+
   const bulkDeleteMutation = useMutation({
     mutationFn: async (ids: string[]) => {
       await Promise.all(
@@ -155,6 +153,36 @@ function WorkflowsPage() {
     },
     onSuccess: () => {
       toast.success('Workflows deleted successfully');
+      setRowSelection({});
+      queryClient.invalidateQueries({ queryKey: ['workflows', selectedWorkspacePath] });
+    },
+  });
+
+  const bulkRestoreMutation = useMutation({
+    mutationFn: async (ids: string[]) => {
+      await Promise.all(
+        ids.map((id) =>
+          client.request({ url: `/api/automa/workflows/${id}/restore`, method: 'POST' }),
+        ),
+      );
+    },
+    onSuccess: () => {
+      toast.success('Workflows restored successfully');
+      setRowSelection({});
+      queryClient.invalidateQueries({ queryKey: ['workflows', selectedWorkspacePath] });
+    },
+  });
+
+  const bulkForceDeleteMutation = useMutation({
+    mutationFn: async (ids: string[]) => {
+      await Promise.all(
+        ids.map((id) =>
+          client.request({ url: `/api/automa/workflows/${id}/force`, method: 'DELETE' }),
+        ),
+      );
+    },
+    onSuccess: () => {
+      toast.success('Workflows permanently deleted');
       setRowSelection({});
       queryClient.invalidateQueries({ queryKey: ['workflows', selectedWorkspacePath] });
     },
@@ -179,37 +207,6 @@ function WorkflowsPage() {
       setRowSelection({});
       queryClient.invalidateQueries({ queryKey: ['workflows', selectedWorkspacePath] });
     },
-  });
-
-  const pullMutation = useMutation({
-    mutationFn: async () => {
-      // In future, this will call actual git pull on the selected workspace
-      const { data, error } = await client.request({
-        url: '/api/git/pull',
-        method: 'POST',
-        data: { path: selectedWorkspacePath },
-      });
-      if (error) throw error;
-      return data;
-    },
-    onSuccess: () => {
-      toast.success('Pulled latest workflows from Git');
-      queryClient.invalidateQueries({ queryKey: ['workflows', selectedWorkspacePath] });
-    },
-  });
-
-  const pushMutation = useMutation({
-    mutationFn: async () => {
-      // In future, this will call actual git commit and push
-      const { data, error } = await client.request({
-        url: '/api/git/push',
-        method: 'POST',
-        data: { path: selectedWorkspacePath },
-      });
-      if (error) throw error;
-      return data;
-    },
-    onSuccess: () => toast.success('Committed and Pushed workflows to Git'),
   });
 
   const filteredWorkflows = useMemo(() => {
@@ -242,6 +239,8 @@ function WorkflowsPage() {
       });
       if (selected && typeof selected === 'string') {
         setWorkspacePath(selected);
+        // Persist to backend and restart app so DB is initialized in the new location
+        await platformApi.invoke('update_storage_location', { newPath: selected });
       }
     } catch {
       toast.error('Failed to open folder picker');
@@ -315,186 +314,93 @@ function WorkflowsPage() {
               {selectedWorkspacePath ? selectedWorkspacePath.split(/[/\\]/).pop() : 'Select Folder'}
             </span>
           </Button>
-
-          <div className="h-8 w-px bg-border mx-1 hidden sm:block"></div>
-
-          {isGitInitialized ? (
-            <>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => pullMutation.mutate()}
-                disabled={pullMutation.isPending || pushMutation.isPending || !isWorkspaceSelected}
-              >
-                <DownloadIcon
-                  className={`mr-2 h-4 w-4 ${pullMutation.isPending ? 'animate-bounce' : ''}`}
-                />
-                Git Pull
-              </Button>
-              <Button
-                variant="default"
-                size="sm"
-                className="bg-sky-500 hover:bg-sky-600 text-white"
-                onClick={() => pushMutation.mutate()}
-                disabled={pullMutation.isPending || pushMutation.isPending || !isWorkspaceSelected}
-              >
-                <UploadCloudIcon
-                  className={`mr-2 h-4 w-4 ${pushMutation.isPending ? 'animate-pulse' : ''}`}
-                />
-                Git Push
-              </Button>
-            </>
-          ) : (
-            <Dialog open={gitDialogOpen} onOpenChange={setGitDialogOpen}>
-              <DialogTrigger asChild>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="bg-primary/10 text-primary border-primary hover:bg-primary/20"
-                >
-                  <GitBranch className="mr-2 h-4 w-4" />
-                  Initialize Git
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="sm:max-w-[460px] p-0 overflow-hidden">
-                <div className="bg-muted/50 px-6 py-4 border-b">
-                  <DialogHeader>
-                    <div className="mx-auto bg-primary/10 p-3 rounded-full w-12 h-12 flex items-center justify-center mb-2">
-                      <GitBranch className="h-6 w-6 text-primary" />
-                    </div>
-                    <DialogTitle className="text-center text-lg">Initialize Workspace</DialogTitle>
-                    <DialogDescription className="text-center">
-                      Clone a remote workflow repository to begin your automation journey.
-                    </DialogDescription>
-                  </DialogHeader>
-                </div>
-
-                <div className="p-6 space-y-5">
-                  {gitInstallGuide && (
-                    <Alert className="bg-muted/50 text-foreground border-primary/20">
-                      <TerminalSquare className="h-4 w-4 text-primary" />
-                      <AlertTitle className="font-semibold text-primary">
-                        Git CLI is missing
-                      </AlertTitle>
-                      <AlertDescription className="text-xs text-muted-foreground mt-2 space-y-2">
-                        <p>
-                          Please open PowerShell and run the following command to install via Scoop:
-                        </p>
-                        <code className="block bg-background border px-2 py-1.5 rounded font-mono select-all">
-                          scoop install git
-                        </code>
-                        <p className="mt-2 text-muted-foreground">
-                          If you don't have Scoop, install it first:
-                        </p>
-                        <code className="block bg-background border px-2 py-1.5 rounded font-mono select-all">
-                          Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser;
-                          Invoke-RestMethod -Uri https://get.scoop.sh | Invoke-Expression
-                        </code>
-                      </AlertDescription>
-                    </Alert>
-                  )}
-
-                  <div className="space-y-2">
-                    <Label
-                      htmlFor="repo-url"
-                      className="text-xs font-semibold uppercase text-muted-foreground"
-                    >
-                      Repository URL
-                    </Label>
-                    <Input
-                      id="repo-url"
-                      placeholder="https://github.com/company/workflows.git"
-                      value={gitUrl}
-                      onChange={(e) => setGitUrl(e.target.value)}
-                      className="h-9 transition-all focus-visible:ring-primary/50"
-                      disabled={isGitLoading}
-                      autoComplete="off"
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label className="text-xs font-semibold uppercase text-muted-foreground">
-                      Local Destination
-                    </Label>
-                    <Input
-                      readOnly
-                      value={selectedWorkspacePath || ''}
-                      className="h-9 w-full bg-muted/30 text-sm"
-                      disabled
-                    />
-                  </div>
-                </div>
-
-                <DialogFooter className="bg-muted/30 px-6 py-4 border-t">
-                  <Button
-                    type="button"
-                    onClick={handleInitGit}
-                    disabled={isGitLoading || !gitUrl || !selectedWorkspacePath}
-                    className="w-full sm:w-auto"
-                  >
-                    {isGitLoading ? (
-                      <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        Cloning Repository...
-                      </>
-                    ) : (
-                      'Clone Repository'
-                    )}
-                  </Button>
-                </DialogFooter>
-              </DialogContent>
-            </Dialog>
-          )}
         </div>
       </PageHeader>
 
       {isWorkspaceSelected && (
         <div className="flex flex-col gap-4">
           <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center justify-between">
-            <WorkflowsToolbar searchQuery={searchQuery} onSearchChange={setSearchQuery} />
+            <WorkflowsToolbar
+              searchQuery={searchQuery}
+              setSearchQuery={setSearchQuery}
+              viewMode={viewMode}
+              setViewMode={setViewMode}
+            />
             {Object.keys(rowSelection).length > 0 && (
               <div className="flex items-center gap-2 bg-muted/50 p-1.5 rounded-md border border-border/50 text-sm">
                 <span className="px-2 text-muted-foreground">
                   {Object.keys(rowSelection).length} selected
                 </span>
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  onClick={() =>
-                    bulkUpdateStatusMutation.mutate({
-                      ids: Object.keys(rowSelection),
-                      isDisabled: 0,
-                    })
-                  }
-                  disabled={bulkUpdateStatusMutation.isPending}
-                >
-                  Enable
-                </Button>
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  onClick={() =>
-                    bulkUpdateStatusMutation.mutate({
-                      ids: Object.keys(rowSelection),
-                      isDisabled: 1,
-                    })
-                  }
-                  disabled={bulkUpdateStatusMutation.isPending}
-                >
-                  Disable
-                </Button>
-                <Button
-                  variant="destructive"
-                  size="sm"
-                  onClick={() => {
-                    if (confirm('Are you sure you want to delete selected workflows?')) {
-                      bulkDeleteMutation.mutate(Object.keys(rowSelection));
-                    }
-                  }}
-                  disabled={bulkDeleteMutation.isPending}
-                >
-                  Delete
-                </Button>
+
+                {viewMode === 'active' ? (
+                  <>
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      onClick={() =>
+                        bulkUpdateStatusMutation.mutate({
+                          ids: Object.keys(rowSelection),
+                          isDisabled: 0,
+                        })
+                      }
+                      disabled={bulkUpdateStatusMutation.isPending}
+                    >
+                      Enable
+                    </Button>
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      onClick={() =>
+                        bulkUpdateStatusMutation.mutate({
+                          ids: Object.keys(rowSelection),
+                          isDisabled: 1,
+                        })
+                      }
+                      disabled={bulkUpdateStatusMutation.isPending}
+                    >
+                      Disable
+                    </Button>
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      onClick={() => {
+                        if (confirm('Are you sure you want to delete selected workflows?')) {
+                          bulkDeleteMutation.mutate(Object.keys(rowSelection));
+                        }
+                      }}
+                      disabled={bulkDeleteMutation.isPending}
+                    >
+                      Delete
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      onClick={() => bulkRestoreMutation.mutate(Object.keys(rowSelection))}
+                      disabled={bulkRestoreMutation.isPending}
+                    >
+                      Restore
+                    </Button>
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      onClick={() => {
+                        if (
+                          confirm(
+                            'Are you sure you want to permanently delete selected workflows? This cannot be undone.',
+                          )
+                        ) {
+                          bulkForceDeleteMutation.mutate(Object.keys(rowSelection));
+                        }
+                      }}
+                      disabled={bulkForceDeleteMutation.isPending}
+                    >
+                      Force Delete
+                    </Button>
+                  </>
+                )}
               </div>
             )}
           </div>
@@ -505,6 +411,18 @@ function WorkflowsPage() {
             onEdit={(wf) => toast.info(`Edit ${wf.name}`)}
             onDelete={(id) => setWorkflowToDelete(id)}
             onRun={(id) => setWorkflowToRun(id)}
+            onDuplicate={(id) => duplicateMutation.mutate(id)}
+            viewMode={viewMode}
+            onRestore={(id) => restoreMutation.mutate(id)}
+            onForceDelete={(id) => {
+              if (
+                confirm(
+                  'Are you sure you want to permanently delete this workflow? This cannot be undone.',
+                )
+              ) {
+                forceDeleteMutation.mutate(id);
+              }
+            }}
             sortBy={sortBy}
             sortOrder={sortOrder}
             onSortChange={handleSortChange}

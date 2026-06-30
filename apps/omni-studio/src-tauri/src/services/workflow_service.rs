@@ -26,6 +26,24 @@ impl WorkflowService {
         Ok(workflows)
     }
 
+    pub async fn get_trash(pool: &SqlitePool) -> Result<Vec<Workflow>, AppError> {
+        let workflows = sqlx::query_as::<_, Workflow>(
+            r#"
+            SELECT id, name, icon, folder_id, description, drawflow, settings, trigger,
+                   global_data, table_data, data_columns, version, is_disabled, source,
+                   CAST(created_at AS TEXT) as created_at, CAST(updated_at AS TEXT) as updated_at,
+                   CAST(deleted_at AS TEXT) as deleted_at, delete_source
+            FROM workflows
+            WHERE deleted_at IS NOT NULL
+            ORDER BY deleted_at DESC
+            "#
+        )
+        .fetch_all(pool)
+        .await?;
+
+        Ok(workflows)
+    }
+
     pub async fn get_by_id(pool: &SqlitePool, id: &str) -> Result<Workflow, AppError> {
         let workflow = sqlx::query_as::<_, Workflow>(
             r#"
@@ -197,6 +215,28 @@ impl WorkflowService {
         .await?;
 
         Self::get_by_id(pool, id).await
+    }
+
+    /// Duplicate an existing workflow
+    pub async fn duplicate(pool: &SqlitePool, id: &str) -> Result<Workflow, AppError> {
+        let original = Self::get_by_id(pool, id).await?;
+        
+        let new_id = uuid::Uuid::new_v4().to_string();
+        let new_name = format!("{} (Copy)", original.name);
+        
+        let mut new_workflow = original.clone();
+        new_workflow.id = new_id.clone();
+        new_workflow.name = new_name.clone();
+        // Reset timestamps and source fields
+        new_workflow.created_at = None;
+        new_workflow.updated_at = None;
+        new_workflow.deleted_at = None;
+        new_workflow.delete_source = None;
+        new_workflow.source = Some("studio".to_string());
+        
+        Self::create(pool, &new_workflow).await?;
+        
+        Self::get_by_id(pool, &new_id).await
     }
 
     /// Get workflows changed since a timestamp (for sync catch-up after reconnect)

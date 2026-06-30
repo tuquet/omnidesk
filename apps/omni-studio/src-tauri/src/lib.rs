@@ -119,7 +119,7 @@ pub fn run() {
                             app_handle.manage(pool.clone());
                             
                             let _pool_for_rt = pool.clone();
-                            let app_dir = app_handle.path().app_data_dir().unwrap_or_else(|_| PathBuf::from("."));
+                            let app_dir = system::config::get_active_storage_path(&app_handle).unwrap_or_else(|_| PathBuf::from("."));
                             let app_handle_clone = app_handle.clone();
                             
                             tauri::async_runtime::spawn(async move {

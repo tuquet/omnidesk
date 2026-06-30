@@ -1,6 +1,6 @@
 use axum::{
     extract::{Path, Query, State},
-    routing::{get, post},
+    routing::{get, post, put, delete},
     Json, Router,
 };
 use serde::{Deserialize, Serialize};
@@ -94,7 +94,11 @@ pub fn router() -> Router<AppState> {
         .route("/shared", get(get_empty_list))
         .route("/hosted", get(get_empty_list))
         .route("/backup", get(get_empty_list))
+        .route("/trash", get(list_trash_workflows))
         .route("/:id", get(get_workflow).put(update_workflow).delete(delete_workflow))
+        .route("/:id/duplicate", post(duplicate_workflow))
+        .route("/:id/restore", post(restore_workflow))
+        .route("/:id/force", delete(force_delete_workflow))
         .route("/runs", post(create_workflow_run))
         .route("/:id/runs", get(get_workflow_runs))
         .route("/runs/:run_id/logs", get(get_run_logs))
@@ -154,6 +158,23 @@ async fn get_workflow(
     Ok(Json(ApiWorkflow::from(workflow)))
 }
 
+
+#[utoipa::path(
+    get,
+    path = "/api/automa/workflows/trash",
+    responses(
+        (status = 200, description = "List of trashed workflows", body = Vec<ApiWorkflow>)
+    ),
+    tag = "workflows"
+)]
+async fn list_trash_workflows(
+    State(state): State<AppState>,
+) -> Result<Json<Vec<ApiWorkflow>>, AppError> {
+    let workflows = WorkflowService::get_trash(&state.db).await?;
+    let api_workflows = workflows.into_iter().map(ApiWorkflow::from).collect();
+    Ok(Json(api_workflows))
+}
+
 #[utoipa::path(
     post,
     path = "/api/automa/workflows",
@@ -210,11 +231,11 @@ async fn delete_workflow(
     State(state): State<AppState>,
     Path(id): Path<String>,
 ) -> Result<Json<serde_json::Value>, AppError> {
-    // Delete from SQLite
-    WorkflowService::delete(&state.db, &id).await?;
+    // Soft Delete from SQLite
+    WorkflowService::soft_delete(&state.db, &id, "api").await?;
 
-    // Delete from Local File
-    let watch_dir = state.app_dir.join("automa-workflows");
+    // Delete from Local File (if we do soft delete, we also delete the local JSON so it doesn't get synced back)
+    let watch_dir = state.app_dir.join("workflows");
     let file_path = watch_dir.join(format!("{}.json", id));
     if file_path.exists() {
         if let Err(e) = std::fs::remove_file(&file_path) {
@@ -230,6 +251,92 @@ async fn delete_workflow(
     let _ = state.sync_tx.send(event);
 
     Ok(Json(serde_json::json!({ "deleted": true })))
+}
+
+#[utoipa::path(
+    post,
+    path = "/api/automa/workflows/{id}/restore",
+    responses(
+        (status = 200, description = "Workflow restored")
+    ),
+    params(
+        ("id" = String, Path, description = "Workflow ID")
+    ),
+    tag = "workflows"
+)]
+async fn restore_workflow(
+    State(state): State<AppState>,
+    Path(id): Path<String>,
+) -> Result<Json<serde_json::Value>, AppError> {
+    WorkflowService::restore(&state.db, &id).await?;
+    
+    // Fetch and export to JSON
+    if let Ok(wf) = WorkflowService::get_by_id(&state.db, &id).await {
+        let watch_dir = state.app_dir.join("workflows");
+        let _ = crate::services::file_watcher::FileWatcherService::export_workflow_file(&watch_dir, &wf).await;
+    }
+
+    Ok(Json(serde_json::json!({ "restored": true })))
+}
+
+#[utoipa::path(
+    post,
+    path = "/api/automa/workflows/{id}/duplicate",
+    responses(
+        (status = 200, description = "Workflow duplicated")
+    ),
+    params(
+        ("id" = String, Path, description = "Workflow ID")
+    ),
+    tag = "workflows"
+)]
+async fn duplicate_workflow(
+    State(state): State<AppState>,
+    Path(id): Path<String>,
+) -> Result<Json<ApiWorkflow>, AppError> {
+    let duplicated = WorkflowService::duplicate(&state.db, &id).await?;
+    
+    // Export new workflow to local JSON
+    let watch_dir = state.app_dir.join("workflows");
+    let _ = crate::services::file_watcher::FileWatcherService::export_workflow_file(&watch_dir, &duplicated).await;
+
+    // Broadcast to WebSocket so Extension adds it
+    let event = crate::api::handlers::sync_ws::SyncEvent {
+        event_type: "workflow_added".to_string(),
+        payload: serde_json::json!({ "id": duplicated.id, "source": "studio" }),
+    };
+    let _ = state.sync_tx.send(event);
+
+    Ok(Json(ApiWorkflow::from(duplicated)))
+}
+
+#[utoipa::path(
+    delete,
+    path = "/api/automa/workflows/{id}/force",
+    responses(
+        (status = 200, description = "Workflow force deleted")
+    ),
+    params(
+        ("id" = String, Path, description = "Workflow ID")
+    ),
+    tag = "workflows"
+)]
+async fn force_delete_workflow(
+    State(state): State<AppState>,
+    Path(id): Path<String>,
+) -> Result<Json<serde_json::Value>, AppError> {
+    WorkflowService::delete(&state.db, &id).await?;
+    
+    // Delete from Local File (if it exists)
+    let watch_dir = state.app_dir.join("workflows");
+    let file_path = watch_dir.join(format!("{}.json", id));
+    if file_path.exists() {
+        if let Err(e) = std::fs::remove_file(&file_path) {
+            eprintln!("Failed to delete workflow file {:?}: {}", file_path, e);
+        }
+    }
+
+    Ok(Json(serde_json::json!({ "force_deleted": true })))
 }
 
 // ─── Workflow Runs ───────────────────────────────────────────
