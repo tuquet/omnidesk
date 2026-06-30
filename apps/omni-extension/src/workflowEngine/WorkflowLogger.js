@@ -11,9 +11,9 @@ class WorkflowLogger {
       dbLogs.histories.add(history),
     ]);
 
-    // Send telemetry to Omni-Engine
+    // Send telemetry to Omni-Studio as fallback for full report
     try {
-      const baseUrl = process.env.VUE_APP_OMNI_ENGINE_API || 'http://localhost:1423';
+      const baseUrl = process.env.VUE_APP_OMNI_STUDIO_API || 'http://localhost:1422';
       await fetch(`${baseUrl}/api/reports`, {
         method: 'POST',
         headers: {
@@ -27,7 +27,7 @@ class WorkflowLogger {
         }),
       });
     } catch (err) {
-      console.warn('Failed to send workflow report to Omni-Engine:', err);
+      console.warn('Failed to send workflow report to Omni-Studio:', err);
     }
   }
 }

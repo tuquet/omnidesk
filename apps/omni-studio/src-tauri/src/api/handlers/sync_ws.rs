@@ -176,6 +176,49 @@ async fn handle_extension_message(
                 println!("[SyncWS] Full sync requested, sent {} workflows", workflows.len());
             }
         }
+        "workflow_run_started" => {
+            if let Some(payload) = msg.payload {
+                if let (Some(id), Some(workflow_id)) = (
+                    payload.get("id").and_then(|v| v.as_str()),
+                    payload.get("workflowId").and_then(|v| v.as_str()),
+                ) {
+                    let _ = WorkflowService::create_run(db, workflow_id, profile_id, None).await;
+                    println!("[SyncWS] Workflow run started: {}", id);
+                }
+            }
+        }
+        "workflow_log" => {
+            if let Some(payload) = msg.payload {
+                if let (Some(run_id), Some(block_id), Some(block_label), Some(status)) = (
+                    payload.get("runId").and_then(|v| v.as_str()),
+                    payload.get("blockId").and_then(|v| v.as_str()),
+                    payload.get("blockLabel").and_then(|v| v.as_str()),
+                    payload.get("status").and_then(|v| v.as_str()),
+                ) {
+                    let duration_ms = payload.get("durationMs").and_then(|v| v.as_i64());
+                    let data = payload.get("data").map(|v| serde_json::to_string(v).unwrap_or_default());
+                    
+                    let _ = WorkflowService::add_log(
+                        db, run_id, block_id, block_label, status, duration_ms, data.as_deref()
+                    ).await;
+                    println!("[SyncWS] Added log for run {}: block {}", run_id, block_id);
+                }
+            }
+        }
+        "workflow_run_finished" => {
+            if let Some(payload) = msg.payload {
+                if let (Some(run_id), Some(status)) = (
+                    payload.get("runId").and_then(|v| v.as_str()),
+                    payload.get("status").and_then(|v| v.as_str()),
+                ) {
+                    let error = payload.get("error").and_then(|v| v.as_str());
+                    let summary = payload.get("summary").and_then(|v| v.as_str());
+                    
+                    let _ = WorkflowService::finish_run(db, run_id, status, error, summary).await;
+                    println!("[SyncWS] Workflow run finished: {}", run_id);
+                }
+            }
+        }
         _ => {
             println!("[SyncWS] Unknown message type: {}", msg.msg_type);
         }

@@ -49,8 +49,7 @@ pub struct AppState {
         schemas(
             crate::db::models::workflow::Schedule,
             handlers::schedules::CreateSchedulePayload,
-            handlers::schedules::UpdateSchedulePayload,
-            handlers::reports::AutomaReportPayload
+            handlers::schedules::UpdateSchedulePayload
         )
     ),
     tags(
@@ -105,7 +104,6 @@ pub async fn serve(pool: SqlitePool, app_dir: PathBuf, port: u16, app_handle: Ap
         .nest("/api/automa", handlers::automa::router())
         .nest("/api/automa/schedules", handlers::schedules::router())
         .nest("/api/engine/runs", handlers::runs::router())
-        .nest("/api/reports", handlers::reports::router())
         .route("/mcp/sse", get(handlers::mcp::mcp_sse))
         .route("/mcp/messages", post(handlers::mcp::mcp_messages))
         .nest_service("/apps", ServeDir::new(apps_sandbox_dir))

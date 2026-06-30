@@ -392,27 +392,12 @@ async fn create_workflow_run(
     tag = "workflows"
 )]
 async fn get_workflow_runs(
+    State(state): State<AppState>,
     Path(id): Path<String>,
-) -> Result<Json<Vec<serde_json::Value>>, AppError> {
-    let client = reqwest::Client::new();
-    let engine_url = format!("http://127.0.0.1:1423/api/engine/runs?workflow_id={}", id);
-    
-    let res = client.get(&engine_url).send().await;
-    
-    match res {
-        Ok(r) if r.status().is_success() => {
-            let runs: Vec<serde_json::Value> = r.json().await.map_err(|e| AppError::Internal(format!("Failed to parse runs: {}", e)))?;
-            Ok(Json(runs))
-        },
-        Ok(r) => {
-            Err(AppError::Internal(format!("Engine returned {}", r.status())))
-        },
-        Err(e) => {
-            Err(AppError::Internal(format!("Failed to connect to Omni Engine: {}", e)))
-        }
-    }
+) -> Result<Json<Vec<crate::db::models::workflow::WorkflowRun>>, AppError> {
+    let runs = WorkflowService::get_runs_by_workflow(&state.db, &id).await?;
+    Ok(Json(runs))
 }
-
 
 #[utoipa::path(
     get,
@@ -426,23 +411,9 @@ async fn get_workflow_runs(
     tag = "workflows"
 )]
 async fn get_run_logs(
+    State(state): State<AppState>,
     Path(run_id): Path<String>,
-) -> Result<Json<Vec<serde_json::Value>>, AppError> {
-    let client = reqwest::Client::new();
-    let engine_url = format!("http://127.0.0.1:1423/api/engine/logs?run_id={}", run_id);
-    
-    let res = client.get(&engine_url).send().await;
-    
-    match res {
-        Ok(r) if r.status().is_success() => {
-            let logs: Vec<serde_json::Value> = r.json().await.map_err(|e| AppError::Internal(format!("Failed to parse logs: {}", e)))?;
-            Ok(Json(logs))
-        },
-        Ok(r) => {
-            Err(AppError::Internal(format!("Engine returned {}", r.status())))
-        },
-        Err(e) => {
-            Err(AppError::Internal(format!("Failed to connect to Omni Engine: {}", e)))
-        }
-    }
+) -> Result<Json<Vec<crate::db::models::workflow::WorkflowLog>>, AppError> {
+    let logs = WorkflowService::get_logs_by_run(&state.db, &run_id).await?;
+    Ok(Json(logs))
 }

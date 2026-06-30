@@ -397,6 +397,7 @@ class WorkflowEngine {
     }
 
     this.history.push(detail);
+    this.dispatchEvent('history', detail);
   }
 
   async stop() {

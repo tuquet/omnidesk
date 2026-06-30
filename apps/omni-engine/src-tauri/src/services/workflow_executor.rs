@@ -33,7 +33,7 @@ impl WorkflowExecutor {
         let workflow_name = match workflow_res {
             Ok(res) if res.status().is_success() => {
                 let workflow: WorkflowResponse = res.json().await.map_err(|e| AppError::Internal(format!("Failed to parse workflow: {}", e)))?;
-                workflow.name
+                workflow.get("name").and_then(|v| v.as_str()).unwrap_or("Unknown").to_string()
             },
             Ok(res) => {
                 return Err(AppError::NotFound(format!("Workflow {} not found (Studio returned {})", workflow_id, res.status())));

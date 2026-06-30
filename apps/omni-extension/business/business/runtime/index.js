@@ -21,6 +21,7 @@ import BackgroundWorkflowUtils from '@/background/BackgroundWorkflowUtils';
 let ws = null;
 let profileId = null;
 let currentRunId = null;
+let RUNTIME_WS_URL = `ws://127.0.0.1:1423/api/automa/ws`;
 
 // The WorkflowEngine injected by the background script
 const engineRef = null;
@@ -29,10 +30,6 @@ export default function (context, message) {
   if (context !== 'background') return;
 
   console.log('[RuntimeBridge] Initializing Execution Bridge...');
-
-// Default fallback port if not spawned via bridge
-let RUNTIME_WS_URL = `ws://127.0.0.1:1423/api/automa/ws`;
-
   // 1. Listen for the Init Tab (Runtime App spawns Browser with this URL)
   browser.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
     if (

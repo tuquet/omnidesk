@@ -63,7 +63,40 @@ class WorkflowManager {
     });
 
     engine.init();
+    
+    // Notify Studio that the workflow has started
+    import('@/composable/useOmniStudio').then(({ useOmniStudio }) => {
+      const { sendWsMessage } = useOmniStudio();
+      
+      sendWsMessage('workflow_run_started', {
+        id: engine.id,
+        workflowId: workflowData.id,
+        startedAt: engine.startedTimestamp || Date.now()
+      });
+
+      engine.on('history', (logDetail) => {
+        sendWsMessage('workflow_log', {
+          runId: engine.id,
+          blockId: logDetail.blockId,
+          blockLabel: logDetail.name || logDetail.type,
+          status: logDetail.status || 'success',
+          durationMs: logDetail.duration,
+          data: logDetail.data || logDetail.replacedValue || null
+        });
+      });
+    });
+
     engine.on('destroyed', ({ id, status, history, blockDetail, ...rest }) => {
+      import('@/composable/useOmniStudio').then(({ useOmniStudio }) => {
+        const { sendWsMessage } = useOmniStudio();
+        sendWsMessage('workflow_run_finished', {
+          runId: id,
+          status,
+          error: status === 'error' ? getBlockMessage(blockDetail) : null,
+          summary: null
+        });
+      });
+
       if (status !== 'stopped') {
         BrowserAPIService.permissions
           .contains({ permissions: ['notifications'] })
