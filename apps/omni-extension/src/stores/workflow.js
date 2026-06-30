@@ -69,19 +69,6 @@ export const fromStudioWorkflow = (workflow) => {
   };
 };
 
-const fetchFromOmniStudio = async () => {
-  try {
-    const baseUrl = process.env.VUE_APP_OMNI_STUDIO_API || 'http://localhost:1422';
-    const response = await fetch(`${baseUrl}/api/automa/workflows`);
-    if (response.ok) {
-      const data = await response.json();
-      return data.map(fromStudioWorkflow);
-    }
-  } catch (error) {
-    console.error('Failed to fetch workflows from Omni Studio', error);
-  }
-  return [];
-};
 
 
 const syncToOmniStudio = async (workflows) => {
@@ -257,15 +244,9 @@ export const useWorkflowStore = defineStore('workflow', {
 
       let localWorkflows = workflows || {};
 
-      // Pull from Omni-Studio on Init
-      const studioWorkflows = await fetchFromOmniStudio();
-      if (studioWorkflows && studioWorkflows.length > 0) {
-        studioWorkflows.forEach(workflow => {
-          const w = defaultWorkflow(workflow, { duplicateId: false });
-          localWorkflows[w.id] = w;
-        });
-        await browser.storage.local.set({ workflows: localWorkflows });
-      }
+      // The initial sync from Omni Studio is now handled via WebSocket
+      // through initSync() which automatically receives a 'full_sync' event
+      // upon successful connection.
 
       if (isFirstTime) {
         localWorkflows = firstWorkflows.map((workflow) =>

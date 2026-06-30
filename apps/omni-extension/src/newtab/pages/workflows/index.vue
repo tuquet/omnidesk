@@ -107,16 +107,7 @@
                 </span>
               </ui-list-item>
               <ui-list-item
-                tag="button"
-                :active="state.activeTab === 'studio'"
-                color="bg-box-transparent font-semibold"
-                class="pl-14"
-                @click="updateActiveTab({ activeTab: 'studio' })"
-              >
-                <span class="capitalize">
-                  Omni Studio
-                </span>
-              </ui-list-item>
+
               <ui-list-item
                 v-if="userStore.user"
                 :active="state.activeTab === 'shared'"
@@ -145,7 +136,7 @@
           </ui-expand>
         </ui-list>
         <workflows-folder
-          v-if="['local', 'studio'].includes(state.activeTab)"
+          v-if="state.activeTab === 'local'"
           v-model="state.activeFolder"
         />
       </div>
@@ -249,9 +240,7 @@
               <option value="local">
                 {{ t('workflow.type.local') }}
               </option>
-              <option value="studio">
-                Omni Studio
-              </option>
+
               <option v-if="userStore.user" value="shared">
                 {{ t('workflow.type.shared') }}
               </option>
@@ -393,7 +382,7 @@ import WorkflowsFolder from '@/components/newtab/workflows/WorkflowsFolder.vue';
 import WorkflowsHosted from '@/components/newtab/workflows/WorkflowsHosted.vue';
 import WorkflowsLocal from '@/components/newtab/workflows/WorkflowsLocal.vue';
 import WorkflowsShared from '@/components/newtab/workflows/WorkflowsShared.vue';
-import WorkflowsStudio from '@/components/newtab/workflows/WorkflowsStudio.vue';
+
 import WorkflowsUserTeam from '@/components/newtab/workflows/WorkflowsUserTeam.vue';
 import { useDialog } from '@/composable/dialog';
 import { useGroupTooltip } from '@/composable/groupTooltip';
@@ -434,7 +423,7 @@ const state = shallowReactive({
   teams: [],
   query: '',
   activeFolder: '',
-  activeTab: routeActive || 'local',
+  activeTab: routeActive === 'studio' ? 'local' : (routeActive || 'local'),
   teamId: validTeamId ? teamId : '',
   perPage: savedSorts.perPage || 18,
   sortBy: savedSorts.sortBy || 'createdAt',
