@@ -19,6 +19,38 @@ pub fn router() -> Router<AppState> {
     Router::new()
         .route("/run", post(run_e2e))
         .route("/ws", get(ws_handler))
+        .route("/bridge", get(bridge_html))
+}
+
+#[utoipa::path(
+    get,
+    path = "/api/automa/bridge",
+    responses(
+        (status = 200, description = "Returns the Automa bridge HTML")
+    )
+)]
+pub async fn bridge_html() -> impl IntoResponse {
+    axum::response::Html(r#"
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Omni Studio - Automa Bridge</title>
+    <style>
+        body { font-family: system-ui, -apple-system, sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; background-color: #f3f4f6; }
+        .card { background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); text-align: center; }
+        .loader { border: 3px solid #f3f3f3; border-top: 3px solid #3498db; border-radius: 50%; width: 24px; height: 24px; animation: spin 1s linear infinite; margin: 0 auto 1rem; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <div class="loader"></div>
+        <h2>Initializing Automa Extension...</h2>
+        <p>Please wait while the workflow executes. Do not close this tab.</p>
+    </div>
+</body>
+</html>
+    "#)
 }
 
 #[utoipa::path(

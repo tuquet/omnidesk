@@ -14,10 +14,9 @@
  */
 
 import browser from 'webextension-polyfill';
+import BackgroundWorkflowUtils from '@/background/BackgroundWorkflowUtils';
 
-const RUNTIME_APP_PORT = 1424;
-const RUNTIME_WS_URL = `ws://localhost:${RUNTIME_APP_PORT}/api/automa/ws`;
-const INIT_URL_PATTERN = `*://localhost:${RUNTIME_APP_PORT}/init?profile_id=*`;
+// INIT_URL_PATTERN removed as it's directly in the string
 
 let ws = null;
 let profileId = null;
@@ -31,15 +30,23 @@ export default function (context, message) {
 
   console.log('[RuntimeBridge] Initializing Execution Bridge...');
 
+// Default fallback port if not spawned via bridge
+let RUNTIME_WS_URL = `ws://127.0.0.1:1423/api/automa/ws`;
+
   // 1. Listen for the Init Tab (Runtime App spawns Browser with this URL)
   browser.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
     if (
       changeInfo.url &&
-      changeInfo.url.includes(`localhost:${RUNTIME_APP_PORT}/init?profile_id=`)
+      changeInfo.url.includes(`/api/automa/bridge?run_id=`)
     ) {
       const url = new URL(changeInfo.url);
-      profileId = url.searchParams.get('profile_id');
-      console.log(`[RuntimeBridge] Captured profile_id: ${profileId}`);
+      const incomingRunId = url.searchParams.get('run_id');
+      profileId = url.searchParams.get('profile_id') || 'default';
+      
+      const port = url.port || '80';
+      RUNTIME_WS_URL = `ws://127.0.0.1:${port}/api/automa/ws`;
+      
+      console.log(`[RuntimeBridge] Captured run_id: ${incomingRunId}, profile_id: ${profileId}, port: ${port}`);
 
       // Close the init tab immediately
       browser.tabs.remove(tabId);
@@ -146,21 +153,16 @@ function sendToRuntime(eventType, payload) {
 }
 
 function handleExecuteWorkflow(payload) {
-  const { run_id, workflow } = payload;
+  const { run_id, workflow, variables } = payload;
   currentRunId = run_id;
   console.log(
-    `[RuntimeBridge] Executing workflow: ${workflow.name} (Run ID: ${run_id})`
+    `[RuntimeBridge] Executing workflow: ${workflow?.name || 'unknown'} (Run ID: ${run_id})`
   );
 
-  // TODO: Trigger WorkflowEngine here
-  // In Automa, workflows are usually triggered via BackgroundWorkflowTriggers
-  // or by creating a new execution context.
-
-  // Emit event to background script to actually run it
-  if (typeof window !== 'undefined') {
-    const event = new CustomEvent('automa:execute-remote', {
-      detail: { workflow, run_id },
+  if (workflow) {
+    BackgroundWorkflowUtils.instance.executeWorkflow(workflow, {
+      trigger: 'api',
+      data: variables || {},
     });
-    window.dispatchEvent(event);
   }
 }

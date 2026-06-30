@@ -9,12 +9,8 @@ use tauri::AppHandle;
 use tokio::sync::broadcast::Sender;
 use std::time::Duration;
 
-#[derive(Serialize, Deserialize)]
-pub struct WorkflowResponse {
-    pub id: String,
-    pub name: String,
-    // Add other fields as needed for the event
-}
+// Instead of a structured type, we'll parse it as a generic JSON Value to forward everything
+type WorkflowResponse = serde_json::Value;
 
 pub struct WorkflowExecutor;
 
@@ -84,17 +80,27 @@ impl WorkflowExecutor {
 
         println!("[Executor] Created run {} for workflow '{}'", run_id, workflow_name);
 
-        // 3. Launch browser via Profile Microservice (HTTP)
-        let client = Client::new();
-        let profile_api_url = format!("http://127.0.0.1:1421/api/browser-profiles/{}/launch", profile_id);
-        
-        let launch_res = client.post(&profile_api_url)
-            .send()
-            .await;
+        // 3. Launch browser
+        if profile_id == "default" {
+            let bridge_url = format!("http://127.0.0.1:1423/api/automa/bridge?run_id={}", run_id);
+            println!("[Executor] Launching default browser: {}", bridge_url);
             
-        if let Err(e) = launch_res {
-            eprintln!("[Executor] Failed to call Profile API to launch browser: {}", e);
-            return Err(AppError::Internal(format!("Failed to launch profile: {}", e)));
+            use tauri_plugin_shell::ShellExt;
+            if let Err(e) = _app.shell().open(&bridge_url, None) {
+                eprintln!("[Executor] Failed to open default browser: {}", e);
+            }
+        } else {
+            let client = Client::new();
+            let profile_api_url = format!("http://127.0.0.1:1421/api/browser-profiles/{}/launch", profile_id);
+            
+            let launch_res = client.post(&profile_api_url)
+                .send()
+                .await;
+                
+            if let Err(e) = launch_res {
+                eprintln!("[Executor] Failed to call Profile API to launch browser: {}", e);
+                return Err(AppError::Internal(format!("Failed to launch profile: {}", e)));
+            }
         }
 
         // Wait briefly for the browser to launch and connect
