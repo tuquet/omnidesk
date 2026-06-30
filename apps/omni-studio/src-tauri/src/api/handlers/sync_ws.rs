@@ -182,7 +182,7 @@ async fn handle_extension_message(
                     payload.get("id").and_then(|v| v.as_str()),
                     payload.get("workflowId").and_then(|v| v.as_str()),
                 ) {
-                    let _ = WorkflowService::create_run(db, workflow_id, profile_id, None).await;
+                    let _ = WorkflowService::create_run(db, Some(id), workflow_id, profile_id, None).await;
                     println!("[SyncWS] Workflow run started: {}", id);
                 }
             }

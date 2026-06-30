@@ -351,8 +351,8 @@ impl WorkflowService {
 
     // ─── Workflow Runs ───────────────────────────────────────────
 
-    pub async fn create_run(pool: &SqlitePool, workflow_id: &str, profile_id: Option<&str>, schedule_id: Option<&str>) -> Result<WorkflowRun, AppError> {
-        let id = Uuid::now_v7().to_string();
+    pub async fn create_run(pool: &SqlitePool, id_opt: Option<&str>, workflow_id: &str, profile_id: Option<&str>, schedule_id: Option<&str>) -> Result<WorkflowRun, AppError> {
+        let id = id_opt.map(|s| s.to_string()).unwrap_or_else(|| Uuid::now_v7().to_string());
 
         sqlx::query(
             r#"
