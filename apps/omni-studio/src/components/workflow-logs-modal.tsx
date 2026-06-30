@@ -93,8 +93,8 @@ export function WorkflowLogsModal({ workflowId, isOpen, onOpenChange }: Workflow
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-6xl h-[85vh] p-0 flex flex-col overflow-hidden">
-        <DialogHeader className="p-4 border-b">
+      <DialogContent className="max-w-6xl sm:max-w-6xl w-[90vw] h-[85vh] p-0 flex flex-col overflow-hidden">
+        <DialogHeader className="p-4 border-b shrink-0">
           <DialogTitle>Workflow Logs & History</DialogTitle>
         </DialogHeader>
 
@@ -102,11 +102,16 @@ export function WorkflowLogsModal({ workflowId, isOpen, onOpenChange }: Workflow
           {/* @ts-expect-error ResizablePanelGroup direction typings mismatch */}
           <ResizablePanelGroup direction="horizontal" className="h-full w-full rounded-b-lg">
             {/* Left Panel: List of Runs */}
-            <ResizablePanel defaultSize={30} minSize={20} maxSize={40} className="bg-muted/10">
-              <div className="p-4 border-b bg-muted/20 font-medium text-sm text-muted-foreground uppercase tracking-wider">
+            <ResizablePanel
+              defaultSize={30}
+              minSize={20}
+              maxSize={40}
+              className="bg-muted/10 flex flex-col"
+            >
+              <div className="p-4 border-b bg-muted/20 font-medium text-sm text-muted-foreground uppercase tracking-wider shrink-0">
                 Execution History
               </div>
-              <ScrollArea className="h-[calc(100%-49px)]">
+              <ScrollArea className="flex-1">
                 {isRunsLoading ? (
                   <div className="p-4 space-y-3">
                     <Skeleton className="h-16 w-full" />
@@ -185,8 +190,8 @@ export function WorkflowLogsModal({ workflowId, isOpen, onOpenChange }: Workflow
             <ResizableHandle />
 
             {/* Right Panel: Logs for Selected Run */}
-            <ResizablePanel defaultSize={70}>
-              <div className="p-4 border-b bg-muted/5 font-medium text-sm text-muted-foreground uppercase tracking-wider flex items-center justify-between">
+            <ResizablePanel defaultSize={70} className="flex flex-col">
+              <div className="p-4 border-b bg-muted/5 font-medium text-sm text-muted-foreground uppercase tracking-wider flex items-center justify-between shrink-0">
                 <span>Block Execution Logs</span>
                 {isRunActive && (
                   <Badge
@@ -197,7 +202,7 @@ export function WorkflowLogsModal({ workflowId, isOpen, onOpenChange }: Workflow
                   </Badge>
                 )}
               </div>
-              <ScrollArea className="h-[calc(100%-49px)]">
+              <ScrollArea className="flex-1">
                 {!selectedRunId ? (
                   <div className="flex items-center justify-center h-full text-muted-foreground">
                     Select a run to view logs
