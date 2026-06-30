@@ -25,6 +25,7 @@ import { open } from '@tauri-apps/plugin-dialog';
 import { WorkflowsTable, type Workflow } from '../components/workflows-table';
 import { WorkflowsToolbar } from '../components/workflows-toolbar';
 import { WorkflowJsonEditorModal } from '../components/workflow-json-editor-modal';
+import { WorkflowLogsModal } from '../components/workflow-logs-modal';
 
 export const Route = createFileRoute('/')({
   component: WorkflowsPage,
@@ -39,9 +40,11 @@ function WorkflowsPage() {
   const [workflowToRun, setWorkflowToRun] = useState<string | null>(null);
   const [rowSelection, setRowSelection] = useState<Record<string, boolean>>({});
   const [viewMode, setViewMode] = useState<'active' | 'trash'>('active');
-  
+
   const [isEditorOpen, setIsEditorOpen] = useState(false);
   const [editorWorkflowId, setEditorWorkflowId] = useState<string | null>(null);
+  const [isLogsModalOpen, setIsLogsModalOpen] = useState(false);
+  const [logsWorkflowId, setLogsWorkflowId] = useState<string | null>(null);
 
   const queryClient = useQueryClient();
 
@@ -431,6 +434,10 @@ function WorkflowsPage() {
                 forceDeleteMutation.mutate(id);
               }
             }}
+            onViewLogs={(id) => {
+              setLogsWorkflowId(id);
+              setIsLogsModalOpen(true);
+            }}
             sortBy={sortBy}
             sortOrder={sortOrder}
             onSortChange={handleSortChange}
@@ -440,17 +447,15 @@ function WorkflowsPage() {
         </div>
       )}
 
-      {/* Delete Confirmation */}
-      <Dialog open={!!workflowToDelete} onOpenChange={(open) => !open && setWorkflowToDelete(null)}>
+      <Dialog open={!!workflowToDelete} onOpenChange={() => setWorkflowToDelete(null)}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Delete Workflow</DialogTitle>
             <DialogDescription>
-              Are you sure you want to delete this workflow? This will soft-delete it from the
-              database and remove it from all synced profiles.
+              Are you sure you want to delete this workflow? This action cannot be undone.
             </DialogDescription>
           </DialogHeader>
-          <DialogFooter className="mt-4 flex gap-2 sm:justify-end">
+          <DialogFooter>
             <Button variant="outline" onClick={() => setWorkflowToDelete(null)}>
               Cancel
             </Button>
@@ -459,13 +464,12 @@ function WorkflowsPage() {
               onClick={() => workflowToDelete && deleteMutation.mutate(workflowToDelete)}
               disabled={deleteMutation.isPending}
             >
-              {deleteMutation.isPending ? 'Deleting...' : 'Delete Workflow'}
+              {deleteMutation.isPending ? 'Deleting...' : 'Delete'}
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
-      {/* Run Modal */}
       <RunWorkflowModal
         isOpen={!!workflowToRun}
         workflowId={workflowToRun}
@@ -475,8 +479,21 @@ function WorkflowsPage() {
 
       <WorkflowJsonEditorModal
         isOpen={isEditorOpen}
-        onClose={() => setIsEditorOpen(false)}
+        onClose={() => {
+          setIsEditorOpen(false);
+          setEditorWorkflowId(null);
+          queryClient.invalidateQueries({ queryKey: ['workflows', selectedWorkspacePath] });
+        }}
         workflowId={editorWorkflowId}
+      />
+
+      <WorkflowLogsModal
+        workflowId={logsWorkflowId}
+        isOpen={isLogsModalOpen}
+        onOpenChange={(open) => {
+          setIsLogsModalOpen(open);
+          if (!open) setLogsWorkflowId(null);
+        }}
       />
     </PageContainer>
   );

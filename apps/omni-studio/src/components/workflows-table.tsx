@@ -25,6 +25,7 @@ import {
   ArrowUpDownIcon,
   RotateCcw,
   CopyIcon,
+  History,
 } from 'lucide-react';
 import {
   useReactTable,
@@ -59,6 +60,7 @@ interface WorkflowsTableProps {
   viewMode?: 'active' | 'trash';
   onRestore?: (id: string) => void;
   onForceDelete?: (id: string) => void;
+  onViewLogs?: (id: string) => void;
 }
 
 const columnHelper = createColumnHelper<Workflow>();
@@ -78,6 +80,7 @@ export function WorkflowsTable({
   viewMode = 'active',
   onRestore,
   onForceDelete,
+  onViewLogs,
 }: WorkflowsTableProps) {
   const renderSortIcon = useCallback(
     (column: string) => {
@@ -271,6 +274,24 @@ export function WorkflowsTable({
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>Edit Workflow</TooltipContent>
+              </Tooltip>
+
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8 text-indigo-500 hover:text-indigo-600 hover:bg-indigo-500/10 transition-colors shrink-0"
+                    data-testid={`btn-logs-workflow-${workflow.id}`}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onViewLogs?.(workflow.id);
+                    }}
+                  >
+                    <History className="h-4 w-4" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>View Logs & History</TooltipContent>
               </Tooltip>
 
               <Tooltip>
