@@ -35,6 +35,7 @@ import {
   Shield,
   TerminalSquare,
   Pin,
+  FolderOpen,
 } from 'lucide-react';
 import { WindowControls } from './window-controls';
 
