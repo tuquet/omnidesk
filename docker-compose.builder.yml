@@ -1,0 +1,88 @@
+version: '3.8'
+
+x-volumes-config: &builder-volumes
+  - .:/app
+  # Mask out node_modules with anonymous volumes (native Linux performance, no Windows I/O conflict)
+  - /app/node_modules
+  - /app/apps/omni-studio/node_modules
+  - /app/apps/omni-profile/node_modules
+  - /app/apps/omni-engine/node_modules
+  - /app/apps/omni-extension/node_modules
+  - /app/apps/web-portal/node_modules
+  - /app/packages/core/node_modules
+  # Mask out Rust target directories
+  - /app/target
+  - /app/apps/omni-studio/src-tauri/target
+  - /app/apps/omni-profile/src-tauri/target
+  - /app/apps/omni-engine/src-tauri/target
+  # Cache pnpm global store
+  - pnpm-store:/root/.local/share/pnpm/store
+  # Cache cargo registry
+  - cargo-registry:/root/.cargo/registry
+  - cargo-git:/root/.cargo/git
+
+services:
+  build-studio:
+    build:
+      context: .
+      dockerfile: Dockerfile.builder
+    environment:
+      - APP_NAME=omni-studio
+      - APP_TYPE=tauri
+    volumes: *builder-volumes
+    entrypoint: []
+    command: ["/bin/bash", "/app/scripts/docker-build.sh"]
+    restart: "no"
+
+  build-profile:
+    build:
+      context: .
+      dockerfile: Dockerfile.builder
+    environment:
+      - APP_NAME=omni-profile
+      - APP_TYPE=tauri
+    volumes: *builder-volumes
+    entrypoint: []
+    command: ["/bin/bash", "/app/scripts/docker-build.sh"]
+    restart: "no"
+
+  build-engine:
+    build:
+      context: .
+      dockerfile: Dockerfile.builder
+    environment:
+      - APP_NAME=omni-engine
+      - APP_TYPE=tauri
+    volumes: *builder-volumes
+    entrypoint: []
+    command: ["/bin/bash", "/app/scripts/docker-build.sh"]
+    restart: "no"
+
+  build-web:
+    build:
+      context: .
+      dockerfile: Dockerfile.builder
+    environment:
+      - APP_NAME=web-portal
+      - APP_TYPE=web
+    volumes: *builder-volumes
+    entrypoint: []
+    command: ["/bin/bash", "/app/scripts/docker-build.sh"]
+    restart: "no"
+
+  build-extension:
+    build:
+      context: .
+      dockerfile: Dockerfile.builder
+    environment:
+      - APP_NAME=omni-extension
+      - APP_TYPE=extension
+    volumes: *builder-volumes
+    entrypoint: []
+    command: ["/bin/bash", "/app/scripts/docker-build.sh"]
+    restart: "no"
+
+volumes:
+  pnpm-store:
+  cargo-registry:
+  cargo-git:

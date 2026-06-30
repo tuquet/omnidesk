@@ -14,6 +14,9 @@ import {
   AlertTitle,
   AlertDescription,
   RunWorkflowModal,
+  Label,
+  Input,
+  DialogTrigger,
 } from '@omnidesk/ui';
 import {
   WorkflowIcon,
@@ -21,12 +24,15 @@ import {
   AlertCircleIcon,
   DownloadIcon,
   UploadCloudIcon,
+  GitBranch,
+  TerminalSquare,
+  Loader2,
 } from 'lucide-react';
 import { useState, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { client } from '@/lib/api-client';
-import { useWorkspaceStore } from '@omnidesk/core';
+import { useWorkspaceStore, usePlatform } from '@omnidesk/core';
 import { open } from '@tauri-apps/plugin-dialog';
 import { WorkflowsTable, type Workflow } from '../components/workflows-table';
 import { WorkflowsToolbar } from '../components/workflows-toolbar';
@@ -46,8 +52,52 @@ function WorkflowsPage() {
 
   const queryClient = useQueryClient();
 
+  const platformApi = usePlatform();
+
   // If no workspace is selected, we block the UI
   const isWorkspaceSelected = !!selectedWorkspacePath;
+
+  // Git Status Query
+  const { data: isGitInitialized = false, refetch: refetchGitStatus } = useQuery({
+    queryKey: ['gitStatus', selectedWorkspacePath],
+    queryFn: async () => {
+      if (!selectedWorkspacePath) return false;
+      return (await platformApi.invoke('check_git_status', {
+        path: selectedWorkspacePath,
+      })) as boolean;
+    },
+    enabled: isWorkspaceSelected,
+  });
+
+  // Git Init state
+  const [gitUrl, setGitUrl] = useState('');
+  const [isGitLoading, setIsGitLoading] = useState(false);
+  const [gitDialogOpen, setGitDialogOpen] = useState(false);
+  const [gitInstallGuide, setGitInstallGuide] = useState(false);
+
+  const handleInitGit = async () => {
+    if (!gitUrl || !selectedWorkspacePath) return;
+    setIsGitLoading(true);
+    setGitInstallGuide(false);
+    try {
+      const msg = await platformApi.invoke('init_git_repository', {
+        repoUrl: gitUrl,
+        destinationPath: selectedWorkspacePath,
+      });
+      toast.success(msg as string);
+      setGitDialogOpen(false);
+      setGitUrl('');
+      refetchGitStatus();
+    } catch (e) {
+      if (String(e).includes('GIT_NOT_FOUND')) {
+        setGitInstallGuide(true);
+      } else {
+        toast.error(String(e));
+      }
+    } finally {
+      setIsGitLoading(false);
+    }
+  };
 
   const {
     data: workflows = [],
@@ -185,7 +235,6 @@ function WorkflowsPage() {
 
   const handleSelectWorkspace = async () => {
     try {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
       const selected: unknown = await open({
         directory: true,
         multiple: false,
@@ -269,29 +318,133 @@ function WorkflowsPage() {
 
           <div className="h-8 w-px bg-border mx-1 hidden sm:block"></div>
 
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => pullMutation.mutate()}
-            disabled={pullMutation.isPending || pushMutation.isPending || !isWorkspaceSelected}
-          >
-            <DownloadIcon
-              className={`mr-2 h-4 w-4 ${pullMutation.isPending ? 'animate-bounce' : ''}`}
-            />
-            Git Pull
-          </Button>
-          <Button
-            variant="default"
-            size="sm"
-            className="bg-sky-500 hover:bg-sky-600 text-white"
-            onClick={() => pushMutation.mutate()}
-            disabled={pullMutation.isPending || pushMutation.isPending || !isWorkspaceSelected}
-          >
-            <UploadCloudIcon
-              className={`mr-2 h-4 w-4 ${pushMutation.isPending ? 'animate-pulse' : ''}`}
-            />
-            Git Push
-          </Button>
+          {isGitInitialized ? (
+            <>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => pullMutation.mutate()}
+                disabled={pullMutation.isPending || pushMutation.isPending || !isWorkspaceSelected}
+              >
+                <DownloadIcon
+                  className={`mr-2 h-4 w-4 ${pullMutation.isPending ? 'animate-bounce' : ''}`}
+                />
+                Git Pull
+              </Button>
+              <Button
+                variant="default"
+                size="sm"
+                className="bg-sky-500 hover:bg-sky-600 text-white"
+                onClick={() => pushMutation.mutate()}
+                disabled={pullMutation.isPending || pushMutation.isPending || !isWorkspaceSelected}
+              >
+                <UploadCloudIcon
+                  className={`mr-2 h-4 w-4 ${pushMutation.isPending ? 'animate-pulse' : ''}`}
+                />
+                Git Push
+              </Button>
+            </>
+          ) : (
+            <Dialog open={gitDialogOpen} onOpenChange={setGitDialogOpen}>
+              <DialogTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="bg-primary/10 text-primary border-primary hover:bg-primary/20"
+                >
+                  <GitBranch className="mr-2 h-4 w-4" />
+                  Initialize Git
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[460px] p-0 overflow-hidden">
+                <div className="bg-muted/50 px-6 py-4 border-b">
+                  <DialogHeader>
+                    <div className="mx-auto bg-primary/10 p-3 rounded-full w-12 h-12 flex items-center justify-center mb-2">
+                      <GitBranch className="h-6 w-6 text-primary" />
+                    </div>
+                    <DialogTitle className="text-center text-lg">Initialize Workspace</DialogTitle>
+                    <DialogDescription className="text-center">
+                      Clone a remote workflow repository to begin your automation journey.
+                    </DialogDescription>
+                  </DialogHeader>
+                </div>
+
+                <div className="p-6 space-y-5">
+                  {gitInstallGuide && (
+                    <Alert className="bg-muted/50 text-foreground border-primary/20">
+                      <TerminalSquare className="h-4 w-4 text-primary" />
+                      <AlertTitle className="font-semibold text-primary">
+                        Git CLI is missing
+                      </AlertTitle>
+                      <AlertDescription className="text-xs text-muted-foreground mt-2 space-y-2">
+                        <p>
+                          Please open PowerShell and run the following command to install via Scoop:
+                        </p>
+                        <code className="block bg-background border px-2 py-1.5 rounded font-mono select-all">
+                          scoop install git
+                        </code>
+                        <p className="mt-2 text-muted-foreground">
+                          If you don't have Scoop, install it first:
+                        </p>
+                        <code className="block bg-background border px-2 py-1.5 rounded font-mono select-all">
+                          Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser;
+                          Invoke-RestMethod -Uri https://get.scoop.sh | Invoke-Expression
+                        </code>
+                      </AlertDescription>
+                    </Alert>
+                  )}
+
+                  <div className="space-y-2">
+                    <Label
+                      htmlFor="repo-url"
+                      className="text-xs font-semibold uppercase text-muted-foreground"
+                    >
+                      Repository URL
+                    </Label>
+                    <Input
+                      id="repo-url"
+                      placeholder="https://github.com/company/workflows.git"
+                      value={gitUrl}
+                      onChange={(e) => setGitUrl(e.target.value)}
+                      className="h-9 transition-all focus-visible:ring-primary/50"
+                      disabled={isGitLoading}
+                      autoComplete="off"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label className="text-xs font-semibold uppercase text-muted-foreground">
+                      Local Destination
+                    </Label>
+                    <Input
+                      readOnly
+                      value={selectedWorkspacePath || ''}
+                      className="h-9 w-full bg-muted/30 text-sm"
+                      disabled
+                    />
+                  </div>
+                </div>
+
+                <DialogFooter className="bg-muted/30 px-6 py-4 border-t">
+                  <Button
+                    type="button"
+                    onClick={handleInitGit}
+                    disabled={isGitLoading || !gitUrl || !selectedWorkspacePath}
+                    className="w-full sm:w-auto"
+                  >
+                    {isGitLoading ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Cloning Repository...
+                      </>
+                    ) : (
+                      'Clone Repository'
+                    )}
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+          )}
         </div>
       </PageHeader>
 

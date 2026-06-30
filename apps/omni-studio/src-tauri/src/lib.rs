@@ -154,6 +154,7 @@ pub fn run() {
             commands::storage::update_storage_location,
             commands::e2e::run_e2e_orchestrator,
             commands::git::init_git_repository,
+            commands::git::check_git_status,
             omni_tauri_core::system::open_app_folder,
             omni_tauri_core::system::get_app_version,
             omni_tauri_core::window::toggle_always_on_top,

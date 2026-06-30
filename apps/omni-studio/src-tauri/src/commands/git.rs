@@ -2,6 +2,12 @@ use tauri::{command, AppHandle};
 use tokio::process::Command;
 
 #[command]
+pub async fn check_git_status(path: String) -> bool {
+    let git_dir = std::path::PathBuf::from(path).join(".git");
+    git_dir.exists() && git_dir.is_dir()
+}
+
+#[command]
 pub async fn init_git_repository(
     _app_handle: AppHandle,
     repo_url: String,

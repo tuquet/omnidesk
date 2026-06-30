@@ -38,8 +38,8 @@ impl FileWatcherService {
 
         // Spawn blocking watcher thread
         let watch_path = watch_dir.clone();
+        let rt = tokio::runtime::Handle::current();
         std::thread::spawn(move || {
-            let rt = tokio::runtime::Handle::current();
             let tx_clone = tx.clone();
 
             let mut watcher = RecommendedWatcher::new(

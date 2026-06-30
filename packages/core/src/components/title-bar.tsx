@@ -1,6 +1,5 @@
 import { toast } from 'sonner';
 import { useState } from 'react';
-import { open } from '@tauri-apps/plugin-dialog';
 import { useTheme } from 'next-themes';
 import { useTranslation } from 'react-i18next';
 import { usePlatform } from '../providers/platform-provider';
@@ -26,31 +25,16 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
   DropdownMenuSeparator,
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-  Input,
-  Label,
-  Alert,
-  AlertTitle,
-  AlertDescription,
 } from '@omnidesk/ui';
 import {
   Menu,
   Home,
   ChevronDown,
   PanelLeft,
-  GitBranch,
   Play,
   Shield,
   TerminalSquare,
   Pin,
-  FolderOpen,
-  Loader2,
 } from 'lucide-react';
 import { WindowControls } from './window-controls';
 
@@ -63,13 +47,6 @@ export function TitleBar() {
   const { toggleDevMode, isDevMode } = useDevStore();
   const [isPinned, setIsPinned] = useState(false);
   const navigate = useNavigate();
-
-  // Git Init state
-  const [gitUrl, setGitUrl] = useState('');
-  const [gitFolder, setGitFolder] = useState('');
-  const [isGitLoading, setIsGitLoading] = useState(false);
-  const [gitDialogOpen, setGitDialogOpen] = useState(false);
-  const [gitInstallGuide, setGitInstallGuide] = useState(false);
 
   if (platformApi.platform !== 'desktop') return null;
 
@@ -102,45 +79,6 @@ export function TitleBar() {
       toast.success(newState ? 'Window pinned to top' : 'Window unpinned');
     } catch {
       toast.error('Could not toggle pin state');
-    }
-  };
-
-  const handleSelectFolder = async () => {
-    try {
-      const selected = await open({
-        directory: true,
-        multiple: false,
-        title: 'Select Workspace Folder',
-      });
-      if (selected && typeof selected === 'string') {
-        setGitFolder(selected);
-      }
-    } catch (e) {
-      toast.error('Failed to open folder picker');
-    }
-  };
-
-  const handleInitGit = async () => {
-    if (!gitUrl || !gitFolder) return;
-    setIsGitLoading(true);
-    setGitInstallGuide(false);
-    try {
-      const msg = await platformApi.invoke('init_git_repository', {
-        repoUrl: gitUrl,
-        destinationPath: gitFolder,
-      });
-      toast.success(msg as string);
-      setGitDialogOpen(false);
-      setGitUrl('');
-      setGitFolder('');
-    } catch (e) {
-      if (String(e).includes('GIT_NOT_FOUND')) {
-        setGitInstallGuide(true);
-      } else {
-        toast.error(String(e));
-      }
-    } finally {
-      setIsGitLoading(false);
     }
   };
 
@@ -315,122 +253,6 @@ export function TitleBar() {
 
       {/* ── Right Section: View Toggles & Window Controls ── */}
       <div className="flex items-center gap-1 z-10 pr-2" data-tauri-drag-region>
-        {/* Initialize Git */}
-        {config.appName === 'Omni Studio' && (
-          <Dialog open={gitDialogOpen} onOpenChange={setGitDialogOpen}>
-            <DialogTrigger asChild>
-              <Button
-                variant="outline"
-                size="sm"
-                className="h-6 px-2 mr-1 text-[10px] uppercase font-bold tracking-wider text-muted-foreground bg-transparent border-dashed hover:text-foreground hidden lg:inline-flex"
-              >
-                <GitBranch className="h-3 w-3 mr-1.5" />
-                Initialize Git
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-[460px] p-0 overflow-hidden">
-              <div className="bg-muted/50 px-6 py-4 border-b">
-                <DialogHeader>
-                  <div className="mx-auto bg-primary/10 p-3 rounded-full w-12 h-12 flex items-center justify-center mb-2">
-                    <GitBranch className="h-6 w-6 text-primary" />
-                  </div>
-                  <DialogTitle className="text-center text-lg">Initialize Workspace</DialogTitle>
-                  <DialogDescription className="text-center">
-                    Clone a remote workflow repository to begin your automation journey.
-                  </DialogDescription>
-                </DialogHeader>
-              </div>
-
-              <div className="p-6 space-y-5">
-                {gitInstallGuide && (
-                  <Alert className="bg-muted/50 text-foreground border-primary/20">
-                    <TerminalSquare className="h-4 w-4 text-primary" />
-                    <AlertTitle className="font-semibold text-primary">
-                      Git CLI is missing
-                    </AlertTitle>
-                    <AlertDescription className="text-xs text-muted-foreground mt-2 space-y-2">
-                      <p>
-                        Please open PowerShell and run the following command to install via Scoop:
-                      </p>
-                      <code className="block bg-background border px-2 py-1.5 rounded font-mono select-all">
-                        scoop install git
-                      </code>
-                      <p className="mt-2 text-muted-foreground">
-                        If you don't have Scoop, install it first:
-                      </p>
-                      <code className="block bg-background border px-2 py-1.5 rounded font-mono select-all">
-                        Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser;
-                        Invoke-RestMethod -Uri https://get.scoop.sh | Invoke-Expression
-                      </code>
-                    </AlertDescription>
-                  </Alert>
-                )}
-
-                <div className="space-y-2">
-                  <Label
-                    htmlFor="repo-url"
-                    className="text-xs font-semibold uppercase text-muted-foreground"
-                  >
-                    Repository URL
-                  </Label>
-                  <Input
-                    id="repo-url"
-                    placeholder="https://github.com/company/workflows.git"
-                    value={gitUrl}
-                    onChange={(e) => setGitUrl(e.target.value)}
-                    className="h-9 transition-all focus-visible:ring-primary/50"
-                    disabled={isGitLoading}
-                    autoComplete="off"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label className="text-xs font-semibold uppercase text-muted-foreground">
-                    Local Destination
-                  </Label>
-                  <div className="flex gap-2">
-                    <Input
-                      readOnly
-                      placeholder="Select folder..."
-                      value={gitFolder}
-                      className="h-9 flex-1 cursor-pointer bg-muted/30 text-sm"
-                      onClick={!isGitLoading ? handleSelectFolder : undefined}
-                      disabled={isGitLoading}
-                    />
-                    <Button
-                      type="button"
-                      variant="secondary"
-                      className="h-9 px-3 shrink-0"
-                      onClick={handleSelectFolder}
-                      disabled={isGitLoading}
-                    >
-                      <FolderOpen className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </div>
-              </div>
-
-              <DialogFooter className="bg-muted/30 px-6 py-4 border-t">
-                <Button
-                  type="button"
-                  onClick={handleInitGit}
-                  disabled={isGitLoading || !gitUrl || !gitFolder}
-                  className="w-full sm:w-auto"
-                >
-                  {isGitLoading ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Cloning Repository...
-                    </>
-                  ) : (
-                    'Clone Repository'
-                  )}
-                </Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
-        )}
-
         {/* Runner / Terminal */}
         <Button
           variant="ghost"
