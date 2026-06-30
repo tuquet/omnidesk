@@ -12,6 +12,7 @@ import {
 } from '@omnidesk/ui';
 import { client } from '@/lib/api-client';
 import { CheckCircleIcon, XCircleIcon, ClockIcon, PlayCircleIcon } from 'lucide-react';
+import Editor from '@monaco-editor/react';
 
 export type WorkflowRun = {
   id: string;
@@ -260,8 +261,29 @@ export function WorkflowLogsModal({ workflowId, isOpen, onOpenChange }: Workflow
                           </div>
 
                           {log.data && (
-                            <div className="mt-2 text-xs font-mono bg-muted/50 p-2 rounded border max-h-48 overflow-y-auto whitespace-pre-wrap break-all">
-                              {log.data}
+                            <div className="mt-2 h-48 border rounded-md overflow-hidden bg-background">
+                              <Editor
+                                height="100%"
+                                defaultLanguage="json"
+                                value={(() => {
+                                  try {
+                                    return JSON.stringify(JSON.parse(log.data), null, 2);
+                                  } catch (e) {
+                                    return log.data;
+                                  }
+                                })()}
+                                theme="vs-dark"
+                                options={{
+                                  readOnly: true,
+                                  minimap: { enabled: false },
+                                  scrollBeyondLastLine: false,
+                                  wordWrap: 'on',
+                                  tabSize: 2,
+                                  lineNumbers: 'off',
+                                  folding: true,
+                                  contextmenu: false,
+                                }}
+                              />
                             </div>
                           )}
                         </div>
