@@ -11,6 +11,7 @@ import deepmerge from 'lodash.merge';
 import { nanoid } from 'nanoid';
 import { defineStore } from 'pinia';
 import browser from 'webextension-polyfill';
+import { useOmniStudio } from '@/composable/useOmniStudio';
 import { useUserStore } from './user';
 
 // Transform Automa Workflow to Omni Studio Format
@@ -87,14 +88,22 @@ const syncToOmniStudio = async (workflows) => {
   try {
     const payload = Array.isArray(workflows) ? workflows : [workflows];
     const studioPayload = payload.map(toStudioWorkflow);
-    const baseUrl = process.env.VUE_APP_OMNI_STUDIO_API || 'http://localhost:1422';
-    await fetch(`${baseUrl}/api/automa/workflows/sync/push`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ workflows: studioPayload }),
-    });
+    
+    // Attempt to send via WebSocket first
+    const { sendWsMessage } = useOmniStudio();
+    const sent = sendWsMessage('push_workflows', studioPayload);
+    
+    // Fallback to HTTP if WS is not connected
+    if (!sent) {
+      const baseUrl = process.env.VUE_APP_OMNI_STUDIO_API || 'http://localhost:1422';
+      await fetch(`${baseUrl}/api/automa/workflows/sync/push`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ workflows: studioPayload }),
+      });
+    }
   } catch (error) {
     console.error('Failed to sync workflows to Omni Studio', error);
   }
@@ -200,7 +209,47 @@ export const useWorkflowStore = defineStore('workflow', {
       ),
   },
   actions: {
+    initSync() {
+      const { onMessage } = useOmniStudio();
+      onMessage((msg) => {
+        if (msg.event_type === 'full_sync') {
+          const studioWorkflows = msg.payload || [];
+          let localWorkflows = { ...this.workflows };
+
+          studioWorkflows.forEach((workflow) => {
+            const parsed = fromStudioWorkflow(workflow);
+            const w = defaultWorkflow(parsed, { duplicateId: false });
+            localWorkflows[w.id] = w;
+          });
+
+          this.workflows = localWorkflows;
+          browser.storage.local.set({ workflows: localWorkflows });
+        } else if (msg.event_type === 'workflows_changed') {
+          const studioWorkflows = msg.payload || [];
+          let localWorkflows = { ...this.workflows };
+
+          studioWorkflows.forEach((workflow) => {
+            const parsed = fromStudioWorkflow(workflow);
+            const w = defaultWorkflow(parsed, { duplicateId: false });
+            localWorkflows[w.id] = w;
+          });
+
+          this.workflows = localWorkflows;
+          browser.storage.local.set({ workflows: localWorkflows });
+        } else if (msg.event_type === 'workflow_deleted') {
+          const id = msg.payload?.id;
+          if (id) {
+            let localWorkflows = { ...this.workflows };
+            delete localWorkflows[id];
+            this.workflows = localWorkflows;
+            browser.storage.local.set({ workflows: localWorkflows });
+          }
+        }
+      });
+    },
     async loadData() {
+      this.initSync();
+
       const { workflows, isFirstTime } = await browser.storage.local.get([
         'workflows',
         'isFirstTime',

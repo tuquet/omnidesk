@@ -3,6 +3,7 @@ import { ref } from 'vue';
 const isConnected = ref(false);
 let ws = null;
 let reconnectTimer = null;
+const messageListeners = new Set();
 
 export function useOmniStudio() {
   function connect() {
@@ -19,6 +20,17 @@ export function useOmniStudio() {
         if (reconnectTimer) {
           clearTimeout(reconnectTimer);
           reconnectTimer = null;
+        }
+        // When connected, the backend automatically sends a full_sync.
+        // We can optionally request it here, but it's redundant.
+      };
+
+      ws.onmessage = (event) => {
+        try {
+          const data = JSON.parse(event.data);
+          messageListeners.forEach(listener => listener(data));
+        } catch (e) {
+          console.error('Failed to parse WS message:', e);
         }
       };
 
@@ -37,6 +49,19 @@ export function useOmniStudio() {
     }
   }
 
+  function sendWsMessage(msgType, payload = null) {
+    if (ws && ws.readyState === WebSocket.OPEN) {
+      ws.send(JSON.stringify({ msg_type: msgType, payload }));
+      return true;
+    }
+    return false;
+  }
+
+  function onMessage(callback) {
+    messageListeners.add(callback);
+    return () => messageListeners.delete(callback);
+  }
+
   // Connect on first use if not already connected
   if (!ws) {
     connect();
@@ -44,5 +69,7 @@ export function useOmniStudio() {
 
   return {
     isConnected,
+    sendWsMessage,
+    onMessage,
   };
 }
