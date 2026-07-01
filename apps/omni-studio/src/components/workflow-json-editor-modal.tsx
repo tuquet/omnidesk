@@ -59,21 +59,21 @@ const DEFAULT_JSON = {
 function getParameters(parsed: WorkflowDataParsed) {
   if (parsed.drawflow && Array.isArray(parsed.drawflow.nodes)) {
     const triggerNode = parsed.drawflow.nodes.find((n) => n.label === 'trigger');
-    if (triggerNode?.data?.parameters) {
+    if (triggerNode?.data?.parameters && Array.isArray(triggerNode.data.parameters)) {
       return triggerNode.data.parameters;
     }
   }
-  return parsed.trigger?.parameters || [];
+  return Array.isArray(parsed.trigger?.parameters) ? parsed.trigger.parameters : [];
 }
 
 function getTriggers(parsed: WorkflowDataParsed) {
   if (parsed.drawflow && Array.isArray(parsed.drawflow.nodes)) {
     const triggerNode = parsed.drawflow.nodes.find((n) => n.label === 'trigger');
-    if (triggerNode?.data?.triggers) {
+    if (triggerNode?.data?.triggers && Array.isArray(triggerNode.data.triggers)) {
       return triggerNode.data.triggers;
     }
   }
-  return parsed.trigger?.triggers || [];
+  return Array.isArray(parsed.trigger?.triggers) ? parsed.trigger.triggers : [];
 }
 
 function updateParameters(parsed: WorkflowDataParsed, parameters: WorkflowParameter[]) {
@@ -115,19 +115,16 @@ export function WorkflowJsonEditorModal({
   const [activeTab, setActiveTab] = useState<string>('json');
   const [globalDataStr, setGlobalDataStr] = useState<string>('{}');
 
-  // Defer the jsonValue to avoid blocking typing in the editor
-  const deferredJsonValue = useDeferredValue(jsonValue);
-
   // Memoize parsing to prevent running JSON.parse 4 times per render
   const { parsedJson, isValidJson } = useMemo(() => {
-    if (!deferredJsonValue) return { parsedJson: null, isValidJson: true };
+    if (!jsonValue) return { parsedJson: null, isValidJson: true };
     try {
-      const parsed = JSON.parse(deferredJsonValue) as WorkflowDataParsed;
+      const parsed = JSON.parse(jsonValue) as WorkflowDataParsed;
       return { parsedJson: parsed, isValidJson: true };
     } catch {
       return { parsedJson: null, isValidJson: false };
     }
-  }, [deferredJsonValue]);
+  }, [jsonValue]);
 
   const isGlobalDataValid = useMemo(() => {
     try {
@@ -268,13 +265,15 @@ export function WorkflowJsonEditorModal({
                 <WorkflowParametersEditor
                   value={parsedJson ? getParameters(parsedJson as WorkflowDataParsed) : []}
                   onChange={(parameters) => {
-                    try {
-                      const parsed = JSON.parse(jsonValue) as WorkflowDataParsed;
-                      updateParameters(parsed, parameters as WorkflowParameter[]);
-                      setJsonValue(JSON.stringify(parsed, null, 2));
-                    } catch {
-                      // ignore
-                    }
+                    setJsonValue((prevJson) => {
+                      try {
+                        const parsed = JSON.parse(prevJson) as WorkflowDataParsed;
+                        updateParameters(parsed, parameters as WorkflowParameter[]);
+                        return JSON.stringify(parsed, null, 2);
+                      } catch {
+                        return prevJson;
+                      }
+                    });
                   }}
                 />
               )}
@@ -285,13 +284,15 @@ export function WorkflowJsonEditorModal({
                 <WorkflowTriggersEditor
                   value={parsedJson ? getTriggers(parsedJson as WorkflowDataParsed) : []}
                   onChange={(triggers) => {
-                    try {
-                      const parsed = JSON.parse(jsonValue) as WorkflowDataParsed;
-                      updateTriggers(parsed, triggers as WorkflowTrigger[]);
-                      setJsonValue(JSON.stringify(parsed, null, 2));
-                    } catch {
-                      // ignore
-                    }
+                    setJsonValue((prevJson) => {
+                      try {
+                        const parsed = JSON.parse(prevJson) as WorkflowDataParsed;
+                        updateTriggers(parsed, triggers as WorkflowTrigger[]);
+                        return JSON.stringify(parsed, null, 2);
+                      } catch {
+                        return prevJson;
+                      }
+                    });
                   }}
                 />
               )}

@@ -79,8 +79,10 @@ export function WorkflowParametersEditor({ value = [], onChange }: WorkflowParam
             <Droppable droppableId="parameters-list">
               {(provided) => (
                 <div {...provided.droppableProps} ref={provided.innerRef} className="divide-y">
-                  {value.map((param, index) => (
-                    <Draggable key={param.id} draggableId={param.id} index={index}>
+                  {value.map((param, index) => {
+                    const uniqueId = param.id || param.name || `param-${index}`;
+                    return (
+                    <Draggable key={uniqueId} draggableId={uniqueId} index={index}>
                       {(provided) => (
                         <div
                           ref={provided.innerRef}
@@ -198,7 +200,8 @@ export function WorkflowParametersEditor({ value = [], onChange }: WorkflowParam
                         </div>
                       )}
                     </Draggable>
-                  ))}
+                  );
+                  })}
                   {provided.placeholder}
                 </div>
               )}

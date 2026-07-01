@@ -202,29 +202,15 @@ async fn delete_workflow(
         (status = 200, description = "Workflow restored")
     ),
     params(
-        ("id" = String, Path, description = "Workflow ID"),
-        ("workspacePath" = Option<String>, Query, description = "Workspace path")
+        ("id" = String, Path, description = "Workflow ID")
     ),
     tag = "workflows"
 )]
 async fn restore_workflow(
     State(state): State<AppState>,
     Path(id): Path<String>,
-    Query(query): Query<WorkspaceQuery>,
 ) -> Result<Json<serde_json::Value>, AppError> {
     WorkflowService::restore(&state.db, &id).await?;
-
-    // Fetch and export to JSON
-    if let Ok(wf) = WorkflowService::get_by_id(&state.db, &id).await {
-        let watch_dir = query
-            .workspace_path
-            .map(|p| std::path::PathBuf::from(p).join("workflows"))
-            .unwrap_or_else(|| state.app_dir.join("workflows"));
-        let _ = crate::services::file_watcher::FileWatcherService::export_workflow_file(
-            &watch_dir, &wf,
-        )
-        .await;
-    }
 
     Ok(Json(serde_json::json!({ "restored": true })))
 }

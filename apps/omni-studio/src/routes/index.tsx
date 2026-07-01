@@ -52,27 +52,21 @@ function WorkflowsPage() {
   const isWorkspaceSelected = !!selectedWorkspacePath;
 
   useEffect(() => {
-    let unlistenFn: () => void;
-
-    platformApi.listen('workflows-synced', (payload: { count: number }) => {
+    const unlistenSyncPromise = platformApi.listen('workflows-synced', (payload: { count: number }) => {
       if (payload.count > 0) {
         toast.info(`Extension online: Synced ${payload.count} workflow(s) to Studio`);
         queryClient.invalidateQueries({ queryKey: ['workflows'] });
+        queryClient.invalidateQueries({ queryKey: ['workflow'] });
       }
-    }).then((fn) => {
-      unlistenFn = fn;
     });
 
-    let unlistenConnFn: () => void;
-    platformApi.listen('extension-connections-changed', (payload: { count: number }) => {
+    const unlistenConnPromise = platformApi.listen('extension-connections-changed', (payload: { count: number }) => {
       setActiveExtensions(payload.count);
-    }).then((fn) => {
-      unlistenConnFn = fn;
     });
 
     return () => {
-      if (unlistenFn) unlistenFn();
-      if (unlistenConnFn) unlistenConnFn();
+      unlistenSyncPromise.then((fn) => fn());
+      unlistenConnPromise.then((fn) => fn());
     };
   }, [queryClient, platformApi]);
 

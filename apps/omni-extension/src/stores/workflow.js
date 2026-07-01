@@ -75,8 +75,8 @@ export const fromStudioWorkflow = (workflow) => {
     dataColumns: parseJson(workflow.data_columns, [], 'data_columns'),
     version: workflow.version,
     isDisabled: Boolean(workflow.is_disabled),
-    createdAt: workflow.created_at ? new Date(workflow.created_at).getTime() : Date.now(),
-    updatedAt: workflow.updated_at ? new Date(workflow.updated_at).getTime() : Date.now(),
+    createdAt: workflow.created_at ? new Date(workflow.created_at.includes('Z') ? workflow.created_at : workflow.created_at.replace(' ', 'T') + 'Z').getTime() : Date.now(),
+    updatedAt: workflow.updated_at ? new Date(workflow.updated_at.includes('Z') ? workflow.updated_at : workflow.updated_at.replace(' ', 'T') + 'Z').getTime() : Date.now(),
   };
 };
 
@@ -283,15 +283,26 @@ export const useWorkflowStore = defineStore('workflow', {
         } else if (msg.event_type === 'workflows_changed') {
           const studioWorkflows = msg.payload || [];
           let localWorkflows = { ...this.workflows };
+          let changed = false;
 
           studioWorkflows.forEach((workflow) => {
             const parsed = fromStudioWorkflow(workflow);
             const w = defaultWorkflow(parsed, { duplicateId: false });
-            localWorkflows[w.id] = w;
+            
+            const localW = localWorkflows[w.id];
+            // Only overwrite if the Studio workflow is newer or equal to local
+            if (!localW || w.updatedAt >= localW.updatedAt) {
+              localWorkflows[w.id] = w;
+              changed = true;
+            } else {
+              // console.debug(`[SyncBridge] Ignoring older workflow ${w.id} from Studio`);
+            }
           });
 
-          this.workflows = localWorkflows;
-          browser.storage.local.set({ workflows: localWorkflows });
+          if (changed) {
+            this.workflows = localWorkflows;
+            browser.storage.local.set({ workflows: localWorkflows });
+          }
         } else if (msg.event_type === 'workflow_deleted') {
           const id = msg.payload?.id;
           if (id) {

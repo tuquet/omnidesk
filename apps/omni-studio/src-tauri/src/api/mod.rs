@@ -99,19 +99,7 @@ pub async fn serve(pool: SqlitePool, app_dir: PathBuf, port: u16, app_handle: Ap
         active_sync_connections: Arc::new(std::sync::atomic::AtomicUsize::new(0)),
     };
 
-    let watch_dir = app_dir.join("workflows");
-    let pool_clone = pool.clone();
-    let sync_tx_clone = sync_tx.clone();
-    tokio::spawn(async move {
-        let watcher = crate::services::file_watcher::FileWatcherService::new(
-            watch_dir,
-            pool_clone,
-            sync_tx_clone,
-        );
-        if let Err(e) = watcher.start().await {
-            eprintln!("FileWatcher failed to start: {:?}", e);
-        }
-    });
+
 
     let app = Router::new()
         .route(

@@ -70,11 +70,11 @@ export function WorkflowLogsModal({ workflowId, isOpen, onOpenChange }: Workflow
 
         <div className="flex-1 min-h-0 flex flex-row w-full h-full rounded-b-lg overflow-hidden">
           {/* Left Panel: List of Runs */}
-          <div className="w-[320px] bg-muted/10 flex flex-col border-r shrink-0">
+          <div className="w-[320px] bg-muted/10 flex flex-col border-r shrink-0 min-h-0">
             <div className="p-4 border-b bg-muted/20 font-medium text-sm text-muted-foreground uppercase tracking-wider shrink-0">
               Execution History
             </div>
-            <ScrollArea className="flex-1">
+            <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar">
               {isRunsLoading ? (
                 <div className="p-4 space-y-3">
                   <Skeleton className="h-16 w-full" />
@@ -147,11 +147,11 @@ export function WorkflowLogsModal({ workflowId, isOpen, onOpenChange }: Workflow
                   ))}
                 </div>
               )}
-            </ScrollArea>
+            </div>
           </div>
 
           {/* Right Panel: Logs for Selected Run */}
-          <div className="flex-1 flex flex-col min-w-0 bg-background">
+          <div className="flex-1 flex flex-col min-w-0 bg-background min-h-0">
             <div className="p-4 border-b bg-muted/5 font-medium text-sm text-muted-foreground uppercase tracking-wider flex items-center justify-between shrink-0">
               <span>Block Execution Logs</span>
               {isRunActive && (
@@ -163,7 +163,7 @@ export function WorkflowLogsModal({ workflowId, isOpen, onOpenChange }: Workflow
                 </Badge>
               )}
             </div>
-            <ScrollArea className="flex-1">
+            <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar">
               {!selectedRunId ? (
                 <div className="flex items-center justify-center h-full text-muted-foreground">
                   Select a run to view logs
@@ -264,7 +264,7 @@ export function WorkflowLogsModal({ workflowId, isOpen, onOpenChange }: Workflow
                   </div>
                 </div>
               )}
-            </ScrollArea>
+            </div>
           </div>
         </div>
       </DialogContent>
