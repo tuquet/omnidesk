@@ -186,6 +186,7 @@ export function convertWorkflow(workflow, additionalKeys = []) {
     'settings',
     'globalData',
     'description',
+    'trigger',
     ...additionalKeys,
   ];
   const content = {

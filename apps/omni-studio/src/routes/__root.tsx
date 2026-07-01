@@ -1,15 +1,15 @@
 import { createRootRouteWithContext, useNavigate } from '@tanstack/react-router';
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useDevStore } from '@omnidesk/core';
 import type { AuthState } from '@omnidesk/auth';
-import { Button } from '@omnidesk/ui';
+import { Button, ConfirmDialogProvider } from '@omnidesk/ui';
 import { ArrowLeft, Ghost } from 'lucide-react';
 import { TitleBar, StatusBar } from '@omnidesk/core';
 import { AppConfigProvider } from '@omnidesk/core';
 import * as config from '@/config';
 import { useRBAC } from '@/hooks/use-rbac';
 import { ResizeHandles } from '@omnidesk/core';
-import { AutoUpdater } from '@omnidesk/features';
+// import { AutoUpdater } from '@omnidesk/features';
 
 interface MyRouterContext {
   auth: AuthState;
@@ -81,33 +81,34 @@ function RootComponent() {
     }
   }, [setDevMode]);
 
+  const appConfig = useMemo(() => ({
+    ...config,
+    appName: config.APP_NAME,
+    logoSrc: config.LOGO_SRC,
+    navMain: config.NAV_MAIN,
+    navDocuments: config.NAV_DOCUMENTS,
+    navSecondary: config.NAV_SECONDARY,
+    navShowcase: config.NAV_SHOWCASE,
+    navErrorPages: config.NAV_ERROR_PAGES,
+    breadcrumbMap: config.BREADCRUMB_MAP,
+    githubRepo: config.GITHUB_REPO,
+    githubIssues: config.GITHUB_ISSUES,
+    apiDocsUrl: config.API_DOCS_URL,
+  }), []);
+
   return (
     <div className="relative flex h-screen flex-col bg-background">
-      <AppConfigProvider
-        config={{
-          ...config,
-          appName: config.APP_NAME,
-          logoSrc: config.LOGO_SRC,
-          navMain: config.NAV_MAIN,
-          navDocuments: config.NAV_DOCUMENTS,
-          navSecondary: config.NAV_SECONDARY,
-          navShowcase: config.NAV_SHOWCASE,
-          navErrorPages: config.NAV_ERROR_PAGES,
-          breadcrumbMap: config.BREADCRUMB_MAP,
-          githubRepo: config.GITHUB_REPO,
-          githubIssues: config.GITHUB_ISSUES,
-          apiDocsUrl: config.API_DOCS_URL,
-        }}
-        rbac={rbac}
-      >
-        <AutoUpdater />
-        <ResizeHandles />
-        <TitleBar />
-        <div className="flex-1 flex flex-col min-h-0">
-          <AppLayout />
-        </div>
-        <StatusBar />
-      </AppConfigProvider>
+      <ConfirmDialogProvider>
+        <AppConfigProvider config={appConfig} rbac={rbac}>
+          {/* <AutoUpdater /> */}
+          <ResizeHandles />
+          <TitleBar />
+          <div className="flex-1 flex flex-col min-h-0">
+            <AppLayout />
+          </div>
+          <StatusBar />
+        </AppConfigProvider>
+      </ConfirmDialogProvider>
     </div>
   );
 }

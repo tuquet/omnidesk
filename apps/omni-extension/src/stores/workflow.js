@@ -14,8 +14,19 @@ import browser from 'webextension-polyfill';
 import { useOmniStudio } from '@/composable/useOmniStudio';
 import { useUserStore } from './user';
 
-// Transform Automa Workflow to Omni Studio Format
 const toStudioWorkflow = (workflow) => {
+  let triggerData = workflow.trigger || { parameters: [], triggers: [] };
+  
+  if (workflow.drawflow && Array.isArray(workflow.drawflow.nodes)) {
+    const triggerNode = workflow.drawflow.nodes.find((n) => n.label === 'trigger');
+    if (triggerNode && triggerNode.data) {
+      triggerData = {
+        parameters: triggerNode.data.parameters || triggerData.parameters || [],
+        triggers: triggerNode.data.triggers || triggerData.triggers || [],
+      };
+    }
+  }
+
   return {
     id: workflow.id,
     name: workflow.name,
@@ -24,7 +35,7 @@ const toStudioWorkflow = (workflow) => {
     description: workflow.description,
     drawflow: workflow.drawflow,
     settings: workflow.settings,
-    trigger: workflow.trigger,
+    trigger: triggerData,
     global_data: workflow.globalData,
     table_data: workflow.table,
     data_columns: workflow.dataColumns,
@@ -80,7 +91,7 @@ const syncToOmniStudio = (workflows) => {
     const sent = sendWsMessage('push_workflows', studioPayload);
     
     if (!sent) {
-      console.debug('[SyncBridge] Omni Studio is offline. Workflows saved locally and will sync later.');
+      // console.debug('[SyncBridge] Omni Studio is offline. Workflows saved locally and will sync later.');
     }
   } catch (error) {
     console.error('Failed to sync workflows via WebSocket', error);
@@ -115,7 +126,7 @@ const defaultWorkflow = (data = null, options = {}) => {
     table: [],
     dataColumns: [],
     description: '',
-    trigger: null,
+    trigger: { parameters: [], triggers: [] },
     createdAt: Date.now(),
     updatedAt: Date.now(),
     isDisabled: false,
@@ -216,15 +227,59 @@ export const useWorkflowStore = defineStore('workflow', {
         if (msg.event_type === 'full_sync') {
           const studioWorkflows = msg.payload || [];
           let localWorkflows = { ...this.workflows };
+          let workflowsToPush = [];
+          const studioMap = {};
 
           studioWorkflows.forEach((workflow) => {
             const parsed = fromStudioWorkflow(workflow);
             const w = defaultWorkflow(parsed, { duplicateId: false });
-            localWorkflows[w.id] = w;
+            studioMap[w.id] = w;
+
+            const localW = localWorkflows[w.id];
+            if (!localW) {
+              // Not in local, so add it from studio
+              localWorkflows[w.id] = w;
+            } else {
+              // Exists in both, compare version first, then timestamps
+              const localUpdate = localW.updatedAt || 0;
+              const studioUpdate = w.updatedAt || 0;
+              const localVersion = localW.version || '0.0.0';
+              const studioVersion = w.version || '0.0.0';
+
+              const vCmp = studioVersion.localeCompare(localVersion, undefined, { numeric: true, sensitivity: 'base' });
+
+              if (vCmp > 0) {
+                // Studio version is higher
+                localWorkflows[w.id] = w;
+              } else if (vCmp < 0) {
+                // Local version is higher
+                workflowsToPush.push(localW);
+              } else {
+                // Versions are equal, fallback to updatedAt
+                if (studioUpdate >= localUpdate) {
+                  // Studio is newer or equal, overwrite local
+                  localWorkflows[w.id] = w;
+                } else {
+                  // Local is newer, keep local and push to Studio
+                  workflowsToPush.push(localW);
+                }
+              }
+            }
+          });
+
+          // Check for local workflows that don't exist in Studio at all
+          Object.values(localWorkflows).forEach((localW) => {
+            if (!studioMap[localW.id]) {
+              workflowsToPush.push(localW);
+            }
           });
 
           this.workflows = localWorkflows;
           browser.storage.local.set({ workflows: localWorkflows });
+
+          if (workflowsToPush.length > 0) {
+            syncToOmniStudio(workflowsToPush);
+          }
         } else if (msg.event_type === 'workflows_changed') {
           const studioWorkflows = msg.payload || [];
           let localWorkflows = { ...this.workflows };

@@ -282,9 +282,9 @@ function applyFlowData() {
   }
 
   editor.setNodes(
-    props.data?.nodes?.map((node) => ({ ...node, events: {} })) || []
+    (Array.isArray(props.data?.nodes) ? props.data.nodes : []).map((node) => ({ ...node, events: {} })) || []
   );
-  editor.setEdges(props.data?.edges || []);
+  editor.setEdges(Array.isArray(props.data?.edges) ? props.data.edges : []);
   editor.setViewport({
     x: props.data?.x || 0,
     y: props.data?.y || 0,

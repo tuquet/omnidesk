@@ -17,5 +17,21 @@ export default [
       "**/*.config.mjs",
       "**/*.gen.ts"
     ]
+  },
+  {
+    files: ["packages/ui/**/*.{ts,tsx}"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          paths: [
+            {
+              name: "@omnidesk/ui",
+              message: "Circular Import Error: Please use relative paths or the @/ alias when inside the @omnidesk/ui package."
+            }
+          ]
+        }
+      ]
+    }
   }
 ];

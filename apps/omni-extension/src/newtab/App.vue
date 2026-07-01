@@ -159,7 +159,7 @@ async function fetchUserData() {
     userStore.retrieved = true;
   } catch (error) {
     if (error.message === 'Failed to fetch') {
-      console.warn('Omni Studio is offline (Failed to fetch user data).');
+      // console.warn('Omni Studio is offline (Failed to fetch user data).');
     } else {
       console.error('Error fetching user data:', error);
     }

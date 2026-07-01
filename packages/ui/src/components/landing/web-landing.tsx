@@ -1,5 +1,5 @@
 import { Link } from '@tanstack/react-router';
-import { Button } from '@omnidesk/ui';
+import { Button } from '../../index';
 import { ArrowRight, LayoutDashboard, Workflow, ShieldCheck } from 'lucide-react';
 
 export function WebLanding() {

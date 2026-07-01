@@ -1,4 +1,4 @@
-import { cn } from '@omnidesk/ui';
+import { cn } from '../../index';
 
 /**
  * Lightweight progress bar (not from @omnidesk/ui).

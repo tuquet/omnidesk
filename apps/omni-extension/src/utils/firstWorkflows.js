@@ -2,7 +2,7 @@ import { nanoid } from 'nanoid';
 
 export default [
   {
-    id: nanoid(),
+    id: 'demo-workflow-twitter-000',
     name: 'Twitter Trends to Google Sheets',
     table: [
       { id: '6QbkU', name: 'text', type: 'string' },
@@ -509,7 +509,7 @@ export default [
     description: 'Import current twitter trends to Google Sheets',
   },
   {
-    id: nanoid(),
+    id: 'demo-workflow-google-000',
     name: 'Google search',
     createdAt: Date.now(),
     drawflow: {
@@ -715,7 +715,7 @@ export default [
     },
   },
   {
-    id: nanoid(),
+    id: 'demo-workflow-lorem-00000',
     name: 'Generate lorem ipsum',
     createdAt: Date.now(),
     drawflow: {
@@ -1383,7 +1383,7 @@ export default [
     },
   },
   {
-    id: nanoid(),
+    id: 'demo-workflow-producthunt',
     name: 'Search in ProductHunt',
     createdAt: Date.now(),
     drawflow: {
@@ -1531,7 +1531,7 @@ export default [
     },
   },
   {
-    id: nanoid(),
+    id: 'demo-workflow-keywords-00',
     createdAt: Date.now(),
     name: 'Google Keyword Research',
     table: [

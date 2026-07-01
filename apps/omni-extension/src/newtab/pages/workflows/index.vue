@@ -279,13 +279,7 @@
               :sort="{ by: state.sortBy, order: state.sortOrder }"
             />
           </ui-tab-panel>
-          <ui-tab-panel value="studio" class="workflows-container">
-            <workflows-studio
-              :search="state.query"
-              :folder-id="state.activeFolder"
-              :sort="{ by: state.sortBy, order: state.sortOrder }"
-            />
-          </ui-tab-panel>
+
         </ui-tab-panels>
         <ui-card
           v-if="workflowStore.isFirstTime"

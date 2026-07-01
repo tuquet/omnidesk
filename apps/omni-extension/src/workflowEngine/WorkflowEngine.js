@@ -130,9 +130,23 @@ class WorkflowEngine {
         return;
       }
 
-      const { nodes, edges } = this.workflow.drawflow;
+      const { nodes, edges } = this.workflow.drawflow || {};
+      
+      console.error('DEBUG WorkflowEngine init:', {
+        typeOfNodes: typeof nodes,
+        isArray: Array.isArray(nodes),
+        nodesLength: nodes?.length,
+        nodes: nodes,
+        drawflow: this.workflow.drawflow
+      });
+
       if (!nodes || nodes.length === 0) {
         console.error(`${this.workflow.name} doesn't have blocks`);
+        return;
+      }
+
+      if (!Array.isArray(nodes)) {
+        console.error('CRITICAL ERROR: nodes is not an array!', nodes);
         return;
       }
 

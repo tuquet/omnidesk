@@ -101,7 +101,7 @@ export const usePackageStore = defineStore('packages', {
         this.sharedRetrieved = true;
       } catch (error) {
         if (error.message === 'Failed to fetch') {
-          console.warn('Omni Studio is offline (Failed to fetch shared packages).');
+          // console.warn('Omni Studio is offline (Failed to fetch shared packages).');
         } else {
           console.error(error.message);
         }

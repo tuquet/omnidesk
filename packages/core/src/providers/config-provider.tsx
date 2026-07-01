@@ -1,4 +1,4 @@
-import { createContext, useContext, ReactNode } from 'react';
+import { createContext, useContext, ReactNode, useMemo } from 'react';
 
 export interface NavItem {
   title?: string;
@@ -52,8 +52,10 @@ export function AppConfigProvider({
   rbac, 
   children 
 }: AppConfigContextValue & { children: ReactNode }) {
+  const contextValue = useMemo(() => ({ config, rbac }), [config, rbac]);
+
   return (
-    <AppConfigContext.Provider value={{ config, rbac }}>
+    <AppConfigContext.Provider value={contextValue}>
       {children}
     </AppConfigContext.Provider>
   );

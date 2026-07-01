@@ -1,4 +1,4 @@
-import { useState, useCallback, createContext, useContext, type ReactNode } from 'react';
+import { useState, useCallback, useMemo, createContext, useContext, type ReactNode } from 'react';
 import {
   Button,
   Dialog,
@@ -7,7 +7,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@omnidesk/ui';
+} from '../../index';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -85,8 +85,10 @@ export function ConfirmDialogProvider({ children }: { children: ReactNode }) {
     [state.resolve],
   );
 
+  const contextValue = useMemo(() => ({ confirm }), [confirm]);
+
   return (
-    <ConfirmDialogContext.Provider value={{ confirm }}>
+    <ConfirmDialogContext.Provider value={contextValue}>
       {children}
       <Dialog open={state.open} onOpenChange={(open) => !open && handleClose(false)}>
         <DialogContent>

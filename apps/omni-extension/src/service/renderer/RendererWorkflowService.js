@@ -7,14 +7,11 @@ class RendererWorkflowService {
      * Convert Vue-created proxy into plain object.
      * It will throw error if there a proxy inside the object.
      */
-    const clonedWorkflowData = {};
-    Object.keys(workflowData).forEach((key) => {
-      clonedWorkflowData[key] = toRaw(workflowData[key]);
-    });
+    const clonedWorkflowData = JSON.parse(JSON.stringify(workflowData));
 
     return MessageListener.sendMessage(
       'workflow:execute',
-      { ...workflowData, options },
+      { ...clonedWorkflowData, options },
       'background'
     );
   }

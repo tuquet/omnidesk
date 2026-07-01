@@ -92,7 +92,7 @@ export const useHostedWorkflowStore = defineStore('hosted-workflows', {
         return dataToReturn;
       } catch (error) {
         if (error.message === 'Failed to fetch') {
-          console.warn('Omni Studio is offline (Failed to fetch hosted workflows).');
+          // console.warn('Omni Studio is offline (Failed to fetch hosted workflows).');
         } else {
           console.error('Error fetching hosted workflows:', error);
         }

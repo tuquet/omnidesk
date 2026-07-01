@@ -346,10 +346,7 @@ const component = {
       const iconStr = injectIcons[props.name];
 
       if (typeof iconStr === 'undefined') {
-        console.error(
-          `[v-remixicon] ${props.name} name of the icon is incorrect`
-        );
-        return null;
+        return injectIcons['riGlobalLine'] || null;
       }
 
       return iconStr;

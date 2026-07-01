@@ -2,6 +2,8 @@ import { useState, useEffect, useMemo } from 'react';
 import {
   Dialog,
   DialogContent,
+  DialogHeader,
+  DialogFooter,
   DialogTitle,
   DialogDescription,
   Button,
@@ -187,41 +189,38 @@ export function RunWorkflowModal({ workflowId, profileId, isOpen, onClose, onRun
 
   return (
     <Dialog open={isOpen} onOpenChange={(open: boolean) => !open && handleClose()}>
-      <DialogContent className="sm:max-w-[600px] p-0 border-muted/30 shadow-2xl bg-card overflow-hidden">
-        {/* Header */}
-        <div className="bg-muted/10 p-6 border-b border-muted/20">
-          <DialogTitle className="text-xl font-semibold tracking-tight mb-1">
-            Execution Order
-          </DialogTitle>
-          <DialogDescription className="text-muted-foreground">
+      <DialogContent className="sm:max-w-[600px]">
+        <DialogHeader>
+          <DialogTitle>Execution Order</DialogTitle>
+          <DialogDescription>
             {workflow?.name ? `Configure execution options for "${workflow.name}"` : 'Select target workflow, profile, and parameters'}
           </DialogDescription>
-        </div>
+        </DialogHeader>
 
         {isLoading ? (
-          <div className="p-6 space-y-6">
-            <Skeleton className="h-16 w-full rounded-xl" />
-            <Skeleton className="h-32 w-full rounded-xl" />
-            <Skeleton className="h-12 w-full rounded-xl" />
+          <div className="space-y-6 py-4">
+            <Skeleton className="h-16 w-full rounded-md" />
+            <Skeleton className="h-32 w-full rounded-md" />
+            <Skeleton className="h-12 w-full rounded-md" />
           </div>
         ) : (
-          <div className="p-6 space-y-8 max-h-[65vh] overflow-y-auto custom-scrollbar">
+          <div className="space-y-6 py-4 max-h-[60vh] overflow-y-auto custom-scrollbar">
             
             {/* Step 1: Workflow Selection (If not provided) */}
             {!workflowId && (
               <div className="space-y-4">
                 <div className="flex items-center gap-3">
-                  <div className="flex items-center justify-center w-6 h-6 rounded-full bg-primary/20 text-primary text-xs font-bold">
+                  <div className="flex items-center justify-center w-6 h-6 rounded-full bg-primary/10 text-primary text-xs font-medium">
                     1
                   </div>
-                  <Label className="text-sm font-semibold text-foreground">Select Workflow</Label>
+                  <Label className="text-base font-semibold">Select Workflow</Label>
                 </div>
                 <div className="pl-9">
                   <Select value={selectedWorkflow || undefined} onValueChange={setSelectedWorkflow}>
-                    <SelectTrigger className="w-full bg-muted/20 border-muted/30 focus:border-primary/50 transition-colors h-11">
+                    <SelectTrigger className="w-full">
                       <SelectValue placeholder="Choose a workflow to run..." />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent position="popper">
                       {workflowsList.map((wf: any) => (
                         <SelectItem key={wf.id} value={wf.id} className="cursor-pointer">
                           {wf.name}
@@ -237,17 +236,17 @@ export function RunWorkflowModal({ workflowId, profileId, isOpen, onClose, onRun
             {!profileId && (
               <div className="space-y-4">
                 <div className="flex items-center gap-3">
-                  <div className="flex items-center justify-center w-6 h-6 rounded-full bg-primary/20 text-primary text-xs font-bold">
+                  <div className="flex items-center justify-center w-6 h-6 rounded-full bg-primary/10 text-primary text-xs font-medium">
                     {workflowId ? '1' : '2'}
                   </div>
-                  <Label className="text-sm font-semibold text-foreground">Target Profile</Label>
+                  <Label className="text-base font-semibold">Target Profile</Label>
                 </div>
                 <div className="pl-9">
                   <Select value={selectedProfile || undefined} onValueChange={setSelectedProfile}>
-                    <SelectTrigger className="w-full bg-muted/20 border-muted/30 focus:border-primary/50 transition-colors h-11">
+                    <SelectTrigger className="w-full">
                       <SelectValue placeholder="Select a browser profile..." />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent position="popper">
                       <SelectItem value="default" className="cursor-pointer font-medium text-primary">
                         Default Profile
                       </SelectItem>
@@ -269,17 +268,17 @@ export function RunWorkflowModal({ workflowId, profileId, isOpen, onClose, onRun
             {triggerParams.length > 0 && selectedWorkflow && (
               <div className="space-y-4">
                 <div className="flex items-center gap-3">
-                  <div className="flex items-center justify-center w-6 h-6 rounded-full bg-primary/20 text-primary text-xs font-bold">
+                  <div className="flex items-center justify-center w-6 h-6 rounded-full bg-primary/10 text-primary text-xs font-medium">
                     {(!workflowId && !profileId) ? '3' : (!workflowId || !profileId) ? '2' : '1'}
                   </div>
-                  <Label className="text-sm font-semibold text-foreground">Trigger Parameters</Label>
+                  <Label className="text-base font-semibold">Trigger Parameters</Label>
                 </div>
                 
                 <div className="pl-9 space-y-4">
-                  <div className="p-4 rounded-xl border border-muted/30 bg-muted/10 space-y-4">
+                  <div className="p-4 rounded-md border bg-muted/50 space-y-4">
                     {triggerParams.map((param) => (
                       <div key={param.name} className="space-y-2 flex flex-col">
-                        <Label htmlFor={`var-${param.name}`} className="text-sm text-foreground/90 font-medium">
+                        <Label htmlFor={`var-${param.name}`}>
                           {param.label || param.name}
                         </Label>
                         
@@ -289,7 +288,6 @@ export function RunWorkflowModal({ workflowId, profileId, isOpen, onClose, onRun
                             type={param.type === 'number' ? 'number' : 'text'}
                             value={variables[param.name] ?? ''}
                             onChange={(e: any) => handleVariableChange(param.name, param.type === 'number' ? Number(e.target.value) : e.target.value)}
-                            className="bg-background/50 border-muted/40 focus-visible:border-primary/50 h-10"
                             placeholder={`Enter ${param.name}...`}
                           />
                         ) : param.type === 'boolean' ? (
@@ -303,7 +301,6 @@ export function RunWorkflowModal({ workflowId, profileId, isOpen, onClose, onRun
                             id={`var-${param.name}`}
                             value={variables[param.name] ?? ''}
                             onChange={(e: any) => handleVariableChange(param.name, e.target.value)}
-                            className="bg-background/50 border-muted/40 focus-visible:border-primary/50 h-10"
                             placeholder={`Enter ${param.name}...`}
                           />
                         )}
@@ -316,28 +313,22 @@ export function RunWorkflowModal({ workflowId, profileId, isOpen, onClose, onRun
           </div>
         )}
 
-        <div className="p-6 border-t border-muted/20 bg-muted/5 flex items-center justify-between">
+        <DialogFooter>
           <Button 
-            variant="ghost" 
+            variant="outline" 
             onClick={handleClose} 
             disabled={runMutation.isPending}
-            className="text-muted-foreground hover:text-foreground"
           >
             Cancel
           </Button>
           <Button 
             onClick={() => runMutation.mutate()} 
             disabled={runMutation.isPending || isLoading || !selectedWorkflow}
-            className="w-full max-w-[240px] h-11 text-sm font-semibold tracking-wide uppercase transition-all duration-300"
-            style={{
-              background: 'linear-gradient(to right, hsl(var(--primary)), hsl(var(--primary)/0.8))',
-              color: 'white'
-            }}
           >
-            <PlayIcon className="w-4 h-4 mr-2 fill-current" />
+            <PlayIcon className="w-4 h-4 mr-2" />
             {runMutation.isPending ? 'Starting...' : 'Execute Workflow'}
           </Button>
-        </div>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );

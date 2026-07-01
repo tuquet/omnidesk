@@ -1,6 +1,5 @@
 use axum::{
     extract::{Path, Query, State},
-    http::StatusCode,
     routing::{get, post, delete},
     Json, Router,
 };
@@ -88,6 +87,11 @@ async fn get_empty_list() -> Result<Json<Vec<serde_json::Value>>, AppError> {
 #[derive(Deserialize)]
 pub struct ListWorkflowsQuery {
     pub since: Option<String>,
+}
+
+#[derive(Deserialize)]
+pub struct WorkspaceQuery {
+    pub workspacePath: Option<String>,
 }
 
 #[utoipa::path(
@@ -198,20 +202,25 @@ async fn update_workflow(
         (status = 404, description = "Workflow not found")
     ),
     params(
-        ("id" = String, Path, description = "Workflow ID")
+        ("id" = String, Path, description = "Workflow ID"),
+        ("workspacePath" = Option<String>, Query, description = "Workspace path")
     ),
     tag = "workflows"
 )]
 async fn delete_workflow(
     State(state): State<AppState>,
     Path(id): Path<String>,
+    Query(query): Query<WorkspaceQuery>,
 ) -> Result<Json<serde_json::Value>, AppError> {
     // Soft Delete from SQLite
     WorkflowService::soft_delete(&state.db, &id, "api").await?;
 
     // Delete from Local File (if we do soft delete, we also delete the local JSON so it doesn't get synced back)
-    let watch_dir = state.app_dir.join("workflows");
-    let file_path = watch_dir.join(format!("{}.json", id));
+    let watch_dir = query.workspacePath
+        .map(|p| std::path::PathBuf::from(p).join("workflows"))
+        .unwrap_or_else(|| state.app_dir.join("workflows"));
+        
+    let file_path = watch_dir.join(format!("{}.automa.json", id));
     if file_path.exists() {
         if let Err(e) = std::fs::remove_file(&file_path) {
             eprintln!("Failed to delete workflow file {:?}: {}", file_path, e);
@@ -235,19 +244,23 @@ async fn delete_workflow(
         (status = 200, description = "Workflow restored")
     ),
     params(
-        ("id" = String, Path, description = "Workflow ID")
+        ("id" = String, Path, description = "Workflow ID"),
+        ("workspacePath" = Option<String>, Query, description = "Workspace path")
     ),
     tag = "workflows"
 )]
 async fn restore_workflow(
     State(state): State<AppState>,
     Path(id): Path<String>,
+    Query(query): Query<WorkspaceQuery>,
 ) -> Result<Json<serde_json::Value>, AppError> {
     WorkflowService::restore(&state.db, &id).await?;
     
     // Fetch and export to JSON
     if let Ok(wf) = WorkflowService::get_by_id(&state.db, &id).await {
-        let watch_dir = state.app_dir.join("workflows");
+        let watch_dir = query.workspacePath
+            .map(|p| std::path::PathBuf::from(p).join("workflows"))
+            .unwrap_or_else(|| state.app_dir.join("workflows"));
         let _ = crate::services::file_watcher::FileWatcherService::export_workflow_file(&watch_dir, &wf).await;
     }
 
@@ -261,18 +274,22 @@ async fn restore_workflow(
         (status = 200, description = "Workflow duplicated")
     ),
     params(
-        ("id" = String, Path, description = "Workflow ID")
+        ("id" = String, Path, description = "Workflow ID"),
+        ("workspacePath" = Option<String>, Query, description = "Workspace path")
     ),
     tag = "workflows"
 )]
 async fn duplicate_workflow(
     State(state): State<AppState>,
     Path(id): Path<String>,
+    Query(query): Query<WorkspaceQuery>,
 ) -> Result<Json<WorkflowPayload>, AppError> {
     let duplicated = WorkflowService::duplicate(&state.db, &id).await?;
     
     // Export new workflow to local JSON
-    let watch_dir = state.app_dir.join("workflows");
+    let watch_dir = query.workspacePath
+        .map(|p| std::path::PathBuf::from(p).join("workflows"))
+        .unwrap_or_else(|| state.app_dir.join("workflows"));
     let _ = crate::services::file_watcher::FileWatcherService::export_workflow_file(&watch_dir, &duplicated).await;
 
     // Broadcast to WebSocket so Extension adds it
@@ -292,19 +309,23 @@ async fn duplicate_workflow(
         (status = 200, description = "Workflow force deleted")
     ),
     params(
-        ("id" = String, Path, description = "Workflow ID")
+        ("id" = String, Path, description = "Workflow ID"),
+        ("workspacePath" = Option<String>, Query, description = "Workspace path")
     ),
     tag = "workflows"
 )]
 async fn force_delete_workflow(
     State(state): State<AppState>,
     Path(id): Path<String>,
+    Query(query): Query<WorkspaceQuery>,
 ) -> Result<Json<serde_json::Value>, AppError> {
     WorkflowService::delete(&state.db, &id).await?;
     
     // Delete from Local File (if it exists)
-    let watch_dir = state.app_dir.join("workflows");
-    let file_path = watch_dir.join(format!("{}.json", id));
+    let watch_dir = query.workspacePath
+        .map(|p| std::path::PathBuf::from(p).join("workflows"))
+        .unwrap_or_else(|| state.app_dir.join("workflows"));
+    let file_path = watch_dir.join(format!("{}.automa.json", id));
     if file_path.exists() {
         if let Err(e) = std::fs::remove_file(&file_path) {
             eprintln!("Failed to delete workflow file {:?}: {}", file_path, e);

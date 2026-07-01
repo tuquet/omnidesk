@@ -1,4 +1,6 @@
+ 
 import { createFileRoute } from '@tanstack/react-router';
+import { open } from '@tauri-apps/plugin-dialog';
 import {
   PageContainer,
   PageHeader,
@@ -14,14 +16,14 @@ import {
   AlertTitle,
   AlertDescription,
   RunWorkflowModal,
+  useConfirmDialog,
 } from '@omnidesk/ui';
 import { WorkflowIcon, FolderOpenIcon, AlertCircleIcon } from 'lucide-react';
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useDeferredValue } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { client } from '@/lib/api-client';
 import { useWorkspaceStore, usePlatform } from '@omnidesk/core';
-import { open } from '@tauri-apps/plugin-dialog';
 import { WorkflowsTable, type Workflow } from '../components/workflows-table';
 import { WorkflowsToolbar } from '../components/workflows-toolbar';
 import { WorkflowJsonEditorModal } from '../components/workflow-json-editor-modal';
@@ -32,6 +34,7 @@ export const Route = createFileRoute('/')({
 });
 
 function WorkflowsPage() {
+  const { confirm } = useConfirmDialog();
   const { selectedWorkspacePath, setWorkspacePath } = useWorkspaceStore();
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState<string>('updated_at');
@@ -40,6 +43,8 @@ function WorkflowsPage() {
   const [workflowToRun, setWorkflowToRun] = useState<string | null>(null);
   const [rowSelection, setRowSelection] = useState<Record<string, boolean>>({});
   const [viewMode, setViewMode] = useState<'active' | 'trash'>('active');
+
+  const deferredSearchQuery = useDeferredValue(searchQuery);
 
   const [isEditorOpen, setIsEditorOpen] = useState(false);
   const [editorWorkflowId, setEditorWorkflowId] = useState<string | null>(null);
@@ -83,6 +88,7 @@ function WorkflowsPage() {
       return (data as Workflow[]) || [];
     },
     enabled: isWorkspaceSelected,
+    staleTime: 60 * 1000, // Do not sync on every window focus within 1 minute
   });
 
   const deleteMutation = useMutation({
@@ -90,6 +96,7 @@ function WorkflowsPage() {
       const { error } = await client.request({
         url: `/api/automa/workflows/${id}`,
         method: 'DELETE',
+        query: { workspacePath: selectedWorkspacePath }
       });
       if (error) throw error;
     },
@@ -108,6 +115,7 @@ function WorkflowsPage() {
       const { error } = await client.request({
         url: `/api/automa/workflows/${id}/restore`,
         method: 'POST',
+        query: { workspacePath: selectedWorkspacePath }
       });
       if (error) throw error;
     },
@@ -122,6 +130,7 @@ function WorkflowsPage() {
       const { error } = await client.request({
         url: `/api/automa/workflows/${id}/force`,
         method: 'DELETE',
+        query: { workspacePath: selectedWorkspacePath }
       });
       if (error) throw error;
     },
@@ -140,6 +149,7 @@ function WorkflowsPage() {
       const { error } = await client.request({
         url: `/api/automa/workflows/${id}/duplicate`,
         method: 'POST',
+        query: { workspacePath: selectedWorkspacePath }
       });
       if (error) throw error;
     },
@@ -152,7 +162,7 @@ function WorkflowsPage() {
   const bulkDeleteMutation = useMutation({
     mutationFn: async (ids: string[]) => {
       await Promise.all(
-        ids.map((id) => client.request({ url: `/api/automa/workflows/${id}`, method: 'DELETE' })),
+        ids.map((id) => client.request({ url: `/api/automa/workflows/${id}`, method: 'DELETE', query: { workspacePath: selectedWorkspacePath } })),
       );
     },
     onSuccess: () => {
@@ -166,7 +176,7 @@ function WorkflowsPage() {
     mutationFn: async (ids: string[]) => {
       await Promise.all(
         ids.map((id) =>
-          client.request({ url: `/api/automa/workflows/${id}/restore`, method: 'POST' }),
+          client.request({ url: `/api/automa/workflows/${id}/restore`, method: 'POST', query: { workspacePath: selectedWorkspacePath } }),
         ),
       );
     },
@@ -181,7 +191,7 @@ function WorkflowsPage() {
     mutationFn: async (ids: string[]) => {
       await Promise.all(
         ids.map((id) =>
-          client.request({ url: `/api/automa/workflows/${id}/force`, method: 'DELETE' }),
+          client.request({ url: `/api/automa/workflows/${id}/force`, method: 'DELETE', query: { workspacePath: selectedWorkspacePath } }),
         ),
       );
     },
@@ -216,8 +226,8 @@ function WorkflowsPage() {
   const filteredWorkflows = useMemo(() => {
     return workflows
       .filter((wf) => {
-        if (!searchQuery) return true;
-        const q = searchQuery.toLowerCase();
+        if (!deferredSearchQuery) return true;
+        const q = deferredSearchQuery.toLowerCase();
         return wf.name?.toLowerCase().includes(q) || wf.description?.toLowerCase().includes(q);
       })
       .sort((a, b) => {
@@ -232,7 +242,7 @@ function WorkflowsPage() {
         if (aVal > bVal) return sortOrder === 'asc' ? 1 : -1;
         return 0;
       });
-  }, [workflows, searchQuery, sortBy, sortOrder]);
+  }, [workflows, deferredSearchQuery, sortBy, sortOrder]);
 
   const handleSelectWorkspace = async () => {
     try {
@@ -371,8 +381,13 @@ function WorkflowsPage() {
                     <Button
                       variant="destructive"
                       size="sm"
-                      onClick={() => {
-                        if (confirm('Are you sure you want to delete selected workflows?')) {
+                      onClick={async () => {
+                        const confirmed = await confirm({
+                          title: 'Delete workflows?',
+                          description: 'Are you sure you want to delete selected workflows?',
+                          destructive: true,
+                        });
+                        if (confirmed) {
                           bulkDeleteMutation.mutate(Object.keys(rowSelection));
                         }
                       }}
@@ -394,12 +409,13 @@ function WorkflowsPage() {
                     <Button
                       variant="destructive"
                       size="sm"
-                      onClick={() => {
-                        if (
-                          confirm(
-                            'Are you sure you want to permanently delete selected workflows? This cannot be undone.',
-                          )
-                        ) {
+                      onClick={async () => {
+                        const confirmed = await confirm({
+                          title: 'Force Delete workflows?',
+                          description: 'Are you sure you want to permanently delete selected workflows? This cannot be undone.',
+                          destructive: true,
+                        });
+                        if (confirmed) {
                           bulkForceDeleteMutation.mutate(Object.keys(rowSelection));
                         }
                       }}
@@ -425,12 +441,13 @@ function WorkflowsPage() {
             onDuplicate={(id) => duplicateMutation.mutate(id)}
             viewMode={viewMode}
             onRestore={(id) => restoreMutation.mutate(id)}
-            onForceDelete={(id) => {
-              if (
-                confirm(
-                  'Are you sure you want to permanently delete this workflow? This cannot be undone.',
-                )
-              ) {
+            onForceDelete={async (id) => {
+              const confirmed = await confirm({
+                title: 'Force Delete workflow?',
+                description: 'Are you sure you want to permanently delete this workflow? This cannot be undone.',
+                destructive: true,
+              });
+              if (confirmed) {
                 forceDeleteMutation.mutate(id);
               }
             }}

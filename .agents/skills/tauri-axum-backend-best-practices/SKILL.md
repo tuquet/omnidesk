@@ -88,3 +88,12 @@ When tasked with adding a new backend feature:
 - [ ] Did I add `#[utoipa::path]` to the new Axum handler?
 - [ ] Did I register the handler in `ApiDoc` and `Router`?
 - [ ] If handling external URLs/Auth, did I use the OS default browser instead of an internal WebView?
+
+## 6. Common Rust Errors in this Project
+
+When refactoring or adding new Axum routes/Tauri commands, watch out for these common errors:
+
+- **Missing \http\ crate (E0433)**: Do not use \http::StatusCode\ directly if the \http\ crate is not in \Cargo.toml\. Instead, use the re-exported \xum::http::StatusCode\.
+- **Unused imports**: Always clean up unused imports (like \http::StatusCode\) when refactoring to avoid compiler warnings.
+- **Strict Typing (ny) in TypeScript**: (Note for Frontend/UI) When interacting with untyped JSON data from Tauri/Axum, avoid using \ny\ as it triggers strict ESLint rules (\@typescript-eslint/no-unsafe-assignment\). Provide proper TypeScript types (e.g., \Record<string, unknown>\ or extend types) when parsing SQLite/JSON structures.
+

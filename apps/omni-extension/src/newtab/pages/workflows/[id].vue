@@ -925,7 +925,7 @@ async function initAutocomplete() {
     autocompleteState.blocks = objData;
   } else {
     const autocompleteData = {};
-    const nodes = editorData.value?.nodes || [];
+    const nodes = Array.isArray(editorData.value?.nodes) ? editorData.value.nodes : [];
     nodes.forEach(({ label, id, data }) => {
       Object.assign(
         autocompleteData,
@@ -952,7 +952,7 @@ async function initAutocomplete() {
   }
 }
 function registerTrigger() {
-  const triggerBlock = (editorData.value?.nodes || []).find(
+  const triggerBlock = (Array.isArray(editorData.value?.nodes) ? editorData.value.nodes : []).find(
     (node) => node.label === 'trigger'
   );
   registerWorkflowTrigger(workflowId, triggerBlock);

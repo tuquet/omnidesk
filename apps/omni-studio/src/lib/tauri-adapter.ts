@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import type { PlatformAdapter } from '@omnidesk/core';
 import { invoke } from '@tauri-apps/api/core';
 import { convertFileSrc } from '@tauri-apps/api/core';

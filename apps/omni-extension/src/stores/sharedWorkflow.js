@@ -61,7 +61,7 @@ export const useSharedWorkflowStore = defineStore('shared-workflows', {
             return sharedWorkflows;
           } catch (error) {
             if (error.message === 'Failed to fetch') {
-              console.warn('Omni Studio is offline (Failed to fetch shared workflows).');
+              // console.warn('Omni Studio is offline (Failed to fetch shared workflows).');
             } else {
               console.error('Error loading shared workflows:', error);
             }
