@@ -1,10 +1,10 @@
-import React, { useRef, useState } from 'react';
+import React from 'react';
 import {
   SidebarProvider,
+  SidebarInset,
   ResizablePanelGroup,
   ResizablePanel,
   ResizableHandle,
-  cn,
 } from '@omnidesk/ui';
 import { useLayoutStore } from '../stores/use-layout-store';
 import { useDevStore } from '../stores/use-dev-store';
@@ -18,76 +18,17 @@ export interface OmniLayoutProps {
 export function OmniLayout({ sidebarContent, children }: OmniLayoutProps) {
   const { sidebarOpen, setSidebarOpen } = useLayoutStore();
   const { isDevMode } = useDevStore();
-  const [sidebarWidth, setSidebarWidth] = useState(240);
-  const isDragging = useRef(false);
-  const [isDraggingState, setIsDraggingState] = useState(false);
-
-  // Custom drag logic for sidebar
-  const startDrag = (e: React.MouseEvent) => {
-    e.preventDefault();
-    isDragging.current = true;
-    setIsDraggingState(true);
-    document.body.style.cursor = 'col-resize';
-    const startX = e.clientX;
-    const startWidth = sidebarWidth;
-
-    const onMouseMove = (e: MouseEvent) => {
-      if (!isDragging.current) return;
-      const delta = e.clientX - startX;
-      let newWidth = startWidth + delta;
-      if (newWidth < 240) newWidth = 240;
-      if (newWidth > 600) newWidth = 600;
-      setSidebarWidth(newWidth);
-    };
-
-    const onMouseUp = () => {
-      isDragging.current = false;
-      setIsDraggingState(false);
-      document.body.style.cursor = '';
-      window.removeEventListener('mousemove', onMouseMove);
-      window.removeEventListener('mouseup', onMouseUp);
-    };
-
-    window.addEventListener('mousemove', onMouseMove);
-    window.addEventListener('mouseup', onMouseUp);
-  };
-
   const mainArea = (
     <SidebarProvider
       open={sidebarOpen}
       onOpenChange={setSidebarOpen}
-      style={{ '--sidebar-width': '100%' } as React.CSSProperties}
     >
-      <div className="flex h-full w-full bg-background overflow-hidden relative">
-        {/* Sidebar Area */}
-        {sidebarContent && (
-          <div
-            className={cn(
-              'flex-shrink-0 relative bg-sidebar',
-              !isDraggingState && 'transition-[width,opacity] duration-200 ease-linear',
-              sidebarOpen ? 'opacity-100' : 'w-0 opacity-0 overflow-hidden',
-            )}
-            style={{ width: sidebarOpen ? `${sidebarWidth}px` : '0px' }}
-          >
-            <div className="w-full h-full flex flex-col min-w-[240px]">{sidebarContent}</div>
-
-            {/* Custom Resize Handle */}
-            <div
-              onMouseDown={startDrag}
-              className={cn(
-                'absolute right-0 top-0 bottom-0 w-1.5 cursor-col-resize z-50 hover:bg-border/80 transition-colors',
-                !sidebarOpen && 'hidden',
-              )}
-            />
-          </div>
-        )}
-
-        {/* Separator Line */}
-        {sidebarContent && sidebarOpen && <div className="w-px h-full bg-border flex-shrink-0" />}
-
-        {/* Main Content Area */}
-        <div className="flex-1 min-w-0 flex flex-col relative bg-background overflow-y-auto">{children}</div>
-      </div>
+      {sidebarContent}
+      <SidebarInset className="overflow-hidden">
+        <div className="flex-1 min-w-0 flex flex-col relative bg-background overflow-y-auto">
+          {children}
+        </div>
+      </SidebarInset>
     </SidebarProvider>
   );
 
