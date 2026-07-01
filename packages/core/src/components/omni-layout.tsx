@@ -1,5 +1,5 @@
 import React from 'react';
-import { SidebarProvider, SidebarInset, ResizablePanelGroup, ResizablePanel, ResizableHandle } from '@omnidesk/ui';;
+import { SidebarProvider, SidebarInset } from '@omnidesk/ui';
 import { useLayoutStore } from '../stores/use-layout-store';
 import { useDevStore } from '../stores/use-dev-store';
 import { DevToolsPane } from './dev-tools-pane';
@@ -16,9 +16,10 @@ export function OmniLayout({ sidebarContent, children }: OmniLayoutProps) {
     <SidebarProvider
       open={sidebarOpen}
       onOpenChange={setSidebarOpen}
+      className="min-h-0 h-full w-full"
     >
       {sidebarContent}
-      <SidebarInset className="overflow-hidden">
+      <SidebarInset className="overflow-hidden min-h-0 h-full flex-1 w-full relative">
         <div className="flex-1 min-w-0 flex flex-col relative bg-background overflow-y-auto">
           {children}
         </div>
@@ -29,23 +30,16 @@ export function OmniLayout({ sidebarContent, children }: OmniLayoutProps) {
   return (
     <>
       <RouteProgressBar />
-      <ResizablePanelGroup orientation="vertical" className="h-full w-full">
-        <ResizablePanel
-          defaultSize={isDevMode ? 70 : 100}
-          minSize={30}
-          className="flex flex-col relative min-h-0"
-        >
+      <div className="flex flex-col relative h-full w-full min-h-0">
+        <div className="flex-1 min-h-0 flex flex-col relative">
           {mainArea}
-        </ResizablePanel>
+        </div>
         {isDevMode && (
-          <>
-            <ResizableHandle withHandle />
-            <ResizablePanel defaultSize={30} minSize={10} className="flex flex-col border-t-0">
-              <DevToolsPane />
-            </ResizablePanel>
-          </>
+          <div className="h-[30vh] min-h-[200px] border-t flex flex-col bg-background relative z-50">
+            <DevToolsPane />
+          </div>
         )}
-      </ResizablePanelGroup>
+      </div>
     </>
   );
 }

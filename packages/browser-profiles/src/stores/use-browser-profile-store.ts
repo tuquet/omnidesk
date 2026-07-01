@@ -60,7 +60,7 @@ export function useBrowserProfileStore() {
     browserProfileStore.setState((s) => ({ ...s, profiles }));
   }, []);
 
-  const createProfile = async (payload: CreateBrowserProfilePayload) => {
+  const createProfile = useCallback(async (payload: CreateBrowserProfilePayload) => {
     const newProfile = await fetchApi<BrowserProfile>('/api/browser-profiles', {
       method: 'POST',
       body: JSON.stringify(payload),
@@ -69,9 +69,9 @@ export function useBrowserProfileStore() {
       ...s,
       profiles: [newProfile, ...s.profiles],
     }));
-  };
+  }, []);
 
-  const updateProfile = async (payload: UpdateBrowserProfilePayload) => {
+  const updateProfile = useCallback(async (payload: UpdateBrowserProfilePayload) => {
     const updatedProfile = await fetchApi<BrowserProfile>(`/api/browser-profiles/${payload.id}`, {
       method: 'PUT',
       body: JSON.stringify(payload),
@@ -80,17 +80,17 @@ export function useBrowserProfileStore() {
       ...s,
       profiles: s.profiles.map((p) => (p.id === payload.id ? updatedProfile : p)),
     }));
-  };
+  }, []);
 
-  const deleteProfile = async (id: string) => {
+  const deleteProfile = useCallback(async (id: string) => {
     await fetchApi(`/api/browser-profiles/${id}`, { method: 'DELETE' });
     browserProfileStore.setState((s) => ({
       ...s,
       profiles: s.profiles.filter((p) => p.id !== id),
     }));
-  };
+  }, []);
 
-  const launchProfile = async (id: string, payload: Record<string, unknown> = {}) => {
+  const launchProfile = useCallback(async (id: string, payload: Record<string, unknown> = {}) => {
     await fetchApi(`/api/browser-profiles/${id}/launch`, {
       method: 'POST',
       body: JSON.stringify(payload),
@@ -100,34 +100,34 @@ export function useBrowserProfileStore() {
       ...s,
       profiles: s.profiles.map((p) => (p.id === id ? { ...p, status: 'RUNNING', pid: 1 } : p)),
     }));
-  };
+  }, []);
 
-  const stopProfile = async (id: string) => {
+  const stopProfile = useCallback(async (id: string) => {
     await fetchApi(`/api/browser-profiles/${id}/stop`, { method: 'POST' });
     // Update local status optimistically
     browserProfileStore.setState((s) => ({
       ...s,
       profiles: s.profiles.map((p) => (p.id === id ? { ...p, status: 'IDLE', pid: null } : p)),
     }));
-  };
+  }, []);
 
-  const resetBrowserEngine = async () => {
+  const resetBrowserEngine = useCallback(async () => {
     await fetchApi(`/api/browser-profiles/browser-engine`, { method: 'DELETE' });
-  };
+  }, []);
 
-  const fetchAvailableVersions = async (browserType: string) => {
+  const fetchAvailableVersions = useCallback(async (browserType: string) => {
     return fetchApi<{ browser_version: string; executable_path: string }[]>(
       `/api/browser-profiles/available-versions?browser_type=${browserType}`,
     );
-  };
+  }, []);
 
-  const fetchEngineStatus = async (browserType: string, version?: string) => {
+  const fetchEngineStatus = useCallback(async (browserType: string, version?: string) => {
     const qs = new URLSearchParams({ browser_type: browserType });
     if (version) qs.set('version', version);
     return fetchApi<{ is_downloaded: boolean; exe_path: string | null }>(
       `/api/browser-profiles/engine-status?${qs.toString()}`,
     );
-  };
+  }, []);
 
   return {
     ...state,

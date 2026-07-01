@@ -5,7 +5,7 @@ import { Database, FileJson } from 'lucide-react';
 
 function ProfileSidebar() {
   return (
-    <Sidebar variant="inset" collapsible="none" className="w-full">
+    <Sidebar variant="inset" collapsible="offcanvas">
       <SidebarHeader>
         <div className="flex items-center gap-2 px-2 py-1.5 font-semibold text-sm">
           <Database className="h-4 w-4" />

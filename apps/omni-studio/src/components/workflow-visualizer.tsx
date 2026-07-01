@@ -141,7 +141,7 @@ export function WorkflowVisualizer({ parsedJson }: { parsedJson: unknown }) {
   }, [parsedJson, setNodes, setEdges]);
 
   return (
-    <div className="w-full h-full min-h-[500px]">
+    <div className="w-full h-full min-h-[500px] [&_.react-flow__controls-button]:bg-card [&_.react-flow__controls-button]:text-foreground [&_.react-flow__controls-button]:border-border [&_.react-flow__controls-button:hover]:bg-muted [&_.react-flow__controls-button_svg]:fill-foreground">
       <ReactFlow
         nodes={nodes}
         edges={edges}
