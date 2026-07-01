@@ -53,8 +53,15 @@ As an AI Agent modifying the OmniDesk ecosystem, you MUST evaluate every code ch
 ## 8. Code Quality & Linting
 
 - **No Lint Bypassing**: NEVER use `eslint-disable` or similar directives to forcefully bypass ESLint rules just to achieve a goal or pass a typecheck. Always solve the underlying type or logic issues cleanly and correctly.
+- **Single Source of Truth for TypeScript Types**: DO NOT declare derived, duplicated, or ad-hoc TypeScript interfaces/types across different apps or packages (e.g., manually defining `interface Workflow` in multiple places). All core domain models and shared types MUST be defined in a single source of truth (e.g., `@omnidesk/types`) and imported everywhere. This prevents fragmentation and ensures type consistency across the monorepo.
 
 ## 9. Centralized API Requests & Error Handling
 
 - **No Local Try-Catch for APIs**: All API request operations MUST be centralized in a single location (e.g., dedicated API clients or hooks). Do NOT use `try-catch` blocks at the individual call sites.
 - **Global Interceptors**: Let the global interceptor layer handle all error reporting and logging in a single, centralized place.
+
+## 10. Database Migrations (SQLx)
+
+- **Immutable Migrations**: Never modify an existing `.sql` migration file that has already been applied, as SQLx tracks file checksums. Modifying an old migration will result in a "Mismatched migration checksum" panic at runtime.
+- **Always Create New Files**: To modify a database schema, ALWAYS create a new migration file (e.g. `YYYYMMDDHHMMSS_description.sql`) using `ALTER TABLE` or similar commands.
+- **Early Development Exception**: If the app is in early development and not yet released, you may modify an existing migration file ONLY IF you explicitly warn the user that they must delete their local SQLite `.db` file to start fresh.

@@ -123,6 +123,8 @@ impl SchedulerService {
                         w.global_data,
                         w.table_data,
                         w.data_columns,
+                        w.content,
+                        w.connected_table,
                         w.version,
                         w.is_disabled,
                         w.source,

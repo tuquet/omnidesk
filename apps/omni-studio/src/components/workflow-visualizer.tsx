@@ -13,27 +13,7 @@ import '@xyflow/react/dist/style.css';
 import dagre from 'dagre';
 import { Card } from '@omnidesk/ui';;
 
-interface DrawflowNode {
-  id?: string | number;
-  label?: string;
-  type?: string;
-  data?: unknown;
-}
-
-interface DrawflowEdge {
-  id?: string | number;
-  source: string | number;
-  target: string | number;
-}
-
-interface DrawflowData {
-  nodes?: DrawflowNode[] | Record<string, DrawflowNode>;
-  edges?: DrawflowEdge[] | Record<string, DrawflowEdge>;
-}
-
-interface WorkflowData {
-  drawflow?: DrawflowData;
-}
+import type { DrawflowNode, DrawflowEdge, WorkflowDataParsed } from '@omnidesk/types';
 
 interface WorkflowCardData {
   label: string;
@@ -109,7 +89,7 @@ export function WorkflowVisualizer({ parsedJson }: { parsedJson: unknown }) {
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
 
   useEffect(() => {
-    const typedJson = parsedJson as WorkflowData | undefined;
+    const typedJson = parsedJson as WorkflowDataParsed | undefined;
     if (!typedJson?.drawflow) return;
 
     let rawNodes: DrawflowNode[] = [];

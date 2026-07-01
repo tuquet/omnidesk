@@ -36,15 +36,3 @@ export const ROLES = {
   ADMIN: 'ADMIN',
 } as const;
 export type Role = typeof ROLES[keyof typeof ROLES];
-
-export interface WorkflowParameter {
-  name: string;
-  type: string;
-  label?: string;
-  defaultValue?: any;
-}
-
-export interface WorkflowTrigger {
-  type: string;
-  config?: any;
-}

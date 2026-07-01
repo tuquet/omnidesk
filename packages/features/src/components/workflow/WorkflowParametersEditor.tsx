@@ -6,22 +6,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Checkbox } from '@omnidesk/ui';
 import { Textarea } from '@omnidesk/ui';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@omnidesk/ui';
-import { GripVertical, Trash2, ChevronDown, Plus } from 'lucide-react';
+import { Plus, Trash2, GripVertical, ChevronDown } from 'lucide-react';
+import type { WorkflowParameter } from '@omnidesk/types';
 import { Label } from '@omnidesk/ui';
-
-export interface WorkflowParameter {
-  id: string;
-  name: string;
-  type: 'string' | 'number' | 'json' | 'checkbox';
-  description: string;
-  defaultValue: any;
-  placeholder: string;
-  data: {
-    required?: boolean;
-    useMask?: boolean;
-    unmaskValue?: boolean;
-  };
-}
 
 interface WorkflowParametersEditorProps {
   value: WorkflowParameter[];

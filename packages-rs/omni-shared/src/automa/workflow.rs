@@ -32,6 +32,7 @@ pub struct WorkflowPayload {
 
 impl WorkflowPayload {
     /// Creates a WorkflowPayload from raw string fields (usually from a database model)
+    #[allow(clippy::too_many_arguments)]
     pub fn from_raw(
         id: String,
         name: String,

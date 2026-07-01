@@ -16,6 +16,7 @@
     "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md,css}\"",
     "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,md,css}\"",
     "clean": "turbo run clean",
+    "db:reset": "node scripts/db-reset.js",
     "prepare": "husky",
     "docs:dev": "vitepress dev docs",
     "docs:build": "vitepress build docs",

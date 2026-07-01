@@ -6,7 +6,6 @@ use axum::{
     Router,
 };
 use crate::api::AppState;
-use serde::{Deserialize, Serialize};
 use futures_util::{sink::SinkExt, stream::StreamExt};
 
 use omni_shared::automa::AutomaEvent;

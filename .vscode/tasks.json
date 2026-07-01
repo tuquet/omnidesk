@@ -2,6 +2,20 @@
   "version": "2.0.0",
   "tasks": [
     // ==========================================
+    // === Database Management
+    // ==========================================
+    {
+      "label": "🔄 Reset Local Databases (db:reset)",
+      "type": "shell",
+      "command": "pnpm db:reset",
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true
+      }
+    },
+    // ==========================================
     // === Development Servers
     // ==========================================
     {

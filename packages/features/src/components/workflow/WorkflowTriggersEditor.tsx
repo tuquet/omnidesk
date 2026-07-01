@@ -8,12 +8,7 @@ import { Trash2, ChevronDown, Plus } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from '@omnidesk/ui';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@omnidesk/ui';
 
-export interface WorkflowTrigger {
-  id: string;
-  type: string;
-  data: any;
-}
-
+import type { WorkflowTrigger } from '@omnidesk/types';
 interface WorkflowTriggersEditorProps {
   value: WorkflowTrigger[];
   onChange: (value: WorkflowTrigger[]) => void;

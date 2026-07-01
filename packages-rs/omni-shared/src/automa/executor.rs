@@ -21,6 +21,7 @@ pub struct SharedWorkflowExecutor;
 
 impl SharedWorkflowExecutor {
     /// Executes a workflow, returning the intent for the caller to handle side-effects (e.g. launching a browser).
+    #[allow(clippy::too_many_arguments)]
     pub async fn execute(
         db: &SqlitePool,
         ws_tx: &Sender<AutomaEvent>,

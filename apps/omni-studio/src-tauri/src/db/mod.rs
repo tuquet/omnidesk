@@ -49,12 +49,10 @@ pub async fn init_db(app_dir: PathBuf) -> Result<SqlitePool, sqlx::Error> {
         .await;
         
     // Run migrations automatically on startup
-    let mut shared_migrator = sqlx::migrate!("../../../packages-rs/omni-shared/migrations");
-    shared_migrator.set_ignore_missing(true);
-    shared_migrator.run(&pool).await?;
+    omni_shared::db::run_migrations(&pool, &[
+        omni_shared::db::DbComponent::Shared,
+        omni_shared::db::DbComponent::Automa,
+    ]).await?;
 
-    let mut automa_migrator = sqlx::migrate!("../../../packages-rs/omni-shared/migrations-automa");
-    automa_migrator.set_ignore_missing(true);
-    automa_migrator.run(&pool).await?;
     Ok(pool)
 }

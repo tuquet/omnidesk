@@ -15,9 +15,12 @@ import {
 import {
   WorkflowParametersEditor,
   WorkflowTriggersEditor,
-  type WorkflowParameter,
-  type WorkflowTrigger,
 } from '@omnidesk/features';
+import type { 
+  WorkflowParameter, 
+  WorkflowTrigger,
+  WorkflowDataParsed
+} from '@omnidesk/types';
 import { Loader2 } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
@@ -52,32 +55,32 @@ const DEFAULT_JSON = {
   }
 };
 
-function getParameters(parsed: any) {
+function getParameters(parsed: WorkflowDataParsed) {
   if (parsed.drawflow && Array.isArray(parsed.drawflow.nodes)) {
-    const triggerNode = parsed.drawflow.nodes.find((n: any) => n.label === 'trigger');
+    const triggerNode = parsed.drawflow.nodes.find((n) => n.label === 'trigger');
     if (triggerNode?.data?.parameters) {
-      return triggerNode.data.parameters as WorkflowParameter[];
+      return triggerNode.data.parameters;
     }
   }
-  return (parsed.trigger?.parameters as WorkflowParameter[]) || [];
+  return parsed.trigger?.parameters || [];
 }
 
-function getTriggers(parsed: any) {
+function getTriggers(parsed: WorkflowDataParsed) {
   if (parsed.drawflow && Array.isArray(parsed.drawflow.nodes)) {
-    const triggerNode = parsed.drawflow.nodes.find((n: any) => n.label === 'trigger');
+    const triggerNode = parsed.drawflow.nodes.find((n) => n.label === 'trigger');
     if (triggerNode?.data?.triggers) {
-      return triggerNode.data.triggers as WorkflowTrigger[];
+      return triggerNode.data.triggers;
     }
   }
-  return (parsed.trigger?.triggers as WorkflowTrigger[]) || [];
+  return parsed.trigger?.triggers || [];
 }
 
-function updateParameters(parsed: any, parameters: any[]) {
+function updateParameters(parsed: WorkflowDataParsed, parameters: WorkflowParameter[]) {
   parsed.trigger = parsed.trigger || {};
   parsed.trigger.parameters = parameters;
   
   if (parsed.drawflow && Array.isArray(parsed.drawflow.nodes)) {
-    const triggerNode = parsed.drawflow.nodes.find((n: any) => n.label === 'trigger');
+    const triggerNode = parsed.drawflow.nodes.find((n) => n.label === 'trigger');
     if (triggerNode) {
       triggerNode.data = triggerNode.data || {};
       triggerNode.data.parameters = parameters;
@@ -85,12 +88,12 @@ function updateParameters(parsed: any, parameters: any[]) {
   }
 }
 
-function updateTriggers(parsed: any, triggers: any[]) {
+function updateTriggers(parsed: WorkflowDataParsed, triggers: WorkflowTrigger[]) {
   parsed.trigger = parsed.trigger || {};
   parsed.trigger.triggers = triggers;
   
   if (parsed.drawflow && Array.isArray(parsed.drawflow.nodes)) {
-    const triggerNode = parsed.drawflow.nodes.find((n: any) => n.label === 'trigger');
+    const triggerNode = parsed.drawflow.nodes.find((n) => n.label === 'trigger');
     if (triggerNode) {
       triggerNode.data = triggerNode.data || {};
       triggerNode.data.triggers = triggers;
@@ -118,7 +121,7 @@ export function WorkflowJsonEditorModal({
   const { parsedJson, isValidJson } = useMemo(() => {
     if (!deferredJsonValue) return { parsedJson: null, isValidJson: true };
     try {
-      const parsed = JSON.parse(deferredJsonValue);
+      const parsed = JSON.parse(deferredJsonValue) as WorkflowDataParsed;
       return { parsedJson: parsed, isValidJson: true };
     } catch {
       return { parsedJson: null, isValidJson: false };
@@ -168,7 +171,7 @@ export function WorkflowJsonEditorModal({
   };
 
   const saveMutation = useMutation({
-    mutationFn: async (parsedData: any) => {
+    mutationFn: async (parsedData: WorkflowDataParsed) => {
       const url = isEditMode ? `/api/automa/workflows/${workflowId}` : `/api/automa/workflows`;
       const method = isEditMode ? 'PUT' : 'POST';
       
@@ -193,7 +196,7 @@ export function WorkflowJsonEditorModal({
 
   const handleSave = () => {
     try {
-      const parsed = JSON.parse(jsonValue) as unknown;
+      const parsed = JSON.parse(jsonValue) as WorkflowDataParsed;
       saveMutation.mutate(parsed);
     } catch {
       toast.error('Invalid JSON format. Please fix the errors before saving.');
@@ -222,9 +225,11 @@ export function WorkflowJsonEditorModal({
             setActiveTab(val);
             if (val === 'global_data' && isValidJson) {
               try {
-                const parsed = JSON.parse(jsonValue);
+                const parsed = JSON.parse(jsonValue) as WorkflowDataParsed;
                 setGlobalDataStr(JSON.stringify(parsed.global_data || {}, null, 2));
-              } catch {}
+              } catch {
+                // ignore
+              }
             }
           }} className="flex-1 flex flex-col min-h-0">
             <TabsList className="mb-2 self-start">
@@ -256,10 +261,10 @@ export function WorkflowJsonEditorModal({
             <TabsContent value="parameters" className="flex-1 min-h-0 overflow-auto border rounded-md p-4 m-0 bg-background">
               {isValidJson && (
                 <WorkflowParametersEditor
-                  value={parsedJson ? (getParameters(parsedJson) as WorkflowParameter[]) : []}
+                  value={parsedJson ? getParameters(parsedJson as WorkflowDataParsed) : []}
                   onChange={(parameters) => {
                     try {
-                      const parsed = JSON.parse(jsonValue) as any;
+                      const parsed = JSON.parse(jsonValue) as WorkflowDataParsed;
                       updateParameters(parsed, parameters as WorkflowParameter[]);
                       setJsonValue(JSON.stringify(parsed, null, 2));
                     } catch {
@@ -273,10 +278,10 @@ export function WorkflowJsonEditorModal({
             <TabsContent value="triggers" className="flex-1 min-h-0 overflow-auto border rounded-md p-4 m-0 bg-background">
               {isValidJson && (
                 <WorkflowTriggersEditor
-                  value={parsedJson ? (getTriggers(parsedJson) as WorkflowTrigger[]) : []}
+                  value={parsedJson ? getTriggers(parsedJson as WorkflowDataParsed) : []}
                   onChange={(triggers) => {
                     try {
-                      const parsed = JSON.parse(jsonValue) as any;
+                      const parsed = JSON.parse(jsonValue) as WorkflowDataParsed;
                       updateTriggers(parsed, triggers as WorkflowTrigger[]);
                       setJsonValue(JSON.stringify(parsed, null, 2));
                     } catch {
@@ -295,14 +300,14 @@ export function WorkflowJsonEditorModal({
                 onChange={(val) => {
                   if (val !== undefined) {
                     setGlobalDataStr(val);
-                    try {
-                      const parsedGlobal = JSON.parse(val);
-                      const parsedMain = JSON.parse(jsonValue);
-                      parsedMain.global_data = parsedGlobal;
-                      setJsonValue(JSON.stringify(parsedMain, null, 2));
-                    } catch {
-                      // wait for valid JSON
-                    }
+                      try {
+                        const parsedGlobal = JSON.parse(val) as Record<string, unknown>;
+                        const parsedMain = JSON.parse(jsonValue) as WorkflowDataParsed;
+                        parsedMain.global_data = parsedGlobal;
+                        setJsonValue(JSON.stringify(parsedMain, null, 2));
+                      } catch {
+                        // wait for valid JSON
+                      }
                   }
                 }}
                 theme="vs-dark"
