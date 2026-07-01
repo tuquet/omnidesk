@@ -43,7 +43,6 @@ export function InlineTagEditor({ profile, initialTags }: InlineTagEditorProps) 
         browser_version: profile.browser_version,
         os: profile.os,
         notes: profile.notes,
-        proxy: profile.proxy,
         status: profile.status,
         tags: JSON.stringify(newTagsArray),
       });

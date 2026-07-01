@@ -12,9 +12,18 @@ export * from './api-response';
 export * from './constants';
 export * from './workflow';
 
+// Generated types
+export type {
+  Workflow,
+  WorkflowRun,
+  WorkflowLog,
+  BrowserProfile,
+  CreateBrowserProfilePayload,
+  UpdateBrowserProfilePayload
+} from './client';
+
 // Moved from apps/core
 export * from './apps';
-export * from './browser-profile';
 export * from './logger';
 export * from './navigation';
 export * from './rbac';

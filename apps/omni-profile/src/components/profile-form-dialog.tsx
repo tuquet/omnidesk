@@ -90,7 +90,7 @@ export function ProfileFormDialog({
     }
   }, [mode, profile, open]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim() || name.length < 3) {
       toast.error('Profile name must be at least 3 characters');
@@ -115,7 +115,6 @@ export function ProfileFormDialog({
           os,
           data_dir_path: dataDirPath,
           notes: notes || null,
-          executable_path: executablePath || null,
           tags,
         });
         toast.success('Profile created successfully');
@@ -128,7 +127,6 @@ export function ProfileFormDialog({
           os,
           data_dir_path: profile.data_dir_path,
           notes: notes || null,
-          executable_path: executablePath || null,
           tags,
         });
         toast.success('Profile updated successfully');

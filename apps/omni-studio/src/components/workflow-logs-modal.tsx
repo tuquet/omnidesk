@@ -117,13 +117,13 @@ export function WorkflowLogsModal({ workflowId, isOpen, onOpenChange }: Workflow
                                 : 'Running'}
                           </span>
                         </div>
-                        <span className="text-xs text-muted-foreground" title={run.started_at}>
+                        <span className="text-xs text-muted-foreground" title={run.started_at || undefined}>
                           {new Intl.DateTimeFormat('en-US', {
                             month: 'short',
                             day: 'numeric',
                             hour: '2-digit',
                             minute: '2-digit',
-                          }).format(new Date(run.started_at))}
+                          }).format(new Date(run.started_at || Date.now()))}
                         </span>
                       </div>
 
@@ -133,14 +133,14 @@ export function WorkflowLogsModal({ workflowId, isOpen, onOpenChange }: Workflow
                         </div>
                       )}
 
-                      {run.ended_at && (
+                      {(run as WorkflowRun & { ended_at?: string }).ended_at && (
                         <div className="text-xs text-muted-foreground flex items-center gap-1">
                           <ClockIcon className="w-3 h-3" />
                           {new Intl.DateTimeFormat('en-US', {
                             hour: '2-digit',
                             minute: '2-digit',
                             second: '2-digit',
-                          }).format(new Date(run.ended_at))}
+                          }).format(new Date((run as WorkflowRun & { ended_at?: string }).ended_at as string))}
                         </div>
                       )}
                     </div>
