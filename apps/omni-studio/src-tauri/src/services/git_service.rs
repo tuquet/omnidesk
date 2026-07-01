@@ -1,6 +1,6 @@
-use std::process::Command;
-use std::path::Path;
 use crate::error::AppError;
+use std::path::Path;
+use std::process::Command;
 
 pub struct GitService;
 
@@ -41,11 +41,15 @@ impl GitService {
             .map_err(|e| AppError::Internal(format!("Failed to execute git commit: {}", e)))?;
 
         let commit_stdout = String::from_utf8_lossy(&commit_output.stdout);
-        let nothing_to_commit = commit_stdout.contains("nothing to commit") || commit_stdout.contains("working tree clean");
+        let nothing_to_commit = commit_stdout.contains("nothing to commit")
+            || commit_stdout.contains("working tree clean");
 
         if !commit_output.status.success() && !nothing_to_commit {
             let err = String::from_utf8_lossy(&commit_output.stderr);
-            return Err(AppError::Internal(format!("Git commit failed: {} - {}", err, commit_stdout)));
+            return Err(AppError::Internal(format!(
+                "Git commit failed: {} - {}",
+                err, commit_stdout
+            )));
         }
 
         // git push

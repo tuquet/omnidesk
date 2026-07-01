@@ -4,170 +4,674 @@ export type ClientOptions = {
     baseUrl: `${string}://${string}` | (string & {});
 };
 
-export type CreateIssueDto = {
-    actual_behavior?: string | null;
-    assignee?: string | null;
-    description?: string | null;
-    expected_behavior?: string | null;
-    metadata?: string | null;
-    priority?: string | null;
-    reproduce_steps?: string | null;
-    source_id?: string | null;
-    source_name?: string | null;
-    source_url?: string | null;
-    tags?: Array<string> | null;
-    title: string;
+/**
+ * Request payload for pushing workflows from the Extension
+ */
+export type PushWorkflowsPayload = {
+    workflows: Array<Workflow>;
 };
 
-export type Issue = {
-    actual_behavior?: string | null;
-    ai_analysis?: string | null;
-    assignee?: string | null;
-    created_at: string;
-    description?: string | null;
-    expected_behavior?: string | null;
+/**
+ * Schedule: Profile × Workflow on a cron.
+ */
+export type Schedule = {
+    created_at?: string | null;
+    cron_expr: string;
     id: string;
-    is_verified: boolean;
-    metadata?: string | null;
-    priority: string;
-    reproduce_steps?: string | null;
-    resolution_reason?: string | null;
-    source_id?: string | null;
-    source_name?: string | null;
-    source_url?: string | null;
-    status: string;
-    tags: string;
-    title: string;
-    updated_at: string;
-    verified_at?: string | null;
+    is_enabled?: number | null;
+    last_run_at?: string | null;
+    name: string;
+    next_run_at?: string | null;
+    profile_id: string;
+    run_count?: number | null;
+    updated_at?: string | null;
+    workflow_id: string;
 };
 
-export type ListIssuesData = {
+/**
+ * Response for sync status
+ */
+export type SyncStatusResponse = {
+    last_sync?: string | null;
+    watch_dir: string;
+    workflow_count: number;
+};
+
+/**
+ * Workflow definition — mirrors the Automa Extension's workflow JSON structure.
+ */
+export type Workflow = {
+    connected_table?: string | null;
+    content?: string | null;
+    created_at?: string | null;
+    data_columns?: string | null;
+    delete_source?: string | null;
+    deleted_at?: string | null;
+    description?: string | null;
+    drawflow: string;
+    folder_id?: string | null;
+    global_data?: string | null;
+    icon?: string | null;
+    id: string;
+    is_disabled?: number | null;
+    name: string;
+    settings: string;
+    source?: string | null;
+    table_data?: string | null;
+    trigger?: string | null;
+    updated_at?: string | null;
+    version?: string | null;
+};
+
+/**
+ * Per-block execution log entry within a run.
+ */
+export type WorkflowLog = {
+    block_id: string;
+    block_label?: string | null;
+    data?: string | null;
+    duration_ms?: number | null;
+    id: string;
+    run_id: string;
+    status: string;
+    timestamp?: string | null;
+};
+
+export type WorkflowPayload = {
+    connected_table?: string | null;
+    content?: string | null;
+    created_at?: string | null;
+    data_columns?: {
+        [key: string]: unknown;
+    } | null;
+    delete_source?: string | null;
+    deleted_at?: string | null;
+    description?: string | null;
+    drawflow: {
+        [key: string]: unknown;
+    };
+    folder_id?: string | null;
+    global_data?: {
+        [key: string]: unknown;
+    } | null;
+    icon?: string | null;
+    id: string;
+    is_disabled?: number | null;
+    name: string;
+    settings: {
+        [key: string]: unknown;
+    };
+    source?: string | null;
+    table_data?: {
+        [key: string]: unknown;
+    } | null;
+    trigger?: {
+        [key: string]: unknown;
+    } | null;
+    updated_at?: string | null;
+    version?: string | null;
+};
+
+/**
+ * A single execution of a workflow.
+ */
+export type WorkflowRun = {
+    created_at?: string | null;
+    error_message?: string | null;
+    finished_at?: string | null;
+    id: string;
+    profile_id?: string | null;
+    schedule_id?: string | null;
+    started_at?: string | null;
+    status: string;
+    summary?: string | null;
+    workflow_id: string;
+};
+
+export type BrowserProfile = {
+    browser_type?: string | null;
+    browser_version?: string | null;
+    cdp_url?: string | null;
+    created_at?: string | null;
+    data_dir_path: string;
+    group_id?: string | null;
+    id: string;
+    last_used_at?: string | null;
+    name: string;
+    notes?: string | null;
+    os?: string | null;
+    pid?: number | null;
+    status?: string | null;
+    tags?: string | null;
+    updated_at?: string | null;
+};
+
+export type BrowserVersion = {
+    is_downloaded: boolean;
+    version: string;
+};
+
+export type CreateBrowserProfilePayload = {
+    browser_type?: string | null;
+    browser_version?: string | null;
+    data_dir_path: string;
+    group_id?: string | null;
+    name: string;
+    notes?: string | null;
+    os?: string | null;
+    status?: string | null;
+    tags?: string | null;
+};
+
+export type EngineStatusResponse = {
+    exe_path?: string | null;
+    is_downloaded: boolean;
+};
+
+export type UpdateBrowserProfilePayload = {
+    browser_type?: string | null;
+    browser_version?: string | null;
+    data_dir_path: string;
+    group_id?: string | null;
+    id: string;
+    name: string;
+    notes?: string | null;
+    os?: string | null;
+    status?: string | null;
+    tags?: string | null;
+};
+
+export type ListWorkflowsData = {
     body?: never;
     path?: never;
-    query?: never;
-    url: '/api/issues';
+    query?: {
+        /**
+         * ISO timestamp - return only workflows changed after this time
+         */
+        since?: string;
+    };
+    url: '/api/automa/workflows';
 };
 
-export type ListIssuesResponses = {
+export type ListWorkflowsResponses = {
     /**
-     * List all issues
+     * List all workflows (or changed since timestamp)
      */
-    200: Array<Issue>;
+    200: unknown;
 };
 
-export type ListIssuesResponse = ListIssuesResponses[keyof ListIssuesResponses];
-
-export type CreateIssueData = {
-    body: CreateIssueDto;
+export type CreateWorkflowData = {
+    body: WorkflowPayload;
     path?: never;
     query?: never;
-    url: '/api/issues';
+    url: '/api/automa/workflows';
 };
 
-export type CreateIssueResponses = {
+export type CreateWorkflowResponses = {
     /**
-     * Issue created successfully
+     * Workflow created
      */
-    201: Issue;
+    201: unknown;
 };
 
-export type CreateIssueResponse = CreateIssueResponses[keyof CreateIssueResponses];
-
-export type BatchCreateIssuesData = {
-    body: Array<CreateIssueDto>;
-    path?: never;
-    query?: never;
-    url: '/api/issues/batch';
-};
-
-export type BatchCreateIssuesResponses = {
-    /**
-     * Batch accepted for processing
-     */
-    202: unknown;
-};
-
-export type DeleteIssueData = {
+export type GetRunLogsData = {
     body?: never;
     path: {
         /**
-         * Issue ID
+         * Run ID
+         */
+        run_id: string;
+    };
+    query?: never;
+    url: '/api/automa/workflows/runs/{run_id}/logs';
+};
+
+export type GetRunLogsResponses = {
+    /**
+     * List workflow logs
+     */
+    200: unknown;
+};
+
+export type ExportWorkflowData = {
+    body?: never;
+    path: {
+        /**
+         * Workflow ID
          */
         id: string;
     };
     query?: never;
-    url: '/api/issues/{id}';
+    url: '/api/automa/workflows/sync/export/{id}';
 };
 
-export type DeleteIssueErrors = {
+export type ExportWorkflowResponses = {
     /**
-     * Issue not found
+     * Workflow JSON exported
+     */
+    200: unknown;
+};
+
+export type ImportWorkflowData = {
+    body: WorkflowPayload;
+    path?: never;
+    query?: never;
+    url: '/api/automa/workflows/sync/import';
+};
+
+export type ImportWorkflowResponses = {
+    /**
+     * Workflow imported
+     */
+    200: unknown;
+};
+
+export type PushWorkflowsData = {
+    body: PushWorkflowsPayload;
+    path?: never;
+    query?: never;
+    url: '/api/automa/workflows/sync/push';
+};
+
+export type PushWorkflowsResponses = {
+    /**
+     * Workflows synced successfully
+     */
+    200: unknown;
+};
+
+export type SyncStatusData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/automa/workflows/sync/status';
+};
+
+export type SyncStatusResponses = {
+    /**
+     * Sync status
+     */
+    200: unknown;
+};
+
+export type DeleteWorkflowData = {
+    body?: never;
+    path: {
+        /**
+         * Workflow ID
+         */
+        id: string;
+    };
+    query?: {
+        /**
+         * Workspace path
+         */
+        workspacePath?: string;
+    };
+    url: '/api/automa/workflows/{id}';
+};
+
+export type DeleteWorkflowErrors = {
+    /**
+     * Workflow not found
      */
     404: unknown;
 };
 
-export type DeleteIssueResponses = {
+export type DeleteWorkflowResponses = {
     /**
-     * Issue deleted successfully
+     * Workflow deleted
      */
     204: void;
 };
 
-export type DeleteIssueResponse = DeleteIssueResponses[keyof DeleteIssueResponses];
+export type DeleteWorkflowResponse = DeleteWorkflowResponses[keyof DeleteWorkflowResponses];
 
-export type GetIssueData = {
+export type GetWorkflowData = {
     body?: never;
     path: {
         /**
-         * Issue ID
+         * Workflow ID
          */
         id: string;
     };
     query?: never;
-    url: '/api/issues/{id}';
+    url: '/api/automa/workflows/{id}';
 };
 
-export type GetIssueErrors = {
+export type GetWorkflowErrors = {
     /**
-     * Issue not found
+     * Workflow not found
      */
     404: unknown;
 };
 
-export type GetIssueResponses = {
+export type GetWorkflowResponses = {
     /**
-     * Get issue by ID
+     * Get workflow by ID
      */
-    200: Issue;
+    200: unknown;
 };
 
-export type GetIssueResponse = GetIssueResponses[keyof GetIssueResponses];
-
-export type UpdateIssueData = {
-    body: CreateIssueDto;
+export type UpdateWorkflowData = {
+    body: WorkflowPayload;
     path: {
         /**
-         * Issue ID
+         * Workflow ID
          */
         id: string;
     };
     query?: never;
-    url: '/api/issues/{id}';
+    url: '/api/automa/workflows/{id}';
 };
 
-export type UpdateIssueErrors = {
+export type UpdateWorkflowErrors = {
     /**
-     * Issue not found
+     * Workflow not found
      */
     404: unknown;
 };
 
-export type UpdateIssueResponses = {
+export type UpdateWorkflowResponses = {
     /**
-     * Issue updated successfully
+     * Workflow updated
      */
-    200: Issue;
+    200: unknown;
 };
 
-export type UpdateIssueResponse = UpdateIssueResponses[keyof UpdateIssueResponses];
+export type GetWorkflowRunsData = {
+    body?: never;
+    path: {
+        /**
+         * Workflow ID
+         */
+        id: string;
+    };
+    query?: never;
+    url: '/api/automa/workflows/{id}/runs';
+};
+
+export type GetWorkflowRunsResponses = {
+    /**
+     * List workflow runs
+     */
+    200: unknown;
+};
+
+export type MeData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/me';
+};
+
+export type MeResponses = {
+    /**
+     * User info
+     */
+    200: unknown;
+};
+
+export type HealthCheckData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/health';
+};
+
+export type HealthCheckResponses = {
+    /**
+     * Health status
+     */
+    200: unknown;
+};
+
+export type PingData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/ping';
+};
+
+export type PingResponses = {
+    /**
+     * Pong
+     */
+    200: unknown;
+};
+
+export type ListProfilesData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/browser-profiles';
+};
+
+export type ListProfilesResponses = {
+    /**
+     * List of browser profiles
+     */
+    200: Array<BrowserProfile>;
+};
+
+export type ListProfilesResponse = ListProfilesResponses[keyof ListProfilesResponses];
+
+export type CreateProfileData = {
+    body: CreateBrowserProfilePayload;
+    path?: never;
+    query?: never;
+    url: '/api/browser-profiles';
+};
+
+export type CreateProfileResponses = {
+    /**
+     * Browser profile created
+     */
+    200: BrowserProfile;
+};
+
+export type CreateProfileResponse = CreateProfileResponses[keyof CreateProfileResponses];
+
+export type DeleteBrowserEngineData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/browser-profiles/browser-engine';
+};
+
+export type DeleteBrowserEngineResponses = {
+    /**
+     * Browser engine deleted successfully
+     */
+    200: unknown;
+};
+
+export type GetDownloadStatusData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/browser-profiles/download-status';
+};
+
+export type GetDownloadStatusResponses = {
+    /**
+     * Download status stream
+     */
+    200: unknown;
+};
+
+export type GetEngineStatusData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/browser-profiles/engine-status';
+};
+
+export type GetEngineStatusResponses = {
+    /**
+     * Status of browser engine
+     */
+    200: EngineStatusResponse;
+};
+
+export type GetEngineStatusResponse = GetEngineStatusResponses[keyof GetEngineStatusResponses];
+
+export type DeleteProfileData = {
+    body?: never;
+    path: {
+        /**
+         * Profile ID
+         */
+        id: string;
+    };
+    query?: never;
+    url: '/api/browser-profiles/{id}';
+};
+
+export type DeleteProfileErrors = {
+    /**
+     * Profile not found
+     */
+    404: unknown;
+};
+
+export type DeleteProfileResponses = {
+    /**
+     * Browser profile deleted
+     */
+    204: void;
+};
+
+export type DeleteProfileResponse = DeleteProfileResponses[keyof DeleteProfileResponses];
+
+export type GetProfileData = {
+    body?: never;
+    path: {
+        /**
+         * Profile ID
+         */
+        id: string;
+    };
+    query?: never;
+    url: '/api/browser-profiles/{id}';
+};
+
+export type GetProfileErrors = {
+    /**
+     * Profile not found
+     */
+    404: unknown;
+};
+
+export type GetProfileResponses = {
+    /**
+     * Browser profile
+     */
+    200: BrowserProfile;
+};
+
+export type GetProfileResponse = GetProfileResponses[keyof GetProfileResponses];
+
+export type UpdateProfileData = {
+    body: UpdateBrowserProfilePayload;
+    path: {
+        /**
+         * Profile ID
+         */
+        id: string;
+    };
+    query?: never;
+    url: '/api/browser-profiles/{id}';
+};
+
+export type UpdateProfileErrors = {
+    /**
+     * Profile not found
+     */
+    404: unknown;
+};
+
+export type UpdateProfileResponses = {
+    /**
+     * Browser profile updated
+     */
+    200: BrowserProfile;
+};
+
+export type UpdateProfileResponse = UpdateProfileResponses[keyof UpdateProfileResponses];
+
+export type CleanProfileStorageData = {
+    body?: never;
+    path: {
+        /**
+         * Profile ID
+         */
+        id: string;
+    };
+    query?: never;
+    url: '/api/browser-profiles/{id}/clean';
+};
+
+export type CleanProfileStorageErrors = {
+    /**
+     * Profile not found
+     */
+    404: unknown;
+};
+
+export type CleanProfileStorageResponses = {
+    /**
+     * Storage cleaned
+     */
+    200: unknown;
+};
+
+export type LaunchProfileData = {
+    body?: never;
+    path: {
+        /**
+         * Browser profile ID
+         */
+        id: string;
+    };
+    query?: {
+        /**
+         * Optional URL to open on launch
+         */
+        startup_url?: string;
+    };
+    url: '/api/browser-profiles/{id}/launch';
+};
+
+export type LaunchProfileResponses = {
+    /**
+     * Browser launched successfully
+     */
+    200: unknown;
+};
+
+export type StopProfileData = {
+    body?: never;
+    path: {
+        /**
+         * Browser profile ID
+         */
+        id: string;
+    };
+    query?: never;
+    url: '/api/browser-profiles/{id}/stop';
+};
+
+export type StopProfileErrors = {
+    /**
+     * Profile not found
+     */
+    404: unknown;
+};
+
+export type StopProfileResponses = {
+    /**
+     * Browser stopped successfully
+     */
+    200: unknown;
+};

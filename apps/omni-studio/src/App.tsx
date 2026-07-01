@@ -30,7 +30,7 @@ declare module '@tanstack/react-router' {
   }
 }
 
-import { isSupabaseConfigured } from './lib/supabase';
+import { isSupabaseConfigured } from '@omnidesk/supabase';
 import { EnvSetupWarning } from '@omnidesk/ui';;
 
 export default function App() {

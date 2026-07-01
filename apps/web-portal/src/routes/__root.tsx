@@ -4,7 +4,7 @@ import { useDevStore } from '@omnidesk/core';
 import type { AuthState } from '@omnidesk/auth';
 import { AppConfigProvider, type AppConfig } from '@omnidesk/core';
 import * as config from '@/config';
-import { useRBAC } from '@/hooks/use-rbac';
+import { useRBAC } from '@omnidesk/core';
 import { NotFoundPage } from '@omnidesk/features';
 import { useDeepLinkAuth } from '@omnidesk/core';
 import { DefaultErrorFallback } from '@omnidesk/ui';;

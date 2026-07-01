@@ -1,11 +1,8 @@
-use axum::{
-    extract::State,
-    Json, Router,
-};
-use serde::{Deserialize, Serialize};
 use crate::api::AppState;
 use crate::error::AppError;
 use crate::services::runs_service;
+use axum::{extract::State, Json, Router};
+use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 
 #[derive(Serialize)]
@@ -49,17 +46,13 @@ async fn create_run(
     let db = state.db.clone();
     let app = state.app_handle.clone();
     let ws_tx = state.automa_ws_tx.clone();
-    
+
     let p_id = payload.profile_id.unwrap_or_else(|| "default".to_string());
-    
+
     // Fetch full workflow
-    let record = sqlx::query_as::<_, crate::db::models::workflow::Workflow>(
-        "SELECT * FROM workflows WHERE id = ?"
-    )
-    .bind(&payload.workflow_id)
-    .fetch_optional(&db)
-    .await
-    .unwrap_or_default();
+    let record = crate::services::runs_service::get_workflow(&db, &payload.workflow_id)
+        .await
+        .unwrap_or_default();
 
     let (workflow_name, workflow_json) = if let Some(w) = record {
         let payload = omni_shared::automa::workflow::WorkflowPayload::from_raw(
@@ -84,27 +77,48 @@ async fn create_run(
             w.deleted_at,
             w.delete_source,
         );
-        (w.name, Some(serde_json::to_value(&payload).unwrap_or(serde_json::json!({}))))
+        (
+            w.name,
+            Some(serde_json::to_value(&payload).unwrap_or(serde_json::json!({}))),
+        )
     } else {
         ("Unknown Workflow".to_string(), None)
     };
 
     match omni_shared::automa::executor::SharedWorkflowExecutor::execute(
-        &db, &ws_tx, &payload.workflow_id, &workflow_name, workflow_json, &p_id, payload.schedule_id.as_deref(), payload.variables, omni_tauri_core::constants::RUNTIME_PORT, omni_tauri_core::constants::PROFILE_PORT
-    ).await {
+        &db,
+        &ws_tx,
+        &payload.workflow_id,
+        &workflow_name,
+        workflow_json,
+        &p_id,
+        payload.schedule_id.as_deref(),
+        payload.variables,
+        omni_tauri_core::constants::RUNTIME_PORT,
+        omni_tauri_core::constants::PROFILE_PORT,
+    )
+    .await
+    {
         Ok(exec_result) => {
             let run_id = match exec_result {
-                omni_shared::automa::executor::ExecutionResult::NeedsDefaultBrowser { run_id, bridge_url } => {
+                omni_shared::automa::executor::ExecutionResult::NeedsDefaultBrowser {
+                    run_id,
+                    bridge_url,
+                } => {
                     use tauri_plugin_opener::OpenerExt;
                     if let Err(e) = app.opener().open_url(&bridge_url, None::<&str>) {
                         eprintln!("[Runs] Failed to open default browser: {}", e);
                     }
                     run_id
-                },
-                omni_shared::automa::executor::ExecutionResult::LaunchedProfile { run_id } => run_id,
+                }
+                omni_shared::automa::executor::ExecutionResult::LaunchedProfile { run_id } => {
+                    run_id
+                }
             };
-            Ok(Json(serde_json::json!({ "id": run_id, "status": "LAUNCHING" })))
-        },
+            Ok(Json(
+                serde_json::json!({ "id": run_id, "status": "LAUNCHING" }),
+            ))
+        }
         Err(e) => {
             eprintln!("Failed to execute workflow: {:?}", e);
             Err(crate::error::AppError::Internal(format!("{:?}", e)))

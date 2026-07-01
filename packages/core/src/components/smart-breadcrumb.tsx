@@ -163,7 +163,7 @@ export function SmartBreadcrumb() {
                   </BreadcrumbLink>
                 )}
               </BreadcrumbItem>
-              {!isLast && <BreadcrumbSeparator />}
+              {!isLast ? <BreadcrumbSeparator /> : null}
             </React.Fragment>
           );
         })}

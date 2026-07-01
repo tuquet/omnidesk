@@ -1,7 +1,11 @@
 pub mod auth;
 pub mod handlers;
 
-use axum::{Router, routing::{get, post}, response::IntoResponse, Json};
+use axum::{
+    response::IntoResponse,
+    routing::{get, post},
+    Json, Router,
+};
 use sqlx::SqlitePool;
 use std::net::SocketAddr;
 use std::path::PathBuf;
@@ -14,8 +18,8 @@ use utoipa_scalar::{Scalar, Servable};
 use auth::Claims;
 
 use std::{collections::HashMap, sync::Arc};
-use tokio::sync::{mpsc, RwLock};
 use tauri::AppHandle;
+use tokio::sync::{mpsc, RwLock};
 
 #[derive(Clone)]
 pub struct AppState {
@@ -67,8 +71,10 @@ pub async fn serve(pool: SqlitePool, app_dir: PathBuf, port: u16, app_handle: Ap
     let scheduler = match crate::services::scheduler::SchedulerService::start(
         pool.clone(),
         app_handle.clone(),
-        automa_ws_tx.clone()
-    ).await {
+        automa_ws_tx.clone(),
+    )
+    .await
+    {
         Ok(s) => {
             println!("[Runtime] Scheduler started successfully");
             Some(s)
@@ -79,7 +85,7 @@ pub async fn serve(pool: SqlitePool, app_dir: PathBuf, port: u16, app_handle: Ap
         }
     };
 
-    let state = AppState { 
+    let state = AppState {
         db: pool,
         mcp_sessions: Arc::new(RwLock::new(HashMap::new())),
         app_dir: app_dir.clone(),
@@ -94,7 +100,10 @@ pub async fn serve(pool: SqlitePool, app_dir: PathBuf, port: u16, app_handle: Ap
     }
 
     let app = Router::new()
-        .route("/", get(|| async { axum::response::Redirect::temporary("/scalar") }))
+        .route(
+            "/",
+            get(|| async { axum::response::Redirect::temporary("/scalar") }),
+        )
         .merge(Scalar::with_url("/scalar", ApiDoc::openapi()))
         .route("/openapi.json", get(|| async { Json(ApiDoc::openapi()) }))
         .route("/health", get(health_check))
@@ -192,7 +201,9 @@ mod tests {
     #[test]
     fn export_openapi_json() {
         let doc = ApiDoc::openapi();
-        let json = doc.to_pretty_json().expect("Failed to serialize OpenAPI spec");
-        fs::write("../../openapi.json", json).expect("Failed to write openapi.json");
+        let json = doc
+            .to_pretty_json()
+            .expect("Failed to serialize OpenAPI spec");
+        fs::write("../../../packages/types/openapi-engine.json", json).expect("Failed to write openapi.json");
     }
 }

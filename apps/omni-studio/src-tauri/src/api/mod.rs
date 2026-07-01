@@ -1,7 +1,7 @@
 pub mod auth;
 pub mod handlers;
 
-use axum::{Router, routing::get, response::IntoResponse, Json};
+use axum::{response::IntoResponse, routing::get, Json, Router};
 use sqlx::SqlitePool;
 use std::net::SocketAddr;
 use std::path::PathBuf;
@@ -13,8 +13,8 @@ use utoipa_scalar::{Scalar, Servable};
 use auth::Claims;
 
 use std::{collections::HashMap, sync::Arc};
-use tokio::sync::{mpsc, RwLock};
 use tauri::AppHandle;
+use tokio::sync::{mpsc, RwLock};
 
 #[derive(Clone)]
 pub struct AppState {
@@ -70,7 +70,7 @@ pub async fn serve(pool: SqlitePool, app_dir: PathBuf, port: u16, app_handle: Ap
     let (sync_tx, _rx) = tokio::sync::broadcast::channel(100);
     let (automa_ws_tx, _) = tokio::sync::broadcast::channel(100);
 
-    let state = AppState { 
+    let state = AppState {
         db: pool.clone(),
         mcp_sessions,
         app_dir: app_dir.clone(),
@@ -84,14 +84,21 @@ pub async fn serve(pool: SqlitePool, app_dir: PathBuf, port: u16, app_handle: Ap
     let pool_clone = pool.clone();
     let sync_tx_clone = sync_tx.clone();
     tokio::spawn(async move {
-        let watcher = crate::services::file_watcher::FileWatcherService::new(watch_dir, pool_clone, sync_tx_clone);
+        let watcher = crate::services::file_watcher::FileWatcherService::new(
+            watch_dir,
+            pool_clone,
+            sync_tx_clone,
+        );
         if let Err(e) = watcher.start().await {
             eprintln!("FileWatcher failed to start: {:?}", e);
         }
     });
 
     let app = Router::new()
-        .route("/", get(|| async { axum::response::Redirect::temporary("/scalar") }))
+        .route(
+            "/",
+            get(|| async { axum::response::Redirect::temporary("/scalar") }),
+        )
         .merge(Scalar::with_url("/scalar", ApiDoc::openapi()))
         .route("/openapi.json", get(|| async { Json(ApiDoc::openapi()) }))
         .route("/health", get(health_check))
@@ -105,7 +112,10 @@ pub async fn serve(pool: SqlitePool, app_dir: PathBuf, port: u16, app_handle: Ap
         .nest("/api/mcp", handlers::mcp::router())
         .nest("/api/git", handlers::git::router())
         .nest("/api/automa", handlers::automa::router())
-        .route("/api/automa/ws/sync", get(handlers::sync_ws::ws_sync_handler))
+        .route(
+            "/api/automa/ws/sync",
+            get(handlers::sync_ws::ws_sync_handler),
+        )
         .layer(CorsLayer::permissive())
         .with_state(state);
 
@@ -125,7 +135,9 @@ async fn health_check() -> impl IntoResponse {
 }
 
 #[utoipa::path(get, path = "/ping", responses((status = 200, description = "Pong")))]
-async fn ping() -> &'static str { "pong" }
+async fn ping() -> &'static str {
+    "pong"
+}
 
 #[utoipa::path(get, path = "/api/me", responses((status = 200, description = "User info")))]
 async fn me(claims: Option<Claims>) -> impl IntoResponse {
@@ -135,7 +147,8 @@ async fn me(claims: Option<Claims>) -> impl IntoResponse {
             "email": claims.email,
             "is_admin": claims.is_admin(),
             "role": claims.role,
-        })).into_response()
+        }))
+        .into_response()
     } else {
         // Dummy local user for Automa Extension so it bypasses auth
         Json(serde_json::json!({
@@ -143,7 +156,8 @@ async fn me(claims: Option<Claims>) -> impl IntoResponse {
             "email": "local@omnidesk.app",
             "is_admin": true,
             "role": "ADMIN",
-        })).into_response()
+        }))
+        .into_response()
     }
 }
 

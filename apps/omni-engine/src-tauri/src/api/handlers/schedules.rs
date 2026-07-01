@@ -14,7 +14,12 @@ use crate::services::schedules_service;
 pub fn router() -> Router<AppState> {
     Router::new()
         .route("/", get(list_schedules).post(create_schedule))
-        .route("/:id", get(get_schedule).put(update_schedule).delete(delete_schedule))
+        .route(
+            "/:id",
+            get(get_schedule)
+                .put(update_schedule)
+                .delete(delete_schedule),
+        )
         .route("/:id/toggle", post(toggle_schedule))
         .route("/:id/run-now", post(run_now))
 }
@@ -47,9 +52,7 @@ pub struct UpdateSchedulePayload {
     ),
     tag = "schedules"
 )]
-async fn list_schedules(
-    State(state): State<AppState>,
-) -> Result<Json<Vec<Schedule>>, AppError> {
+async fn list_schedules(State(state): State<AppState>) -> Result<Json<Vec<Schedule>>, AppError> {
     let schedules = schedules_service::list_schedules(&state.db).await?;
     Ok(Json(schedules))
 }

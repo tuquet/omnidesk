@@ -1,17 +1,17 @@
+use sqlx::SqlitePool;
 use std::collections::HashMap;
 use std::sync::Arc;
 use tokio::sync::RwLock;
 use tokio_cron_scheduler::{Job, JobScheduler};
-use sqlx::SqlitePool;
 use uuid::Uuid as JobUuid;
 
 use crate::db::models::workflow::Schedule;
-use crate::error::AppError;
-use omni_shared::automa::executor::{SharedWorkflowExecutor, ExecutionResult};
 use crate::db::models::workflow::WorkflowRun;
+use crate::error::AppError;
+use omni_shared::automa::executor::{ExecutionResult, SharedWorkflowExecutor};
+use omni_shared::automa::AutomaEvent;
 use tauri::AppHandle;
 use tokio::sync::broadcast::Sender;
-use omni_shared::automa::AutomaEvent;
 
 /// SchedulerService manages cron jobs for automated workflow execution.
 ///
@@ -32,9 +32,10 @@ impl SchedulerService {
     pub async fn start(
         db: SqlitePool,
         app_handle: AppHandle,
-        automa_ws_tx: Sender<AutomaEvent>
+        automa_ws_tx: Sender<AutomaEvent>,
     ) -> Result<Self, AppError> {
-        let scheduler = JobScheduler::new().await
+        let scheduler = JobScheduler::new()
+            .await
             .map_err(|e| AppError::Internal(format!("Failed to create scheduler: {}", e)))?;
 
         let service = Self {
@@ -45,20 +46,27 @@ impl SchedulerService {
             automa_ws_tx,
         };
 
-        let schedules = sqlx::query_as::<_, Schedule>("SELECT * FROM schedules WHERE is_enabled = 1")
-            .fetch_all(&db)
-            .await
-            .unwrap_or_default();
+        let schedules =
+            sqlx::query_as::<_, Schedule>("SELECT * FROM schedules WHERE is_enabled = 1")
+                .fetch_all(&db)
+                .await
+                .unwrap_or_default();
         println!("[Scheduler] Loading {} enabled schedules", schedules.len());
 
         for schedule in &schedules {
             if let Err(e) = service.add_schedule(schedule).await {
-                eprintln!("[Scheduler] Failed to register '{}': {:?}", schedule.name, e);
+                eprintln!(
+                    "[Scheduler] Failed to register '{}': {:?}",
+                    schedule.name, e
+                );
             }
         }
 
         // Start the scheduler
-        service.scheduler.start().await
+        service
+            .scheduler
+            .start()
+            .await
             .map_err(|e| AppError::Internal(format!("Failed to start scheduler: {}", e)))?;
 
         println!("[Scheduler] Started successfully");
@@ -177,11 +185,19 @@ impl SchedulerService {
         .map_err(|e| AppError::Internal(format!("Invalid cron expression '{}': {}", cron_expr, e)))?;
 
         let job_uuid = job.guid();
-        self.scheduler.add(job).await
+        self.scheduler
+            .add(job)
+            .await
             .map_err(|e| AppError::Internal(format!("Failed to add job: {}", e)))?;
 
-        self.job_map.write().await.insert(schedule.id.clone(), job_uuid);
-        println!("[Scheduler] Registered: '{}' [{}]", schedule.name, schedule.cron_expr);
+        self.job_map
+            .write()
+            .await
+            .insert(schedule.id.clone(), job_uuid);
+        println!(
+            "[Scheduler] Registered: '{}' [{}]",
+            schedule.name, schedule.cron_expr
+        );
 
         Ok(())
     }
@@ -205,14 +221,20 @@ impl SchedulerService {
     }
 
     /// Execute a schedule immediately (bypass cron)
-    pub async fn execute_now(&self, db: &SqlitePool, schedule: &Schedule) -> Result<WorkflowRun, AppError> {
-        println!("[Scheduler] Manual trigger: '{}' (workflow={}, profile={})",
-            schedule.name, schedule.workflow_id, schedule.profile_id);
+    pub async fn execute_now(
+        &self,
+        db: &SqlitePool,
+        schedule: &Schedule,
+    ) -> Result<WorkflowRun, AppError> {
+        println!(
+            "[Scheduler] Manual trigger: '{}' (workflow={}, profile={})",
+            schedule.name, schedule.workflow_id, schedule.profile_id
+        );
 
         // Update run stats
         let now = chrono::Utc::now().timestamp_millis();
         let _ = sqlx::query(
-            "UPDATE schedules SET last_run_at = ?, run_count = run_count + 1 WHERE id = ?"
+            "UPDATE schedules SET last_run_at = ?, run_count = run_count + 1 WHERE id = ?",
         )
         .bind(now)
         .bind(&schedule.id)
@@ -221,17 +243,18 @@ impl SchedulerService {
 
         let workflow_name = schedule.name.clone();
         let exec_result = SharedWorkflowExecutor::execute(
-            db, 
-            &self.automa_ws_tx, 
-            &schedule.workflow_id, 
-            &workflow_name, 
-            None, 
-            &schedule.profile_id, 
-            Some(&schedule.id), 
-            None, 
+            db,
+            &self.automa_ws_tx,
+            &schedule.workflow_id,
+            &workflow_name,
+            None,
+            &schedule.profile_id,
+            Some(&schedule.id),
+            None,
             omni_tauri_core::constants::RUNTIME_PORT,
-            omni_tauri_core::constants::PROFILE_PORT
-        ).await?;
+            omni_tauri_core::constants::PROFILE_PORT,
+        )
+        .await?;
 
         let run_id = match exec_result {
             ExecutionResult::NeedsDefaultBrowser { run_id, bridge_url } => {
@@ -240,10 +263,10 @@ impl SchedulerService {
                     eprintln!("[Scheduler] Failed to open default browser: {}", e);
                 }
                 run_id
-            },
+            }
             ExecutionResult::LaunchedProfile { run_id } => run_id,
         };
-        
+
         // Construct a dummy WorkflowRun for the response
         Ok(WorkflowRun {
             id: run_id,

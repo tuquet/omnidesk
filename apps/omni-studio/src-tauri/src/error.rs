@@ -35,14 +35,20 @@ impl IntoResponse for AppError {
         let (status, error_message) = match self {
             AppError::Database(err) => {
                 log::error!("Database error: {:?}", err);
-                (StatusCode::INTERNAL_SERVER_ERROR, format!("Internal database error: {:?}", err))
+                (
+                    StatusCode::INTERNAL_SERVER_ERROR,
+                    format!("Internal database error: {:?}", err),
+                )
             }
             AppError::Unauthorized(msg) => (StatusCode::UNAUTHORIZED, msg),
             AppError::NotFound(msg) => (StatusCode::NOT_FOUND, msg),
             AppError::BadRequest(msg) => (StatusCode::BAD_REQUEST, msg),
             AppError::Internal(msg) => {
                 log::error!("Internal error: {}", msg);
-                (StatusCode::INTERNAL_SERVER_ERROR, "Internal server error".to_string())
+                (
+                    StatusCode::INTERNAL_SERVER_ERROR,
+                    "Internal server error".to_string(),
+                )
             }
         };
 
@@ -56,20 +62,35 @@ impl IntoResponse for AppError {
     }
 }
 
-// Convert AppError into a String for Tauri IPC (Tauri commands require errors to implement Serialize, 
-// but returning a String is the most common pattern).
-impl From<AppError> for String {
-    fn from(err: AppError) -> Self {
-        match err {
-            AppError::Database(e) => format!("Database error: {}", e),
-            AppError::Unauthorized(msg) => format!("Unauthorized: {}", msg),
-            AppError::NotFound(msg) => format!("Not found: {}", msg),
-            AppError::BadRequest(msg) => format!("Bad request: {}", msg),
-            AppError::Internal(msg) => format!("Internal error: {}", msg),
+impl std::fmt::Display for AppError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            AppError::Database(e) => write!(f, "Database error: {}", e),
+            AppError::Unauthorized(msg) => write!(f, "Unauthorized: {}", msg),
+            AppError::NotFound(msg) => write!(f, "Not found: {}", msg),
+            AppError::BadRequest(msg) => write!(f, "Bad request: {}", msg),
+            AppError::Internal(msg) => write!(f, "Internal error: {}", msg),
         }
     }
 }
 
+// Convert AppError into a String for Tauri IPC (Tauri commands require errors to implement Serialize,
+// but returning a String is the most common pattern).
+impl From<AppError> for String {
+    fn from(err: AppError) -> Self {
+        err.to_string()
+    }
+}
+
+// Implement Serialize so Tauri commands can return Result<T, AppError> natively.
+impl serde::Serialize for AppError {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(&self.to_string())
+    }
+}
 
 impl From<omni_shared::error::AppError> for AppError {
     fn from(err: omni_shared::error::AppError) -> Self {
@@ -82,3 +103,22 @@ impl From<omni_shared::error::AppError> for AppError {
         }
     }
 }
+
+impl From<String> for AppError {
+    fn from(err: String) -> Self {
+        AppError::Internal(err)
+    }
+}
+
+impl From<&str> for AppError {
+    fn from(err: &str) -> Self {
+        AppError::Internal(err.to_string())
+    }
+}
+
+impl From<std::io::Error> for AppError {
+    fn from(err: std::io::Error) -> Self {
+        AppError::Internal(err.to_string())
+    }
+}
+

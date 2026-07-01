@@ -65,7 +65,7 @@ export function HardwareMonitor() {
         <TooltipContent side="top" className="text-xs">
           <p>Total Memory: {memTotalGb} GB</p>
           <p>Memory Usage: {(memRatio * 100).toFixed(0)}%</p>
-          {isHighMem && <p className="text-destructive mt-1 font-semibold">High Memory Usage!</p>}
+          {isHighMem ? <p className="text-destructive mt-1 font-semibold">High Memory Usage!</p> : null}
         </TooltipContent>
       </Tooltip>
     </TooltipProvider>

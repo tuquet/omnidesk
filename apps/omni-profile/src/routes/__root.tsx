@@ -8,7 +8,7 @@ import { TitleBar } from '@omnidesk/core';
 import { StatusBar } from '@omnidesk/features';
 import { AppConfigProvider } from '@omnidesk/core';
 import * as config from '@/config';
-import { useRBAC } from '@/hooks/use-rbac';
+import { useRBAC } from '@omnidesk/core';
 import { ResizeHandles } from '@omnidesk/core';
 import { AutoUpdater } from '@omnidesk/features';
 

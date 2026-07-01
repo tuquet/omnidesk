@@ -1,16 +1,16 @@
 use std::path::PathBuf;
+pub mod api;
 pub mod commands;
 pub mod db;
-pub mod api;
-pub mod system;
 pub mod error;
 pub mod services;
+pub mod system;
 
 use commands::{credentials, preferences};
 use tauri::{
     menu::{Menu, MenuItem},
     tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent},
-    Manager, Emitter, WindowEvent,
+    Emitter, Manager, WindowEvent,
 };
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -18,9 +18,15 @@ pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_single_instance::init(|app, args, _cwd| {
             if let Some(url) = args.iter().find(|a| a.starts_with("omnidesk://")) {
-                let _ = app.emit(omni_tauri_core::constants::DEEP_LINK_RECEIVED_EVENT, url.clone());
+                let _ = app.emit(
+                    omni_tauri_core::constants::DEEP_LINK_RECEIVED_EVENT,
+                    url.clone(),
+                );
             }
-            let _ = app.get_webview_window("main").expect("no main window").set_focus();
+            let _ = app
+                .get_webview_window("main")
+                .expect("no main window")
+                .set_focus();
         }))
         .plugin(tauri_plugin_deep_link::init())
         .plugin(tauri_plugin_opener::init())
@@ -40,7 +46,8 @@ pub fn run() {
         .setup(|app| {
             // Setup System Tray
             let quit_i = MenuItem::with_id(app, "quit", "Quit Omni Studio", true, None::<&str>)?;
-            let toggle_i = MenuItem::with_id(app, "toggle", "Show/Hide Omni Studio", true, None::<&str>)?;
+            let toggle_i =
+                MenuItem::with_id(app, "toggle", "Show/Hide Omni Studio", true, None::<&str>)?;
             let menu = Menu::with_items(app, &[&toggle_i, &quit_i])?;
 
             let _tray = TrayIconBuilder::new()
@@ -65,21 +72,24 @@ pub fn run() {
                     }
                     _ => {}
                 })
-                .on_tray_icon_event(|tray, event| if let TrayIconEvent::Click {
+                .on_tray_icon_event(|tray, event| {
+                    if let TrayIconEvent::Click {
                         button: MouseButton::Left,
                         button_state: MouseButtonState::Up,
                         ..
-                    } = event {
-                    let app = tray.app_handle();
-                    if let Some(window) = app.get_webview_window("main") {
-                        let _ = window.is_visible().map(|visible| {
-                            if visible {
-                                let _ = window.hide();
-                            } else {
-                                let _ = window.show();
-                                let _ = window.set_focus();
-                            }
-                        });
+                    } = event
+                    {
+                        let app = tray.app_handle();
+                        if let Some(window) = app.get_webview_window("main") {
+                            let _ = window.is_visible().map(|visible| {
+                                if visible {
+                                    let _ = window.hide();
+                                } else {
+                                    let _ = window.show();
+                                    let _ = window.set_focus();
+                                }
+                            });
+                        }
                     }
                 })
                 .build(app)?;
@@ -104,30 +114,39 @@ pub fn run() {
                     }
                 }
             }
-            
+
             // Smart user-mode deep link registration (bypasses UAC admin requirement)
             system::deep_link::register_protocol_user_mode("omnidesk");
-            
+
             let app_handle = app.handle().clone();
-            
+
             if let Ok(app_dir) = system::config::get_active_storage_path(&app_handle) {
                 if std::fs::create_dir_all(&app_dir).is_ok() {
                     // Initialize database synchronously to prevent race conditions with the UI
-                    match tauri::async_runtime::block_on(async { db::init_db(app_dir.clone()).await }) {
+                    match tauri::async_runtime::block_on(async {
+                        db::init_db(app_dir.clone()).await
+                    }) {
                         Ok(pool) => {
                             // Manage state for Tauri commands before UI can call them
                             app_handle.manage(pool.clone());
-                            
+
                             let _pool_for_rt = pool.clone();
-                            let app_dir = system::config::get_active_storage_path(&app_handle).unwrap_or_else(|_| PathBuf::from("."));
+                            let app_dir = system::config::get_active_storage_path(&app_handle)
+                                .unwrap_or_else(|_| PathBuf::from("."));
                             let app_handle_clone = app_handle.clone();
-                            
+
                             tauri::async_runtime::spawn(async move {
                                 // Realtime listener has been extracted/removed
-                                
+
                                 // Only run Axum if not disabled
                                 if std::env::var("OMNIDESK_DISABLE_API").is_err() {
-                                    api::serve(pool, app_dir, omni_tauri_core::constants::WORKFLOW_PORT, app_handle_clone).await;
+                                    api::serve(
+                                        pool,
+                                        app_dir,
+                                        omni_tauri_core::constants::WORKFLOW_PORT,
+                                        app_handle_clone,
+                                    )
+                                    .await;
                                 }
                             });
                         }
@@ -141,7 +160,7 @@ pub fn run() {
             } else {
                 eprintln!("Failed to get app data dir");
             }
-            
+
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![

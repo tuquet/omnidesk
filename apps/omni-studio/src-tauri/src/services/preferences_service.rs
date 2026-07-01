@@ -1,11 +1,12 @@
-use sqlx::SqlitePool;
 use crate::error::AppError;
+use sqlx::SqlitePool;
 
 pub async fn get_home_layout(pool: &SqlitePool, user_id: &str) -> Result<String, AppError> {
-    let result: Option<String> = sqlx::query_scalar("SELECT home_screen_order FROM user_preferences WHERE user_id = ?")
-        .bind(user_id)
-        .fetch_optional(pool)
-        .await?;
+    let result: Option<String> =
+        sqlx::query_scalar("SELECT home_screen_order FROM user_preferences WHERE user_id = ?")
+            .bind(user_id)
+            .fetch_optional(pool)
+            .await?;
 
     Ok(result.unwrap_or_else(|| "[]".to_string()))
 }
@@ -26,23 +27,24 @@ pub async fn update_home_layout(
     let payload = serde_json::json!({
         "user_id": user_id,
         "home_screen_order": home_screen_order,
-    }).to_string();
+    })
+    .to_string();
 
     match omni_shared::crypto::get_or_generate_keypair(user_id) {
-        Ok((_priv, pub_key)) => {
-            match omni_shared::crypto::encrypt_payload(&pub_key, &payload) {
-                Ok(encrypted_payload) => {
-                    let _ = sqlx::query("INSERT INTO sync_queue (id, user_id, action, payload) VALUES (?, ?, ?, ?)")
-                        .bind(&job_id)
-                        .bind(user_id)
-                        .bind("UPDATE_PREFERENCES")
-                        .bind(encrypted_payload)
-                        .execute(pool)
-                        .await;
-                }
-                Err(e) => eprintln!("Failed to encrypt payload: {:?}", e),
+        Ok((_priv, pub_key)) => match omni_shared::crypto::encrypt_payload(&pub_key, &payload) {
+            Ok(encrypted_payload) => {
+                let _ = sqlx::query(
+                    "INSERT INTO sync_queue (id, user_id, action, payload) VALUES (?, ?, ?, ?)",
+                )
+                .bind(&job_id)
+                .bind(user_id)
+                .bind("UPDATE_PREFERENCES")
+                .bind(encrypted_payload)
+                .execute(pool)
+                .await;
             }
-        }
+            Err(e) => eprintln!("Failed to encrypt payload: {:?}", e),
+        },
         Err(e) => eprintln!("Failed to get/generate keypair: {:?}", e),
     }
 

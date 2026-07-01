@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import { useEffect, useState, useRef } from 'react';
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@omnidesk/supabase';
 import { toast } from 'sonner';
 import { DEFAULT_AUTHENTICATED_ROUTE } from '@/config/route-config';
 import { ROUTES } from '@/config/route-config';

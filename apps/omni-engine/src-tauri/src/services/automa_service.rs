@@ -1,5 +1,5 @@
-use sqlx::SqlitePool;
 use crate::error::AppError;
+use sqlx::SqlitePool;
 
 pub async fn mark_run_finished(
     pool: &SqlitePool,
@@ -7,13 +7,15 @@ pub async fn mark_run_finished(
     status: &str,
 ) -> Result<(), AppError> {
     let now = chrono::Utc::now().timestamp_millis();
-    sqlx::query("UPDATE workflow_runs SET status = ?, updated_at = ?, finished_at = ? WHERE id = ?")
-        .bind(status)
-        .bind(now)
-        .bind(now)
-        .bind(run_id)
-        .execute(pool)
-        .await?;
+    sqlx::query(
+        "UPDATE workflow_runs SET status = ?, updated_at = ?, finished_at = ? WHERE id = ?",
+    )
+    .bind(status)
+    .bind(now)
+    .bind(now)
+    .bind(run_id)
+    .execute(pool)
+    .await?;
     Ok(())
 }
 

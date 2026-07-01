@@ -65,3 +65,23 @@ As an AI Agent modifying the OmniDesk ecosystem, you MUST evaluate every code ch
 - **Immutable Migrations**: Never modify an existing `.sql` migration file that has already been applied, as SQLx tracks file checksums. Modifying an old migration will result in a "Mismatched migration checksum" panic at runtime.
 - **Always Create New Files**: To modify a database schema, ALWAYS create a new migration file (e.g. `YYYYMMDDHHMMSS_description.sql`) using `ALTER TABLE` or similar commands.
 - **Early Development Exception**: If the app is in early development and not yet released, you may modify an existing migration file ONLY IF you explicitly warn the user that they must delete their local SQLite `.db` file to start fresh.
+
+## 11. Backend Warnings & Unused Code
+
+- **Zero Warnings Policy**: When modifying Rust backend code, you MUST pay attention to `cargo check` warnings (e.g., `unused imports`, `dead code`, clippy warnings).
+- **Auto-Fixing**: Proactively run `cargo fix --allow-dirty --allow-no-vcs` or manually clean up unused imports/variables to maintain a clean codebase. Do not leave trailing warnings in the backend.
+
+## 12. Frontend Warnings & Unused Code
+
+- **Zero Warnings Policy**: When modifying React/TypeScript frontend code, you MUST pay attention to `eslint` warnings (e.g., `@typescript-eslint/no-unused-vars`, unused imports) and `tsc` typecheck errors.
+- **Auto-Fixing**: Proactively run `pnpm lint --fix` or manually clean up unused imports/variables to maintain a clean codebase. Do not leave trailing warnings in the frontend console.
+
+## 13. Code Reusability & DRY (Don't Repeat Yourself)
+
+- **Avoid Function Duplication**: Before writing a new utility function, React hook, or Rust helper, always search the codebase to see if an equivalent already exists in the shared packages (`packages/core`, `packages/features`, `packages-rs/omni-shared`, etc.).
+- **Extract Shared Logic**: If you find yourself writing the exact same logic or helper function in multiple applications (`apps/`), STOP. Extract that logic into the appropriate shared package and import it. Do not duplicate implementations.
+
+## 14. API Synchronization (OpenAPI to TypeScript)
+
+- **Mandatory Sync**: Whenever you add, remove, or modify a backend API endpoint (e.g., an Axum handler or Utoipa macro) in the Rust backend, you MUST run the API synchronization script: `pnpm run sync:api`.
+- **Workflow**: The `pnpm run sync:api` command will automatically generate the `openapi.json` from the Rust code and use `openapi-ts` to regenerate the TypeScript API clients in `@omnidesk/types`. Failure to run this script will result in the Frontend being out-of-sync with the Backend, leading to runtime or typecheck errors.

@@ -23,20 +23,21 @@ const SERVICE_NAME: &str = "com.omnidesk.devtool.credentials";
 
 #[tauri::command]
 pub async fn set_credential(key: String, secret: String) -> Result<(), KeyringError> {
-    let entry = Entry::new(SERVICE_NAME, &key)
+    let entry =
+        Entry::new(SERVICE_NAME, &key).map_err(|e| KeyringError::AccessFailed(e.to_string()))?;
+
+    entry
+        .set_password(&secret)
         .map_err(|e| KeyringError::AccessFailed(e.to_string()))?;
-        
-    entry.set_password(&secret)
-        .map_err(|e| KeyringError::AccessFailed(e.to_string()))?;
-        
+
     Ok(())
 }
 
 #[tauri::command]
 pub async fn get_credential(key: String) -> Result<String, KeyringError> {
-    let entry = Entry::new(SERVICE_NAME, &key)
-        .map_err(|e| KeyringError::AccessFailed(e.to_string()))?;
-        
+    let entry =
+        Entry::new(SERVICE_NAME, &key).map_err(|e| KeyringError::AccessFailed(e.to_string()))?;
+
     match entry.get_password() {
         Ok(password) => Ok(password),
         Err(keyring::Error::NoEntry) => Err(KeyringError::NotFound),
@@ -46,9 +47,9 @@ pub async fn get_credential(key: String) -> Result<String, KeyringError> {
 
 #[tauri::command]
 pub async fn delete_credential(key: String) -> Result<(), KeyringError> {
-    let entry = Entry::new(SERVICE_NAME, &key)
-        .map_err(|e| KeyringError::AccessFailed(e.to_string()))?;
-        
+    let entry =
+        Entry::new(SERVICE_NAME, &key).map_err(|e| KeyringError::AccessFailed(e.to_string()))?;
+
     match entry.delete_credential() {
         Ok(_) => Ok(()),
         Err(keyring::Error::NoEntry) => Ok(()),

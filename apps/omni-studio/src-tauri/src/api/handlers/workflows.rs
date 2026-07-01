@@ -1,69 +1,15 @@
-use axum::{
-    extract::{Path, Query, State},
-    routing::{get, post, delete},
-    Json, Router,
-};
-use serde::Deserialize;
 use crate::api::AppState;
 use crate::db::models::workflow::Workflow;
 use crate::error::AppError;
 use crate::services::workflow_service::WorkflowService;
+use axum::{
+    extract::{Path, Query, State},
+    routing::{delete, get, post},
+    Json, Router,
+};
+use serde::Deserialize;
 
 use omni_shared::automa::workflow::WorkflowPayload;
-
-impl From<Workflow> for WorkflowPayload {
-    fn from(w: Workflow) -> Self {
-        WorkflowPayload::from_raw(
-            w.id,
-            w.name,
-            w.icon,
-            w.folder_id,
-            w.description,
-            w.drawflow,
-            w.settings,
-            w.trigger,
-            w.global_data,
-            w.table_data,
-            w.data_columns,
-            w.content,
-            w.connected_table,
-            w.version,
-            w.is_disabled,
-            w.source,
-            w.created_at,
-            w.updated_at,
-            w.deleted_at,
-            w.delete_source,
-        )
-    }
-}
-
-impl From<WorkflowPayload> for Workflow {
-    fn from(aw: WorkflowPayload) -> Self {
-        Workflow {
-            id: aw.id,
-            name: aw.name,
-            icon: aw.icon,
-            folder_id: aw.folder_id,
-            description: aw.description,
-            drawflow: serde_json::to_string(&aw.drawflow).unwrap_or_else(|_| "{}".to_string()),
-            settings: serde_json::to_string(&aw.settings).unwrap_or_else(|_| "{}".to_string()),
-            trigger: aw.trigger.map(|v| serde_json::to_string(&v).unwrap_or_default()),
-            global_data: aw.global_data.map(|v| serde_json::to_string(&v).unwrap_or_default()),
-            table_data: aw.table_data.map(|v| serde_json::to_string(&v).unwrap_or_default()),
-            data_columns: aw.data_columns.map(|v| serde_json::to_string(&v).unwrap_or_default()),
-            content: aw.content,
-            connected_table: aw.connected_table,
-            version: aw.version,
-            is_disabled: aw.is_disabled,
-            source: aw.source,
-            created_at: aw.created_at,
-            updated_at: aw.updated_at,
-            deleted_at: aw.deleted_at,
-            delete_source: aw.delete_source,
-        }
-    }
-}
 
 pub fn router() -> Router<AppState> {
     Router::new()
@@ -73,7 +19,12 @@ pub fn router() -> Router<AppState> {
         .route("/hosted", get(get_empty_list))
         .route("/backup", get(get_empty_list))
         .route("/trash", get(list_trash_workflows))
-        .route("/:id", get(get_workflow).put(update_workflow).delete(delete_workflow))
+        .route(
+            "/:id",
+            get(get_workflow)
+                .put(update_workflow)
+                .delete(delete_workflow),
+        )
         .route("/:id/duplicate", post(duplicate_workflow))
         .route("/:id/restore", post(restore_workflow))
         .route("/:id/force", delete(force_delete_workflow))
@@ -119,7 +70,9 @@ async fn list_workflows(
     } else {
         WorkflowService::get_all(&state.db).await?
     };
-    Ok(Json(workflows.into_iter().map(WorkflowPayload::from).collect()))
+    Ok(Json(
+        workflows.into_iter().map(WorkflowPayload::from).collect(),
+    ))
 }
 
 #[utoipa::path(
@@ -141,7 +94,6 @@ async fn get_workflow(
     let workflow = WorkflowService::get_by_id(&state.db, &id).await?;
     Ok(Json(WorkflowPayload::from(workflow)))
 }
-
 
 #[utoipa::path(
     get,
@@ -221,10 +173,11 @@ async fn delete_workflow(
     WorkflowService::soft_delete(&state.db, &id, "api").await?;
 
     // Delete from Local File (if we do soft delete, we also delete the local JSON so it doesn't get synced back)
-    let watch_dir = query.workspace_path
+    let watch_dir = query
+        .workspace_path
         .map(|p| std::path::PathBuf::from(p).join("workflows"))
         .unwrap_or_else(|| state.app_dir.join("workflows"));
-        
+
     let file_path = watch_dir.join(format!("{}.automa.json", id));
     if file_path.exists() {
         if let Err(e) = std::fs::remove_file(&file_path) {
@@ -260,13 +213,17 @@ async fn restore_workflow(
     Query(query): Query<WorkspaceQuery>,
 ) -> Result<Json<serde_json::Value>, AppError> {
     WorkflowService::restore(&state.db, &id).await?;
-    
+
     // Fetch and export to JSON
     if let Ok(wf) = WorkflowService::get_by_id(&state.db, &id).await {
-        let watch_dir = query.workspace_path
+        let watch_dir = query
+            .workspace_path
             .map(|p| std::path::PathBuf::from(p).join("workflows"))
             .unwrap_or_else(|| state.app_dir.join("workflows"));
-        let _ = crate::services::file_watcher::FileWatcherService::export_workflow_file(&watch_dir, &wf).await;
+        let _ = crate::services::file_watcher::FileWatcherService::export_workflow_file(
+            &watch_dir, &wf,
+        )
+        .await;
     }
 
     Ok(Json(serde_json::json!({ "restored": true })))
@@ -290,12 +247,17 @@ async fn duplicate_workflow(
     Query(query): Query<WorkspaceQuery>,
 ) -> Result<Json<WorkflowPayload>, AppError> {
     let duplicated = WorkflowService::duplicate(&state.db, &id).await?;
-    
+
     // Export new workflow to local JSON
-    let watch_dir = query.workspace_path
+    let watch_dir = query
+        .workspace_path
         .map(|p| std::path::PathBuf::from(p).join("workflows"))
         .unwrap_or_else(|| state.app_dir.join("workflows"));
-    let _ = crate::services::file_watcher::FileWatcherService::export_workflow_file(&watch_dir, &duplicated).await;
+    let _ = crate::services::file_watcher::FileWatcherService::export_workflow_file(
+        &watch_dir,
+        &duplicated,
+    )
+    .await;
 
     // Broadcast to WebSocket so Extension adds it
     let event = crate::api::handlers::sync_ws::SyncEvent {
@@ -325,9 +287,10 @@ async fn force_delete_workflow(
     Query(query): Query<WorkspaceQuery>,
 ) -> Result<Json<serde_json::Value>, AppError> {
     WorkflowService::delete(&state.db, &id).await?;
-    
+
     // Delete from Local File (if it exists)
-    let watch_dir = query.workspace_path
+    let watch_dir = query
+        .workspace_path
         .map(|p| std::path::PathBuf::from(p).join("workflows"))
         .unwrap_or_else(|| state.app_dir.join("workflows"));
     let file_path = watch_dir.join(format!("{}.automa.json", id));
@@ -366,24 +329,34 @@ async fn create_workflow_run(
     let runtime_api_url = omni_tauri_core::constants::get_runtime_api_url();
     let engine_health_url = format!("{}/health", runtime_api_url);
     let engine_url = format!("{}/api/engine/runs", runtime_api_url);
-    
+
     // Check if we should fallback immediately
     let is_default = payload.profile_id.as_deref() == Some("default");
-    
+
     let fallback_reason = if !is_default {
         // Quick healthcheck to see if engine is alive
-        let health_res = client.get(engine_health_url).timeout(std::time::Duration::from_millis(500)).send().await;
+        let health_res = client
+            .get(engine_health_url)
+            .timeout(std::time::Duration::from_millis(500))
+            .send()
+            .await;
         if health_res.is_ok() && health_res.unwrap().status().is_success() {
             let res = client.post(engine_url).json(&payload).send().await;
             match res {
                 Ok(r) if r.status().is_success() => {
-                    let run: serde_json::Value = r.json().await.map_err(|e| AppError::Internal(format!("Failed to parse run: {}", e)))?;
+                    let run: serde_json::Value = r
+                        .json()
+                        .await
+                        .map_err(|e| AppError::Internal(format!("Failed to parse run: {}", e)))?;
                     return Ok(Json(run));
-                },
+                }
                 Ok(r) => {
                     // If it returned an error status, it means engine is reachable but rejected it.
-                    return Err(AppError::Internal(format!("Engine returned {}", r.status())));
-                },
+                    return Err(AppError::Internal(format!(
+                        "Engine returned {}",
+                        r.status()
+                    )));
+                }
                 Err(e) => {
                     format!("Engine reachable but POST failed ({})", e)
                 }
@@ -394,47 +367,56 @@ async fn create_workflow_run(
     } else {
         "Default profile requested".to_string()
     };
-    
-    println!("[Studio] Fallback executing workflow locally. Reason: {}", fallback_reason);
-        // Get the workflow to send down
-        let workflow = WorkflowService::get_by_id(&state.db, &payload.workflow_id).await?;
-        let api_workflow = WorkflowPayload::from(workflow.clone());
-        let workflow_json = serde_json::to_value(api_workflow).unwrap_or(serde_json::json!({
-            "id": payload.workflow_id,
-            "name": workflow.name.clone()
-        }));
-        
-        let exec_result = omni_shared::automa::executor::SharedWorkflowExecutor::execute(
-            &state.db,
-            &state.automa_ws_tx,
-            &payload.workflow_id,
-            &workflow.name,
-            Some(workflow_json),
-            payload.profile_id.as_deref().unwrap_or("default"),
-            payload.schedule_id.as_deref(),
-            payload.variables.clone(),
-            omni_tauri_core::constants::WORKFLOW_PORT,
-            omni_tauri_core::constants::PROFILE_PORT,
-        ).await?;
-        
-        let run_id = match exec_result {
-            omni_shared::automa::executor::ExecutionResult::NeedsDefaultBrowser { run_id, bridge_url } => {
-                use tauri_plugin_opener::OpenerExt;
-                if let Err(e) = state.app_handle.opener().open_url(&bridge_url, None::<&str>) {
-                    eprintln!("[Studio] Failed to open default browser: {}", e);
-                }
-                run_id
-            },
-            omni_shared::automa::executor::ExecutionResult::LaunchedProfile { run_id } => run_id,
-        };
-        
-        return Ok(Json(serde_json::json!({
-            "run_id": run_id,
-            "status": "LAUNCHING"
-        })));
 
+    println!(
+        "[Studio] Fallback executing workflow locally. Reason: {}",
+        fallback_reason
+    );
+    // Get the workflow to send down
+    let workflow = WorkflowService::get_by_id(&state.db, &payload.workflow_id).await?;
+    let api_workflow = WorkflowPayload::from(workflow.clone());
+    let workflow_json = serde_json::to_value(api_workflow).unwrap_or(serde_json::json!({
+        "id": payload.workflow_id,
+        "name": workflow.name.clone()
+    }));
+
+    let exec_result = omni_shared::automa::executor::SharedWorkflowExecutor::execute(
+        &state.db,
+        &state.automa_ws_tx,
+        &payload.workflow_id,
+        &workflow.name,
+        Some(workflow_json),
+        payload.profile_id.as_deref().unwrap_or("default"),
+        payload.schedule_id.as_deref(),
+        payload.variables.clone(),
+        omni_tauri_core::constants::WORKFLOW_PORT,
+        omni_tauri_core::constants::PROFILE_PORT,
+    )
+    .await?;
+
+    let run_id = match exec_result {
+        omni_shared::automa::executor::ExecutionResult::NeedsDefaultBrowser {
+            run_id,
+            bridge_url,
+        } => {
+            use tauri_plugin_opener::OpenerExt;
+            if let Err(e) = state
+                .app_handle
+                .opener()
+                .open_url(&bridge_url, None::<&str>)
+            {
+                eprintln!("[Studio] Failed to open default browser: {}", e);
+            }
+            run_id
+        }
+        omni_shared::automa::executor::ExecutionResult::LaunchedProfile { run_id } => run_id,
+    };
+
+    return Ok(Json(serde_json::json!({
+        "run_id": run_id,
+        "status": "LAUNCHING"
+    })));
 }
-
 
 #[utoipa::path(
     get,

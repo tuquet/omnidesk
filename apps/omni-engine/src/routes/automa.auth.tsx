@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { useEffect, useState } from 'react';
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@omnidesk/supabase';
 import { LoginForm } from '@omnidesk/auth';
 import { CheckCircle2, Loader2, Puzzle } from 'lucide-react';
 import type { Session } from '@supabase/supabase-js';

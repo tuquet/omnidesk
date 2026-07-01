@@ -1,2 +1,2 @@
-pub mod deep_link;
 pub mod config;
+pub mod deep_link;

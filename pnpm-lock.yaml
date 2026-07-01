@@ -26,10 +26,10 @@ importers:
         version: 9.39.4
       '@modelcontextprotocol/server-filesystem':
         specifier: ^2026.1.14
-        version: 2026.1.14(zod@3.25.76)
+        version: 2026.1.14(zod@4.4.3)
       '@supabase/mcp-server-supabase':
         specifier: ^0.8.2
-        version: 0.8.2(@modelcontextprotocol/sdk@1.29.0(zod@3.25.76))(zod@3.25.76)
+        version: 0.8.2(@modelcontextprotocol/sdk@1.29.0(zod@4.4.3))(zod@4.4.3)
       '@tauri-apps/cli':
         specifier: ^2.11.2
         version: 2.11.3
@@ -47,7 +47,7 @@ importers:
         version: 9.39.4(jiti@2.7.0)
       eslint-plugin-import:
         specifier: ^2.32.0
-        version: 2.32.0(@typescript-eslint/parser@8.62.0(eslint@9.39.4(jiti@2.7.0))(typescript@6.0.3))(eslint-import-resolver-webpack@0.13.11)(eslint@9.39.4(jiti@2.7.0))
+        version: 2.32.0(eslint-import-resolver-webpack@0.13.11)(eslint@9.39.4(jiti@2.7.0))
       eslint-plugin-react:
         specifier: ^7.37.5
         version: 7.37.5(eslint@9.39.4(jiti@2.7.0))
@@ -108,9 +108,6 @@ importers:
       '@fontsource-variable/inter':
         specifier: ^5.2.8
         version: 5.2.8
-      '@hey-api/client-fetch':
-        specifier: ^0.13.1
-        version: 0.13.1(@hey-api/openapi-ts@0.98.2(magicast@0.5.3)(typescript@6.0.3))
       '@omnidesk/app-automa':
         specifier: workspace:*
         version: link:../../packages/app-automa
@@ -129,6 +126,9 @@ importers:
       '@omnidesk/features':
         specifier: workspace:*
         version: link:../../packages/features
+      '@omnidesk/supabase':
+        specifier: workspace:^
+        version: link:../../packages/supabase
       '@omnidesk/types':
         specifier: workspace:*
         version: link:../../packages/types
@@ -244,9 +244,6 @@ importers:
       '@eslint/js':
         specifier: ^9.21.0
         version: 9.39.4
-      '@hey-api/openapi-ts':
-        specifier: ^0.98.2
-        version: 0.98.2(magicast@0.5.3)(typescript@6.0.3)
       '@omnidesk/config':
         specifier: workspace:*
         version: link:../../packages/config
@@ -610,7 +607,7 @@ importers:
         version: 0.13.11(eslint-plugin-import@2.32.0)(webpack@5.76.0)
       eslint-plugin-import:
         specifier: ^2.32.0
-        version: 2.32.0(@typescript-eslint/parser@8.62.0(eslint@9.39.4(jiti@2.7.0))(typescript@6.0.3))(eslint-import-resolver-webpack@0.13.11)(eslint@9.39.4(jiti@2.7.0))
+        version: 2.32.0(eslint-import-resolver-webpack@0.13.11)(eslint@9.39.4(jiti@2.7.0))
       eslint-plugin-prettier:
         specifier: ^5.0.0
         version: 5.5.6(@types/eslint@9.6.1)(eslint-config-prettier@8.10.2(eslint@9.39.4(jiti@2.7.0)))(eslint@9.39.4(jiti@2.7.0))(prettier@3.9.1)
@@ -695,9 +692,6 @@ importers:
       '@fontsource-variable/inter':
         specifier: ^5.2.8
         version: 5.2.8
-      '@hey-api/client-fetch':
-        specifier: ^0.13.1
-        version: 0.13.1(@hey-api/openapi-ts@0.98.2(magicast@0.5.3)(typescript@6.0.3))
       '@omnidesk/app-automa':
         specifier: workspace:*
         version: link:../../packages/app-automa
@@ -716,6 +710,9 @@ importers:
       '@omnidesk/features':
         specifier: workspace:*
         version: link:../../packages/features
+      '@omnidesk/supabase':
+        specifier: workspace:^
+        version: link:../../packages/supabase
       '@omnidesk/types':
         specifier: workspace:*
         version: link:../../packages/types
@@ -834,9 +831,6 @@ importers:
       '@eslint/js':
         specifier: ^9.21.0
         version: 9.39.4
-      '@hey-api/openapi-ts':
-        specifier: ^0.98.2
-        version: 0.98.2(magicast@0.5.3)(typescript@6.0.3)
       '@omnidesk/config':
         specifier: workspace:*
         version: link:../../packages/config
@@ -927,9 +921,6 @@ importers:
       '@fontsource-variable/inter':
         specifier: ^5.2.8
         version: 5.2.8
-      '@hey-api/client-fetch':
-        specifier: ^0.13.1
-        version: 0.13.1(@hey-api/openapi-ts@0.98.2(magicast@0.5.3)(typescript@6.0.3))
       '@monaco-editor/react':
         specifier: ^4.7.0
         version: 4.7.0(monaco-editor@0.55.1)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
@@ -951,6 +942,9 @@ importers:
       '@omnidesk/features':
         specifier: workspace:*
         version: link:../../packages/features
+      '@omnidesk/supabase':
+        specifier: workspace:^
+        version: link:../../packages/supabase
       '@omnidesk/types':
         specifier: workspace:*
         version: link:../../packages/types
@@ -1072,9 +1066,6 @@ importers:
       '@eslint/js':
         specifier: ^9.21.0
         version: 9.39.4
-      '@hey-api/openapi-ts':
-        specifier: ^0.98.2
-        version: 0.98.2(magicast@0.5.3)(typescript@6.0.3)
       '@omnidesk/config':
         specifier: workspace:*
         version: link:../../packages/config
@@ -1165,9 +1156,6 @@ importers:
       '@fontsource-variable/inter':
         specifier: ^5.2.8
         version: 5.2.8
-      '@hey-api/client-fetch':
-        specifier: ^0.13.1
-        version: 0.13.1(@hey-api/openapi-ts@0.98.2(magicast@0.5.3)(typescript@6.0.3))
       '@omnidesk/app-automa':
         specifier: workspace:*
         version: link:../../packages/app-automa
@@ -1186,6 +1174,9 @@ importers:
       '@omnidesk/features':
         specifier: workspace:*
         version: link:../../packages/features
+      '@omnidesk/supabase':
+        specifier: workspace:^
+        version: link:../../packages/supabase
       '@omnidesk/types':
         specifier: workspace:*
         version: link:../../packages/types
@@ -1277,9 +1268,6 @@ importers:
       '@eslint/js':
         specifier: ^9.21.0
         version: 9.39.4
-      '@hey-api/openapi-ts':
-        specifier: ^0.98.2
-        version: 0.98.2(magicast@0.5.3)(typescript@6.0.3)
       '@omnidesk/config':
         specifier: workspace:*
         version: link:../../packages/config
@@ -1791,9 +1779,24 @@ importers:
       '@tanstack/zod-form-adapter':
         specifier: ^0.42.1
         version: 0.42.1(zod@4.4.3)
+      '@tauri-apps/api':
+        specifier: ^2.5.0
+        version: 2.11.1
+      '@tauri-apps/plugin-deep-link':
+        specifier: ~2
+        version: 2.4.9
       '@tauri-apps/plugin-dialog':
         specifier: ~2
         version: 2.7.1
+      '@tauri-apps/plugin-opener':
+        specifier: ^2.5.4
+        version: 2.5.4
+      '@tauri-apps/plugin-process':
+        specifier: ^2.3.1
+        version: 2.3.1
+      '@tauri-apps/plugin-updater':
+        specifier: ^2.10.1
+        version: 2.10.1
       clsx:
         specifier: ^2.1.1
         version: 2.1.1
@@ -12407,13 +12410,35 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@modelcontextprotocol/server-filesystem@2026.1.14(zod@3.25.76)':
+  '@modelcontextprotocol/sdk@1.29.0(zod@4.4.3)':
     dependencies:
-      '@modelcontextprotocol/sdk': 1.29.0(zod@3.25.76)
+      '@hono/node-server': 1.19.14(hono@4.12.25)
+      ajv: 8.20.0
+      ajv-formats: 3.0.1(ajv@8.20.0)
+      content-type: 1.0.5
+      cors: 2.8.6
+      cross-spawn: 7.0.6
+      eventsource: 3.0.7
+      eventsource-parser: 3.1.0
+      express: 5.2.1
+      express-rate-limit: 8.5.2(express@5.2.1)
+      hono: 4.12.25
+      jose: 6.2.3
+      json-schema-typed: 8.0.2
+      pkce-challenge: 5.0.1
+      raw-body: 3.0.2
+      zod: 4.4.3
+      zod-to-json-schema: 3.25.2(zod@4.4.3)
+    transitivePeerDependencies:
+      - supports-color
+
+  '@modelcontextprotocol/server-filesystem@2026.1.14(zod@4.4.3)':
+    dependencies:
+      '@modelcontextprotocol/sdk': 1.29.0(zod@4.4.3)
       diff: 5.2.2
       glob: 10.5.0
       minimatch: 10.2.5
-      zod-to-json-schema: 3.25.2(zod@3.25.76)
+      zod-to-json-schema: 3.25.2(zod@4.4.3)
     transitivePeerDependencies:
       - '@cfworker/json-schema'
       - supports-color
@@ -13516,21 +13541,21 @@ snapshots:
     dependencies:
       tslib: 2.8.1
 
-  '@supabase/mcp-server-supabase@0.8.2(@modelcontextprotocol/sdk@1.29.0(zod@3.25.76))(zod@3.25.76)':
+  '@supabase/mcp-server-supabase@0.8.2(@modelcontextprotocol/sdk@1.29.0(zod@4.4.3))(zod@4.4.3)':
     dependencies:
       '@mjackson/multipart-parser': 0.10.1
-      '@modelcontextprotocol/sdk': 1.29.0(zod@3.25.76)
-      '@supabase/mcp-utils': 0.5.1(@modelcontextprotocol/sdk@1.29.0(zod@3.25.76))(zod@3.25.76)
+      '@modelcontextprotocol/sdk': 1.29.0(zod@4.4.3)
+      '@supabase/mcp-utils': 0.5.1(@modelcontextprotocol/sdk@1.29.0(zod@4.4.3))(zod@4.4.3)
       common-tags: 1.8.2
       gqlmin: 0.3.2
       graphql: 16.14.2
       openapi-fetch: 0.13.8
-      zod: 3.25.76
+      zod: 4.4.3
 
-  '@supabase/mcp-utils@0.5.1(@modelcontextprotocol/sdk@1.29.0(zod@3.25.76))(zod@3.25.76)':
+  '@supabase/mcp-utils@0.5.1(@modelcontextprotocol/sdk@1.29.0(zod@4.4.3))(zod@4.4.3)':
     dependencies:
-      '@modelcontextprotocol/sdk': 1.29.0(zod@3.25.76)
-      zod: 3.25.76
+      '@modelcontextprotocol/sdk': 1.29.0(zod@4.4.3)
+      zod: 4.4.3
 
   '@supabase/phoenix@0.4.4': {}
 
@@ -16297,7 +16322,7 @@ snapshots:
     dependencies:
       confusing-browser-globals: 1.0.11
       eslint: 9.39.4(jiti@2.7.0)
-      eslint-plugin-import: 2.32.0(@typescript-eslint/parser@8.62.0(eslint@9.39.4(jiti@2.7.0))(typescript@6.0.3))(eslint-import-resolver-webpack@0.13.11)(eslint@9.39.4(jiti@2.7.0))
+      eslint-plugin-import: 2.32.0(eslint-import-resolver-webpack@0.13.11)(eslint@9.39.4(jiti@2.7.0))
       object.assign: 4.1.7
       object.entries: 1.1.9
       semver: 6.3.1
@@ -16329,7 +16354,7 @@ snapshots:
     dependencies:
       debug: 3.2.7
       enhanced-resolve: 0.9.1
-      eslint-plugin-import: 2.32.0(@typescript-eslint/parser@8.62.0(eslint@9.39.4(jiti@2.7.0))(typescript@6.0.3))(eslint-import-resolver-webpack@0.13.11)(eslint@9.39.4(jiti@2.7.0))
+      eslint-plugin-import: 2.32.0(eslint-import-resolver-webpack@0.13.11)(eslint@9.39.4(jiti@2.7.0))
       find-root: 1.1.0
       hasown: 2.0.4
       interpret: 1.4.0
@@ -16342,18 +16367,17 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  eslint-module-utils@2.13.0(@typescript-eslint/parser@8.62.0(eslint@9.39.4(jiti@2.7.0))(typescript@6.0.3))(eslint-import-resolver-node@0.3.10)(eslint-import-resolver-webpack@0.13.11)(eslint@9.39.4(jiti@2.7.0)):
+  eslint-module-utils@2.13.0(eslint-import-resolver-node@0.3.10)(eslint-import-resolver-webpack@0.13.11)(eslint@9.39.4(jiti@2.7.0)):
     dependencies:
       debug: 3.2.7
     optionalDependencies:
-      '@typescript-eslint/parser': 8.62.0(eslint@9.39.4(jiti@2.7.0))(typescript@6.0.3)
       eslint: 9.39.4(jiti@2.7.0)
       eslint-import-resolver-node: 0.3.10
       eslint-import-resolver-webpack: 0.13.11(eslint-plugin-import@2.32.0)(webpack@5.76.0)
     transitivePeerDependencies:
       - supports-color
 
-  eslint-plugin-import@2.32.0(@typescript-eslint/parser@8.62.0(eslint@9.39.4(jiti@2.7.0))(typescript@6.0.3))(eslint-import-resolver-webpack@0.13.11)(eslint@9.39.4(jiti@2.7.0)):
+  eslint-plugin-import@2.32.0(eslint-import-resolver-webpack@0.13.11)(eslint@9.39.4(jiti@2.7.0)):
     dependencies:
       '@rtsao/scc': 1.1.0
       array-includes: 3.1.9
@@ -16364,7 +16388,7 @@ snapshots:
       doctrine: 2.1.0
       eslint: 9.39.4(jiti@2.7.0)
       eslint-import-resolver-node: 0.3.10
-      eslint-module-utils: 2.13.0(@typescript-eslint/parser@8.62.0(eslint@9.39.4(jiti@2.7.0))(typescript@6.0.3))(eslint-import-resolver-node@0.3.10)(eslint-import-resolver-webpack@0.13.11)(eslint@9.39.4(jiti@2.7.0))
+      eslint-module-utils: 2.13.0(eslint-import-resolver-node@0.3.10)(eslint-import-resolver-webpack@0.13.11)(eslint@9.39.4(jiti@2.7.0))
       hasown: 2.0.4
       is-core-module: 2.16.2
       is-glob: 4.0.3
@@ -16375,8 +16399,6 @@ snapshots:
       semver: 6.3.1
       string.prototype.trimend: 1.0.10
       tsconfig-paths: 3.15.0
-    optionalDependencies:
-      '@typescript-eslint/parser': 8.62.0(eslint@9.39.4(jiti@2.7.0))(typescript@6.0.3)
     transitivePeerDependencies:
       - eslint-import-resolver-typescript
       - eslint-import-resolver-webpack
@@ -20425,6 +20447,10 @@ snapshots:
   zod-to-json-schema@3.25.2(zod@3.25.76):
     dependencies:
       zod: 3.25.76
+
+  zod-to-json-schema@3.25.2(zod@4.4.3):
+    dependencies:
+      zod: 4.4.3
 
   zod@3.25.76: {}
 

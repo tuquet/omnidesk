@@ -1,18 +1,11 @@
-use axum::{
-    extract::State,
-    http::StatusCode,
-    routing::get,
-    Router,
-    Json,
-};
+use crate::api::{auth::Claims, AppState};
+use crate::services::preferences_service;
+use axum::{extract::State, http::StatusCode, routing::get, Json, Router};
 use serde::Deserialize;
 use utoipa::ToSchema;
-use crate::api::{AppState, auth::Claims};
-use crate::services::preferences_service;
 
 pub fn router() -> Router<AppState> {
-    Router::new()
-        .route("/home-layout", get(get_home_layout).put(update_home_layout))
+    Router::new().route("/home-layout", get(get_home_layout).put(update_home_layout))
 }
 
 #[derive(Deserialize, ToSchema)]
@@ -38,7 +31,7 @@ pub async fn update_home_layout(
 ) -> Result<StatusCode, StatusCode> {
     let pool = &state.db;
     let user_id = claims.user_id();
-    
+
     match preferences_service::update_home_layout(pool, user_id, &payload.home_screen_order).await {
         Ok(_) => Ok(StatusCode::OK),
         Err(e) => {
@@ -64,7 +57,7 @@ pub async fn get_home_layout(
 ) -> Result<Json<String>, StatusCode> {
     let pool = &state.db;
     let user_id = claims.user_id();
-    
+
     match preferences_service::get_home_layout(pool, user_id).await {
         Ok(layout) => Ok(Json(layout)),
         Err(e) => {

@@ -346,7 +346,7 @@ export function WorkflowJsonEditorModal({
               onClick={handleSave} 
               disabled={!isValidJson || (activeTab === 'global_data' && !isGlobalDataValid) || saveMutation.isPending || isFetching}
             >
-              {saveMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              {saveMutation.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
               {isEditMode ? 'Save Changes' : 'Create Workflow'}
             </Button>
           </div>

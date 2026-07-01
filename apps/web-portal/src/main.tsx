@@ -27,7 +27,7 @@ document.addEventListener('keydown', (e) => {
 });
 
 import { PlatformProvider } from '@omnidesk/core';
-import { webAdapter } from './lib/web-adapter';
+import { webAdapter } from '@omnidesk/core';
 
 const rootElement = document.getElementById('root');
 if (!rootElement) throw new Error('Root element not found');

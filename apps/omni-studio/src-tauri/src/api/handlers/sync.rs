@@ -1,3 +1,8 @@
+use crate::api::AppState;
+use crate::db::models::workflow::Workflow;
+use crate::error::AppError;
+use crate::services::file_watcher::FileWatcherService;
+use crate::services::workflow_service::WorkflowService;
 use axum::{
     extract::{Path, State},
     routing::{get, post},
@@ -5,11 +10,6 @@ use axum::{
 };
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
-use crate::api::AppState;
-use crate::db::models::workflow::Workflow;
-use crate::error::AppError;
-use crate::services::workflow_service::WorkflowService;
-use crate::services::file_watcher::FileWatcherService;
 
 pub fn router() -> Router<AppState> {
     Router::new()
@@ -130,8 +130,11 @@ async fn import_workflow(
     let upserted = WorkflowService::upsert(&state.db, &workflow).await?;
     let watch_dir = state.app_dir.join("workflows");
     let _ = std::fs::create_dir_all(&watch_dir);
-    let _ = crate::services::file_watcher::FileWatcherService::export_workflow_file(&watch_dir, &upserted).await;
-    
+    let _ = crate::services::file_watcher::FileWatcherService::export_workflow_file(
+        &watch_dir, &upserted,
+    )
+    .await;
+
     // Broadcast to Extension that there's a new workflow
     let event = crate::api::handlers::sync_ws::SyncEvent {
         event_type: "workflows_changed".to_string(),
@@ -152,9 +155,7 @@ async fn import_workflow(
     ),
     tag = "sync"
 )]
-async fn sync_status(
-    State(state): State<AppState>,
-) -> Result<Json<SyncStatusResponse>, AppError> {
+async fn sync_status(State(state): State<AppState>) -> Result<Json<SyncStatusResponse>, AppError> {
     let watch_dir = state.app_dir.join("workflows");
     let workflows = WorkflowService::get_all(&state.db).await?;
 
@@ -182,23 +183,29 @@ async fn sync_local(
     // 1. Read from the 'workflows' subfolder of the workspace
     let workspace_dir = std::path::PathBuf::from(payload.folder_path);
     let watch_dir = workspace_dir.join("workflows");
-    
+
     if !watch_dir.exists() {
         if let Err(e) = std::fs::create_dir_all(&watch_dir) {
-            return Err(AppError::Internal(format!("Failed to create workflows folder: {}", e)));
+            return Err(AppError::Internal(format!(
+                "Failed to create workflows folder: {}",
+                e
+            )));
         }
     }
 
     // 2. Get all active workflows in DB
-    let active_workflows = WorkflowService::get_all(&state.db).await.unwrap_or_default();
-    let db_ids: std::collections::HashSet<String> = active_workflows.into_iter().map(|w| w.id).collect();
+    let active_workflows = WorkflowService::get_all(&state.db)
+        .await
+        .unwrap_or_default();
+    let db_ids: std::collections::HashSet<String> =
+        active_workflows.into_iter().map(|w| w.id).collect();
 
     let entries = std::fs::read_dir(&watch_dir)
         .map_err(|e| AppError::Internal(format!("Failed to read dir: {}", e)))?;
 
     let mut count = 0;
     let mut file_ids = std::collections::HashSet::new();
-    
+
     for entry in entries.flatten() {
         let path = entry.path();
         if path.extension().is_some_and(|ext| ext == "json") {
@@ -206,7 +213,7 @@ async fn sync_local(
                 Ok(c) => c,
                 Err(_) => continue,
             };
-            
+
             // First try to parse as strict Workflow
             if let Ok(workflow) = serde_json::from_str::<Workflow>(&content) {
                 if WorkflowService::upsert(&state.db, &workflow).await.is_ok() {
@@ -223,20 +230,47 @@ async fn sync_local(
             } else if let Ok(mut value) = serde_json::from_str::<serde_json::Value>(&content) {
                 // Try parsing as raw Automa export format
                 if let Some(obj) = value.as_object_mut() {
-                    let name_str = obj.get("name").and_then(|v| v.as_str()).unwrap_or("Untitled Workflow");
-                    let id = obj.get("id").and_then(|v| v.as_str()).map(|s| s.to_string()).unwrap_or_else(|| {
-                        uuid::Uuid::new_v5(&uuid::Uuid::NAMESPACE_OID, name_str.as_bytes()).to_string()
-                    });
+                    let name_str = obj
+                        .get("name")
+                        .and_then(|v| v.as_str())
+                        .unwrap_or("Untitled Workflow");
+                    let id = obj
+                        .get("id")
+                        .and_then(|v| v.as_str())
+                        .map(|s| s.to_string())
+                        .unwrap_or_else(|| {
+                            uuid::Uuid::new_v5(&uuid::Uuid::NAMESPACE_OID, name_str.as_bytes())
+                                .to_string()
+                        });
                     let name = name_str.to_string();
-                    let icon = obj.get("icon").and_then(|v| v.as_str()).map(|s| s.to_string());
-                    let description = obj.get("description").and_then(|v| v.as_str()).map(|s| s.to_string());
-                    let drawflow = obj.get("drawflow").map(|v| v.to_string()).unwrap_or_else(|| "{}".to_string());
-                    let settings = obj.get("settings").map(|v| v.to_string()).unwrap_or_else(|| "{}".to_string());
+                    let icon = obj
+                        .get("icon")
+                        .and_then(|v| v.as_str())
+                        .map(|s| s.to_string());
+                    let description = obj
+                        .get("description")
+                        .and_then(|v| v.as_str())
+                        .map(|s| s.to_string());
+                    let drawflow = obj
+                        .get("drawflow")
+                        .map(|v| v.to_string())
+                        .unwrap_or_else(|| "{}".to_string());
+                    let settings = obj
+                        .get("settings")
+                        .map(|v| v.to_string())
+                        .unwrap_or_else(|| "{}".to_string());
                     let global_data = obj.get("globalData").map(|v| {
-                        if v.is_string() { v.as_str().unwrap().to_string() } else { v.to_string() }
+                        if v.is_string() {
+                            v.as_str().unwrap().to_string()
+                        } else {
+                            v.to_string()
+                        }
                     });
-                    let version = obj.get("version").and_then(|v| v.as_str()).map(|s| s.to_string());
-                    
+                    let version = obj
+                        .get("version")
+                        .and_then(|v| v.as_str())
+                        .map(|s| s.to_string());
+
                     let workflow = Workflow {
                         id: id.clone(),
                         name,
@@ -268,7 +302,7 @@ async fn sync_local(
                                 log::info!("Sync: Auto-renamed {:?} to {:?}", path, new_path);
                             }
                         }
-                        
+
                         file_ids.insert(id);
                         count += 1;
                     }
@@ -281,7 +315,10 @@ async fn sync_local(
     let mut deleted_count = 0;
     for id in db_ids {
         if !file_ids.contains(&id) {
-            if WorkflowService::soft_delete(&state.db, &id, "sync_reconciliation").await.is_ok() {
+            if WorkflowService::soft_delete(&state.db, &id, "sync_reconciliation")
+                .await
+                .is_ok()
+            {
                 deleted_count += 1;
             }
         }

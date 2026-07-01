@@ -2,7 +2,7 @@
 
 import type { Client, ClientMeta, Options as Options2, RequestResult, TDataShape } from './client';
 import { client } from './client.gen';
-import type { BatchCreateIssuesData, BatchCreateIssuesResponses, CreateIssueData, CreateIssueResponses, DeleteIssueData, DeleteIssueErrors, DeleteIssueResponses, GetIssueData, GetIssueErrors, GetIssueResponses, ListIssuesData, ListIssuesResponses, UpdateIssueData, UpdateIssueErrors, UpdateIssueResponses } from './types.gen';
+import type { CleanProfileStorageData, CleanProfileStorageErrors, CleanProfileStorageResponses, CreateProfileData, CreateProfileResponses, CreateWorkflowData, CreateWorkflowResponses, DeleteBrowserEngineData, DeleteBrowserEngineResponses, DeleteProfileData, DeleteProfileErrors, DeleteProfileResponses, DeleteWorkflowData, DeleteWorkflowErrors, DeleteWorkflowResponses, ExportWorkflowData, ExportWorkflowResponses, GetDownloadStatusData, GetDownloadStatusResponses, GetEngineStatusData, GetEngineStatusResponses, GetProfileData, GetProfileErrors, GetProfileResponses, GetRunLogsData, GetRunLogsResponses, GetWorkflowData, GetWorkflowErrors, GetWorkflowResponses, GetWorkflowRunsData, GetWorkflowRunsResponses, HealthCheckData, HealthCheckResponses, ImportWorkflowData, ImportWorkflowResponses, LaunchProfileData, LaunchProfileResponses, ListProfilesData, ListProfilesResponses, ListWorkflowsData, ListWorkflowsResponses, MeData, MeResponses, PingData, PingResponses, PushWorkflowsData, PushWorkflowsResponses, StopProfileData, StopProfileErrors, StopProfileResponses, SyncStatusData, SyncStatusResponses, UpdateProfileData, UpdateProfileErrors, UpdateProfileResponses, UpdateWorkflowData, UpdateWorkflowErrors, UpdateWorkflowResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean, TResponse = unknown> = Options2<TData, ThrowOnError, TResponse> & {
     /**
@@ -18,10 +18,10 @@ export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends 
     meta?: keyof ClientMeta extends never ? Record<string, unknown> : ClientMeta;
 };
 
-export const listIssues = <ThrowOnError extends boolean = false>(options?: Options<ListIssuesData, ThrowOnError>): RequestResult<ListIssuesResponses, unknown, ThrowOnError> => (options?.client ?? client).get<ListIssuesResponses, unknown, ThrowOnError>({ url: '/api/issues', ...options });
+export const listWorkflows = <ThrowOnError extends boolean = false>(options?: Options<ListWorkflowsData, ThrowOnError>): RequestResult<ListWorkflowsResponses, unknown, ThrowOnError> => (options?.client ?? client).get<ListWorkflowsResponses, unknown, ThrowOnError>({ url: '/api/automa/workflows', ...options });
 
-export const createIssue = <ThrowOnError extends boolean = false>(options: Options<CreateIssueData, ThrowOnError>): RequestResult<CreateIssueResponses, unknown, ThrowOnError> => (options.client ?? client).post<CreateIssueResponses, unknown, ThrowOnError>({
-    url: '/api/issues',
+export const createWorkflow = <ThrowOnError extends boolean = false>(options: Options<CreateWorkflowData, ThrowOnError>): RequestResult<CreateWorkflowResponses, unknown, ThrowOnError> => (options.client ?? client).post<CreateWorkflowResponses, unknown, ThrowOnError>({
+    url: '/api/automa/workflows',
     ...options,
     headers: {
         'Content-Type': 'application/json',
@@ -29,8 +29,20 @@ export const createIssue = <ThrowOnError extends boolean = false>(options: Optio
     }
 });
 
-export const batchCreateIssues = <ThrowOnError extends boolean = false>(options: Options<BatchCreateIssuesData, ThrowOnError>): RequestResult<BatchCreateIssuesResponses, unknown, ThrowOnError> => (options.client ?? client).post<BatchCreateIssuesResponses, unknown, ThrowOnError>({
-    url: '/api/issues/batch',
+export const getRunLogs = <ThrowOnError extends boolean = false>(options: Options<GetRunLogsData, ThrowOnError>): RequestResult<GetRunLogsResponses, unknown, ThrowOnError> => (options.client ?? client).get<GetRunLogsResponses, unknown, ThrowOnError>({ url: '/api/automa/workflows/runs/{run_id}/logs', ...options });
+
+/**
+ * GET /api/automa/workflows/sync/export/:id
+ * Export a single workflow as downloadable JSON
+ */
+export const exportWorkflow = <ThrowOnError extends boolean = false>(options: Options<ExportWorkflowData, ThrowOnError>): RequestResult<ExportWorkflowResponses, unknown, ThrowOnError> => (options.client ?? client).get<ExportWorkflowResponses, unknown, ThrowOnError>({ url: '/api/automa/workflows/sync/export/{id}', ...options });
+
+/**
+ * POST /api/automa/workflows/sync/import
+ * Import a workflow from JSON body
+ */
+export const importWorkflow = <ThrowOnError extends boolean = false>(options: Options<ImportWorkflowData, ThrowOnError>): RequestResult<ImportWorkflowResponses, unknown, ThrowOnError> => (options.client ?? client).post<ImportWorkflowResponses, unknown, ThrowOnError>({
+    url: '/api/automa/workflows/sync/import',
     ...options,
     headers: {
         'Content-Type': 'application/json',
@@ -38,15 +50,78 @@ export const batchCreateIssues = <ThrowOnError extends boolean = false>(options:
     }
 });
 
-export const deleteIssue = <ThrowOnError extends boolean = false>(options: Options<DeleteIssueData, ThrowOnError>): RequestResult<DeleteIssueResponses, DeleteIssueErrors, ThrowOnError> => (options.client ?? client).delete<DeleteIssueResponses, DeleteIssueErrors, ThrowOnError>({ url: '/api/issues/{id}', ...options });
-
-export const getIssue = <ThrowOnError extends boolean = false>(options: Options<GetIssueData, ThrowOnError>): RequestResult<GetIssueResponses, GetIssueErrors, ThrowOnError> => (options.client ?? client).get<GetIssueResponses, GetIssueErrors, ThrowOnError>({ url: '/api/issues/{id}', ...options });
-
-export const updateIssue = <ThrowOnError extends boolean = false>(options: Options<UpdateIssueData, ThrowOnError>): RequestResult<UpdateIssueResponses, UpdateIssueErrors, ThrowOnError> => (options.client ?? client).put<UpdateIssueResponses, UpdateIssueErrors, ThrowOnError>({
-    url: '/api/issues/{id}',
+/**
+ * POST /api/automa/workflows/sync/push
+ * Receives workflows from the Extension and upserts them into the database + files
+ */
+export const pushWorkflows = <ThrowOnError extends boolean = false>(options: Options<PushWorkflowsData, ThrowOnError>): RequestResult<PushWorkflowsResponses, unknown, ThrowOnError> => (options.client ?? client).post<PushWorkflowsResponses, unknown, ThrowOnError>({
+    url: '/api/automa/workflows/sync/push',
     ...options,
     headers: {
         'Content-Type': 'application/json',
         ...options.headers
     }
 });
+
+/**
+ * GET /api/automa/workflows/sync/status
+ * Returns current sync status
+ */
+export const syncStatus = <ThrowOnError extends boolean = false>(options?: Options<SyncStatusData, ThrowOnError>): RequestResult<SyncStatusResponses, unknown, ThrowOnError> => (options?.client ?? client).get<SyncStatusResponses, unknown, ThrowOnError>({ url: '/api/automa/workflows/sync/status', ...options });
+
+export const deleteWorkflow = <ThrowOnError extends boolean = false>(options: Options<DeleteWorkflowData, ThrowOnError>): RequestResult<DeleteWorkflowResponses, DeleteWorkflowErrors, ThrowOnError> => (options.client ?? client).delete<DeleteWorkflowResponses, DeleteWorkflowErrors, ThrowOnError>({ url: '/api/automa/workflows/{id}', ...options });
+
+export const getWorkflow = <ThrowOnError extends boolean = false>(options: Options<GetWorkflowData, ThrowOnError>): RequestResult<GetWorkflowResponses, GetWorkflowErrors, ThrowOnError> => (options.client ?? client).get<GetWorkflowResponses, GetWorkflowErrors, ThrowOnError>({ url: '/api/automa/workflows/{id}', ...options });
+
+export const updateWorkflow = <ThrowOnError extends boolean = false>(options: Options<UpdateWorkflowData, ThrowOnError>): RequestResult<UpdateWorkflowResponses, UpdateWorkflowErrors, ThrowOnError> => (options.client ?? client).put<UpdateWorkflowResponses, UpdateWorkflowErrors, ThrowOnError>({
+    url: '/api/automa/workflows/{id}',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+export const getWorkflowRuns = <ThrowOnError extends boolean = false>(options: Options<GetWorkflowRunsData, ThrowOnError>): RequestResult<GetWorkflowRunsResponses, unknown, ThrowOnError> => (options.client ?? client).get<GetWorkflowRunsResponses, unknown, ThrowOnError>({ url: '/api/automa/workflows/{id}/runs', ...options });
+
+export const me = <ThrowOnError extends boolean = false>(options?: Options<MeData, ThrowOnError>): RequestResult<MeResponses, unknown, ThrowOnError> => (options?.client ?? client).get<MeResponses, unknown, ThrowOnError>({ url: '/api/me', ...options });
+
+export const healthCheck = <ThrowOnError extends boolean = false>(options?: Options<HealthCheckData, ThrowOnError>): RequestResult<HealthCheckResponses, unknown, ThrowOnError> => (options?.client ?? client).get<HealthCheckResponses, unknown, ThrowOnError>({ url: '/health', ...options });
+
+export const ping = <ThrowOnError extends boolean = false>(options?: Options<PingData, ThrowOnError>): RequestResult<PingResponses, unknown, ThrowOnError> => (options?.client ?? client).get<PingResponses, unknown, ThrowOnError>({ url: '/ping', ...options });
+
+export const listProfiles = <ThrowOnError extends boolean = false>(options?: Options<ListProfilesData, ThrowOnError>): RequestResult<ListProfilesResponses, unknown, ThrowOnError> => (options?.client ?? client).get<ListProfilesResponses, unknown, ThrowOnError>({ url: '/api/browser-profiles', ...options });
+
+export const createProfile = <ThrowOnError extends boolean = false>(options: Options<CreateProfileData, ThrowOnError>): RequestResult<CreateProfileResponses, unknown, ThrowOnError> => (options.client ?? client).post<CreateProfileResponses, unknown, ThrowOnError>({
+    url: '/api/browser-profiles',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+export const deleteBrowserEngine = <ThrowOnError extends boolean = false>(options?: Options<DeleteBrowserEngineData, ThrowOnError>): RequestResult<DeleteBrowserEngineResponses, unknown, ThrowOnError> => (options?.client ?? client).delete<DeleteBrowserEngineResponses, unknown, ThrowOnError>({ url: '/api/browser-profiles/browser-engine', ...options });
+
+export const getDownloadStatus = <ThrowOnError extends boolean = false>(options?: Options<GetDownloadStatusData, ThrowOnError>): RequestResult<GetDownloadStatusResponses, unknown, ThrowOnError> => (options?.client ?? client).get<GetDownloadStatusResponses, unknown, ThrowOnError>({ url: '/api/browser-profiles/download-status', ...options });
+
+export const getEngineStatus = <ThrowOnError extends boolean = false>(options?: Options<GetEngineStatusData, ThrowOnError>): RequestResult<GetEngineStatusResponses, unknown, ThrowOnError> => (options?.client ?? client).get<GetEngineStatusResponses, unknown, ThrowOnError>({ url: '/api/browser-profiles/engine-status', ...options });
+
+export const deleteProfile = <ThrowOnError extends boolean = false>(options: Options<DeleteProfileData, ThrowOnError>): RequestResult<DeleteProfileResponses, DeleteProfileErrors, ThrowOnError> => (options.client ?? client).delete<DeleteProfileResponses, DeleteProfileErrors, ThrowOnError>({ url: '/api/browser-profiles/{id}', ...options });
+
+export const getProfile = <ThrowOnError extends boolean = false>(options: Options<GetProfileData, ThrowOnError>): RequestResult<GetProfileResponses, GetProfileErrors, ThrowOnError> => (options.client ?? client).get<GetProfileResponses, GetProfileErrors, ThrowOnError>({ url: '/api/browser-profiles/{id}', ...options });
+
+export const updateProfile = <ThrowOnError extends boolean = false>(options: Options<UpdateProfileData, ThrowOnError>): RequestResult<UpdateProfileResponses, UpdateProfileErrors, ThrowOnError> => (options.client ?? client).put<UpdateProfileResponses, UpdateProfileErrors, ThrowOnError>({
+    url: '/api/browser-profiles/{id}',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+export const cleanProfileStorage = <ThrowOnError extends boolean = false>(options: Options<CleanProfileStorageData, ThrowOnError>): RequestResult<CleanProfileStorageResponses, CleanProfileStorageErrors, ThrowOnError> => (options.client ?? client).post<CleanProfileStorageResponses, CleanProfileStorageErrors, ThrowOnError>({ url: '/api/browser-profiles/{id}/clean', ...options });
+
+export const launchProfile = <ThrowOnError extends boolean = false>(options: Options<LaunchProfileData, ThrowOnError>): RequestResult<LaunchProfileResponses, unknown, ThrowOnError> => (options.client ?? client).post<LaunchProfileResponses, unknown, ThrowOnError>({ url: '/api/browser-profiles/{id}/launch', ...options });
+
+export const stopProfile = <ThrowOnError extends boolean = false>(options: Options<StopProfileData, ThrowOnError>): RequestResult<StopProfileResponses, StopProfileErrors, ThrowOnError> => (options.client ?? client).post<StopProfileResponses, StopProfileErrors, ThrowOnError>({ url: '/api/browser-profiles/{id}/stop', ...options });

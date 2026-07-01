@@ -94,7 +94,7 @@ export function ConfirmDialogProvider({ children }: { children: ReactNode }) {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>{state.title}</DialogTitle>
-            {state.description && <DialogDescription>{state.description}</DialogDescription>}
+            {state.description ? <DialogDescription>{state.description}</DialogDescription> : null}
           </DialogHeader>
           <DialogFooter>
             <Button variant="outline" onClick={() => handleClose(false)}>

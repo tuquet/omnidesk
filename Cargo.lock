@@ -2760,6 +2760,23 @@ dependencies = [
 ]
 
 [[package]]
+name = "jsonwebtoken"
+version = "10.4.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "eba32bfb4ffdeaca3e34431072faf01745c9b26d25504aa7a6cf5684334fc4fc"
+dependencies = [
+ "base64 0.22.1",
+ "getrandom 0.2.17",
+ "js-sys",
+ "pem",
+ "serde",
+ "serde_json",
+ "signature",
+ "simple_asn1",
+ "zeroize",
+]
+
+[[package]]
 name = "keyboard-types"
 version = "0.7.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3456,7 +3473,7 @@ dependencies = [
  "dirs 5.0.1",
  "dotenvy",
  "futures-util",
- "jsonwebtoken",
+ "jsonwebtoken 9.3.1",
  "keyring",
  "omni-shared",
  "omni-tauri-core",
@@ -3503,7 +3520,7 @@ dependencies = [
  "dirs 5.0.1",
  "dotenvy",
  "futures-util",
- "jsonwebtoken",
+ "jsonwebtoken 9.3.1",
  "keyring",
  "log",
  "omni-shared",
@@ -3548,6 +3565,7 @@ dependencies = [
  "base64 0.22.1",
  "chrono",
  "futures-util",
+ "jsonwebtoken 10.4.0",
  "keyring",
  "omni-tauri-core",
  "pkcs8",
@@ -3582,7 +3600,7 @@ dependencies = [
  "dotenvy",
  "futures-util",
  "globset",
- "jsonwebtoken",
+ "jsonwebtoken 9.3.1",
  "keyring",
  "log",
  "notify",
@@ -8030,6 +8048,20 @@ name = "zeroize"
 version = "1.9.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e13c156562582aa81c60cb29407084cdb54c4164760106ab78e6c5b0858cf64e"
+dependencies = [
+ "zeroize_derive",
+]
+
+[[package]]
+name = "zeroize_derive"
+version = "1.5.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3c50655cbb0fe3fc43170059e702f1ce5e19b84cec58dc87b037a09935c2f328"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn 2.0.118",
+]
 
 [[package]]
 name = "zerotrie"

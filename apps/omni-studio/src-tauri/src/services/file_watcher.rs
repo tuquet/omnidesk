@@ -1,10 +1,10 @@
-use notify::{Config, Event, RecommendedWatcher, RecursiveMode, Watcher, EventKind};
+use notify::{Config, Event, EventKind, RecommendedWatcher, RecursiveMode, Watcher};
+use sqlx::SqlitePool;
 use std::path::{Path, PathBuf};
 use tokio::sync::mpsc;
-use sqlx::SqlitePool;
 
-use crate::error::AppError;
 use crate::db::models::workflow::Workflow;
+use crate::error::AppError;
 use crate::services::workflow_service::WorkflowService;
 
 use std::collections::HashMap;
@@ -21,8 +21,17 @@ pub struct FileWatcherService {
 }
 
 impl FileWatcherService {
-    pub fn new(watch_dir: PathBuf, pool: SqlitePool, sync_tx: tokio::sync::broadcast::Sender<crate::api::handlers::sync_ws::SyncEvent>) -> Self {
-        Self { watch_dir, pool, sync_tx, path_to_id: Arc::new(Mutex::new(HashMap::new())) }
+    pub fn new(
+        watch_dir: PathBuf,
+        pool: SqlitePool,
+        sync_tx: tokio::sync::broadcast::Sender<crate::api::handlers::sync_ws::SyncEvent>,
+    ) -> Self {
+        Self {
+            watch_dir,
+            pool,
+            sync_tx,
+            path_to_id: Arc::new(Mutex::new(HashMap::new())),
+        }
     }
 
     /// Start watching the directory. Returns a handle to stop watching.
@@ -79,7 +88,8 @@ impl FileWatcherService {
     async fn import_all_from_dir(&self) -> Result<(), AppError> {
         // 1. Get all active workflows from DB
         let active_workflows = WorkflowService::get_all(&self.pool).await?;
-        let db_ids: std::collections::HashSet<String> = active_workflows.into_iter().map(|w| w.id).collect();
+        let db_ids: std::collections::HashSet<String> =
+            active_workflows.into_iter().map(|w| w.id).collect();
 
         // 2. Read the directory and upsert files
         let entries = std::fs::read_dir(&self.watch_dir)
@@ -94,16 +104,23 @@ impl FileWatcherService {
                     Ok(wf) => {
                         let expected_filename = format!("{}.automa.json", wf.id);
                         let mut final_path = path.clone();
-                        
+
                         if path.file_name().and_then(|s| s.to_str()) != Some(&expected_filename) {
                             let new_path = path.with_file_name(&expected_filename);
                             if std::fs::rename(&path, &new_path).is_ok() {
                                 final_path = new_path;
-                                log::info!("FileWatcher: Auto-renamed {:?} to {:?}", path, final_path);
+                                log::info!(
+                                    "FileWatcher: Auto-renamed {:?} to {:?}",
+                                    path,
+                                    final_path
+                                );
                             }
                         }
-                        
-                        self.path_to_id.lock().unwrap().insert(final_path, wf.id.clone());
+
+                        self.path_to_id
+                            .lock()
+                            .unwrap()
+                            .insert(final_path, wf.id.clone());
                         file_ids.insert(wf.id);
                         count += 1;
                     }
@@ -116,13 +133,21 @@ impl FileWatcherService {
         let mut deleted_count = 0;
         for id in db_ids {
             if !file_ids.contains(&id) {
-                if WorkflowService::soft_delete(&self.pool, &id, "reconciliation").await.is_ok() {
+                if WorkflowService::soft_delete(&self.pool, &id, "reconciliation")
+                    .await
+                    .is_ok()
+                {
                     deleted_count += 1;
                 }
             }
         }
 
-        log::info!("FileWatcher: Reconciled {:?} - Imported {}, Soft-deleted {} missing workflows", self.watch_dir, count, deleted_count);
+        log::info!(
+            "FileWatcher: Reconciled {:?} - Imported {}, Soft-deleted {} missing workflows",
+            self.watch_dir,
+            count,
+            deleted_count
+        );
         Ok(())
     }
 
@@ -141,16 +166,24 @@ impl FileWatcherService {
                         Ok(wf) => {
                             let expected_filename = format!("{}.automa.json", wf.id);
                             let mut final_path = path.clone();
-                            
-                            if path.file_name().and_then(|s| s.to_str()) != Some(&expected_filename) {
+
+                            if path.file_name().and_then(|s| s.to_str()) != Some(&expected_filename)
+                            {
                                 let new_path = path.with_file_name(&expected_filename);
                                 if std::fs::rename(path, &new_path).is_ok() {
                                     final_path = new_path;
-                                    log::info!("FileWatcher: Auto-renamed {:?} to {:?}", path, final_path);
+                                    log::info!(
+                                        "FileWatcher: Auto-renamed {:?} to {:?}",
+                                        path,
+                                        final_path
+                                    );
                                 }
                             }
-                            
-                            self.path_to_id.lock().unwrap().insert(final_path, wf.id.clone());
+
+                            self.path_to_id
+                                .lock()
+                                .unwrap()
+                                .insert(final_path, wf.id.clone());
                             log::info!("FileWatcher: Upserted workflow '{}' ({})", wf.name, wf.id);
                             // Broadcast change to WebSocket
                             let event = crate::api::handlers::sync_ws::SyncEvent {
@@ -164,11 +197,12 @@ impl FileWatcherService {
                 }
                 EventKind::Remove(_) => {
                     log::info!("FileWatcher: Detected deletion of {:?}", path);
-                    
+
                     // Retrieve the ID associated with this path, fallback to filename parsing
                     let id_opt = {
                         let mut map = self.path_to_id.lock().unwrap();
-                        map.remove(path).or_else(|| Self::extract_id_from_filename(path))
+                        map.remove(path)
+                            .or_else(|| Self::extract_id_from_filename(path))
                     };
 
                     if let Some(id) = id_opt {
@@ -182,7 +216,9 @@ impl FileWatcherService {
                                 };
                                 let _ = self.sync_tx.send(event);
                             }
-                            Err(e) => log::error!("FileWatcher: Failed to soft-delete {}: {:?}", id, e),
+                            Err(e) => {
+                                log::error!("FileWatcher: Failed to soft-delete {}: {:?}", id, e)
+                            }
                         }
                     }
                 }
@@ -204,24 +240,59 @@ impl FileWatcherService {
         // Fallback to raw Automa export format
         if let Ok(mut value) = serde_json::from_str::<serde_json::Value>(&content) {
             if let Some(obj) = value.as_object_mut() {
-                let name_str = obj.get("name").and_then(|v| v.as_str()).unwrap_or("Untitled Workflow");
-                let id = obj.get("id").and_then(|v| v.as_str()).map(|s| s.to_string()).unwrap_or_else(|| {
-                    uuid::Uuid::new_v5(&uuid::Uuid::NAMESPACE_OID, name_str.as_bytes()).to_string()
-                });
+                let name_str = obj
+                    .get("name")
+                    .and_then(|v| v.as_str())
+                    .unwrap_or("Untitled Workflow");
+                let id = obj
+                    .get("id")
+                    .and_then(|v| v.as_str())
+                    .map(|s| s.to_string())
+                    .unwrap_or_else(|| {
+                        uuid::Uuid::new_v5(&uuid::Uuid::NAMESPACE_OID, name_str.as_bytes())
+                            .to_string()
+                    });
                 let name = name_str.to_string();
-                let icon = obj.get("icon").and_then(|v| v.as_str()).map(|s| s.to_string());
-                let description = obj.get("description").and_then(|v| v.as_str()).map(|s| s.to_string());
-                let drawflow = obj.get("drawflow").map(|v| {
-                    if v.is_string() { v.as_str().unwrap().to_string() } else { v.to_string() }
-                }).unwrap_or_else(|| "{}".to_string());
-                let settings = obj.get("settings").map(|v| {
-                    if v.is_string() { v.as_str().unwrap().to_string() } else { v.to_string() }
-                }).unwrap_or_else(|| "{}".to_string());
+                let icon = obj
+                    .get("icon")
+                    .and_then(|v| v.as_str())
+                    .map(|s| s.to_string());
+                let description = obj
+                    .get("description")
+                    .and_then(|v| v.as_str())
+                    .map(|s| s.to_string());
+                let drawflow = obj
+                    .get("drawflow")
+                    .map(|v| {
+                        if v.is_string() {
+                            v.as_str().unwrap().to_string()
+                        } else {
+                            v.to_string()
+                        }
+                    })
+                    .unwrap_or_else(|| "{}".to_string());
+                let settings = obj
+                    .get("settings")
+                    .map(|v| {
+                        if v.is_string() {
+                            v.as_str().unwrap().to_string()
+                        } else {
+                            v.to_string()
+                        }
+                    })
+                    .unwrap_or_else(|| "{}".to_string());
                 let global_data = obj.get("globalData").map(|v| {
-                    if v.is_string() { v.as_str().unwrap().to_string() } else { v.to_string() }
+                    if v.is_string() {
+                        v.as_str().unwrap().to_string()
+                    } else {
+                        v.to_string()
+                    }
                 });
-                let version = obj.get("version").and_then(|v| v.as_str()).map(|s| s.to_string());
-                
+                let version = obj
+                    .get("version")
+                    .and_then(|v| v.as_str())
+                    .map(|s| s.to_string());
+
                 let workflow = Workflow {
                     id,
                     name,
@@ -253,7 +324,10 @@ impl FileWatcherService {
     }
 
     /// Export a workflow from the database to a .json file
-    pub async fn export_workflow_file(watch_dir: &Path, workflow: &Workflow) -> Result<PathBuf, AppError> {
+    pub async fn export_workflow_file(
+        watch_dir: &Path,
+        workflow: &Workflow,
+    ) -> Result<PathBuf, AppError> {
         let filename = format!("{}.automa.json", workflow.id);
         let path = watch_dir.join(&filename);
 
@@ -263,7 +337,11 @@ impl FileWatcherService {
         std::fs::write(&path, &json)
             .map_err(|e| AppError::Internal(format!("Failed to write file: {}", e)))?;
 
-        log::info!("FileWatcher: Exported workflow '{}' to {:?}", workflow.name, path);
+        log::info!(
+            "FileWatcher: Exported workflow '{}' to {:?}",
+            workflow.name,
+            path
+        );
         Ok(path)
     }
 

@@ -1,5 +1,8 @@
 use axum::{
-    extract::{State, ws::{WebSocket, WebSocketUpgrade, Message}},
+    extract::{
+        ws::{Message, WebSocket, WebSocketUpgrade},
+        State,
+    },
     response::IntoResponse,
 };
 use futures_util::{sink::SinkExt, stream::StreamExt};
@@ -37,7 +40,10 @@ pub async fn ws_sync_handler(
     axum::extract::Query(query): axum::extract::Query<SyncQuery>,
     State(state): State<AppState>,
 ) -> impl IntoResponse {
-    println!("[SyncWS] Extension connecting... (profile_id: {:?})", query.profile_id);
+    println!(
+        "[SyncWS] Extension connecting... (profile_id: {:?})",
+        query.profile_id
+    );
     ws.on_upgrade(move |socket| handle_sync_socket(socket, state, query.profile_id))
 }
 
@@ -46,19 +52,30 @@ async fn handle_sync_socket(socket: WebSocket, state: AppState, profile_id: Opti
     use tauri::Emitter;
 
     let active_count = state.active_sync_connections.fetch_add(1, Ordering::SeqCst) + 1;
-    let _ = state.app_handle.emit("extension-connections-changed", serde_json::json!({ "count": active_count }));
+    let _ = state.app_handle.emit(
+        "extension-connections-changed",
+        serde_json::json!({ "count": active_count }),
+    );
 
     let (mut sender, mut receiver) = socket.split();
     let mut rx = state.sync_tx.subscribe();
 
-    println!("[SyncWS] Extension connected (total: {}). Preparing sync payload...", active_count);
+    println!(
+        "[SyncWS] Extension connected (total: {}). Preparing sync payload...",
+        active_count
+    );
 
     // Send initial full sync on connect
     let workflows_to_sync = if let Some(ref pid) = profile_id {
         // Worker Mode: Selective Sync
         if let Ok(Some(run)) = WorkflowService::get_active_run_by_profile(&state.db, pid).await {
-            println!("[SyncWS] Worker profile {} is running workflow {}. Extracting dependencies...", pid, run.workflow_id);
-            WorkflowService::get_workflows_for_run(&state.db, &run.workflow_id).await.unwrap_or_default()
+            println!(
+                "[SyncWS] Worker profile {} is running workflow {}. Extracting dependencies...",
+                pid, run.workflow_id
+            );
+            WorkflowService::get_workflows_for_run(&state.db, &run.workflow_id)
+                .await
+                .unwrap_or_default()
         } else {
             // No active run found for this profile, send empty
             println!("[SyncWS] Worker profile {} has no active run.", pid);
@@ -66,7 +83,9 @@ async fn handle_sync_socket(socket: WebSocket, state: AppState, profile_id: Opti
         }
     } else {
         // Master Mode: Full Sync
-        WorkflowService::get_all(&state.db).await.unwrap_or_default()
+        WorkflowService::get_all(&state.db)
+            .await
+            .unwrap_or_default()
     };
 
     let event = SyncEvent {
@@ -93,15 +112,23 @@ async fn handle_sync_socket(socket: WebSocket, state: AppState, profile_id: Opti
     let sync_tx = state.sync_tx.clone();
     let app_dir = state.app_dir.clone();
     let profile_id_clone = profile_id.clone();
-        let app_handle_clone = state.app_handle.clone();
-        let mut recv_task = tokio::spawn(async move {
-            while let Some(Ok(msg)) = receiver.next().await {
-                match msg {
-                    Message::Text(text) => {
-                        if let Ok(ext_msg) = serde_json::from_str::<ExtensionMessage>(&text) {
-                            handle_extension_message(&db, &sync_tx, &app_dir, &app_handle_clone, ext_msg, profile_id_clone.as_deref()).await;
-                        }
+    let app_handle_clone = state.app_handle.clone();
+    let mut recv_task = tokio::spawn(async move {
+        while let Some(Ok(msg)) = receiver.next().await {
+            match msg {
+                Message::Text(text) => {
+                    if let Ok(ext_msg) = serde_json::from_str::<ExtensionMessage>(&text) {
+                        handle_extension_message(
+                            &db,
+                            &sync_tx,
+                            &app_dir,
+                            &app_handle_clone,
+                            ext_msg,
+                            profile_id_clone.as_deref(),
+                        )
+                        .await;
                     }
+                }
                 Message::Ping(data) => {
                     // Pong is sent automatically by axum
                     println!("[SyncWS] Received ping ({} bytes)", data.len());
@@ -122,7 +149,10 @@ async fn handle_sync_socket(socket: WebSocket, state: AppState, profile_id: Opti
     }
 
     let active_count = state.active_sync_connections.fetch_sub(1, Ordering::SeqCst) - 1;
-    let _ = state.app_handle.emit("extension-connections-changed", serde_json::json!({ "count": active_count }));
+    let _ = state.app_handle.emit(
+        "extension-connections-changed",
+        serde_json::json!({ "count": active_count }),
+    );
     println!("[SyncWS] Connection closed (remaining: {})", active_count);
 }
 
@@ -138,7 +168,10 @@ async fn handle_extension_message(
     match msg.msg_type.as_str() {
         "push_workflows" => {
             if let Some(pid) = profile_id {
-                println!("[SyncWS] Ignoring push_workflows from worker profile {}", pid);
+                println!(
+                    "[SyncWS] Ignoring push_workflows from worker profile {}",
+                    pid
+                );
                 return;
             }
 
@@ -169,10 +202,12 @@ async fn handle_extension_message(
                         }
                     }
                     println!("[SyncWS] Received {} workflows from Extension", count);
-                    
+
                     if count > 0 {
                         use tauri::Emitter;
-                        app_handle.emit("workflows-synced", serde_json::json!({ "count": count })).ok();
+                        app_handle
+                            .emit("workflows-synced", serde_json::json!({ "count": count }))
+                            .ok();
                     }
                 }
             }
@@ -188,7 +223,10 @@ async fn handle_extension_message(
                     payload: serde_json::to_value(&workflows).unwrap_or_default(),
                 };
                 let _ = sync_tx.send(event);
-                println!("[SyncWS] Full sync requested, sent {} workflows", workflows.len());
+                println!(
+                    "[SyncWS] Full sync requested, sent {} workflows",
+                    workflows.len()
+                );
             }
         }
         "workflow_run_started" => {
@@ -197,7 +235,9 @@ async fn handle_extension_message(
                     payload.get("id").and_then(|v| v.as_str()),
                     payload.get("workflowId").and_then(|v| v.as_str()),
                 ) {
-                    let _ = WorkflowService::create_run(db, Some(id), workflow_id, profile_id, None).await;
+                    let _ =
+                        WorkflowService::create_run(db, Some(id), workflow_id, profile_id, None)
+                            .await;
                     println!("[SyncWS] Workflow run started: {}", id);
                 }
             }
@@ -211,11 +251,20 @@ async fn handle_extension_message(
                     payload.get("status").and_then(|v| v.as_str()),
                 ) {
                     let duration_ms = payload.get("durationMs").and_then(|v| v.as_i64());
-                    let data = payload.get("data").map(|v| serde_json::to_string(v).unwrap_or_default());
-                    
+                    let data = payload
+                        .get("data")
+                        .map(|v| serde_json::to_string(v).unwrap_or_default());
+
                     let _ = WorkflowService::add_log(
-                        db, run_id, block_id, block_label, status, duration_ms, data.as_deref()
-                    ).await;
+                        db,
+                        run_id,
+                        block_id,
+                        block_label,
+                        status,
+                        duration_ms,
+                        data.as_deref(),
+                    )
+                    .await;
                     println!("[SyncWS] Added log for run {}: block {}", run_id, block_id);
                 }
             }
@@ -228,7 +277,7 @@ async fn handle_extension_message(
                 ) {
                     let error = payload.get("error").and_then(|v| v.as_str());
                     let summary = payload.get("summary").and_then(|v| v.as_str());
-                    
+
                     let _ = WorkflowService::finish_run(db, run_id, status, error, summary).await;
                     println!("[SyncWS] Workflow run finished: {}", run_id);
                 }

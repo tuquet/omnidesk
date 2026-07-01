@@ -34,7 +34,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         Commands::Health => {
             let url = format!("{}/health", base_url);
             let client = reqwest::Client::new();
-            
+
             let res = client.get(&url).send().await?;
             if res.status().is_success() {
                 let text = res.text().await?;

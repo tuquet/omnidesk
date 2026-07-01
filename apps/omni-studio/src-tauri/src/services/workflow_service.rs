@@ -1,7 +1,7 @@
+use crate::db::models::workflow::{Workflow, WorkflowLog, WorkflowRun};
+use crate::error::AppError;
 use sqlx::SqlitePool;
 use uuid::Uuid;
-use crate::error::AppError;
-use crate::db::models::workflow::{Workflow, WorkflowRun, WorkflowLog};
 
 pub struct WorkflowService;
 
@@ -18,7 +18,7 @@ impl WorkflowService {
             FROM workflows
             WHERE deleted_at IS NULL
             ORDER BY updated_at DESC
-            "#
+            "#,
         )
         .fetch_all(pool)
         .await?;
@@ -36,7 +36,7 @@ impl WorkflowService {
             FROM workflows
             WHERE deleted_at IS NOT NULL
             ORDER BY deleted_at DESC
-            "#
+            "#,
         )
         .fetch_all(pool)
         .await?;
@@ -53,7 +53,7 @@ impl WorkflowService {
                    CAST(deleted_at AS TEXT) as deleted_at, delete_source
             FROM workflows
             WHERE id = ?
-            "#
+            "#,
         )
         .bind(id)
         .fetch_optional(pool)
@@ -97,7 +97,11 @@ impl WorkflowService {
         Self::get_by_id(pool, &id).await
     }
 
-    pub async fn update(pool: &SqlitePool, id: &str, workflow: &Workflow) -> Result<Workflow, AppError> {
+    pub async fn update(
+        pool: &SqlitePool,
+        id: &str,
+        workflow: &Workflow,
+    ) -> Result<Workflow, AppError> {
         let result = sqlx::query(
             r#"
             UPDATE workflows
@@ -105,7 +109,7 @@ impl WorkflowService {
                 trigger = ?, global_data = ?, table_data = ?, data_columns = ?, version = ?,
                 is_disabled = ?, source = ?, updated_at = CURRENT_TIMESTAMP
             WHERE id = ?
-            "#
+            "#,
         )
         .bind(&workflow.name)
         .bind(&workflow.icon)
@@ -201,7 +205,10 @@ impl WorkflowService {
         .await?;
 
         if result.rows_affected() == 0 {
-            return Err(AppError::NotFound(format!("Workflow {} not found or already deleted", id)));
+            return Err(AppError::NotFound(format!(
+                "Workflow {} not found or already deleted",
+                id
+            )));
         }
 
         Ok(())
@@ -222,10 +229,10 @@ impl WorkflowService {
     /// Duplicate an existing workflow
     pub async fn duplicate(pool: &SqlitePool, id: &str) -> Result<Workflow, AppError> {
         let original = Self::get_by_id(pool, id).await?;
-        
+
         let new_id = uuid::Uuid::new_v4().to_string();
         let new_name = format!("{} (Copy)", original.name);
-        
+
         let mut new_workflow = original.clone();
         new_workflow.id = new_id.clone();
         new_workflow.name = new_name.clone();
@@ -235,15 +242,18 @@ impl WorkflowService {
         new_workflow.deleted_at = None;
         new_workflow.delete_source = None;
         new_workflow.source = Some("studio".to_string());
-        
+
         Self::create(pool, &new_workflow).await?;
-        
+
         Self::get_by_id(pool, &new_id).await
     }
 
     /// Get workflows changed since a timestamp (for sync catch-up after reconnect)
     /// Returns both active and soft-deleted workflows so the client can apply deletions
-    pub async fn get_changed_since(pool: &SqlitePool, since: &str) -> Result<Vec<Workflow>, AppError> {
+    pub async fn get_changed_since(
+        pool: &SqlitePool,
+        since: &str,
+    ) -> Result<Vec<Workflow>, AppError> {
         let workflows = sqlx::query_as::<_, Workflow>(
             r#"
             SELECT id, name, icon, folder_id, description, drawflow, settings, trigger,
@@ -253,7 +263,7 @@ impl WorkflowService {
             FROM workflows
             WHERE updated_at > ? OR deleted_at > ?
             ORDER BY updated_at DESC
-            "#
+            "#,
         )
         .bind(since)
         .bind(since)
@@ -266,15 +276,18 @@ impl WorkflowService {
     // ─── Dependency Graph ────────────────────────────────────────
 
     /// Extracts dependencies recursively by parsing the `drawflow` JSON
-    pub async fn get_dependencies(pool: &SqlitePool, root_id: &str) -> Result<std::collections::HashSet<String>, AppError> {
+    pub async fn get_dependencies(
+        pool: &SqlitePool,
+        root_id: &str,
+    ) -> Result<std::collections::HashSet<String>, AppError> {
         let mut deps = std::collections::HashSet::new();
         let mut queue = vec![root_id.to_string()];
-        
+
         while let Some(current_id) = queue.pop() {
             if deps.contains(&current_id) {
                 continue;
             }
-            
+
             // Mark as visited/required
             deps.insert(current_id.clone());
 
@@ -287,11 +300,16 @@ impl WorkflowService {
             // Parse drawflow to find execute-workflow nodes
             if let Ok(value) = serde_json::from_str::<serde_json::Value>(&wf.drawflow) {
                 // Format 1: drawflow.Home.data
-                if let Some(nodes) = value.pointer("/drawflow/Home/data").and_then(|v| v.as_object()) {
+                if let Some(nodes) = value
+                    .pointer("/drawflow/Home/data")
+                    .and_then(|v| v.as_object())
+                {
                     for (_, node) in nodes {
                         if let Some(name) = node.get("name").and_then(|v| v.as_str()) {
                             if name == "execute-workflow" {
-                                if let Some(dep_id) = node.pointer("/data/workflowId").and_then(|v| v.as_str()) {
+                                if let Some(dep_id) =
+                                    node.pointer("/data/workflowId").and_then(|v| v.as_str())
+                                {
                                     if !deps.contains(dep_id) {
                                         queue.push(dep_id.to_string());
                                     }
@@ -300,13 +318,15 @@ impl WorkflowService {
                         }
                     }
                 }
-                
+
                 // Format 2: nodes array
                 if let Some(nodes) = value.get("nodes").and_then(|v| v.as_array()) {
                     for node in nodes {
                         if let Some(label) = node.get("label").and_then(|v| v.as_str()) {
                             if label == "execute-workflow" {
-                                if let Some(dep_id) = node.pointer("/data/workflowId").and_then(|v| v.as_str()) {
+                                if let Some(dep_id) =
+                                    node.pointer("/data/workflowId").and_then(|v| v.as_str())
+                                {
                                     if !deps.contains(dep_id) {
                                         queue.push(dep_id.to_string());
                                     }
@@ -317,18 +337,25 @@ impl WorkflowService {
                 }
             }
         }
-        
+
         Ok(deps)
     }
 
     /// Fetches only the required workflows for a specific root workflow (Selective Sync)
-    pub async fn get_workflows_for_run(pool: &SqlitePool, root_id: &str) -> Result<Vec<Workflow>, AppError> {
+    pub async fn get_workflows_for_run(
+        pool: &SqlitePool,
+        root_id: &str,
+    ) -> Result<Vec<Workflow>, AppError> {
         let deps = Self::get_dependencies(pool, root_id).await?;
         if deps.is_empty() {
             return Ok(vec![]);
         }
 
-        let ids_csv = deps.into_iter().map(|s| format!("'{}'", s.replace("'", "''"))).collect::<Vec<_>>().join(",");
+        let ids_csv = deps
+            .into_iter()
+            .map(|s| format!("'{}'", s.replace("'", "''")))
+            .collect::<Vec<_>>()
+            .join(",");
         let query_str = format!(
             r#"
             SELECT id, name, icon, folder_id, description, drawflow, settings, trigger,
@@ -351,14 +378,22 @@ impl WorkflowService {
 
     // ─── Workflow Runs ───────────────────────────────────────────
 
-    pub async fn create_run(pool: &SqlitePool, id_opt: Option<&str>, workflow_id: &str, profile_id: Option<&str>, schedule_id: Option<&str>) -> Result<WorkflowRun, AppError> {
-        let id = id_opt.map(|s| s.to_string()).unwrap_or_else(|| Uuid::now_v7().to_string());
+    pub async fn create_run(
+        pool: &SqlitePool,
+        id_opt: Option<&str>,
+        workflow_id: &str,
+        profile_id: Option<&str>,
+        schedule_id: Option<&str>,
+    ) -> Result<WorkflowRun, AppError> {
+        let id = id_opt
+            .map(|s| s.to_string())
+            .unwrap_or_else(|| Uuid::now_v7().to_string());
 
         sqlx::query(
             r#"
             INSERT INTO workflow_runs (id, workflow_id, profile_id, schedule_id, status, started_at)
             VALUES (?, ?, ?, ?, 'RUNNING', CURRENT_TIMESTAMP)
-            "#
+            "#,
         )
         .bind(&id)
         .bind(workflow_id)
@@ -380,7 +415,7 @@ impl WorkflowService {
                    CAST(created_at AS TEXT) as created_at
             FROM workflow_runs
             WHERE id = ?
-            "#
+            "#,
         )
         .bind(id)
         .fetch_optional(pool)
@@ -390,7 +425,10 @@ impl WorkflowService {
         Ok(run)
     }
 
-    pub async fn get_runs_by_workflow(pool: &SqlitePool, workflow_id: &str) -> Result<Vec<WorkflowRun>, AppError> {
+    pub async fn get_runs_by_workflow(
+        pool: &SqlitePool,
+        workflow_id: &str,
+    ) -> Result<Vec<WorkflowRun>, AppError> {
         let runs = sqlx::query_as::<_, WorkflowRun>(
             r#"
             SELECT id, workflow_id, profile_id, schedule_id, status,
@@ -402,7 +440,7 @@ impl WorkflowService {
             WHERE workflow_id = ?
             ORDER BY created_at DESC
             LIMIT 50
-            "#
+            "#,
         )
         .bind(workflow_id)
         .fetch_all(pool)
@@ -411,7 +449,10 @@ impl WorkflowService {
         Ok(runs)
     }
 
-    pub async fn get_active_run_by_profile(pool: &SqlitePool, profile_id: &str) -> Result<Option<WorkflowRun>, AppError> {
+    pub async fn get_active_run_by_profile(
+        pool: &SqlitePool,
+        profile_id: &str,
+    ) -> Result<Option<WorkflowRun>, AppError> {
         let run = sqlx::query_as::<_, WorkflowRun>(
             r#"
             SELECT id, workflow_id, profile_id, schedule_id, status,
@@ -423,7 +464,7 @@ impl WorkflowService {
             WHERE profile_id = ? AND status = 'RUNNING'
             ORDER BY created_at DESC
             LIMIT 1
-            "#
+            "#,
         )
         .bind(profile_id)
         .fetch_optional(pool)
@@ -432,13 +473,19 @@ impl WorkflowService {
         Ok(run)
     }
 
-    pub async fn finish_run(pool: &SqlitePool, id: &str, status: &str, error: Option<&str>, summary: Option<&str>) -> Result<(), AppError> {
+    pub async fn finish_run(
+        pool: &SqlitePool,
+        id: &str,
+        status: &str,
+        error: Option<&str>,
+        summary: Option<&str>,
+    ) -> Result<(), AppError> {
         sqlx::query(
             r#"
             UPDATE workflow_runs
             SET status = ?, finished_at = CURRENT_TIMESTAMP, error_message = ?, summary = ?
             WHERE id = ?
-            "#
+            "#,
         )
         .bind(status)
         .bind(error)
@@ -452,14 +499,22 @@ impl WorkflowService {
 
     // ─── Workflow Logs ───────────────────────────────────────────
 
-    pub async fn add_log(pool: &SqlitePool, run_id: &str, block_id: &str, block_label: &str, status: &str, duration_ms: Option<i64>, data: Option<&str>) -> Result<(), AppError> {
+    pub async fn add_log(
+        pool: &SqlitePool,
+        run_id: &str,
+        block_id: &str,
+        block_label: &str,
+        status: &str,
+        duration_ms: Option<i64>,
+        data: Option<&str>,
+    ) -> Result<(), AppError> {
         let id = Uuid::now_v7().to_string();
 
         sqlx::query(
             r#"
             INSERT INTO workflow_logs (id, run_id, block_id, block_label, status, duration_ms, data)
             VALUES (?, ?, ?, ?, ?, ?, ?)
-            "#
+            "#,
         )
         .bind(&id)
         .bind(run_id)
@@ -474,7 +529,10 @@ impl WorkflowService {
         Ok(())
     }
 
-    pub async fn get_logs_by_run(pool: &SqlitePool, run_id: &str) -> Result<Vec<WorkflowLog>, AppError> {
+    pub async fn get_logs_by_run(
+        pool: &SqlitePool,
+        run_id: &str,
+    ) -> Result<Vec<WorkflowLog>, AppError> {
         let logs = sqlx::query_as::<_, WorkflowLog>(
             r#"
             SELECT id, run_id, block_id, block_label, status, duration_ms, data,
@@ -482,7 +540,7 @@ impl WorkflowService {
             FROM workflow_logs
             WHERE run_id = ?
             ORDER BY timestamp ASC
-            "#
+            "#,
         )
         .bind(run_id)
         .fetch_all(pool)

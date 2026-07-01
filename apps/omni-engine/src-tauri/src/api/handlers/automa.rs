@@ -1,11 +1,14 @@
+use crate::api::AppState;
 use axum::{
-    extract::{State, ws::{WebSocket, WebSocketUpgrade, Message}},
+    extract::{
+        ws::{Message, WebSocket, WebSocketUpgrade},
+        State,
+    },
     http::StatusCode,
-    routing::{get, post},
     response::IntoResponse,
+    routing::{get, post},
     Router,
 };
-use crate::api::AppState;
 use futures_util::{sink::SinkExt, stream::StreamExt};
 
 use omni_shared::automa::AutomaEvent;
@@ -25,7 +28,8 @@ pub fn router() -> Router<AppState> {
     )
 )]
 pub async fn bridge_html() -> impl IntoResponse {
-    axum::response::Html(r#"
+    axum::response::Html(
+        r#"
 <!DOCTYPE html>
 <html>
 <head>
@@ -45,7 +49,8 @@ pub async fn bridge_html() -> impl IntoResponse {
     </div>
 </body>
 </html>
-    "#)
+    "#,
+    )
 }
 
 #[utoipa::path(
@@ -77,40 +82,77 @@ async fn handle_socket(socket: WebSocket, state: AppState) {
 
     // Spawn a task to receive messages from the WebSocket client and process them
     let mut recv_task = tokio::spawn(async move {
-
         while let Some(Ok(Message::Text(text))) = receiver.next().await {
             if let Ok(event) = serde_json::from_str::<AutomaEvent>(&text) {
                 println!("Received event from Automa Extension: {}", event.event_type);
-                
+
                 use tauri::Emitter;
-                let _ = app_clone.emit(omni_tauri_core::constants::E2E_LOG_EVENT, format!("[AUTOMA] Received event: {}", event.event_type));
+                let _ = app_clone.emit(
+                    omni_tauri_core::constants::E2E_LOG_EVENT,
+                    format!("[AUTOMA] Received event: {}", event.event_type),
+                );
 
                 // Process events directly in Engine DB
                 let db = state.db.clone();
                 match event.event_type.as_str() {
                     "run_started" => {
-                        let _ = app_clone.emit(omni_tauri_core::constants::E2E_LOG_EVENT, "Run started (tracked in engine DB)");
-                    },
+                        let _ = app_clone.emit(
+                            omni_tauri_core::constants::E2E_LOG_EVENT,
+                            "Run started (tracked in engine DB)",
+                        );
+                    }
                     "run_finished" => {
                         if let Some(run_id) = event.payload.get("run_id").and_then(|v| v.as_str()) {
-                            let status = event.payload.get("status").and_then(|v| v.as_str()).unwrap_or("COMPLETED");
-                            let _ = crate::services::automa_service::mark_run_finished(&db, run_id, status).await;
-                            let _ = app_clone.emit(omni_tauri_core::constants::E2E_LOG_EVENT, "Run finished (saved to engine DB)");
+                            let status = event
+                                .payload
+                                .get("status")
+                                .and_then(|v| v.as_str())
+                                .unwrap_or("COMPLETED");
+                            let _ = crate::services::automa_service::mark_run_finished(
+                                &db, run_id, status,
+                            )
+                            .await;
+                            let _ = app_clone.emit(
+                                omni_tauri_core::constants::E2E_LOG_EVENT,
+                                "Run finished (saved to engine DB)",
+                            );
                         }
-                    },
+                    }
                     "log_added" => {
                         if let Some(run_id) = event.payload.get("run_id").and_then(|v| v.as_str()) {
-                            let block_id = event.payload.get("block_id").and_then(|v| v.as_str()).unwrap_or("");
-                            let block_label = event.payload.get("block_label").and_then(|v| v.as_str()).unwrap_or("");
-                            let status = event.payload.get("status").and_then(|v| v.as_str()).unwrap_or("SUCCESS");
-                            
+                            let block_id = event
+                                .payload
+                                .get("block_id")
+                                .and_then(|v| v.as_str())
+                                .unwrap_or("");
+                            let block_label = event
+                                .payload
+                                .get("block_label")
+                                .and_then(|v| v.as_str())
+                                .unwrap_or("");
+                            let status = event
+                                .payload
+                                .get("status")
+                                .and_then(|v| v.as_str())
+                                .unwrap_or("SUCCESS");
+
                             // Optional data parsing
-                            let duration_ms = event.payload.get("duration_ms").and_then(|v| v.as_i64());
+                            let duration_ms =
+                                event.payload.get("duration_ms").and_then(|v| v.as_i64());
                             let data = event.payload.get("data").and_then(|v| v.as_str());
 
-                            let _ = crate::services::automa_service::add_run_log(&db, run_id, block_id, block_label, status, duration_ms, data).await;
+                            let _ = crate::services::automa_service::add_run_log(
+                                &db,
+                                run_id,
+                                block_id,
+                                block_label,
+                                status,
+                                duration_ms,
+                                data,
+                            )
+                            .await;
                         }
-                    },
+                    }
 
                     _ => {}
                 }
@@ -132,11 +174,9 @@ async fn handle_socket(socket: WebSocket, state: AppState) {
         (status = 200, description = "E2E Orchestrator launched")
     )
 )]
-pub async fn run_e2e(
-    State(state): State<AppState>,
-) -> Result<StatusCode, StatusCode> {
+pub async fn run_e2e(State(state): State<AppState>) -> Result<StatusCode, StatusCode> {
     let app = state.app_handle.clone();
-    
+
     // Broadcast an event to all connected extensions to run a workflow (just as an example)
     let event = AutomaEvent {
         event_type: omni_tauri_core::constants::WS_EXECUTE_WORKFLOW.to_string(),

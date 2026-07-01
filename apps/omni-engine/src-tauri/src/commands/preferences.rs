@@ -1,14 +1,13 @@
+use crate::services::preferences;
 use sqlx::SqlitePool;
 use tauri::State;
-use crate::services::preferences;
 
 #[tauri::command]
 pub async fn get_user_preferences(
     user_id: String,
     db: State<'_, SqlitePool>,
-) -> Result<String, String> {
-    let result = preferences::get_home_layout(&db, &user_id).await
-        .map_err(String::from)?;
+) -> Result<String, crate::error::AppError> {
+    let result = preferences::get_home_layout(&db, &user_id).await?;
 
     Ok(result)
 }
@@ -18,10 +17,8 @@ pub async fn update_home_screen_order(
     user_id: String,
     home_screen_order: String,
     db: State<'_, SqlitePool>,
-) -> Result<(), String> {
-    preferences::update_home_layout(&db, &user_id, &home_screen_order).await
-        .map_err(String::from)?;
+) -> Result<(), crate::error::AppError> {
+    preferences::update_home_layout(&db, &user_id, &home_screen_order).await?;
 
     Ok(())
 }
-

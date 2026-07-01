@@ -1,5 +1,6 @@
 import { useAuth } from '@omnidesk/auth';
-import { hasPermission, RBAC_ENABLED, type Permission } from '@/config/rbac';
+import { hasPermission, RBAC_ENABLED } from '../lib/rbac';
+import type { Permission } from '@omnidesk/types';
 
 /**
  * Hook that provides RBAC-aware helpers for the current user.

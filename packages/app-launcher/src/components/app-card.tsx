@@ -42,7 +42,7 @@ export function AppCard({
         <div className="flex flex-col min-w-0 pr-4 justify-center">
           <h3 className="text-[16px] font-semibold leading-tight truncate text-foreground flex items-center gap-1.5">
             {app.name}
-            {app.is_core && <Shield className="h-3.5 w-3.5 text-muted-foreground/60" />}
+            {app.is_core ? <Shield className="h-3.5 w-3.5 text-muted-foreground/60" /> : null}
           </h3>
           <p className="text-[13px] text-muted-foreground truncate mt-0.5">{app.description}</p>
           {/* Subtle category tag under the description (Mac App Store style) */}

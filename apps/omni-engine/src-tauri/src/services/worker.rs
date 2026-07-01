@@ -1,8 +1,8 @@
-use sqlx::SqlitePool;
+use crate::error::AppError;
 use reqwest::Client;
 use serde_json::Value;
+use sqlx::SqlitePool;
 use std::time::Duration;
-use crate::error::AppError;
 
 #[derive(sqlx::FromRow)]
 struct SyncJob {
@@ -46,17 +46,24 @@ pub fn start_background_worker(pool: SqlitePool) {
             for job in jobs {
                 if let Ok((url, anon_key)) = get_supabase_config() {
                     let mut success = false;
-                    
+
                     // Decrypt Payload
-                    let (priv_key, _pub) = match omni_shared::crypto::get_or_generate_keypair(&job.user_id) {
-                        Ok(keys) => keys,
-                        Err(e) => {
-                            eprintln!("[Worker] Failed to get keypair for {}: {:?}", job.user_id, e);
-                            continue;
-                        }
-                    };
-                    
-                    let decrypted_payload = match omni_shared::crypto::decrypt_payload(&priv_key, &job.payload) {
+                    let (priv_key, _pub) =
+                        match omni_shared::crypto::get_or_generate_keypair(&job.user_id) {
+                            Ok(keys) => keys,
+                            Err(e) => {
+                                eprintln!(
+                                    "[Worker] Failed to get keypair for {}: {:?}",
+                                    job.user_id, e
+                                );
+                                continue;
+                            }
+                        };
+
+                    let decrypted_payload = match omni_shared::crypto::decrypt_payload(
+                        &priv_key,
+                        &job.payload,
+                    ) {
                         Ok(p) => p,
                         Err(e) => {
                             eprintln!("[Worker] Failed to decrypt job {}: {:?}. Deleting permanently from queue due to decryption error.", job.id, e);
@@ -67,19 +74,21 @@ pub fn start_background_worker(pool: SqlitePool) {
                             continue;
                         }
                     };
-                    
+
                     // Sign Payload
-                    let signature = match omni_shared::crypto::sign_payload(&priv_key, &decrypted_payload) {
-                        Ok(s) => s,
-                        Err(e) => {
-                            eprintln!("[Worker] Failed to sign job {}: {:?}", job.id, e);
-                            continue;
-                        }
-                    };
-                    
+                    let signature =
+                        match omni_shared::crypto::sign_payload(&priv_key, &decrypted_payload) {
+                            Ok(s) => s,
+                            Err(e) => {
+                                eprintln!("[Worker] Failed to sign job {}: {:?}", job.id, e);
+                                continue;
+                            }
+                        };
+
                     if job.action == "INSTALL_APP" {
                         if let Ok(payload) = serde_json::from_str::<Value>(&decrypted_payload) {
-                            let res = client.post(format!("{}/rest/v1/user_installed_apps", url))
+                            let res = client
+                                .post(format!("{}/rest/v1/user_installed_apps", url))
                                 .header("apikey", &anon_key)
                                 .header("X-OmniDesk-Signature", &signature)
                                 .header("X-OmniDesk-User", &job.user_id)
@@ -88,19 +97,31 @@ pub fn start_background_worker(pool: SqlitePool) {
                                 .json(&payload)
                                 .send()
                                 .await;
-                            
+
                             if let Ok(response) = res {
-                                if response.status().is_success() || response.status() == reqwest::StatusCode::CONFLICT {
+                                if response.status().is_success()
+                                    || response.status() == reqwest::StatusCode::CONFLICT
+                                {
                                     success = true;
                                 } else {
-                                    eprintln!("[Worker] Sync INSTALL failed HTTP {}", response.status());
+                                    eprintln!(
+                                        "[Worker] Sync INSTALL failed HTTP {}",
+                                        response.status()
+                                    );
                                 }
                             }
                         }
                     } else if job.action == "UNINSTALL_APP" {
                         if let Ok(payload) = serde_json::from_str::<Value>(&decrypted_payload) {
-                            if let (Some(user_id), Some(app_id)) = (payload.get("user_id").and_then(|v| v.as_str()), payload.get("app_id").and_then(|v| v.as_str())) {
-                                let res = client.delete(format!("{}/rest/v1/user_installed_apps?user_id=eq.{}&app_id=eq.{}", url, user_id, app_id))
+                            if let (Some(user_id), Some(app_id)) = (
+                                payload.get("user_id").and_then(|v| v.as_str()),
+                                payload.get("app_id").and_then(|v| v.as_str()),
+                            ) {
+                                let res = client
+                                    .delete(format!(
+                                        "{}/rest/v1/user_installed_apps?user_id=eq.{}&app_id=eq.{}",
+                                        url, user_id, app_id
+                                    ))
                                     .header("apikey", &anon_key)
                                     .header("X-OmniDesk-Signature", &signature)
                                     .header("X-OmniDesk-User", &job.user_id)
@@ -111,14 +132,18 @@ pub fn start_background_worker(pool: SqlitePool) {
                                     if response.status().is_success() {
                                         success = true;
                                     } else {
-                                        eprintln!("[Worker] Sync UNINSTALL failed HTTP {}", response.status());
+                                        eprintln!(
+                                            "[Worker] Sync UNINSTALL failed HTTP {}",
+                                            response.status()
+                                        );
                                     }
                                 }
                             }
                         }
                     } else if job.action == "UPDATE_PREFERENCES" {
                         if let Ok(payload) = serde_json::from_str::<Value>(&decrypted_payload) {
-                            let res = client.post(format!("{}/rest/v1/user_preferences", url))
+                            let res = client
+                                .post(format!("{}/rest/v1/user_preferences", url))
                                 .header("apikey", &anon_key)
                                 .header("X-OmniDesk-Signature", &signature)
                                 .header("X-OmniDesk-User", &job.user_id)
@@ -127,12 +152,17 @@ pub fn start_background_worker(pool: SqlitePool) {
                                 .json(&payload)
                                 .send()
                                 .await;
-                            
+
                             if let Ok(response) = res {
-                                if response.status().is_success() || response.status() == reqwest::StatusCode::CONFLICT {
+                                if response.status().is_success()
+                                    || response.status() == reqwest::StatusCode::CONFLICT
+                                {
                                     success = true;
                                 } else {
-                                    eprintln!("[Worker] Sync UPDATE_PREFERENCES failed HTTP {}", response.status());
+                                    eprintln!(
+                                        "[Worker] Sync UPDATE_PREFERENCES failed HTTP {}",
+                                        response.status()
+                                    );
                                 }
                             }
                         }

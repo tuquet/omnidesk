@@ -1,11 +1,6 @@
-use serde::{Deserialize, Serialize};
 use tauri::AppHandle;
 
-#[derive(Serialize, Deserialize)]
-pub struct StorageInfo {
-    pub current_path: String,
-    pub is_default: bool,
-}
+use omni_shared::models::system::StorageInfo;
 
 #[tauri::command]
 pub async fn get_storage_info(app_handle: AppHandle) -> Result<StorageInfo, String> {

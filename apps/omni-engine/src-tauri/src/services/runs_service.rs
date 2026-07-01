@@ -1,7 +1,10 @@
-use sqlx::{SqlitePool, Row};
 use crate::error::AppError;
+use sqlx::{Row, SqlitePool};
 
-pub async fn get_logs(pool: &SqlitePool, run_id: Option<&str>) -> Result<Vec<serde_json::Value>, AppError> {
+pub async fn get_logs(
+    pool: &SqlitePool,
+    run_id: Option<&str>,
+) -> Result<Vec<serde_json::Value>, AppError> {
     let query = if let Some(id) = run_id {
         sqlx::query(
             "SELECT id, run_id, block_id, block_label, status, duration_ms, data, CAST(created_at AS TEXT) as created_at FROM workflow_logs WHERE run_id = ? ORDER BY created_at ASC"
@@ -13,12 +16,12 @@ pub async fn get_logs(pool: &SqlitePool, run_id: Option<&str>) -> Result<Vec<ser
     };
 
     let rows = query.fetch_all(pool).await?;
-    
+
     let mut logs = Vec::new();
     for row in rows {
         let duration_ms: Option<i64> = row.try_get("duration_ms").ok();
         let data: Option<String> = row.try_get("data").ok();
-        
+
         logs.push(serde_json::json!({
             "id": row.try_get::<String, _>("id").unwrap_or_default(),
             "run_id": row.try_get::<String, _>("run_id").unwrap_or_default(),
@@ -34,7 +37,10 @@ pub async fn get_logs(pool: &SqlitePool, run_id: Option<&str>) -> Result<Vec<ser
     Ok(logs)
 }
 
-pub async fn get_runs(pool: &SqlitePool, workflow_id: Option<&str>) -> Result<Vec<crate::api::handlers::runs::WorkflowRun>, AppError> {
+pub async fn get_runs(
+    pool: &SqlitePool,
+    workflow_id: Option<&str>,
+) -> Result<Vec<crate::api::handlers::runs::WorkflowRun>, AppError> {
     let query = if let Some(id) = workflow_id {
         sqlx::query(
             "SELECT id, workflow_id, profile_id, schedule_id, status, CAST(started_at AS TEXT) as started_at, CAST(finished_at AS TEXT) as finished_at FROM workflow_runs WHERE workflow_id = ? ORDER BY started_at DESC LIMIT 50"
@@ -46,7 +52,7 @@ pub async fn get_runs(pool: &SqlitePool, workflow_id: Option<&str>) -> Result<Ve
     };
 
     let rows = query.fetch_all(pool).await?;
-    
+
     let mut runs = Vec::new();
     for row in rows {
         runs.push(crate::api::handlers::runs::WorkflowRun {
@@ -61,4 +67,18 @@ pub async fn get_runs(pool: &SqlitePool, workflow_id: Option<&str>) -> Result<Ve
     }
 
     Ok(runs)
+}
+
+pub async fn get_workflow(
+    pool: &SqlitePool,
+    workflow_id: &str,
+) -> Result<Option<crate::db::models::workflow::Workflow>, AppError> {
+    let record = sqlx::query_as::<_, crate::db::models::workflow::Workflow>(
+        "SELECT * FROM workflows WHERE id = ?",
+    )
+    .bind(workflow_id)
+    .fetch_optional(pool)
+    .await?;
+
+    Ok(record)
 }

@@ -1,30 +1,334 @@
 {
   "openapi": "3.1.0",
   "info": {
-    "title": "omnidesk",
-    "description": "Cross-platform Desktop DevTool — Crawl, manage, and expose bugs via MCP",
-    "contact": {
-      "name": "OmniDesk Team"
-    },
-    "license": {
-      "name": ""
-    },
+    "title": "OmniDesk Unified API",
     "version": "0.1.0"
   },
   "paths": {
-    "/api/issues": {
+    "/api/automa/workflows": {
       "get": {
-        "tags": ["issues"],
-        "operationId": "list_issues",
+        "tags": [
+          "workflows"
+        ],
+        "operationId": "list_workflows",
+        "parameters": [
+          {
+            "name": "since",
+            "in": "query",
+            "description": "ISO timestamp - return only workflows changed after this time",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "200": {
-            "description": "List all issues",
+            "description": "List all workflows (or changed since timestamp)"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "workflows"
+        ],
+        "operationId": "create_workflow",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WorkflowPayload"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Workflow created"
+          }
+        }
+      }
+    },
+    "/api/automa/workflows/runs/{run_id}/logs": {
+      "get": {
+        "tags": [
+          "workflows"
+        ],
+        "operationId": "get_run_logs",
+        "parameters": [
+          {
+            "name": "run_id",
+            "in": "path",
+            "description": "Run ID",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List workflow logs"
+          }
+        }
+      }
+    },
+    "/api/automa/workflows/sync/export/{id}": {
+      "get": {
+        "tags": [
+          "sync"
+        ],
+        "summary": "GET /api/automa/workflows/sync/export/:id\nExport a single workflow as downloadable JSON",
+        "operationId": "export_workflow",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Workflow ID",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Workflow JSON exported"
+          }
+        }
+      }
+    },
+    "/api/automa/workflows/sync/import": {
+      "post": {
+        "tags": [
+          "sync"
+        ],
+        "summary": "POST /api/automa/workflows/sync/import\nImport a workflow from JSON body",
+        "operationId": "import_workflow",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WorkflowPayload"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Workflow imported"
+          }
+        }
+      }
+    },
+    "/api/automa/workflows/sync/push": {
+      "post": {
+        "tags": [
+          "sync"
+        ],
+        "summary": "POST /api/automa/workflows/sync/push\nReceives workflows from the Extension and upserts them into the database + files",
+        "operationId": "push_workflows",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PushWorkflowsPayload"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Workflows synced successfully"
+          }
+        }
+      }
+    },
+    "/api/automa/workflows/sync/status": {
+      "get": {
+        "tags": [
+          "sync"
+        ],
+        "summary": "GET /api/automa/workflows/sync/status\nReturns current sync status",
+        "operationId": "sync_status",
+        "responses": {
+          "200": {
+            "description": "Sync status"
+          }
+        }
+      }
+    },
+    "/api/automa/workflows/{id}": {
+      "get": {
+        "tags": [
+          "workflows"
+        ],
+        "operationId": "get_workflow",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Workflow ID",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Get workflow by ID"
+          },
+          "404": {
+            "description": "Workflow not found"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "workflows"
+        ],
+        "operationId": "update_workflow",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Workflow ID",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WorkflowPayload"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Workflow updated"
+          },
+          "404": {
+            "description": "Workflow not found"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "workflows"
+        ],
+        "operationId": "delete_workflow",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Workflow ID",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "workspacePath",
+            "in": "query",
+            "description": "Workspace path",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Workflow deleted"
+          },
+          "404": {
+            "description": "Workflow not found"
+          }
+        }
+      }
+    },
+    "/api/automa/workflows/{id}/runs": {
+      "get": {
+        "tags": [
+          "workflows"
+        ],
+        "operationId": "get_workflow_runs",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Workflow ID",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List workflow runs"
+          }
+        }
+      }
+    },
+    "/api/me": {
+      "get": {
+        "tags": [],
+        "operationId": "me",
+        "responses": {
+          "200": {
+            "description": "User info"
+          }
+        }
+      }
+    },
+    "/health": {
+      "get": {
+        "tags": [],
+        "operationId": "health_check",
+        "responses": {
+          "200": {
+            "description": "Health status"
+          }
+        }
+      }
+    },
+    "/ping": {
+      "get": {
+        "tags": [],
+        "operationId": "ping",
+        "responses": {
+          "200": {
+            "description": "Pong"
+          }
+        }
+      }
+    },
+    "/api/browser-profiles": {
+      "get": {
+        "tags": [
+          "profiles"
+        ],
+        "operationId": "list_profiles",
+        "responses": {
+          "200": {
+            "description": "List of browser profiles",
             "content": {
               "application/json": {
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/Issue"
+                    "$ref": "#/components/schemas/BrowserProfile"
                   }
                 }
               }
@@ -33,25 +337,27 @@
         }
       },
       "post": {
-        "tags": ["issues"],
-        "operationId": "create_issue",
+        "tags": [
+          "profiles"
+        ],
+        "operationId": "create_profile",
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/CreateIssueDto"
+                "$ref": "#/components/schemas/CreateBrowserProfilePayload"
               }
             }
           },
           "required": true
         },
         "responses": {
-          "201": {
-            "description": "Issue created successfully",
+          "200": {
+            "description": "Browser profile created",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Issue"
+                  "$ref": "#/components/schemas/BrowserProfile"
                 }
               }
             }
@@ -59,74 +365,98 @@
         }
       }
     },
-    "/api/issues/batch": {
-      "post": {
-        "tags": ["issues"],
-        "operationId": "batch_create_issues",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/components/schemas/CreateIssueDto"
-                }
-              }
-            }
-          },
-          "required": true
-        },
+    "/api/browser-profiles/browser-engine": {
+      "delete": {
+        "tags": [
+          "handlers::browser_profiles"
+        ],
+        "operationId": "delete_browser_engine",
         "responses": {
-          "202": {
-            "description": "Batch accepted for processing"
+          "200": {
+            "description": "Browser engine deleted successfully"
           }
         }
       }
     },
-    "/api/issues/{id}": {
+    "/api/browser-profiles/download-status": {
       "get": {
-        "tags": ["issues"],
-        "operationId": "get_issue",
+        "tags": [
+          "handlers::browser_profiles"
+        ],
+        "operationId": "get_download_status",
+        "responses": {
+          "200": {
+            "description": "Download status stream"
+          }
+        }
+      }
+    },
+    "/api/browser-profiles/engine-status": {
+      "get": {
+        "tags": [
+          "handlers::browser_profiles"
+        ],
+        "operationId": "get_engine_status",
+        "responses": {
+          "200": {
+            "description": "Status of browser engine",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EngineStatusResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/browser-profiles/{id}": {
+      "get": {
+        "tags": [
+          "profiles"
+        ],
+        "operationId": "get_profile",
         "parameters": [
           {
             "name": "id",
             "in": "path",
-            "description": "Issue ID",
+            "description": "Profile ID",
             "required": true,
             "schema": {
-              "type": "string",
-              "format": "uuid"
+              "type": "string"
             }
           }
         ],
         "responses": {
           "200": {
-            "description": "Get issue by ID",
+            "description": "Browser profile",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Issue"
+                  "$ref": "#/components/schemas/BrowserProfile"
                 }
               }
             }
           },
           "404": {
-            "description": "Issue not found"
+            "description": "Profile not found"
           }
         }
       },
       "put": {
-        "tags": ["issues"],
-        "operationId": "update_issue",
+        "tags": [
+          "profiles"
+        ],
+        "operationId": "update_profile",
         "parameters": [
           {
             "name": "id",
             "in": "path",
-            "description": "Issue ID",
+            "description": "Profile ID",
             "required": true,
             "schema": {
-              "type": "string",
-              "format": "uuid"
+              "type": "string"
             }
           }
         ],
@@ -134,7 +464,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/CreateIssueDto"
+                "$ref": "#/components/schemas/UpdateBrowserProfilePayload"
               }
             }
           },
@@ -142,41 +472,129 @@
         },
         "responses": {
           "200": {
-            "description": "Issue updated successfully",
+            "description": "Browser profile updated",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Issue"
+                  "$ref": "#/components/schemas/BrowserProfile"
                 }
               }
             }
           },
           "404": {
-            "description": "Issue not found"
+            "description": "Profile not found"
           }
         }
       },
       "delete": {
-        "tags": ["issues"],
-        "operationId": "delete_issue",
+        "tags": [
+          "profiles"
+        ],
+        "operationId": "delete_profile",
         "parameters": [
           {
             "name": "id",
             "in": "path",
-            "description": "Issue ID",
+            "description": "Profile ID",
             "required": true,
             "schema": {
-              "type": "string",
-              "format": "uuid"
+              "type": "string"
             }
           }
         ],
         "responses": {
           "204": {
-            "description": "Issue deleted successfully"
+            "description": "Browser profile deleted"
           },
           "404": {
-            "description": "Issue not found"
+            "description": "Profile not found"
+          }
+        }
+      }
+    },
+    "/api/browser-profiles/{id}/clean": {
+      "post": {
+        "tags": [
+          "profiles"
+        ],
+        "operationId": "clean_profile_storage",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Profile ID",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Storage cleaned"
+          },
+          "404": {
+            "description": "Profile not found"
+          }
+        }
+      }
+    },
+    "/api/browser-profiles/{id}/launch": {
+      "post": {
+        "tags": [
+          "handlers::browser_profiles"
+        ],
+        "operationId": "launch_profile",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Browser profile ID",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "startup_url",
+            "in": "query",
+            "description": "Optional URL to open on launch",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Browser launched successfully"
+          }
+        }
+      }
+    },
+    "/api/browser-profiles/{id}/stop": {
+      "post": {
+        "tags": [
+          "handlers::browser_profiles"
+        ],
+        "operationId": "stop_profile",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Browser profile ID",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Browser stopped successfully"
+          },
+          "404": {
+            "description": "Profile not found"
           }
         }
       }
@@ -184,127 +602,701 @@
   },
   "components": {
     "schemas": {
-      "CreateIssueDto": {
+      "PushWorkflowsPayload": {
         "type": "object",
-        "required": ["title"],
+        "description": "Request payload for pushing workflows from the Extension",
+        "required": [
+          "workflows"
+        ],
         "properties": {
-          "actual_behavior": {
-            "type": ["string", "null"]
-          },
-          "assignee": {
-            "type": ["string", "null"]
-          },
-          "description": {
-            "type": ["string", "null"]
-          },
-          "expected_behavior": {
-            "type": ["string", "null"]
-          },
-          "metadata": {
-            "type": ["string", "null"]
-          },
-          "priority": {
-            "type": ["string", "null"]
-          },
-          "reproduce_steps": {
-            "type": ["string", "null"]
-          },
-          "source_id": {
-            "type": ["string", "null"]
-          },
-          "source_name": {
-            "type": ["string", "null"]
-          },
-          "source_url": {
-            "type": ["string", "null"]
-          },
-          "tags": {
-            "type": ["array", "null"],
+          "workflows": {
+            "type": "array",
             "items": {
-              "type": "string"
+              "$ref": "#/components/schemas/Workflow"
             }
+          }
+        }
+      },
+      "Schedule": {
+        "type": "object",
+        "description": "Schedule: Profile × Workflow on a cron.",
+        "required": [
+          "id",
+          "name",
+          "workflow_id",
+          "profile_id",
+          "cron_expr"
+        ],
+        "properties": {
+          "created_at": {
+            "type": [
+              "string",
+              "null"
+            ]
           },
-          "title": {
+          "cron_expr": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "is_enabled": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64"
+          },
+          "last_run_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "name": {
+            "type": "string"
+          },
+          "next_run_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "profile_id": {
+            "type": "string"
+          },
+          "run_count": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64"
+          },
+          "updated_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "workflow_id": {
             "type": "string"
           }
         }
       },
-      "Issue": {
+      "SyncStatusResponse": {
         "type": "object",
+        "description": "Response for sync status",
         "required": [
-          "id",
-          "title",
-          "status",
-          "priority",
-          "tags",
-          "is_verified",
-          "created_at",
-          "updated_at"
+          "watch_dir",
+          "workflow_count"
         ],
         "properties": {
-          "actual_behavior": {
-            "type": ["string", "null"]
+          "last_sync": {
+            "type": [
+              "string",
+              "null"
+            ]
           },
-          "ai_analysis": {
-            "type": ["string", "null"]
-          },
-          "assignee": {
-            "type": ["string", "null"]
-          },
-          "created_at": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "description": {
-            "type": ["string", "null"]
-          },
-          "expected_behavior": {
-            "type": ["string", "null"]
-          },
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "is_verified": {
-            "type": "boolean"
-          },
-          "metadata": {
-            "type": ["string", "null"]
-          },
-          "priority": {
+          "watch_dir": {
             "type": "string"
           },
-          "reproduce_steps": {
-            "type": ["string", "null"]
+          "workflow_count": {
+            "type": "integer",
+            "minimum": 0
+          }
+        }
+      },
+      "Workflow": {
+        "type": "object",
+        "description": "Workflow definition — mirrors the Automa Extension's workflow JSON structure.",
+        "required": [
+          "id",
+          "name",
+          "drawflow",
+          "settings"
+        ],
+        "properties": {
+          "connected_table": {
+            "type": [
+              "string",
+              "null"
+            ]
           },
-          "resolution_reason": {
-            "type": ["string", "null"]
+          "content": {
+            "type": [
+              "string",
+              "null"
+            ]
           },
-          "source_id": {
-            "type": ["string", "null"]
+          "created_at": {
+            "type": [
+              "string",
+              "null"
+            ]
           },
-          "source_name": {
-            "type": ["string", "null"]
+          "data_columns": {
+            "type": [
+              "string",
+              "null"
+            ]
           },
-          "source_url": {
-            "type": ["string", "null"]
+          "delete_source": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "deleted_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "description": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "drawflow": {
+            "type": "string"
+          },
+          "folder_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "global_data": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "icon": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "id": {
+            "type": "string"
+          },
+          "is_disabled": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64"
+          },
+          "name": {
+            "type": "string"
+          },
+          "settings": {
+            "type": "string"
+          },
+          "source": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "table_data": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "trigger": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "updated_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "version": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      },
+      "WorkflowLog": {
+        "type": "object",
+        "description": "Per-block execution log entry within a run.",
+        "required": [
+          "id",
+          "run_id",
+          "block_id",
+          "status"
+        ],
+        "properties": {
+          "block_id": {
+            "type": "string"
+          },
+          "block_label": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "data": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "duration_ms": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64"
+          },
+          "id": {
+            "type": "string"
+          },
+          "run_id": {
+            "type": "string"
           },
           "status": {
             "type": "string"
           },
-          "tags": {
+          "timestamp": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      },
+      "WorkflowPayload": {
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "drawflow",
+          "settings"
+        ],
+        "properties": {
+          "connected_table": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "content": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "created_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "data_columns": {
+            "type": [
+              "object",
+              "null"
+            ]
+          },
+          "delete_source": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "deleted_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "description": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "drawflow": {
+            "type": "object"
+          },
+          "folder_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "global_data": {
+            "type": [
+              "object",
+              "null"
+            ]
+          },
+          "icon": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "id": {
             "type": "string"
           },
-          "title": {
+          "is_disabled": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64"
+          },
+          "name": {
             "type": "string"
+          },
+          "settings": {
+            "type": "object"
+          },
+          "source": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "table_data": {
+            "type": [
+              "object",
+              "null"
+            ]
+          },
+          "trigger": {
+            "type": [
+              "object",
+              "null"
+            ]
           },
           "updated_at": {
-            "type": "string",
-            "format": "date-time"
+            "type": [
+              "string",
+              "null"
+            ]
           },
-          "verified_at": {
-            "type": ["string", "null"],
-            "format": "date-time"
+          "version": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      },
+      "WorkflowRun": {
+        "type": "object",
+        "description": "A single execution of a workflow.",
+        "required": [
+          "id",
+          "workflow_id",
+          "status"
+        ],
+        "properties": {
+          "created_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "error_message": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "finished_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "id": {
+            "type": "string"
+          },
+          "profile_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "schedule_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "started_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "status": {
+            "type": "string"
+          },
+          "summary": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "workflow_id": {
+            "type": "string"
+          }
+        }
+      },
+      "BrowserProfile": {
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "data_dir_path"
+        ],
+        "properties": {
+          "browser_type": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "browser_version": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "cdp_url": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "created_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "data_dir_path": {
+            "type": "string"
+          },
+          "group_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "id": {
+            "type": "string"
+          },
+          "last_used_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "name": {
+            "type": "string"
+          },
+          "notes": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "os": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "pid": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32"
+          },
+          "status": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "tags": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "updated_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      },
+      "BrowserVersion": {
+        "type": "object",
+        "required": [
+          "version",
+          "is_downloaded"
+        ],
+        "properties": {
+          "is_downloaded": {
+            "type": "boolean"
+          },
+          "version": {
+            "type": "string"
+          }
+        }
+      },
+      "CreateBrowserProfilePayload": {
+        "type": "object",
+        "required": [
+          "name",
+          "data_dir_path"
+        ],
+        "properties": {
+          "browser_type": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "browser_version": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "data_dir_path": {
+            "type": "string"
+          },
+          "group_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "name": {
+            "type": "string"
+          },
+          "notes": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "os": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "status": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "tags": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      },
+      "EngineStatusResponse": {
+        "type": "object",
+        "required": [
+          "is_downloaded"
+        ],
+        "properties": {
+          "exe_path": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "is_downloaded": {
+            "type": "boolean"
+          }
+        }
+      },
+      "UpdateBrowserProfilePayload": {
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "data_dir_path"
+        ],
+        "properties": {
+          "browser_type": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "browser_version": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "data_dir_path": {
+            "type": "string"
+          },
+          "group_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "notes": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "os": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "status": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "tags": {
+            "type": [
+              "string",
+              "null"
+            ]
           }
         }
       }
@@ -312,8 +1304,20 @@
   },
   "tags": [
     {
-      "name": "issues",
-      "description": "Bug Issues management API"
+      "name": "health",
+      "description": "Health check endpoints"
+    },
+    {
+      "name": "workflows",
+      "description": "Workflow management endpoints"
+    },
+    {
+      "name": "sync",
+      "description": "Sync endpoints"
+    },
+    {
+      "name": "profiles",
+      "description": "Browser profile management endpoints"
     }
   ]
 }

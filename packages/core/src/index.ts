@@ -36,3 +36,9 @@ export * from './components/omni-layout';
 // API
 export * from './lib/api-config';
 export * from './lib/rbac';
+
+// Hooks
+export * from './hooks/use-rbac';
+// Adapters
+export * from './lib/adapters/tauri-adapter';
+export * from './lib/adapters/web-adapter';

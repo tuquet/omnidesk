@@ -1,14 +1,13 @@
+use axum::http::StatusCode;
 use axum::{
     extract::{Query, State},
     response::sse::{Event, Sse},
     Json,
 };
 use futures_util::stream::Stream;
-use serde::{Deserialize, Serialize};
 use std::convert::Infallible;
 use tokio::sync::mpsc;
 use uuid::Uuid;
-use axum::http::StatusCode;
 
 use crate::{api::AppState, services::mcp_service};
 use axum::routing::{get, post};
@@ -19,29 +18,7 @@ pub fn router() -> axum::Router<AppState> {
         .route("/messages", post(mcp_messages))
 }
 
-#[derive(Deserialize)]
-pub struct SessionQuery {
-    #[serde(rename = "sessionId")]
-    pub session_id: Option<String>,
-}
-
-#[derive(Serialize, Deserialize, Debug)]
-pub struct JsonRpcRequest {
-    pub jsonrpc: String,
-    pub id: Option<serde_json::Value>,
-    pub method: String,
-    pub params: Option<serde_json::Value>,
-}
-
-#[derive(Serialize, Deserialize, Debug)]
-pub struct JsonRpcResponse {
-    pub jsonrpc: String,
-    pub id: serde_json::Value,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub result: Option<serde_json::Value>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub error: Option<serde_json::Value>,
-}
+use omni_shared::models::mcp::{JsonRpcRequest, JsonRpcResponse, SessionQuery};
 
 pub async fn mcp_sse(
     State(state): State<AppState>,
@@ -50,16 +27,20 @@ pub async fn mcp_sse(
     let (tx, mut rx) = mpsc::channel::<serde_json::Value>(32);
 
     // Register session
-    state.mcp_sessions.write().await.insert(session_id.clone(), tx);
+    state
+        .mcp_sessions
+        .write()
+        .await
+        .insert(session_id.clone(), tx);
 
     let session_id_clone = session_id.clone();
-    
+
     let stream = async_stream::stream! {
         // Send the endpoint event as required by MCP SSE transport
         let endpoint_event = Event::default()
             .event("endpoint")
             .data(format!("/mcp/messages?sessionId={}", session_id_clone));
-        
+
         yield Ok(endpoint_event);
 
         while let Some(msg) = rx.recv().await {
@@ -80,10 +61,15 @@ pub async fn mcp_messages(
     Query(query): Query<SessionQuery>,
     Json(payload): Json<JsonRpcRequest>,
 ) -> Result<StatusCode, (StatusCode, String)> {
-    let session_id = query.session_id.ok_or((StatusCode::BAD_REQUEST, "Missing sessionId".to_string()))?;
-    
+    let session_id = query
+        .session_id
+        .ok_or((StatusCode::BAD_REQUEST, "Missing sessionId".to_string()))?;
+
     let sessions = state.mcp_sessions.read().await;
-    let tx = sessions.get(&session_id).ok_or((StatusCode::BAD_REQUEST, "Invalid sessionId".to_string()))?.clone();
+    let tx = sessions
+        .get(&session_id)
+        .ok_or((StatusCode::BAD_REQUEST, "Invalid sessionId".to_string()))?
+        .clone();
     drop(sessions); // Release read lock
 
     // Process the MCP request in background to not block the POST response
@@ -166,7 +152,9 @@ async fn handle_mcp_request(req: JsonRpcRequest, _db: sqlx::SqlitePool) -> JsonR
             if let Some(params) = req.params {
                 if let Some(uri) = params.get("uri").and_then(|u| u.as_str()) {
                     if uri == "sqlite://user_installed_apps" {
-                        let apps = mcp_service::get_installed_apps(&_db).await.unwrap_or_default();
+                        let apps = mcp_service::get_installed_apps(&_db)
+                            .await
+                            .unwrap_or_default();
                         response.result = Some(serde_json::json!({
                             "contents": [
                                 {
@@ -177,7 +165,9 @@ async fn handle_mcp_request(req: JsonRpcRequest, _db: sqlx::SqlitePool) -> JsonR
                             ]
                         }));
                     } else {
-                        response.error = Some(serde_json::json!({"code": -32602, "message": "Resource not found"}));
+                        response.error = Some(
+                            serde_json::json!({"code": -32602, "message": "Resource not found"}),
+                        );
                     }
                 }
             }
@@ -185,25 +175,31 @@ async fn handle_mcp_request(req: JsonRpcRequest, _db: sqlx::SqlitePool) -> JsonR
         "tools/call" => {
             if let Some(params) = req.params {
                 let name = params.get("name").and_then(|n| n.as_str()).unwrap_or("");
-                let args = params.get("arguments").cloned().unwrap_or(serde_json::Value::Null);
-                
+                let args = params
+                    .get("arguments")
+                    .cloned()
+                    .unwrap_or(serde_json::Value::Null);
+
                 match name {
                     "get_keyring" => {
                         let service = args.get("service").and_then(|s| s.as_str()).unwrap_or("");
                         let account = args.get("account").and_then(|a| a.as_str()).unwrap_or("");
-                        
+
                         let result_text = if service.is_empty() || account.is_empty() {
                             "Service and account must not be empty.".to_string()
                         } else {
                             match keyring::Entry::new(service, account) {
                                 Ok(entry) => match entry.get_password() {
                                     Ok(secret) => secret,
-                                    Err(e) => format!("Error: Credential not found or inaccessible: {}", e),
+                                    Err(e) => format!(
+                                        "Error: Credential not found or inaccessible: {}",
+                                        e
+                                    ),
                                 },
                                 Err(e) => format!("Error: Keyring access failed: {}", e),
                             }
                         };
-                        
+
                         response.result = Some(serde_json::json!({
                             "content": [
                                 {
@@ -215,17 +211,23 @@ async fn handle_mcp_request(req: JsonRpcRequest, _db: sqlx::SqlitePool) -> JsonR
                     }
                     "sync_command" => {
                         let cmd = args.get("command").and_then(|c| c.as_str()).unwrap_or("");
-                        let target_device = args.get("target_device").and_then(|t| t.as_str()).unwrap_or("cloud");
-                        
+                        let target_device = args
+                            .get("target_device")
+                            .and_then(|t| t.as_str())
+                            .unwrap_or("cloud");
+
                         let result_text = if cmd.is_empty() {
                             "Command must not be empty.".to_string()
                         } else {
                             match mcp_service::queue_sync_command(&_db, cmd, target_device).await {
-                                Ok(job_id) => format!("Queued command '{}' (job_id: {}) to sync_queue successfully.", cmd, job_id),
+                                Ok(job_id) => format!(
+                                    "Queued command '{}' (job_id: {}) to sync_queue successfully.",
+                                    cmd, job_id
+                                ),
                                 Err(e) => format!("Failed to queue command: {:?}", e),
                             }
                         };
-                        
+
                         response.result = Some(serde_json::json!({
                             "content": [
                                 {
@@ -236,11 +238,13 @@ async fn handle_mcp_request(req: JsonRpcRequest, _db: sqlx::SqlitePool) -> JsonR
                         }));
                     }
                     _ => {
-                        response.error = Some(serde_json::json!({"code": -32601, "message": "Tool not found"}));
+                        response.error =
+                            Some(serde_json::json!({"code": -32601, "message": "Tool not found"}));
                     }
                 }
             } else {
-                response.error = Some(serde_json::json!({"code": -32602, "message": "Missing params"}));
+                response.error =
+                    Some(serde_json::json!({"code": -32602, "message": "Missing params"}));
             }
         }
         _ => {

@@ -2,7 +2,7 @@ import { Store } from '@tanstack/store';
 import { useStore } from '@tanstack/react-store';
 import { WORKFLOW_API_URL, PROFILE_API_URL } from '@omnidesk/core';
 import { IPC_COMMANDS, IPC_EVENTS } from '@omnidesk/types';
-import { tauriAdapter } from '../lib/tauri-adapter';
+import { tauriAdapter } from '@omnidesk/core';
 
 export interface DashboardState {
   workflows: { id: string; name: string }[];

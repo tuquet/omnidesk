@@ -12,7 +12,7 @@ pub async fn init_git_repository(
     _app_handle: AppHandle,
     repo_url: String,
     destination_path: String,
-) -> Result<String, String> {
+) -> Result<String, crate::error::AppError> {
     let git_workspace = std::path::PathBuf::from(&destination_path);
 
     if !git_workspace.exists() {
@@ -24,7 +24,7 @@ pub async fn init_git_repository(
     // Check if git is installed
     let git_check = Command::new("git").arg("--version").output().await;
     if git_check.is_err() {
-        return Err("GIT_NOT_FOUND".to_string());
+        return Err(crate::error::AppError::Internal("GIT_NOT_FOUND".to_string()));
     }
 
     // Check if the directory is empty
@@ -34,7 +34,11 @@ pub async fn init_git_repository(
 
     if !is_empty {
         // Just git init, git remote add origin
-        let _ = Command::new("git").arg("init").current_dir(&git_workspace).output().await;
+        let _ = Command::new("git")
+            .arg("init")
+            .current_dir(&git_workspace)
+            .output()
+            .await;
         let _ = Command::new("git")
             .arg("remote")
             .arg("add")
@@ -56,7 +60,7 @@ pub async fn init_git_repository(
 
         if !output.status.success() {
             let stderr = String::from_utf8_lossy(&output.stderr);
-            return Err(format!("Git clone failed: {}", stderr));
+            return Err(crate::error::AppError::Internal(format!("Git clone failed: {}", stderr)));
         }
     }
 
@@ -72,10 +76,22 @@ pub async fn init_git_repository(
         // "No commits yet" indicates a newly initialized repo without any commits
         if stdout.contains("No commits yet") {
             let readme_path = git_workspace.join("README.md");
-            let _ = tokio::fs::write(&readme_path, "# Workspace\n\nInitialized by OmniStudio.").await;
+            let _ =
+                tokio::fs::write(&readme_path, "# Workspace\n\nInitialized by OmniStudio.").await;
 
-            let _ = Command::new("git").arg("branch").arg("-M").arg("main").current_dir(&git_workspace).output().await;
-            let _ = Command::new("git").arg("add").arg(".").current_dir(&git_workspace).output().await;
+            let _ = Command::new("git")
+                .arg("branch")
+                .arg("-M")
+                .arg("main")
+                .current_dir(&git_workspace)
+                .output()
+                .await;
+            let _ = Command::new("git")
+                .arg("add")
+                .arg(".")
+                .current_dir(&git_workspace)
+                .output()
+                .await;
             let _ = Command::new("git")
                 .arg("commit")
                 .arg("-m")
@@ -83,7 +99,7 @@ pub async fn init_git_repository(
                 .current_dir(&git_workspace)
                 .output()
                 .await;
-                
+
             // Optionally try to push
             let _ = Command::new("git")
                 .arg("push")

@@ -27,7 +27,7 @@ document.addEventListener('keydown', (e) => {
 });
 
 import { PlatformProvider } from '@omnidesk/core';
-import { tauriAdapter } from './lib/tauri-adapter';
+import { tauriAdapter } from '@omnidesk/core';
 
 const rootElement = document.getElementById('root');
 if (!rootElement) throw new Error('Root element not found');

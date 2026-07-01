@@ -1,12 +1,7 @@
-use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
 use tauri::Manager;
 
-#[derive(Debug, Serialize, Deserialize, Clone)]
-#[derive(Default)]
-pub struct GlobalConfig {
-    pub storage_path: Option<String>,
-}
+use omni_shared::models::system::GlobalConfig;
 
 
 pub fn get_global_config_path(app_handle: &tauri::AppHandle) -> Result<PathBuf, String> {
