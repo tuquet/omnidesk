@@ -3,6 +3,7 @@ import { useEffect, useState, useRef } from 'react';
 import { supabase } from '@/lib/supabase';
 import { toast } from 'sonner';
 import { DEFAULT_AUTHENTICATED_ROUTE } from '@/config/route-config';
+import { ROUTES } from '@/config/route-config';
 
 export const Route = createFileRoute('/auth/callback')({
   component: AuthCallbackPage,
@@ -80,7 +81,7 @@ function AuthCallbackPage() {
             <p className="text-sm text-muted-foreground">{error}</p>
           </div>
           <button
-            onClick={() => navigate({ to: '/login' })}
+            onClick={() => navigate({ to: ROUTES.LOGIN })}
             className="inline-flex h-10 items-center justify-center rounded-md bg-primary px-8 text-sm font-medium text-primary-foreground shadow transition-colors hover:bg-primary/90"
           >
             Quay lại Đăng nhập

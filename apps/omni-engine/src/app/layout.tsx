@@ -12,7 +12,7 @@ import {
   SidebarMenuButton,
 } from '@omnidesk/ui';
 import { MonitorPlay, Settings, Terminal, Zap } from 'lucide-react';
-import { DEFAULT_AUTHENTICATED_ROUTE } from '@/config/route-config';
+import { ROUTES } from '@/config/route-config';
 
 function EngineSidebar() {
   return (
@@ -30,7 +30,7 @@ function EngineSidebar() {
             <SidebarMenu>
               <SidebarMenuItem>
                 <SidebarMenuButton className="text-xs" asChild>
-                  <Link to={DEFAULT_AUTHENTICATED_ROUTE}>
+                  <Link to={ROUTES.HOME}>
                     <Terminal />
                     <span>Execute Order</span>
                   </Link>
@@ -38,7 +38,7 @@ function EngineSidebar() {
               </SidebarMenuItem>
               <SidebarMenuItem>
                 <SidebarMenuButton className="text-xs" asChild>
-                  <Link to="/active-jobs">
+                  <Link to={ROUTES.ACTIVE_JOBS}>
                     <Zap />
                     <span>Triggers</span>
                   </Link>
@@ -46,7 +46,7 @@ function EngineSidebar() {
               </SidebarMenuItem>
               <SidebarMenuItem>
                 <SidebarMenuButton className="text-xs" asChild>
-                  <Link to="/settings">
+                  <Link to={ROUTES.SETTINGS}>
                     <Settings />
                     <span>Settings</span>
                   </Link>

@@ -52,7 +52,7 @@ function NotFound() {
         </p>
 
         {/* Go Home button */}
-        <Button size="lg" className="gap-2 px-8" onClick={() => navigate({ to: '/' })}>
+        <Button size="lg" className="gap-2 px-8" onClick={() => navigate({ to: ROUTES.HOME })}>
           <ArrowLeft className="h-4 w-4" />
           Go Home
         </Button>
@@ -113,6 +113,7 @@ function RootComponent() {
 }
 
 import { DefaultErrorFallback } from '@omnidesk/ui';
+import { ROUTES } from '@/config/route-config';
 
 export const Route = createRootRouteWithContext<MyRouterContext>()({
   component: RootComponent,

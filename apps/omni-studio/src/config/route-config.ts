@@ -27,3 +27,8 @@ export const PUBLIC_ROUTES = [
  * Always use '/' so the root index decides what view to show.
  */
 export const DEFAULT_AUTHENTICATED_ROUTE = '/' as const;
+
+export const ROUTES = {
+  HOME: DEFAULT_AUTHENTICATED_ROUTE,
+  LOGIN: '/login',
+} as const;

@@ -12,6 +12,7 @@ import {
   SidebarMenuButton,
 } from '@omnidesk/ui';
 import { Workflow, Blocks } from 'lucide-react';
+import { ROUTES } from '@/config/route-config';
 
 function StudioSidebar() {
   return (
@@ -29,7 +30,7 @@ function StudioSidebar() {
             <SidebarMenu>
               <SidebarMenuItem>
                 <SidebarMenuButton className="text-xs" asChild>
-                  <Link to="/">
+                  <Link to={ROUTES.HOME}>
                     <Blocks />
                     <span>My Workflows</span>
                   </Link>
