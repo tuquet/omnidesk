@@ -18,7 +18,7 @@ export interface RunWorkflowModalProps {
   profileId?: string | null;
   isOpen: boolean;
   onClose: () => void;
-  onRunSuccess?: () => void;
+  onRunSuccess?: (runId?: string) => void;
   workflowApiUrl?: string;
   profileApiUrl?: string;
 }
@@ -157,10 +157,11 @@ export function RunWorkflowModal({ workflowId, profileId, isOpen, onClose, onRun
         const errData = await response.json().catch(() => null);
         throw new Error(errData?.error || 'Failed to start execution');
       }
+      return response.json();
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       toast.success('Workflow execution started');
-      onRunSuccess?.();
+      onRunSuccess?.(data?.id);
       onClose();
     },
     onError: (err: any) => {

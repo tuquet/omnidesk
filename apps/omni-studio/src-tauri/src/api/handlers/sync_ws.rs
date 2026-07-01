@@ -235,6 +235,30 @@ async fn handle_extension_message(
                     payload.get("id").and_then(|v| v.as_str()),
                     payload.get("workflowId").and_then(|v| v.as_str()),
                 ) {
+                    // Prevent duplicate runs: 
+                    // When launched via Bridge WS, the backend already created a run. 
+                    // The extension's Sync WS will try to push a duplicate run.
+                    // We check if there's a recent RUNNING run for this workflow.
+                    if let Ok(recent_runs) = sqlx::query_as::<_, crate::db::models::workflow::WorkflowRun>(
+                        "SELECT * FROM workflow_runs WHERE workflow_id = ? AND status = 'RUNNING' ORDER BY started_at DESC LIMIT 1"
+                    )
+                    .bind(workflow_id)
+                    .fetch_optional(db)
+                    .await {
+                        if let Some(run) = recent_runs {
+                            // The extension generated its own run_id.
+                            // To ensure logs and finish events from the extension match,
+                            // we update the backend's Bridge run to use the extension's ID.
+                            let _ = sqlx::query("UPDATE workflow_runs SET id = ? WHERE id = ?")
+                                .bind(id)
+                                .bind(&run.id)
+                                .execute(db)
+                                .await;
+                            println!("[SyncWS] Merged Bridge run {} to Extension run {}", run.id, id);
+                            return;
+                        }
+                    }
+
                     let _ =
                         WorkflowService::create_run(db, Some(id), workflow_id, profile_id, None)
                             .await;
@@ -251,9 +275,13 @@ async fn handle_extension_message(
                     payload.get("status").and_then(|v| v.as_str()),
                 ) {
                     let duration_ms = payload.get("durationMs").and_then(|v| v.as_i64());
-                    let data = payload
-                        .get("data")
-                        .map(|v| serde_json::to_string(v).unwrap_or_default());
+                    let mut data_val = payload.get("data").cloned();
+                    if data_val.is_none() || data_val.as_ref().is_some_and(|v| v.is_null()) {
+                        if let Some(desc) = payload.get("description") {
+                            data_val = Some(serde_json::json!({ "description": desc }));
+                        }
+                    }
+                    let data = data_val.map(|v| serde_json::to_string(&v).unwrap_or_default());
 
                     let _ = WorkflowService::add_log(
                         db,
@@ -271,14 +299,19 @@ async fn handle_extension_message(
         }
         "workflow_run_finished" => {
             if let Some(payload) = msg.payload {
-                if let (Some(run_id), Some(status)) = (
+                if let (Some(run_id), Some(raw_status)) = (
                     payload.get("runId").and_then(|v| v.as_str()),
                     payload.get("status").and_then(|v| v.as_str()),
                 ) {
+                    let mut status = raw_status.to_uppercase();
+                    if status == "FAILED" || status == "STOPPED" {
+                        status = "ERROR".to_string();
+                    }
+                    
                     let error = payload.get("error").and_then(|v| v.as_str());
                     let summary = payload.get("summary").and_then(|v| v.as_str());
 
-                    let _ = WorkflowService::finish_run(db, run_id, status, error, summary).await;
+                    let _ = WorkflowService::finish_run(db, run_id, &status, error, summary).await;
                     println!("[SyncWS] Workflow run finished: {}", run_id);
                 }
             }

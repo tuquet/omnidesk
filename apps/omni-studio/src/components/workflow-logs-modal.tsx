@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, Badge, Skeleton, cn, Button } from '@omnidesk/ui';
 import { client } from '@/lib/api-client';
@@ -17,6 +17,16 @@ interface WorkflowLogsModalProps {
 export function WorkflowLogsModal({ workflowId, isOpen, onOpenChange }: WorkflowLogsModalProps) {
   const [selectedRunId, setSelectedRunId] = useState<string | null>(null);
   const queryClient = useQueryClient();
+  const logsEndRef = useRef<HTMLDivElement>(null);
+
+  // Listen to select-workflow-run events
+  useEffect(() => {
+    const handleSelectRun = (e: CustomEvent<{ runId: string | null }>) => {
+      setSelectedRunId(e.detail.runId);
+    };
+    window.addEventListener('select-workflow-run', handleSelectRun as EventListener);
+    return () => window.removeEventListener('select-workflow-run', handleSelectRun as EventListener);
+  }, []);
 
   // Fetch runs
   const { data: runs = [], isLoading: isRunsLoading } = useQuery<WorkflowRun[]>({
@@ -93,7 +103,7 @@ export function WorkflowLogsModal({ workflowId, isOpen, onOpenChange }: Workflow
       if (!selectedRunId) return [];
       const { data, error } = await getRunLogs({
         client,
-        path: { run_id: selectedRunId },
+        path: { run_id: selectedRunId } as any,
       });
       if (error) throw error;
       return (data as WorkflowLog[]) || [];
@@ -102,6 +112,13 @@ export function WorkflowLogsModal({ workflowId, isOpen, onOpenChange }: Workflow
     // Auto-refresh if the run is currently running
     refetchInterval: isRunActive ? 1000 : false,
   });
+
+  // Auto-scroll to bottom when logs change
+  useEffect(() => {
+    if (logs.length > 0 && isRunActive) {
+      logsEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [logs, isRunActive]);
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
@@ -337,6 +354,7 @@ export function WorkflowLogsModal({ workflowId, isOpen, onOpenChange }: Workflow
                         </div>
                       </div>
                     ))}
+                    <div ref={logsEndRef} />
                   </div>
                 </div>
               )}

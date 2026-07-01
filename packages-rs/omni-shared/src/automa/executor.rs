@@ -87,31 +87,60 @@ impl SharedWorkflowExecutor {
             ExecutionResult::LaunchedProfile { run_id: run_id.clone() }
         };
 
-        // Wait briefly for the browser to launch and connect
-        tokio::time::sleep(Duration::from_secs(3)).await;
+        // Spawn the waiting and broadcasting logic in the background
+        // so we can return immediately and allow the caller to open the browser.
+        let ws_tx_clone = ws_tx.clone();
+        let run_id_inner = run_id.clone();
+        let workflow_id_inner = workflow_id.to_string();
+        let workflow_name_inner = workflow_name.to_string();
+        let db_clone = db.clone();
+        tokio::spawn(async move {
+            // Wait dynamically for the browser to launch and connect to the WebSocket.
+            // We poll receiver_count() up to 10 seconds.
+            let mut connected = false;
+            for _ in 0..20 {
+                if ws_tx_clone.receiver_count() > 0 {
+                    connected = true;
+                    break;
+                }
+                tokio::time::sleep(Duration::from_millis(500)).await;
+            }
 
-        // If the caller provided the full workflow_json, we send it, otherwise we just send id and name.
-        let workflow_payload = workflow_json.unwrap_or_else(|| {
-            serde_json::json!({
-                "id": workflow_id,
-                "name": workflow_name
-            })
+            if !connected {
+                eprintln!("[SharedExecutor] Timeout waiting for browser to connect to Automa Bridge. URL might not have opened correctly.");
+                let _ = sqlx::query("UPDATE workflow_runs SET status = 'ERROR', error_message = 'Timeout: Browser failed to connect to the Bridge (The URL may not have opened correctly in your default browser). Try keeping the browser open before running.', finished_at = CURRENT_TIMESTAMP WHERE id = ?")
+                    .bind(&run_id_inner)
+                    .execute(&db_clone)
+                    .await;
+                return;
+            }
+
+            // Add a safe buffer to ensure the extension has fully initialized its message listeners
+            // after the socket is established.
+            tokio::time::sleep(Duration::from_secs(2)).await;
+
+            // If the caller provided the full workflow_json, we send it, otherwise we just send id and name.
+            let workflow_payload = workflow_json.unwrap_or_else(|| {
+                serde_json::json!({
+                    "id": workflow_id_inner,
+                    "name": workflow_name_inner
+                })
+            });
+            
+            let payload = serde_json::json!({
+                "run_id": run_id_inner,
+                "workflow": workflow_payload,
+                "variables": variables
+            });
+            
+            let event = AutomaEvent {
+                event_type: omni_tauri_core::constants::WS_EXECUTE_WORKFLOW.to_string(),
+                payload,
+            };
+
+            let _ = ws_tx_clone.send(event);
+            println!("[SharedExecutor] Broadcasted execute_workflow for run {}", run_id_inner);
         });
-        
-        let payload = serde_json::json!({
-            "run_id": run_id,
-            "workflow": workflow_payload,
-            "variables": variables
-        });
-        
-        let event = AutomaEvent {
-            event_type: omni_tauri_core::constants::WS_EXECUTE_WORKFLOW.to_string(),
-            payload,
-        };
-        
-        if let Err(e) = ws_tx.send(event) {
-            eprintln!("[SharedExecutor] Failed to send execute_workflow event to WS: {}", e);
-        }
 
         Ok(exec_result)
     }

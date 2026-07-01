@@ -626,7 +626,17 @@ function WorkflowsPage() {
         isOpen={!!workflowToRun}
         workflowId={workflowToRun}
         onClose={() => setWorkflowToRun(null)}
-        onRunSuccess={() => setRowSelection({})}
+        onRunSuccess={() => {
+          setRowSelection({});
+          if (workflowToRun) {
+            setLogsWorkflowId(workflowToRun);
+            setIsLogsModalOpen(true);
+            // Delay slightly to allow the modal to mount, then dispatch event to clear selection and auto-select newest
+            setTimeout(() => {
+              window.dispatchEvent(new CustomEvent('select-workflow-run', { detail: { runId: null } }));
+            }, 100);
+          }
+        }}
       />
 
       <WorkflowJsonEditorModal
