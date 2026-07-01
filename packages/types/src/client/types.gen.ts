@@ -28,6 +28,10 @@ export type Schedule = {
     workflow_id: string;
 };
 
+export type SyncLocalPayload = {
+    folder_path: string;
+};
+
 /**
  * Response for sync status
  */
@@ -262,6 +266,20 @@ export type ImportWorkflowData = {
 export type ImportWorkflowResponses = {
     /**
      * Workflow imported
+     */
+    200: unknown;
+};
+
+export type SyncLocalData = {
+    body: SyncLocalPayload;
+    path?: never;
+    query?: never;
+    url: '/api/automa/workflows/sync/local';
+};
+
+export type SyncLocalResponses = {
+    /**
+     * Local folder synced successfully
      */
     200: unknown;
 };

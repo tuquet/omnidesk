@@ -9,6 +9,14 @@ import { client } from '@/lib/api-client';
 import { useWorkspaceStore, usePlatform } from '@omnidesk/core';
 import { WorkflowsTable } from '../components/workflows-table';
 import type { Workflow } from '@omnidesk/types';
+import {
+  listWorkflows,
+  importWorkflow,
+  deleteWorkflow,
+  updateWorkflow,
+  syncLocal,
+  type WorkflowPayload
+} from '@omnidesk/types/client';
 import { WorkflowsToolbar } from '../components/workflows-toolbar';
 import { WorkflowJsonEditorModal } from '../components/workflow-json-editor-modal';
 import { WorkflowLogsModal } from '../components/workflow-logs-modal';
@@ -75,21 +83,27 @@ function WorkflowsPage() {
 
       // We first trigger a sync from local folder to SQLite (only in active mode)
       if (viewMode === 'active') {
-        await client.request({
-          url: '/api/automa/workflows/sync/local',
-          method: 'POST',
+        await syncLocal({
+          client,
           body: { folder_path: selectedWorkspacePath },
-          headers: {
-            'Content-Type': 'application/json',
-          },
         });
       }
 
       // Then fetch from SQLite
-      const { data, error } = await client.request({
-        url: viewMode === 'trash' ? '/api/automa/workflows/trash' : '/api/automa/workflows',
-        method: 'GET',
-      });
+      // Note: We don't have a specific GET /trash endpoint in the generated SDK yet.
+      // Assuming listWorkflows handles it, or we fallback to client.request for trash
+      let result;
+      if (viewMode === 'trash') {
+        result = await client.request({
+          url: '/api/automa/workflows/trash',
+          method: 'GET',
+        });
+      } else {
+        result = await listWorkflows({ client });
+      }
+      
+      const data = result.data;
+      const error = result.error;
       if (error) throw error;
       return (data as Workflow[]) || [];
     },
@@ -99,9 +113,10 @@ function WorkflowsPage() {
 
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await client.request({
-        url: `/api/automa/workflows/${id}`,
-        method: 'DELETE',
+      const { error } = await deleteWorkflow({
+        client,
+        path: { id },
+        // @ts-expect-error Typed query might not support this currently
         query: { workspacePath: selectedWorkspacePath },
       });
       if (error) throw error;
@@ -117,11 +132,10 @@ function WorkflowsPage() {
   });
 
   const importMutation = useMutation({
-    mutationFn: async (workflowJson: any) => {
-      const { data, error } = await client.request({
-        url: '/api/automa/workflows/sync/import',
-        method: 'POST',
-        body: workflowJson,
+    mutationFn: async (workflowJson: unknown) => {
+      const { data, error } = await importWorkflow({
+        client,
+        body: workflowJson as WorkflowPayload,
       });
       if (error) throw error;
       return data;
@@ -130,8 +144,8 @@ function WorkflowsPage() {
       toast.success('Workflow imported successfully');
       queryClient.invalidateQueries({ queryKey: ['workflows', selectedWorkspacePath] });
     },
-    onError: (err) => {
-      toast.error(`Failed to import workflow: ${err.message || String(err)}`);
+    onError: () => {
+      // toast.error is handled globally by api-client.ts
     },
   });
 
@@ -188,11 +202,12 @@ function WorkflowsPage() {
     mutationFn: async (ids: string[]) => {
       await Promise.all(
         ids.map((id) =>
-          client.request({
-            url: `/api/automa/workflows/${id}`,
-            method: 'DELETE',
+          deleteWorkflow({
+            client,
+            path: { id },
+            // @ts-expect-error typed query might not support this
             query: { workspacePath: selectedWorkspacePath },
-          }),
+          })
         ),
       );
     },
@@ -247,11 +262,11 @@ function WorkflowsPage() {
       const selectedWfs = workflows.filter((wf) => ids.includes(wf.id));
       await Promise.all(
         selectedWfs.map((wf) =>
-          client.request({
-            url: `/api/automa/workflows/${wf.id}`,
-            method: 'PUT',
-            body: { ...wf, is_disabled: isDisabled },
-          }),
+          updateWorkflow({
+            client,
+            path: { id: wf.id },
+            body: { ...wf, is_disabled: isDisabled } as unknown as WorkflowPayload,
+          })
         ),
       );
     },

@@ -2,7 +2,7 @@
 
 import type { Client, ClientMeta, Options as Options2, RequestResult, TDataShape } from './client';
 import { client } from './client.gen';
-import type { CleanProfileStorageData, CleanProfileStorageErrors, CleanProfileStorageResponses, CreateProfileData, CreateProfileResponses, CreateWorkflowData, CreateWorkflowResponses, DeleteBrowserEngineData, DeleteBrowserEngineResponses, DeleteProfileData, DeleteProfileErrors, DeleteProfileResponses, DeleteWorkflowData, DeleteWorkflowErrors, DeleteWorkflowResponses, ExportWorkflowData, ExportWorkflowResponses, GetDownloadStatusData, GetDownloadStatusResponses, GetEngineStatusData, GetEngineStatusResponses, GetProfileData, GetProfileErrors, GetProfileResponses, GetRunLogsData, GetRunLogsResponses, GetWorkflowData, GetWorkflowErrors, GetWorkflowResponses, GetWorkflowRunsData, GetWorkflowRunsResponses, HealthCheckData, HealthCheckResponses, ImportWorkflowData, ImportWorkflowResponses, LaunchProfileData, LaunchProfileResponses, ListProfilesData, ListProfilesResponses, ListWorkflowsData, ListWorkflowsResponses, MeData, MeResponses, PingData, PingResponses, PushWorkflowsData, PushWorkflowsResponses, StopProfileData, StopProfileErrors, StopProfileResponses, SyncStatusData, SyncStatusResponses, UpdateProfileData, UpdateProfileErrors, UpdateProfileResponses, UpdateWorkflowData, UpdateWorkflowErrors, UpdateWorkflowResponses } from './types.gen';
+import type { CleanProfileStorageData, CleanProfileStorageErrors, CleanProfileStorageResponses, CreateProfileData, CreateProfileResponses, CreateWorkflowData, CreateWorkflowResponses, DeleteBrowserEngineData, DeleteBrowserEngineResponses, DeleteProfileData, DeleteProfileErrors, DeleteProfileResponses, DeleteWorkflowData, DeleteWorkflowErrors, DeleteWorkflowResponses, ExportWorkflowData, ExportWorkflowResponses, GetDownloadStatusData, GetDownloadStatusResponses, GetEngineStatusData, GetEngineStatusResponses, GetProfileData, GetProfileErrors, GetProfileResponses, GetRunLogsData, GetRunLogsResponses, GetWorkflowData, GetWorkflowErrors, GetWorkflowResponses, GetWorkflowRunsData, GetWorkflowRunsResponses, HealthCheckData, HealthCheckResponses, ImportWorkflowData, ImportWorkflowResponses, LaunchProfileData, LaunchProfileResponses, ListProfilesData, ListProfilesResponses, ListWorkflowsData, ListWorkflowsResponses, MeData, MeResponses, PingData, PingResponses, PushWorkflowsData, PushWorkflowsResponses, StopProfileData, StopProfileErrors, StopProfileResponses, SyncLocalData, SyncLocalResponses, SyncStatusData, SyncStatusResponses, UpdateProfileData, UpdateProfileErrors, UpdateProfileResponses, UpdateWorkflowData, UpdateWorkflowErrors, UpdateWorkflowResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean, TResponse = unknown> = Options2<TData, ThrowOnError, TResponse> & {
     /**
@@ -43,6 +43,19 @@ export const exportWorkflow = <ThrowOnError extends boolean = false>(options: Op
  */
 export const importWorkflow = <ThrowOnError extends boolean = false>(options: Options<ImportWorkflowData, ThrowOnError>): RequestResult<ImportWorkflowResponses, unknown, ThrowOnError> => (options.client ?? client).post<ImportWorkflowResponses, unknown, ThrowOnError>({
     url: '/api/automa/workflows/sync/import',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * POST /api/automa/workflows/sync/local
+ * Reads workflows from a given local folder path and upserts to DB
+ */
+export const syncLocal = <ThrowOnError extends boolean = false>(options: Options<SyncLocalData, ThrowOnError>): RequestResult<SyncLocalResponses, unknown, ThrowOnError> => (options.client ?? client).post<SyncLocalResponses, unknown, ThrowOnError>({
+    url: '/api/automa/workflows/sync/local',
     ...options,
     headers: {
         'Content-Type': 'application/json',

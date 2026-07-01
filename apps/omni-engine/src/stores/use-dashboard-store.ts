@@ -1,8 +1,9 @@
 import { Store } from '@tanstack/store';
 import { useStore } from '@tanstack/react-store';
-import { WORKFLOW_API_URL, PROFILE_API_URL } from '@omnidesk/core';
 import { IPC_COMMANDS, IPC_EVENTS } from '@omnidesk/types';
 import { tauriAdapter } from '@omnidesk/core';
+import { listWorkflows, listProfiles, launchProfile } from '@omnidesk/types/client';
+import { workflowClient, profileClient } from '@/lib/api-client';
 
 export interface DashboardState {
   workflows: { id: string; name: string }[];
@@ -30,17 +31,17 @@ export const dashboardActions = {
   async fetchInitialData() {
     dashboardStore.setState((s) => ({ ...s, isLoading: true }));
     
-    // Using fetch directly as we need absolute URLs, but omitting local try-catch
+    // Using typed SDK methods with specific micro-app clients
     const [workflowsRes, profilesRes] = await Promise.all([
-      fetch(`${WORKFLOW_API_URL}/api/automa/workflows`).then(r => r.json() as Promise<{ id: string; name: string }[]>),
-      fetch(`${PROFILE_API_URL}/api/browser-profiles`).then(r => r.json() as Promise<{ id: string; name: string }[]>),
+      listWorkflows({ client: workflowClient }),
+      listProfiles({ client: profileClient }),
     ]);
 
-    const workflows = Array.isArray(workflowsRes) ? workflowsRes : [];
-    const profiles = Array.isArray(profilesRes) ? profilesRes : [];
+    const workflows = Array.isArray(workflowsRes.data) ? (workflowsRes.data as unknown as { id: string; name: string }[]) : [];
+    const profiles = Array.isArray(profilesRes.data) ? (profilesRes.data as unknown as { id: string; name: string }[]) : [];
 
     const initialSelection: Record<string, boolean> = {};
-    profiles.slice(0, 3).forEach((p) => {
+    profiles.slice(0, 3).forEach((p: { id: string }) => {
       initialSelection[p.id] = true;
     });
 
@@ -100,12 +101,12 @@ export const dashboardActions = {
     for (const profile of activeProfiles) {
       dashboardActions.appendLog(`[SYSTEM] Requesting launch for Profile: ${profile.name}...`);
       
-      const res = await fetch(
-        `${PROFILE_API_URL}/api/browser-profiles/${profile.id}/launch`,
-        { method: 'POST' }
-      );
+      const { error } = await launchProfile({
+        client: profileClient,
+        path: { id: profile.id }
+      });
 
-      if (res.ok) {
+      if (!error) {
         dashboardActions.appendLog(`[PROFILE ${profile.name}] Browser launched successfully.`);
       } else {
         dashboardActions.appendLog(`[PROFILE ${profile.name}] ERROR: Failed to launch browser.`);

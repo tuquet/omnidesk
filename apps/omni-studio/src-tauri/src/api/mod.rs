@@ -46,6 +46,7 @@ pub struct AppState {
         handlers::sync::export_workflow,
         handlers::sync::import_workflow,
         handlers::sync::sync_status,
+        handlers::sync::sync_local,
     ),
     components(
         schemas(
@@ -54,7 +55,8 @@ pub struct AppState {
             crate::db::models::workflow::WorkflowLog,
             crate::db::models::workflow::Schedule,
             handlers::sync::PushWorkflowsPayload,
-            handlers::sync::SyncStatusResponse
+            handlers::sync::SyncStatusResponse,
+            handlers::sync::SyncLocalPayload
         )
     ),
     tags(

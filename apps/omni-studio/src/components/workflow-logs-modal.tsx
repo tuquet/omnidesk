@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, ScrollArea, Badge, Skeleton, cn } from '@omnidesk/ui';;
 import { client } from '@/lib/api-client';
+import { getWorkflowRuns, getRunLogs } from '@omnidesk/types/client';
 import { CheckCircleIcon, XCircleIcon, ClockIcon, PlayCircleIcon } from 'lucide-react';
 import Editor from '@monaco-editor/react';
 
@@ -21,9 +22,9 @@ export function WorkflowLogsModal({ workflowId, isOpen, onOpenChange }: Workflow
     queryKey: ['workflow-runs', workflowId],
     queryFn: async () => {
       if (!workflowId) return [];
-      const { data, error } = await client.request({
-        url: `/api/automa/workflows/${workflowId}/runs`,
-        method: 'GET',
+      const { data, error } = await getWorkflowRuns({
+        client,
+        path: { id: workflowId },
       });
       if (error) throw error;
       return (data as WorkflowRun[]) || [];
@@ -48,9 +49,9 @@ export function WorkflowLogsModal({ workflowId, isOpen, onOpenChange }: Workflow
     queryKey: ['workflow-logs', selectedRunId],
     queryFn: async () => {
       if (!selectedRunId) return [];
-      const { data, error } = await client.request({
-        url: `/api/automa/workflows/runs/${selectedRunId}/logs`,
-        method: 'GET',
+      const { data, error } = await getRunLogs({
+        client,
+        path: { run_id: selectedRunId },
       });
       if (error) throw error;
       return (data as WorkflowLog[]) || [];

@@ -123,6 +123,30 @@
         }
       }
     },
+    "/api/automa/workflows/sync/local": {
+      "post": {
+        "tags": [
+          "sync"
+        ],
+        "summary": "POST /api/automa/workflows/sync/local\nReads workflows from a given local folder path and upserts to DB",
+        "operationId": "sync_local",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SyncLocalPayload"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Local folder synced successfully"
+          }
+        }
+      }
+    },
     "/api/automa/workflows/sync/push": {
       "post": {
         "tags": [
@@ -679,6 +703,17 @@
             ]
           },
           "workflow_id": {
+            "type": "string"
+          }
+        }
+      },
+      "SyncLocalPayload": {
+        "type": "object",
+        "required": [
+          "folder_path"
+        ],
+        "properties": {
+          "folder_path": {
             "type": "string"
           }
         }

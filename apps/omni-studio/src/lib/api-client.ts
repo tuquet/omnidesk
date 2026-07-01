@@ -6,8 +6,9 @@ import type { ApiResponse, ApiError } from '@omnidesk/types';
 import { ERROR_CODES } from '@omnidesk/types';
 
 import { WORKFLOW_API_URL } from '@omnidesk/core';
+import type { Client } from '@omnidesk/types/client';
 
-const client = createClient({});
+const client = createClient({}) as unknown as Client;
 
 // ─── Config ────────────────────────────────────────────────────────────────────
 

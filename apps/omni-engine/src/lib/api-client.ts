@@ -4,9 +4,10 @@ import i18n from '@/lib/i18n';
 import { authActions, authStore } from '@omnidesk/auth';
 import type { ApiResponse, ApiError } from '@omnidesk/types';
 import { ERROR_CODES } from '@omnidesk/types';
-import { ENGINE_API_URL } from '@omnidesk/core';
+import { ENGINE_API_URL, WORKFLOW_API_URL, PROFILE_API_URL } from '@omnidesk/core';
+import type { Client } from '@omnidesk/types/client';
 
-const client = createClient({});
+const client = createClient({}) as unknown as Client;
 
 // ─── Config ────────────────────────────────────────────────────────────────────
 
@@ -15,9 +16,19 @@ client.setConfig({
   throwOnError: true,
 });
 
+const workflowClient = createClient({
+  baseUrl: WORKFLOW_API_URL,
+  throwOnError: true,
+}) as unknown as Client;
+
+const profileClient = createClient({
+  baseUrl: PROFILE_API_URL,
+  throwOnError: true,
+}) as unknown as Client;
+
 // ─── Request Interceptor: Auto-attach Bearer Token ─────────────────────────────
 
-client.interceptors.request.use((request: Request) => {
+const requestInterceptor = (request: Request) => {
   const token = authStore.state.session?.access_token;
 
   if (token && request.headers) {
@@ -25,7 +36,11 @@ client.interceptors.request.use((request: Request) => {
   }
 
   return request;
-});
+};
+
+client.interceptors.request.use(requestInterceptor);
+workflowClient.interceptors.request.use(requestInterceptor);
+profileClient.interceptors.request.use(requestInterceptor);
 
 // ─── Error Resolution ──────────────────────────────────────────────────────────
 
@@ -79,7 +94,7 @@ function showApiErrors(errors: ApiError[]) {
 
 // ─── Response Interceptor: Centralized Error Handling ──────────────────────────
 
-client.interceptors.response.use(async (response: Response) => {
+const responseInterceptor = async (response: Response) => {
   if (response.ok) return response;
 
   // Try to parse response body as ApiResponse
@@ -136,6 +151,10 @@ client.interceptors.response.use(async (response: Response) => {
   }
 
   return response;
-});
+};
 
-export { client, resolveErrorMessage, showApiErrors, toastErrorWithCopy };
+client.interceptors.response.use(responseInterceptor);
+workflowClient.interceptors.response.use(responseInterceptor);
+profileClient.interceptors.response.use(responseInterceptor);
+
+export { client, workflowClient, profileClient, resolveErrorMessage, showApiErrors, toastErrorWithCopy };

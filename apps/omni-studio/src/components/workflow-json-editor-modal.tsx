@@ -25,6 +25,7 @@ import { Loader2 } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { client } from '@/lib/api-client';
+import { getWorkflow, updateWorkflow, createWorkflow, type WorkflowPayload } from '@omnidesk/types/client';
 import Editor from '@monaco-editor/react';
 import { useWorkspaceStore } from '@omnidesk/core';
 import { WorkflowVisualizer } from './workflow-visualizer';
@@ -142,9 +143,9 @@ export function WorkflowJsonEditorModal({
     queryKey: ['workflow', workflowId],
     queryFn: async () => {
       if (!workflowId) return null;
-      const { data, error } = await client.request({
-        url: `/api/automa/workflows/${workflowId}`,
-        method: 'GET',
+      const { data, error } = await getWorkflow({
+        client,
+        path: { id: workflowId },
       });
       if (error) throw error;
       return data;
@@ -172,14 +173,19 @@ export function WorkflowJsonEditorModal({
 
   const saveMutation = useMutation({
     mutationFn: async (parsedData: WorkflowDataParsed) => {
-      const url = isEditMode ? `/api/automa/workflows/${workflowId}` : `/api/automa/workflows`;
-      const method = isEditMode ? 'PUT' : 'POST';
-      
-      const response = await client.request({
-        url,
-        method: method as 'POST' | 'PUT',
-        body: parsedData,
-      });
+      let response;
+      if (isEditMode) {
+        response = await updateWorkflow({
+          client,
+          path: { id: workflowId as string },
+          body: parsedData as unknown as WorkflowPayload,
+        });
+      } else {
+        response = await createWorkflow({
+          client,
+          body: parsedData as unknown as WorkflowPayload,
+        });
+      }
       if (response.error) throw response.error;
       return response.data;
     },
@@ -188,9 +194,8 @@ export function WorkflowJsonEditorModal({
       queryClient.invalidateQueries({ queryKey: ['workflows', selectedWorkspacePath] });
       onClose();
     },
-    onError: (err: unknown) => {
-      const msg = err instanceof Error ? err.message : 'Unknown error';
-      toast.error(`Failed to save workflow: ${msg}`);
+    onError: () => {
+      // toast is handled globally by api-client.ts
     },
   });
 
