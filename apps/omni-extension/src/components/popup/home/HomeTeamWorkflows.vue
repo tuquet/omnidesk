@@ -30,7 +30,7 @@
   </div>
 </template>
 <script setup>
-import { computed, onMounted, shallowRef } from 'vue';
+import { computed, onMounted, shallowRef } from 'vue';;
 import { useUserStore } from '@/stores/user';
 import { sendMessage } from '@/utils/message';
 import { useTeamWorkflowStore } from '@/stores/teamWorkflow';

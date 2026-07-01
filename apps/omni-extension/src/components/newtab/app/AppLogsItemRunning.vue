@@ -71,7 +71,7 @@
   </div>
 </template>
 <script setup>
-import { computed, watch, shallowRef, onBeforeUnmount } from 'vue';
+import { computed, watch, shallowRef, onBeforeUnmount } from 'vue';;
 import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { countDuration } from '@/utils/helper';

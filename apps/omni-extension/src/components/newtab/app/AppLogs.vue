@@ -22,7 +22,7 @@
   </ui-modal>
 </template>
 <script setup>
-import { reactive } from 'vue';
+import { reactive } from 'vue';;
 import emitter from '@/lib/mitt';
 import AppLogsItem from './AppLogsItem.vue';
 import AppLogsItems from './AppLogsItems.vue';

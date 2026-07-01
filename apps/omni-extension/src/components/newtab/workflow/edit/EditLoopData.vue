@@ -176,7 +176,7 @@
   </div>
 </template>
 <script setup>
-import { onMounted, shallowReactive, defineAsyncComponent } from 'vue';
+import { onMounted, shallowReactive, defineAsyncComponent } from 'vue';;
 import { nanoid } from 'nanoid';
 import { useI18n } from 'vue-i18n';
 import { useToast } from 'vue-toastification';

@@ -30,7 +30,7 @@
   </div>
 </template>
 <script setup>
-import { shallowReactive } from 'vue';
+import { shallowReactive } from 'vue';;
 import { useI18n } from 'vue-i18n';
 import { nanoid } from 'nanoid';
 import AES from 'crypto-js/aes';

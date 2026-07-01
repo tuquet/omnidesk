@@ -62,7 +62,7 @@ import { useUserStore } from '@/stores/user';
 import { fetchApi } from '@/utils/api';
 import { arraySorter } from '@/utils/helper';
 import { tagColors } from '@/utils/shared';
-import { computed } from 'vue';
+import { computed } from 'vue';;
 import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 import { useToast } from 'vue-toastification';

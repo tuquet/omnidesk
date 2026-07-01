@@ -37,7 +37,7 @@
   </div>
 </template>
 <script setup>
-import { reactive, onBeforeUnmount, onDeactivated } from 'vue';
+import { reactive, onBeforeUnmount, onDeactivated } from 'vue';;
 import { useI18n } from 'vue-i18n';
 import { recordShortcut } from '@/utils/recordKeys';
 import { getReadableShortcut } from '@/composable/shortcut';

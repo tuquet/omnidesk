@@ -97,7 +97,7 @@
   </div>
 </template>
 <script setup>
-import { computed, shallowReactive, defineAsyncComponent } from 'vue';
+import { computed, shallowReactive, defineAsyncComponent } from 'vue';;
 import { useI18n } from 'vue-i18n';
 import { useRoute } from 'vue-router';
 import { useWorkflowStore } from '@/stores/workflow';

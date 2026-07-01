@@ -55,7 +55,7 @@
   </ui-modal>
 </template>
 <script>
-import { reactive, watch, onUnmounted } from 'vue';
+import { reactive, watch, onUnmounted } from 'vue';;
 import { useI18n } from 'vue-i18n';
 import defu from 'defu';
 import { throttle } from '@/utils/helper';

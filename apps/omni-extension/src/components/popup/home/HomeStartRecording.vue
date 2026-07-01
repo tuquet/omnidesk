@@ -77,7 +77,7 @@
   </ui-tab-panels>
 </template>
 <script setup>
-import { reactive, computed } from 'vue';
+import { reactive, computed } from 'vue';;
 import { useI18n } from 'vue-i18n';
 import { useWorkflowStore } from '@/stores/workflow';
 import HomeSelectBlock from './HomeSelectBlock.vue';

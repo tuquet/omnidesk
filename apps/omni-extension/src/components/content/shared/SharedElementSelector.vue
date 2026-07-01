@@ -41,7 +41,7 @@
   </teleport>
 </template>
 <script setup>
-import { reactive, watch, onBeforeUnmount, toRaw } from 'vue';
+import { reactive, watch, onBeforeUnmount, toRaw } from 'vue';;
 import { finder } from '@medv/finder';
 import { debounce } from '@/utils/helper';
 import getSelectorOptions from '@/content/elementSelector/getSelectorOptions';

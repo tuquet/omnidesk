@@ -2,7 +2,7 @@
   <render />
 </template>
 <script setup>
-import { inject, h, useSlots } from 'vue';
+import { inject, h, useSlots } from 'vue';;
 
 /* eslint-disable-next-line */
 const props = defineProps({

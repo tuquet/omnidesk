@@ -219,7 +219,7 @@ import AES from 'crypto-js/aes';
 import encUtf8 from 'crypto-js/enc-utf8';
 import hmacSHA256 from 'crypto-js/hmac-sha256';
 import dayjs from 'dayjs';
-import { onMounted, reactive, toRaw } from 'vue';
+import { onMounted, reactive, toRaw } from 'vue';;
 import { useI18n } from 'vue-i18n';
 import { useToast } from 'vue-toastification';
 import browser from 'webextension-polyfill';

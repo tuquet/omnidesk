@@ -17,7 +17,7 @@
   </div>
 </template>
 <script>
-import { ref, onMounted, watch, shallowRef, onUnmounted } from 'vue';
+import { ref, onMounted, watch, shallowRef, onUnmounted } from 'vue';;
 import createTippy from '@/lib/tippy';
 
 export default {

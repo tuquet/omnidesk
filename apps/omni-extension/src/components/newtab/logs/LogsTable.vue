@@ -63,7 +63,7 @@
   </template>
 </template>
 <script setup>
-import { shallowReactive, defineAsyncComponent } from 'vue';
+import { shallowReactive, defineAsyncComponent } from 'vue';;
 import { useI18n } from 'vue-i18n';
 import { dataExportTypes } from '@/utils/shared';
 import dataExporter from '@/utils/dataExporter';

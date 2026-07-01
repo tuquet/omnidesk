@@ -11,7 +11,7 @@
   </div>
 </template>
 <script setup>
-import { ref, watch, defineAsyncComponent } from 'vue';
+import { ref, watch, defineAsyncComponent } from 'vue';;
 import { debounce } from '@/utils/helper';
 
 const SharedCodemirror = defineAsyncComponent(() =>

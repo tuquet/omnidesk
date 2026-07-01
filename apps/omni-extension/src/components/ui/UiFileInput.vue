@@ -40,14 +40,7 @@
   </div>
 </template>
 <script setup>
-import {
-  computed,
-  defineEmits,
-  defineProps,
-  onMounted,
-  ref,
-  shallowRef,
-} from 'vue';
+import { computed, onMounted, ref, shallowRef } from 'vue';;
 import { useToast } from 'vue-toastification';
 import UiButton from './UiButton.vue';
 

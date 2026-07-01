@@ -93,7 +93,7 @@
   </div>
 </template>
 <script setup>
-import { computed, inject, ref } from 'vue';
+import { computed, inject, ref } from 'vue';;
 import { useI18n } from 'vue-i18n';
 import { useWorkflowStore } from '@/stores/workflow';
 import { useTeamWorkflowStore } from '@/stores/teamWorkflow';

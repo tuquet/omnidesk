@@ -26,7 +26,7 @@
   </div>
 </template>
 <script setup>
-import { watch, ref } from 'vue';
+import { watch, ref } from 'vue';;
 
 const props = defineProps({
   modelValue: {

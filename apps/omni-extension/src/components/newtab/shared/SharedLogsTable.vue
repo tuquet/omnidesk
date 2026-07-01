@@ -125,7 +125,7 @@
   </div>
 </template>
 <script setup>
-import { reactive } from 'vue';
+import { reactive } from 'vue';;
 import { useI18n } from 'vue-i18n';
 import { countDuration } from '@/utils/helper';
 import dayjs from '@/lib/dayjs';

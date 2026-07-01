@@ -180,16 +180,7 @@ import { debounce, parseJSON } from '@/utils/helper';
 import { sendMessage } from '@/utils/message';
 import workflowParameters from '@business/parameters';
 import cloneDeep from 'lodash.clonedeep';
-import {
-  computed,
-  inject,
-  onBeforeUnmount,
-  onMounted,
-  reactive,
-  ref,
-  shallowReactive,
-  watch,
-} from 'vue';
+import { computed, inject, onBeforeUnmount, onMounted, reactive, ref, shallowReactive, watch } from 'vue';;
 import browser from 'webextension-polyfill';
 
 const paramsList = {

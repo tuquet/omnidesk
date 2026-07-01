@@ -69,7 +69,7 @@
   </div>
 </template>
 <script setup>
-import { reactive, onMounted, watch } from 'vue';
+import { reactive, onMounted, watch } from 'vue';;
 import { useI18n } from 'vue-i18n';
 import cloneDeep from 'lodash.clonedeep';
 import { useStore } from '@/stores/main';

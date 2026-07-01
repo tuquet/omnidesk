@@ -32,7 +32,7 @@
   </div>
 </template>
 <script setup>
-import { onMounted, onBeforeUnmount, shallowReactive } from 'vue';
+import { onMounted, onBeforeUnmount, shallowReactive } from 'vue';;
 import { useI18n } from 'vue-i18n';
 import convertWorkflowData from '@/utils/convertWorkflowData';
 import WorkflowEditor from '@/components/newtab/workflow/WorkflowEditor.vue';

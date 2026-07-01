@@ -99,7 +99,7 @@ import { useEditorBlock } from '@/composable/editorBlock';
 import { usePackageStore } from '@/stores/package';
 import { Handle, Position } from '@vue-flow/core';
 import cloneDeep from 'lodash.clonedeep';
-import { onMounted, shallowReactive } from 'vue';
+import { onMounted, shallowReactive } from 'vue';;
 import BlockBase from './BlockBase.vue';
 
 const props = defineProps({

@@ -140,7 +140,7 @@
 import workflowParameters from '@business/parameters';
 import cloneDeep from 'lodash.clonedeep';
 import { nanoid } from 'nanoid/non-secure';
-import { reactive, watch } from 'vue';
+import { reactive, watch } from 'vue';;
 import Draggable from 'vuedraggable';
 import ParameterCheckboxValue from './Parameter/ParameterCheckboxValue.vue';
 import ParameterInputOptions from './Parameter/ParameterInputOptions.vue';

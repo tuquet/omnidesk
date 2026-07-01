@@ -34,7 +34,7 @@
   </div>
 </template>
 <script setup>
-import { shallowReactive } from 'vue';
+import { shallowReactive } from 'vue';;
 import { tasks } from '@/utils/shared';
 import EditForms from '@/components/newtab/workflow/edit/EditForms.vue';
 import EditTriggerEvent from '@/components/newtab/workflow/edit/EditTriggerEvent.vue';

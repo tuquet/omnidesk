@@ -24,7 +24,7 @@
   </div>
 </template>
 <script>
-import { ref, shallowReactive, onMounted } from 'vue';
+import { ref, shallowReactive, onMounted } from 'vue';;
 
 export default {
   props: {

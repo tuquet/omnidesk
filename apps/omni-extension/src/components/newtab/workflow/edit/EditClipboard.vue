@@ -50,7 +50,7 @@
   </div>
 </template>
 <script setup>
-import { computed } from 'vue';
+import { computed } from 'vue';;
 import { useI18n } from 'vue-i18n';
 import { useHasPermissions } from '@/composable/hasPermissions';
 import InsertWorkflowData from './InsertWorkflowData.vue';

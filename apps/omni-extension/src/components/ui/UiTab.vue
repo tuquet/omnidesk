@@ -20,7 +20,7 @@
   </button>
 </template>
 <script setup>
-import { inject } from 'vue';
+import { inject } from 'vue';;
 
 /* eslint-disable-next-line */
 const props = defineProps({

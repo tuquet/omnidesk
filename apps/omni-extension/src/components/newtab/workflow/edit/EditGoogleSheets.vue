@@ -240,7 +240,7 @@
 import { fetchApi } from '@/utils/api';
 import googleSheetsApi from '@/utils/googleSheetsApi';
 import { convert2DArrayToArrayObj, debounce } from '@/utils/helper';
-import { defineAsyncComponent, shallowReactive } from 'vue';
+import { defineAsyncComponent, shallowReactive } from 'vue';;
 import { useI18n } from 'vue-i18n';
 import { useToast } from 'vue-toastification';
 import EditAutocomplete from './EditAutocomplete.vue';

@@ -68,7 +68,7 @@
   </div>
 </template>
 <script setup>
-import { reactive, watch, onMounted } from 'vue';
+import { reactive, watch, onMounted } from 'vue';;
 import cloneDeep from 'lodash.clonedeep';
 
 const props = defineProps({

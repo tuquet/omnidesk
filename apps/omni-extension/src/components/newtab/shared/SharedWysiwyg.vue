@@ -90,7 +90,7 @@
   </div>
 </template>
 <script setup>
-import { shallowRef, onMounted, onBeforeUnmount, watch } from 'vue';
+import { shallowRef, onMounted, onBeforeUnmount, watch } from 'vue';;
 import { Editor, EditorContent } from '@tiptap/vue-3';
 import StarterKit from '@tiptap/starter-kit';
 import Link from '@tiptap/extension-link';

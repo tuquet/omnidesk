@@ -105,13 +105,7 @@
   </ui-modal>
 </template>
 <script setup>
-import {
-  shallowReactive,
-  computed,
-  onMounted,
-  onBeforeUnmount,
-  watch,
-} from 'vue';
+import { shallowReactive, computed, onMounted, onBeforeUnmount, watch } from 'vue';;
 import { useI18n } from 'vue-i18n';
 import SelectionArea from '@viselect/vanilla';
 import browser from 'webextension-polyfill';

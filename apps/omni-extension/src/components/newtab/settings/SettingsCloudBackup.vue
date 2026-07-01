@@ -151,7 +151,7 @@
   </div>
 </template>
 <script setup>
-import { computed, reactive, onMounted } from 'vue';
+import { computed, reactive, onMounted } from 'vue';;
 import { useI18n } from 'vue-i18n';
 import { useToast } from 'vue-toastification';
 import browser from 'webextension-polyfill';

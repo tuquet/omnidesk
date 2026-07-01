@@ -32,7 +32,7 @@
   </ui-modal>
 </template>
 <script setup>
-import { toRaw } from 'vue';
+import { toRaw } from 'vue';;
 import { useI18n } from 'vue-i18n';
 import browser from 'webextension-polyfill';
 

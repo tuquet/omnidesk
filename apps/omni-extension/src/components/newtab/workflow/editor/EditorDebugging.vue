@@ -130,7 +130,7 @@
   </ui-card>
 </template>
 <script setup>
-import { defineAsyncComponent, computed, watch, shallowRef } from 'vue';
+import { defineAsyncComponent, computed, watch, shallowRef } from 'vue';;
 import { useI18n } from 'vue-i18n';
 import dayjs from '@/lib/dayjs';
 import { tasks } from '@/utils/shared';

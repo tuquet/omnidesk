@@ -291,12 +291,7 @@ import { countDuration, fileSaver } from '@/utils/helper';
 import { dataExportTypes, messageHasReferences } from '@/utils/shared';
 import objectPath from 'object-path';
 import Papa from 'papaparse';
-import {
-  computed,
-  defineAsyncComponent,
-  shallowReactive,
-  shallowRef,
-} from 'vue';
+import { computed, defineAsyncComponent, shallowReactive, shallowRef } from 'vue';;
 import { useI18n } from 'vue-i18n';
 
 const SharedCodemirror = defineAsyncComponent(() =>

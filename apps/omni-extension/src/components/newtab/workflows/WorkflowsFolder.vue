@@ -87,7 +87,7 @@
   </div>
 </template>
 <script setup>
-import { computed } from 'vue';
+import { computed } from 'vue';;
 import { useI18n } from 'vue-i18n';
 import { useDialog } from '@/composable/dialog';
 import { parseJSON } from '@/utils/helper';

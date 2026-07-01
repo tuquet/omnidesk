@@ -99,7 +99,7 @@
   </div>
 </template>
 <script setup>
-import { ref, watch, defineAsyncComponent, inject } from 'vue';
+import { ref, watch, defineAsyncComponent, inject } from 'vue';;
 import { nanoid } from 'nanoid';
 import { useI18n } from 'vue-i18n';
 import { autocompletion } from '@codemirror/autocomplete';

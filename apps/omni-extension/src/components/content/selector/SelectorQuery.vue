@@ -64,7 +64,7 @@
   </div>
 </template>
 <script setup>
-import { inject } from 'vue';
+import { inject } from 'vue';;
 import UiInput from '@/components/ui/UiInput.vue';
 
 const props = defineProps({

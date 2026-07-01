@@ -120,7 +120,7 @@
   </block-base>
 </template>
 <script setup>
-import { inject, computed, shallowReactive } from 'vue';
+import { inject, computed, shallowReactive } from 'vue';;
 import { useI18n } from 'vue-i18n';
 import { nanoid } from 'nanoid';
 import { useToast } from 'vue-toastification';

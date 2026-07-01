@@ -83,7 +83,7 @@
   </div>
 </template>
 <script setup>
-import { watch, shallowRef, shallowReactive, toRaw, triggerRef } from 'vue';
+import { watch, shallowRef, shallowReactive, toRaw, triggerRef } from 'vue';;
 import { useRoute, useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { useWorkflowStore } from '@/stores/workflow';

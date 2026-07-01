@@ -51,7 +51,7 @@
 </template>
 <script setup>
 /* eslint-disable */
-import { reactive, computed, onMounted } from 'vue';
+import { reactive, computed, onMounted } from 'vue';;
 import { getBlocks } from '@/utils/getSharedData';
 
 const props = defineProps({

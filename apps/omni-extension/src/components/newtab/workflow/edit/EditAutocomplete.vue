@@ -11,7 +11,7 @@
   </ui-autocomplete>
 </template>
 <script setup>
-import { inject, shallowReactive, computed } from 'vue';
+import { inject, shallowReactive, computed } from 'vue';;
 import objectPath from 'object-path';
 
 defineProps({

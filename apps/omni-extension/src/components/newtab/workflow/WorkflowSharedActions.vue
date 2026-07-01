@@ -94,7 +94,7 @@
 <script setup>
 import WorkflowShare from '@/components/newtab/workflow/WorkflowShare.vue';
 import { useGroupTooltip } from '@/composable/groupTooltip';
-import { shallowReactive } from 'vue';
+import { shallowReactive } from 'vue';;
 import { useI18n } from 'vue-i18n';
 
 const props = defineProps({

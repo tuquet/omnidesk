@@ -24,7 +24,7 @@
   </shared-logs-table>
 </template>
 <script setup>
-import { computed } from 'vue';
+import { computed } from 'vue';;
 import { useI18n } from 'vue-i18n';
 import dbLogs from '@/db/logs';
 import { useLiveQuery } from '@/composable/liveQuery';

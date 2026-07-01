@@ -174,7 +174,7 @@
 <script setup>
 import getFile, { readFileAsBase64 } from '@/utils/getFile';
 import Papa from 'papaparse';
-import { defineAsyncComponent, inject, ref, shallowReactive, watch } from 'vue';
+import { defineAsyncComponent, inject, ref, shallowReactive, watch } from 'vue';;
 import { useI18n } from 'vue-i18n';
 import { useToast } from 'vue-toastification';
 import browser from 'webextension-polyfill';

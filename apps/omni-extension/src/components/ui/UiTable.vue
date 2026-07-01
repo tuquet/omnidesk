@@ -82,7 +82,7 @@
   </div>
 </template>
 <script setup>
-import { reactive, computed, watch } from 'vue';
+import { reactive, computed, watch } from 'vue';;
 import { useI18n } from 'vue-i18n';
 import { isObject, arraySorter } from '@/utils/helper';
 

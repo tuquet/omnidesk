@@ -195,7 +195,7 @@
   />
 </template>
 <script setup>
-import { ref, reactive, watch, onMounted, onBeforeUnmount } from 'vue';
+import { ref, reactive, watch, onMounted, onBeforeUnmount } from 'vue';;
 import browser from 'webextension-polyfill';
 import { toCamelCase } from '@/utils/helper';
 import { tasks } from '@/utils/shared';

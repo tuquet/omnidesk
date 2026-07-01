@@ -33,7 +33,7 @@
   </ui-card>
 </template>
 <script setup>
-import { onMounted, ref, reactive, watch } from 'vue';
+import { onMounted, ref, reactive, watch } from 'vue';;
 import { useI18n } from 'vue-i18n';
 import cloneDeep from 'lodash.clonedeep';
 import { debounce } from '@/utils/helper';

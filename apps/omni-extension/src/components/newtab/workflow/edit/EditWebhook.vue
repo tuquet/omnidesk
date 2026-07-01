@@ -154,7 +154,7 @@
 </template>
 <script setup>
 import { contentTypes } from '@/utils/shared';
-import { defineAsyncComponent, ref, watch } from 'vue';
+import { defineAsyncComponent, ref, watch } from 'vue';;
 import { useI18n } from 'vue-i18n';
 import EditAutocomplete from './EditAutocomplete.vue';
 import InsertWorkflowData from './InsertWorkflowData.vue';

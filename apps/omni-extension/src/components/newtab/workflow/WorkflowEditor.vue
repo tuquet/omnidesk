@@ -78,7 +78,7 @@
   </vue-flow>
 </template>
 <script setup>
-import { onMounted, onBeforeUnmount, watch, computed, reactive } from 'vue';
+import { onMounted, onBeforeUnmount, watch, computed, reactive } from 'vue';;
 import { useI18n } from 'vue-i18n';
 import {
   VueFlow,

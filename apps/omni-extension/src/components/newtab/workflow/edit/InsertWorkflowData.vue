@@ -77,7 +77,7 @@
   </template>
 </template>
 <script setup>
-import { inject } from 'vue';
+import { inject } from 'vue';;
 import { useI18n } from 'vue-i18n';
 
 defineProps({

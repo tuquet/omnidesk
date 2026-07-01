@@ -78,7 +78,7 @@
   </div>
 </template>
 <script setup>
-import { computed, ref, onMounted, watch, toRaw } from 'vue';
+import { computed, ref, onMounted, watch, toRaw } from 'vue';;
 import { useI18n } from 'vue-i18n';
 import browser from 'webextension-polyfill';
 import { useShortcut } from '@/composable/shortcut';

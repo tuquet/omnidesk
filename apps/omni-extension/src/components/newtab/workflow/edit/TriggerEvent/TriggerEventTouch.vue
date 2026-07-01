@@ -10,7 +10,7 @@
   </div>
 </template>
 <script setup>
-import { shallowReactive, watch, onMounted } from 'vue';
+import { shallowReactive, watch, onMounted } from 'vue';;
 import { objectHasKey } from '@/utils/helper';
 
 const props = defineProps({

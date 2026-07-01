@@ -97,7 +97,7 @@
   </div>
 </template>
 <script setup>
-import { ref, reactive, computed, onBeforeUnmount, onMounted } from 'vue';
+import { ref, reactive, computed, onBeforeUnmount, onMounted } from 'vue';;
 import { useI18n } from 'vue-i18n';
 import { useToast } from 'vue-toastification';
 import browser from 'webextension-polyfill';

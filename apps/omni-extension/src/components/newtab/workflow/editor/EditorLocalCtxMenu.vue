@@ -27,7 +27,7 @@
   </ui-popover>
 </template>
 <script setup>
-import { onMounted, reactive, markRaw } from 'vue';
+import { onMounted, reactive, markRaw } from 'vue';;
 import { useI18n } from 'vue-i18n';
 import { excludeGroupBlocks } from '@/utils/shared';
 import { getReadableShortcut, getShortcut } from '@/composable/shortcut';

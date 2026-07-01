@@ -2,7 +2,7 @@
   <p>Hello :)</p>
 </template>
 <script setup>
-import { onMounted } from 'vue';
+import { onMounted } from 'vue';;
 import { useRoute, useRouter } from 'vue-router';
 import emitter from '@/lib/mitt';
 

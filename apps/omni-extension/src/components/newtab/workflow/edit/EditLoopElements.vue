@@ -101,7 +101,7 @@
   </edit-interaction-base>
 </template>
 <script setup>
-import { onMounted } from 'vue';
+import { onMounted } from 'vue';;
 import { useI18n } from 'vue-i18n';
 import { nanoid } from 'nanoid/non-secure';
 import SharedElSelectorActions from '@/components/newtab/shared/SharedElSelectorActions.vue';

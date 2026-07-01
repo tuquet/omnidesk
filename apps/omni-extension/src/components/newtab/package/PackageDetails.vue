@@ -36,7 +36,7 @@
   </div>
 </template>
 <script setup>
-import { reactive } from 'vue';
+import { reactive } from 'vue';;
 import { debounce } from '@/utils/helper';
 import SharedWysiwyg from '@/components/newtab/shared/SharedWysiwyg.vue';
 

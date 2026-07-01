@@ -85,7 +85,7 @@
   </div>
 </template>
 <script setup>
-import { reactive, computed, ref, watch, onMounted } from 'vue';
+import { reactive, computed, ref, watch, onMounted } from 'vue';;
 import { useI18n } from 'vue-i18n';
 import { useToast } from 'vue-toastification';
 import dayjs from '@/lib/dayjs';

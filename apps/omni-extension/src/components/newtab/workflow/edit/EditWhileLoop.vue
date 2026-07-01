@@ -36,7 +36,7 @@
   </div>
 </template>
 <script setup>
-import { onMounted, ref } from 'vue';
+import { onMounted, ref } from 'vue';;
 import { useI18n } from 'vue-i18n';
 import { nanoid } from 'nanoid';
 import SharedConditionBuilder from '@/components/newtab/shared/SharedConditionBuilder/index.vue';

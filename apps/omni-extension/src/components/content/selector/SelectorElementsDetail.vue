@@ -98,7 +98,7 @@
   </ui-tab-panels>
 </template>
 <script setup>
-import { inject } from 'vue';
+import { inject } from 'vue';;
 import SelectorBlocks from './SelectorBlocks.vue';
 import SelectorElementList from './SelectorElementList.vue';
 

@@ -50,7 +50,7 @@
   <storage-edit-table v-model="state.showAddTable" @save="saveTable" />
 </template>
 <script setup>
-import { reactive } from 'vue';
+import { reactive } from 'vue';;
 import { useI18n } from 'vue-i18n';
 import dayjs from 'dayjs';
 import { useDialog } from '@/composable/dialog';

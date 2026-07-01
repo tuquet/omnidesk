@@ -53,7 +53,7 @@
 <script setup>
 import { parseJSON } from '@/utils/helper';
 import { nanoid } from 'nanoid/non-secure';
-import { onMounted, reactive, watch } from 'vue';
+import { onMounted, reactive, watch } from 'vue';;
 import { useRoute, useRouter } from 'vue-router';
 import Draggable from 'vuedraggable';
 

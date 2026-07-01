@@ -161,7 +161,7 @@
   </div>
 </template>
 <script setup>
-import { reactive } from 'vue';
+import { reactive } from 'vue';;
 import { useI18n } from 'vue-i18n';
 import { nanoid } from 'nanoid';
 import cloneDeep from 'lodash.clonedeep';

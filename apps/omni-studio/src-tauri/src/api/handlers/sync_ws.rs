@@ -150,20 +150,7 @@ async fn handle_extension_message(
             }
         }
         "delete_workflow" => {
-            if let Some(payload) = msg.payload {
-                if let Some(id) = payload.get("id").and_then(|v| v.as_str()) {
-                    // Extension is master — hard delete when Extension says so
-                    match WorkflowService::delete(db, id).await {
-                        Ok(_) => {
-                            // Remove JSON file too
-                            let file_path = app_dir.join("workflows").join(format!("{}.json", id));
-                            let _ = std::fs::remove_file(&file_path);
-                            println!("[SyncWS] Deleted workflow {} (from Extension)", id);
-                        }
-                        Err(e) => eprintln!("[SyncWS] Failed to delete {}: {:?}", id, e),
-                    }
-                }
-            }
+            println!("[SyncWS] Ignored delete_workflow request from Extension. Deletion must happen via Studio UI.");
         }
         "request_full_sync" => {
             // Extension requesting all workflows (e.g., after reconnect)

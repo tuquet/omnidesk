@@ -131,7 +131,7 @@
   </div>
 </template>
 <script setup>
-import { reactive, onMounted, inject, watch } from 'vue';
+import { reactive, onMounted, inject, watch } from 'vue';;
 import { useI18n } from 'vue-i18n';
 import { nanoid } from 'nanoid';
 import { debounce } from '@/utils/helper';

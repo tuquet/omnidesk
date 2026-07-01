@@ -66,7 +66,7 @@
   </div>
 </template>
 <script setup>
-import { shallowReactive, shallowRef, watch } from 'vue';
+import { shallowReactive, shallowRef, watch } from 'vue';;
 import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import dbLogs from '@/db/logs';

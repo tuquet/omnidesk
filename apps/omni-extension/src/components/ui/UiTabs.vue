@@ -18,7 +18,7 @@
   </div>
 </template>
 <script setup>
-import { provide, toRefs, ref } from 'vue';
+import { provide, toRefs, ref } from 'vue';;
 
 const props = defineProps({
   modelValue: {

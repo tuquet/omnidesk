@@ -163,13 +163,7 @@ import {
 } from '@/utils/getAIPoweredInfo';
 import cloneDeep from 'lodash.clonedeep';
 import secrets from 'secrets';
-import {
-  computed,
-  defineEmits,
-  defineProps,
-  shallowReactive,
-  watch,
-} from 'vue';
+import { computed, shallowReactive, watch } from 'vue';;
 import { useRoute } from 'vue-router';
 import { useToast } from 'vue-toastification';
 import browser from 'webextension-polyfill';

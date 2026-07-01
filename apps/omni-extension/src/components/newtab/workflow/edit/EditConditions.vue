@@ -120,7 +120,7 @@
   </div>
 </template>
 <script setup>
-import { ref, watch, onMounted, shallowReactive } from 'vue';
+import { ref, watch, onMounted, shallowReactive } from 'vue';;
 import { useI18n } from 'vue-i18n';
 import { nanoid } from 'nanoid';
 import Draggable from 'vuedraggable';

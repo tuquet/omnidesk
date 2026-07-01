@@ -58,7 +58,7 @@
   </edit-interaction-base>
 </template>
 <script setup>
-import { ref } from 'vue';
+import { ref } from 'vue';;
 import { useI18n } from 'vue-i18n';
 import { eventList } from '@/utils/shared';
 import { toCamelCase } from '@/utils/helper';

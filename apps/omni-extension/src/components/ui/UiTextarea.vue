@@ -13,7 +13,7 @@
   ></textarea>
 </template>
 <script>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted } from 'vue';;
 import { useComponentId } from '@/composable/componentId';
 
 export default {

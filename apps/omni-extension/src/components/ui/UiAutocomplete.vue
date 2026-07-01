@@ -32,13 +32,7 @@
   </ui-popover>
 </template>
 <script setup>
-import {
-  computed,
-  onMounted,
-  onBeforeUnmount,
-  shallowReactive,
-  watch,
-} from 'vue';
+import { computed, onMounted, onBeforeUnmount, shallowReactive, watch } from 'vue';;
 import { useI18n } from 'vue-i18n';
 import { useComponentId } from '@/composable/componentId';
 import { debounce } from '@/utils/helper';

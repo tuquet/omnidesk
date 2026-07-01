@@ -26,7 +26,7 @@
   </ui-tab-panels>
 </template>
 <script setup>
-import { reactive, onMounted } from 'vue';
+import { reactive, onMounted } from 'vue';;
 import { useI18n } from 'vue-i18n';
 import defu from 'defu';
 import { excludeOnError } from '@/utils/shared';

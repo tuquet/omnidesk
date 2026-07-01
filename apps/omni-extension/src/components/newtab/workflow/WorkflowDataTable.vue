@@ -96,7 +96,7 @@
   </div>
 </template>
 <script setup>
-import { computed, onMounted, watch, reactive } from 'vue';
+import { computed, onMounted, watch, reactive } from 'vue';;
 import { nanoid } from 'nanoid';
 import { useI18n } from 'vue-i18n';
 import dbStorage from '@/db/storage';

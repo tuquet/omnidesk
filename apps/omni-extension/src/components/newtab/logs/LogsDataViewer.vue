@@ -48,12 +48,7 @@
   </template>
 </template>
 <script setup>
-import {
-  shallowReactive,
-  computed,
-  defineAsyncComponent,
-  onMounted,
-} from 'vue';
+import { shallowReactive, computed, defineAsyncComponent, onMounted } from 'vue';;
 import { useI18n } from 'vue-i18n';
 import dbLogs from '@/db/logs';
 import { dataExportTypes } from '@/utils/shared';

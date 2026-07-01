@@ -344,7 +344,7 @@ import { tagColors } from '@/utils/shared';
 import getTriggerText from '@/utils/triggerText';
 import { convertWorkflow, exportWorkflow } from '@/utils/workflowData';
 import { registerWorkflowTrigger } from '@/utils/workflowTrigger';
-import { computed, reactive } from 'vue';
+import { computed, reactive } from 'vue';;
 import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 import { useToast } from 'vue-toastification';

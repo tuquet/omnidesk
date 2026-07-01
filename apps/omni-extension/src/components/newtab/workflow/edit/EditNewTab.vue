@@ -91,7 +91,7 @@
 <script setup>
 import UiInput from '@/components/ui/UiInput.vue';
 import UiSelect from '@/components/ui/UiSelect.vue';
-import { reactive, watch } from 'vue';
+import { reactive, watch } from 'vue';;
 import { useI18n } from 'vue-i18n';
 import VueSlider from 'vue-slider-component';
 import 'vue-slider-component/theme/default.css';

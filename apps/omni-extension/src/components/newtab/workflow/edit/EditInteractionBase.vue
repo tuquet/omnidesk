@@ -93,7 +93,7 @@
   </div>
 </template>
 <script setup>
-import { onMounted } from 'vue';
+import { onMounted } from 'vue';;
 import { useI18n } from 'vue-i18n';
 import SharedElSelectorActions from '@/components/newtab/shared/SharedElSelectorActions.vue';
 import EditAutocomplete from './EditAutocomplete.vue';

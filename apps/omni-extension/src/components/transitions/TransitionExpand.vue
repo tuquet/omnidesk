@@ -1,5 +1,5 @@
 <script>
-import { h, Transition, TransitionGroup } from 'vue';
+import { h, Transition, TransitionGroup } from 'vue';;
 
 /* eslint-disable */
 export default {

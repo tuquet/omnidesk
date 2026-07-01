@@ -4,7 +4,7 @@
   </div>
 </template>
 <script setup>
-import { toRefs, provide } from 'vue';
+import { toRefs, provide } from 'vue';;
 
 /* eslint-disable-next-line */
 const props = defineProps({

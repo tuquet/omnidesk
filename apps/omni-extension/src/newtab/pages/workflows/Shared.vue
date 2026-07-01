@@ -158,7 +158,7 @@ import { useWorkflowStore } from '@/stores/workflow';
 import { fetchApi } from '@/utils/api';
 import convertWorkflowData from '@/utils/convertWorkflowData';
 import { useHead } from '@vueuse/head';
-import { computed, onMounted, reactive, shallowRef, watch } from 'vue';
+import { computed, onMounted, reactive, shallowRef, watch } from 'vue';;
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
 import { useToast } from 'vue-toastification';

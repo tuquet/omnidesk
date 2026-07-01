@@ -78,7 +78,7 @@
 </template>
 <script setup>
 import { useI18n } from 'vue-i18n';
-import { defineAsyncComponent, shallowRef } from 'vue';
+import { defineAsyncComponent, shallowRef } from 'vue';;
 
 const SharedCodemirror = defineAsyncComponent(() =>
   import('@/components/newtab/shared/SharedCodemirror.vue')

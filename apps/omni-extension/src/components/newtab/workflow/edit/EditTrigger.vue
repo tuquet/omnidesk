@@ -43,7 +43,7 @@
   </div>
 </template>
 <script setup>
-import { onMounted, reactive } from 'vue';
+import { onMounted, reactive } from 'vue';;
 import { useI18n } from 'vue-i18n';
 import { nanoid } from 'nanoid/non-secure';
 import SharedWorkflowTriggers from '@/components/newtab/shared/SharedWorkflowTriggers.vue';

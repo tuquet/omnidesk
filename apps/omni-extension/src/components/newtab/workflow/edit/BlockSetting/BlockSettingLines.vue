@@ -45,7 +45,7 @@
   </div>
 </template>
 <script setup>
-import { inject, onMounted, reactive, computed } from 'vue';
+import { inject, onMounted, reactive, computed } from 'vue';;
 import { useI18n } from 'vue-i18n';
 import { debounce } from '@/utils/helper';
 

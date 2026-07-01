@@ -97,7 +97,7 @@
   </aside>
 </template>
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed } from 'vue';;
 import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 import { useToast } from 'vue-toastification';

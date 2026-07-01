@@ -157,15 +157,7 @@ import SharedElementSelector from '@/components/content/shared/SharedElementSele
 import findSelector from '@/lib/findSelector';
 import FindElement from '@/utils/FindElement';
 import { debounce } from '@/utils/helper';
-import {
-  inject,
-  onBeforeUnmount,
-  onMounted,
-  reactive,
-  ref,
-  toRaw,
-  watch,
-} from 'vue';
+import { inject, onBeforeUnmount, onMounted, reactive, ref, toRaw, watch } from 'vue';;
 import browser from 'webextension-polyfill';
 import { getElementRect } from '../utils';
 import getSelectorOptions from './getSelectorOptions';

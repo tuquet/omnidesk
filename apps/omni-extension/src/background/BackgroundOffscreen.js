@@ -25,6 +25,8 @@ class BackgroundOffscreen {
   /** @type {MessageListener} */
   #messageListener;
 
+  #creatingPromise;
+
   constructor() {
     this.#messageListener = new MessageListener('offscreen');
 
@@ -38,20 +40,36 @@ class BackgroundOffscreen {
   async #ensureDocument() {
     if (IS_FIREFOX) return;
 
+    if (this.#creatingPromise) {
+      await this.#creatingPromise;
+      return;
+    }
+
     const isOpened = await this.isOpened();
     if (isOpened) return;
 
-    await chrome.offscreen.createDocument({
-      url: OFFSCREEN_URL,
-      reasons: [
-        chrome.offscreen.Reason.BLOBS,
-        chrome.offscreen.Reason.CLIPBOARD,
-        chrome.offscreen.Reason.IFRAME_SCRIPTING,
-      ],
-      justification: 'For running the workflow',
-    });
+    this.#creatingPromise = (async () => {
+      try {
+        await chrome.offscreen.createDocument({
+          url: OFFSCREEN_URL,
+          reasons: [
+            chrome.offscreen.Reason.BLOBS,
+            chrome.offscreen.Reason.CLIPBOARD,
+            chrome.offscreen.Reason.IFRAME_SCRIPTING,
+          ],
+          justification: 'For running the workflow',
+        });
+        await sleep(500);
+      } catch (error) {
+        if (!error.message.includes('Only a single offscreen document may be created')) {
+          throw error;
+        }
+      } finally {
+        this.#creatingPromise = null;
+      }
+    })();
 
-    await sleep(500);
+    await this.#creatingPromise;
   }
 
   /**

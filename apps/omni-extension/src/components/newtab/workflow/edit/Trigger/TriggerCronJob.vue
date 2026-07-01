@@ -14,7 +14,7 @@
   </p>
 </template>
 <script setup>
-import { shallowReactive, onMounted } from 'vue';
+import { shallowReactive, onMounted } from 'vue';;
 import { useI18n } from 'vue-i18n';
 import cronParser from 'cron-parser';
 import { debounce } from '@/utils/helper';

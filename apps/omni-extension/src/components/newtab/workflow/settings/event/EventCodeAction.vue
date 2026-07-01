@@ -6,7 +6,7 @@
   />
 </template>
 <script setup>
-import { defineAsyncComponent } from 'vue';
+import { defineAsyncComponent } from 'vue';;
 
 const SharedCodemirror = defineAsyncComponent(() =>
   import('@/components/newtab/shared/SharedCodemirror.vue')

@@ -36,7 +36,7 @@
 </template>
 <script setup>
 import customEditComponents from '@business/blocks/editComponents';
-import { computed } from 'vue';
+import { computed } from 'vue';;
 import { useI18n } from 'vue-i18n';
 import { useToast } from 'vue-toastification';
 

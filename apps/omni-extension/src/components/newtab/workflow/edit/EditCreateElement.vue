@@ -131,7 +131,7 @@ import {
 } from '@/utils/codeEditorAutocomplete';
 import { autocompletion } from '@codemirror/autocomplete';
 import cloneDeep from 'lodash.clonedeep';
-import { defineAsyncComponent, reactive, watch } from 'vue';
+import { defineAsyncComponent, reactive, watch } from 'vue';;
 import EditInteractionBase from './EditInteractionBase.vue';
 
 const SharedCodemirror = defineAsyncComponent(() =>

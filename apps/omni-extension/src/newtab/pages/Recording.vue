@@ -50,7 +50,7 @@
   </div>
 </template>
 <script setup>
-import { onMounted, reactive, toRaw, onBeforeUnmount } from 'vue';
+import { onMounted, reactive, toRaw, onBeforeUnmount } from 'vue';;
 import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 import { nanoid } from 'nanoid';
