@@ -1,8 +1,10 @@
 import { useState, useEffect, useMemo } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogFooter, DialogTitle, DialogDescription, Button, Input, Label, Switch, Select, SelectTrigger, SelectValue, SelectContent, SelectItem, Skeleton } from '@omnidesk/ui';;
+import { Dialog, DialogContent, DialogHeader, DialogFooter, DialogTitle, DialogDescription, Button, Input, Label, Switch, Select, SelectTrigger, SelectValue, SelectContent, SelectItem, Skeleton } from '@omnidesk/ui';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { PlayIcon } from 'lucide-react';
+import { WorkflowDataParsed } from '@omnidesk/types/client';
+import { WORKFLOW_API_URL, PROFILE_API_URL } from '@omnidesk/core/lib/api-config';
 
 
 interface TriggerParameter {
@@ -22,7 +24,7 @@ export interface RunWorkflowModalProps {
   profileApiUrl?: string;
 }
 
-export function RunWorkflowModal({ workflowId, profileId, isOpen, onClose, onRunSuccess, workflowApiUrl = 'http://localhost:1421', profileApiUrl = 'http://localhost:1422' }: RunWorkflowModalProps) {
+export function RunWorkflowModal({ workflowId, profileId, isOpen, onClose, onRunSuccess, workflowApiUrl = WORKFLOW_API_URL, profileApiUrl = PROFILE_API_URL }: RunWorkflowModalProps) {
   const [selectedProfile, setSelectedProfile] = useState<string>(profileId || 'default');
   const [selectedWorkflow, setSelectedWorkflow] = useState<string>(workflowId || '');
   const [variables, setVariables] = useState<Record<string, any>>({});
@@ -69,7 +71,7 @@ export function RunWorkflowModal({ workflowId, profileId, isOpen, onClose, onRun
   });
 
   // 2. Fetch specific workflow details to parse drawflow
-  const { data: workflow, isLoading: loadingWorkflow } = useQuery({
+  const { data: workflow, isLoading: loadingWorkflow, refetch } = useQuery({
     queryKey: ['workflow', selectedWorkflow],
     queryFn: async () => {
       if (!selectedWorkflow) return null;
@@ -84,6 +86,13 @@ export function RunWorkflowModal({ workflowId, profileId, isOpen, onClose, onRun
     },
     enabled: isOpen && !!selectedWorkflow,
   });
+
+  // Reload data when opened to ensure fresh data
+  useEffect(() => {
+    if (isOpen && selectedWorkflow) {
+      refetch();
+    }
+  }, [isOpen, selectedWorkflow, refetch]);
 
   // 3. Extract Trigger Parameters
   const triggerParams = useMemo<TriggerParameter[]>(() => {

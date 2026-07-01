@@ -16,49 +16,55 @@ use axum::response::{Html, IntoResponse};
     tag = "automa"
 )]
 pub async fn bridge_html() -> impl IntoResponse {
-    let html = r#"
+    let extension_id = std::env::var("AUTOMA_EXTENSION_ID")
+        .unwrap_or_else(|_| "ddnmmgebginepgdimcjpdgnefdbocjpl".to_string());
+    
+    // In Edge unpacked extensions use `extension://` instead of `chrome-extension://`
+    let extension_scheme = std::env::var("AUTOMA_EXTENSION_SCHEME")
+        .unwrap_or_else(|_| "chrome-extension".to_string());
+
+    let html = format!(
+        r#"
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Omni Extension Bridge</title>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚡</text></svg>">
     <style>
-        body {
+        body {{
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
             margin: 0;
-            background-color: #f3f4f6;
-            color: #1f2937;
-        }
-        .container {
+            background-color: #0f172a;
+            color: #f8fafc;
+        }}
+        .container {{
             text-align: center;
-            background: white;
             padding: 2rem;
+            background-color: #1e293b;
             border-radius: 8px;
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
             max-width: 400px;
-        }
-        h1 { margin-top: 0; font-size: 1.5rem; }
-        p { color: #4b5563; margin-bottom: 1.5rem; }
-        .loader {
-            border: 3px solid #f3f3f3;
+        }}
+        h1 {{ margin-top: 0; color: #38bdf8; }}
+        p {{ color: #cbd5e1; margin-bottom: 2rem; }}
+        .loader {{
+            border: 4px solid #334155;
+            border-top: 4px solid #38bdf8;
             border-radius: 50%;
-            border-top: 3px solid #3b82f6;
-            width: 24px;
-            height: 24px;
-            -webkit-animation: spin 1s linear infinite; /* Safari */
+            width: 40px;
+            height: 40px;
             animation: spin 1s linear infinite;
             margin: 0 auto;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
+        }}
+        @keyframes spin {{
+            0% {{ transform: rotate(0deg); }}
+            100% {{ transform: rotate(360deg); }}
+        }}
     </style>
 </head>
 <body>
@@ -68,7 +74,8 @@ pub async fn bridge_html() -> impl IntoResponse {
         <div class="loader"></div>
     </div>
     <script>
-        const EXTENSION_ID = "nblegfhjkilmmjeaedgkgmcjjpomcobh";
+        const EXTENSION_ID = "{extension_id}";
+        const EXTENSION_SCHEME = "{extension_scheme}";
         
         // Extract params
         const urlParams = new URLSearchParams(window.location.search);
@@ -77,20 +84,23 @@ pub async fn bridge_html() -> impl IntoResponse {
         const port = window.location.port || '80';
 
         // Construct the Chrome extension bridge URL
-        const extensionUrl = `chrome-extension://${EXTENSION_ID}/bridge.html?run_id=${runId}&profile_id=${profileId}&port=${port}`;
+        const extensionUrl = `${{EXTENSION_SCHEME}}://${{EXTENSION_ID}}/bridge.html?run_id=${{runId}}&profile_id=${{profileId}}&port=${{port}}`;
 
         // Redirect immediately
         window.location.href = extensionUrl;
 
         // Fallback message if redirect fails (e.g. extension not installed)
-        setTimeout(() => {
-            document.querySelector('p').innerHTML = 'It seems the Omni Extension is not responding.<br>Please ensure it is installed and enabled in this browser.';
+        setTimeout(() => {{
+            document.querySelector('p').innerHTML = 'It seems the Omni Extension is not responding.<br>Please ensure it is installed and enabled in this browser.<br><br><i>Check AUTOMA_EXTENSION_ID if using Edge.</i>';
             document.querySelector('.loader').style.display = 'none';
-        }, 3000);
+        }}, 3000);
     </script>
 </body>
 </html>
-"#;
+"#,
+        extension_id = extension_id,
+        extension_scheme = extension_scheme
+    );
 
     Html(html)
 }

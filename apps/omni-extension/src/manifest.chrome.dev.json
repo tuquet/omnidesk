@@ -1,4 +1,5 @@
 {
+  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAwganQYBi0otGX44C48JaCFeKBJ8P7unMYXT9UdQu81tsX03AfLQ4x0Sk8V+aJh0krBfdPVw7NGNOPMB/sk7q/iJdBoNIU7tuqsG3IsmR+cuv9GW0BzbzHnnHlRo+r1WCPr+HCelUQwZBxsmdEi2kNWl+JmYd6mItPLP8J+ECiIMiVIs45UOaFLnvzKutWqzjZkhtJl2tBd2jKPRKLZff0HmTySE/CHYQwER8mS5JQ8aPPv86JT+xTcUeKPgLcGgBAupvisocmi9yUN7YAIXA0CP7aHYC7E9NCo5Qv3zxO7gIG45Z2hQ1C0OocnJySGOsYWaRXAqUe6uYbvTWWZpZuwIDAQAB",
   "manifest_version": 3,
   "name": "Automa-Dev",
   "minimum_chrome_version": "116",
