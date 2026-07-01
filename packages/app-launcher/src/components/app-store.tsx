@@ -1,5 +1,6 @@
 import { useState, useMemo, useCallback, useEffect } from 'react';
 import { useAuth } from '@omnidesk/auth';
+import type { MarketplaceApp } from '@omnidesk/types';
 import { APP_REGISTRY } from '../config/registry';
 import {
   launcherActions,
@@ -12,7 +13,6 @@ import {
   useInstallApp,
   useUninstallApp,
   useLocalInstalledApps,
-  type MarketplaceApp,
 } from '../api/queries';
 import { Button, Input, Skeleton, cn } from '@omnidesk/ui';;
 import { Search, AlertCircle, RefreshCw, CloudUpload } from 'lucide-react';

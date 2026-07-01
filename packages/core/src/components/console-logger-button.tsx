@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { Bug, Copy, Trash2, XCircle, AlertTriangle, Info, Terminal } from 'lucide-react';
 import { Button, DropdownMenu, DropdownMenuContent, DropdownMenuTrigger, Badge, DropdownMenuLabel, DropdownMenuSeparator } from '@omnidesk/ui';;
-import { useConsoleStore } from '@omnidesk/core';
-import type { LogLevel } from '@omnidesk/core';
+import { useConsoleStore } from '../stores/use-console-store';
+import type { LogLevel } from '@omnidesk/types';
 import { toast } from 'sonner';
 
 const getLevelIcon = (level: LogLevel) => {

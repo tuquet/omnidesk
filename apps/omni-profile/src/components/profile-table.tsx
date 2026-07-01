@@ -1,3 +1,5 @@
+import type { BrowserProfile } from '@omnidesk/types';
+
 import { useRef, useMemo, useCallback } from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, Badge, Button, Skeleton, Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@omnidesk/ui';;
 import {
@@ -11,7 +13,6 @@ import {
   ArrowUpDownIcon,
   WorkflowIcon,
 } from 'lucide-react';
-import type { BrowserProfile } from '@omnidesk/browser-profiles';
 import { InlineTagEditor } from './inline-tag-editor';
 import {
   useReactTable,

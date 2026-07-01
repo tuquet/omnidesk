@@ -1,46 +1,6 @@
-import type { LucideIcon } from 'lucide-react';
-import type { Permission } from './rbac';
-import {
-  LayoutDashboardIcon,
-  ActivityIcon,
-  TerminalIcon,
-  SettingsIcon,
-  StoreIcon,
-  CalendarIcon,
-} from 'lucide-react';
-
-// ─── Types ───────────────────────────────────────────────────────────────────
-
-export interface NavItem {
-  title: string;
-  url: string;
-  icon: LucideIcon;
-  /** Optional child items for collapsible groups. */
-  items?: Omit<NavItem, 'icon' | 'items'>[];
-  /** If `true` the collapsible group starts open. */
-  isActive?: boolean;
-  /**
-   * RBAC permission required to see this item.
-   * When `undefined` the item is always visible.
-   * When RBAC is disabled (`VITE_RBAC_ENABLED=false`) this is ignored.
-   */
-  requiredPermission?: Permission;
-}
-
-export interface NavGroup {
-  /** Group label shown in the sidebar. */
-  label: string;
-  items: NavItem[];
-  /** RBAC permission required to see the entire group. */
-  requiredPermission?: Permission;
-}
-
-export interface DocumentItem {
-  name: string;
-  url: string;
-  icon: LucideIcon;
-  requiredPermission?: Permission;
-}
+import { type NavItem, type NavGroup, type DocumentItem, type BreadcrumbEntry, type Permission } from '@omnidesk/types';
+export type { NavItem, NavGroup, DocumentItem, BreadcrumbEntry, Permission };
+import { CalendarIcon, ActivityIcon, LayoutDashboardIcon, TerminalIcon, SettingsIcon, StoreIcon } from 'lucide-react';
 
 // ─── Navigation Groups ──────────────────────────────────────────────────────
 
@@ -76,12 +36,7 @@ export const NAV_DOCUMENTS: DocumentItem[] = [];
 
 // ─── Breadcrumb Route Map ───────────────────────────────────────────────────
 
-export interface BreadcrumbEntry {
-  label: string;
-  url: string;
-  /** Sibling pages at the same level — shown in the dropdown. */
-  siblings?: { label: string; url: string }[];
-}
+
 
 /**
  * Build a complete breadcrumb map from the navigation groups.
@@ -127,12 +82,12 @@ function buildBreadcrumbMap(): Record<string, BreadcrumbEntry[]> {
   }
 
   // Documents
-  const docSiblings = NAV_DOCUMENTS.map((d) => ({ label: d.name, url: d.url }));
+  const docSiblings = NAV_DOCUMENTS.map((d) => ({ label: d.title, url: d.url }));
   const firstDocUrl = NAV_DOCUMENTS[0]?.url ?? '';
   for (const doc of NAV_DOCUMENTS) {
     map[doc.url] = [
       { label: 'Documents', url: firstDocUrl, siblings: docSiblings },
-      { label: doc.name, url: doc.url },
+      { label: doc.title, url: doc.url },
     ];
   }
 

@@ -22,15 +22,7 @@ import {
 import { CSS } from '@dnd-kit/utilities';
 import { apiUrl } from '../lib/api-config';
 
-interface InstalledApp {
-  user_id: string;
-  app_id: string;
-  marketplace_apps: {
-    id: string;
-    name: string;
-    package_hash: string;
-  };
-}
+import type { InstalledApp } from '@omnidesk/types';
 
 interface AppItem {
   id: string;

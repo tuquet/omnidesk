@@ -1,3 +1,4 @@
+import type { AppDefinition } from '@omnidesk/types';
 import * as React from 'react';
 import { useNavigate } from '@tanstack/react-router';
 import { Button, Command, CommandDialog, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList, CommandSeparator } from '@omnidesk/ui';;
@@ -6,7 +7,7 @@ import { SearchIcon } from 'lucide-react';
 
 import { useTranslation } from 'react-i18next';
 import { useLauncherStore } from '@omnidesk/app-launcher';
-import { APP_REGISTRY, type AppDefinition } from '@omnidesk/app-launcher';
+import { APP_REGISTRY} from '@omnidesk/app-launcher';
 
 export function GlobalSearch({ triggerNode }: { triggerNode?: React.ReactNode }) {
   const [open, setOpen] = React.useState(false);

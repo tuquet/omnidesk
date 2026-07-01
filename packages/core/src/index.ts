@@ -18,6 +18,7 @@ export * from './components/window-controls';
 export * from './components/header-user';
 export * from './providers/platform-provider';
 export * from './hooks/use-deep-link-auth';
+export type { PlatformAdapter } from '@omnidesk/types';
 
 // Stores
 export * from './stores/use-console-store';
@@ -34,6 +35,4 @@ export * from './components/omni-layout';
 
 // API
 export * from './lib/api-config';
-
-// API
-export * from './lib/api-config';
+export * from './lib/rbac';

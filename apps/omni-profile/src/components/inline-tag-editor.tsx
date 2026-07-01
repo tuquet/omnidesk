@@ -1,7 +1,8 @@
 import { useState, useRef, useEffect } from 'react';
 import { Badge, Button, Input } from '@omnidesk/ui';;
 import { PlusIcon } from 'lucide-react';
-import { useBrowserProfileStore, type BrowserProfile } from '@omnidesk/browser-profiles';
+import { useBrowserProfileStore } from '@omnidesk/browser-profiles';
+import type { BrowserProfile } from '@omnidesk/types';
 import { toast } from 'sonner';
 
 interface InlineTagEditorProps {

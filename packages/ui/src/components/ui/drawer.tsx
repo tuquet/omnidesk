@@ -16,6 +16,7 @@ function DrawerPortal({
   ...props
 }: React.ComponentProps<typeof DrawerPrimitive.Portal> & { children?: React.ReactNode }) {
   return (
+    // @ts-ignore - vaul DrawerPrimitive.Portal types might be slightly out of sync
     <DrawerPrimitive.Portal data-slot="drawer-portal" {...props}>
       {children}
     </DrawerPrimitive.Portal>

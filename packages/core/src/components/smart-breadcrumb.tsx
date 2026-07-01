@@ -1,7 +1,8 @@
 import * as React from 'react';
 import { Link, useRouterState } from '@tanstack/react-router';
 import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbPage, BreadcrumbSeparator, DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from '@omnidesk/ui';;
-import { useAppConfig, type BreadcrumbEntry } from '../providers/config-provider';
+import { useAppConfig } from '../providers/config-provider';
+import type { BreadcrumbEntry } from '@omnidesk/types';
 import { useTranslation } from 'react-i18next';
 import { ChevronDownIcon, Home } from 'lucide-react';
 import { useDevStore } from '@omnidesk/core';

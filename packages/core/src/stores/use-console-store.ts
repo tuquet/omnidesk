@@ -2,14 +2,7 @@
 import { Store } from '@tanstack/store';
 import { useStore } from '@tanstack/react-store';
 
-export type LogLevel = 'log' | 'info' | 'warn' | 'error';
-
-export interface LogEntry {
-  id: string;
-  level: LogLevel;
-  message: string;
-  timestamp: number;
-}
+import type { LogLevel, LogEntry } from '@omnidesk/types';
 
 export interface ConsoleState {
   logs: LogEntry[];

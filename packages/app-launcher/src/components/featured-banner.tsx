@@ -1,4 +1,4 @@
-import type { MarketplaceApp } from '../api/queries';
+import type { MarketplaceApp } from '@omnidesk/types';
 import { APP_REGISTRY } from '../config/registry';
 import { Button } from '@omnidesk/ui';;
 import { Package, Loader2 } from 'lucide-react';

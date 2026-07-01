@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { z } from 'zod';
 import { client } from '../lib/api-client';
+import type { MarketplaceApp, InstalledAppDetails } from '@omnidesk/types';
 
 // ─── Zod Schemas ────────────────────────────────────────────────────────────
 
@@ -17,7 +18,6 @@ const marketplaceAppSchema = z.object({
   download_url: z.string().nullable().optional(),
 });
 
-export type MarketplaceApp = z.infer<typeof marketplaceAppSchema>;
 
 // ─── Query Keys ─────────────────────────────────────────────────────────────
 
@@ -36,7 +36,7 @@ export function useMarketplaceApps() {
       const { data } = await client.get({
         url: '/api/apps',
       });
-      return z.array(marketplaceAppSchema).parse(data);
+      return z.array(marketplaceAppSchema).parse(data) as MarketplaceApp[];
     },
     staleTime: 5 * 60 * 1000,
   });
@@ -82,7 +82,6 @@ const installedAppDetailsSchema = z.object({
   version: z.string(),
 });
 
-export type InstalledAppDetails = z.infer<typeof installedAppDetailsSchema>;
 
 export function useInstalledAppsDetails() {
   return useQuery({
@@ -91,7 +90,7 @@ export function useInstalledAppsDetails() {
       const { data } = await client.get({
         url: '/api/apps/installed-details',
       });
-      return z.array(installedAppDetailsSchema).parse(data);
+      return z.array(installedAppDetailsSchema).parse(data) as InstalledAppDetails[];
     },
     staleTime: 60 * 1000,
   });

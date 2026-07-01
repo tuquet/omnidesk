@@ -5,27 +5,7 @@ import { client } from '@/lib/api-client';
 import { CheckCircleIcon, XCircleIcon, ClockIcon, PlayCircleIcon } from 'lucide-react';
 import Editor from '@monaco-editor/react';
 
-export type WorkflowRun = {
-  id: string;
-  workflow_id: string;
-  profile_id: string | null;
-  schedule_id: string | null;
-  status: string;
-  started_at: string;
-  ended_at: string | null;
-  error_message: string | null;
-  summary: string | null;
-};
-
-export type WorkflowLog = {
-  id: string;
-  run_id: string;
-  block_id: string;
-  block_label: string;
-  status: string;
-  duration_ms: number | null;
-  data: string | null;
-};
+import type { WorkflowRun, WorkflowLog } from '@omnidesk/types';
 
 interface WorkflowLogsModalProps {
   workflowId: string | null;

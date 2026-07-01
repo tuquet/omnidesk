@@ -1,8 +1,10 @@
+import type { BrowserProfile } from '@omnidesk/types';
+
 import { useState, useEffect } from 'react';
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription, Button, Input, Label, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Textarea, Separator } from '@omnidesk/ui';;
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription, Button, Input, Label, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Textarea, Separator } from '@omnidesk/ui';
 import { Loader2Icon, SaveIcon, PlusIcon } from 'lucide-react';
 import { toast } from 'sonner';
-import { useBrowserProfileStore, type BrowserProfile } from '@omnidesk/browser-profiles';
+import { useBrowserProfileStore } from '@omnidesk/browser-profiles';
 import { ProxyConfig, type ProxyData } from './proxy-config';
 
 interface ProfileFormDialogProps {

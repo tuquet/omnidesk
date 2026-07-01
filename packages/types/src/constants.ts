@@ -9,6 +9,18 @@ export const STORAGE_KEYS = {
   LAUNCHER: 'omnidesk-launcher',
 } as const;
 
+export const TITLE_BAR_HEIGHT = 32; // h-8
+export const WINDOW_CONTROL_WIDTH = 40; // w-10
+export const SIDEBAR_WIDTH_MULTIPLIER = 72;
+export const SIDEBAR_WIDTH = `calc(var(--spacing) * 72)`;
+export const HEADER_HEIGHT_MULTIPLIER = 12;
+export const HEADER_HEIGHT = `calc(var(--spacing) * 12)`;
+export const PROGRESS_BAR_HEIGHT = 3.5;
+export const PROGRESS_BAR_Z = 9999;
+export const PAGE_TRANSITION_DURATION = 350;
+export const SIDEBAR_TRANSITION_DURATION = 200;
+export const CHART_FREEZE_BUFFER = 50;
+
 export const IPC_EVENTS = {
   E2E_LOG: 'e2e-log',
   DEEP_LINK_RECEIVED: 'deep-link-received',

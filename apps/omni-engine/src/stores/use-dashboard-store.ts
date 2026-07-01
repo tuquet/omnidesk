@@ -124,7 +124,7 @@ export const dashboardActions = {
   },
 
   async initListeners() {
-    return tauriAdapter.listen<string>(IPC_EVENTS.E2E_LOG, (payload) => {
+    return tauriAdapter.listen<string>(IPC_EVENTS.E2E_LOG, (payload: any) => {
       dashboardActions.appendLog(payload);
     });
   }

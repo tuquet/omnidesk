@@ -1,10 +1,10 @@
 import { useParams, useNavigate } from '@tanstack/react-router';
 import { useLauncherStore, launcherActions } from '../stores/use-launcher-store';
+import type { MarketplaceApp } from '@omnidesk/types';
 import {
   useMarketplaceApps,
   useInstallApp,
   useUninstallApp,
-  type MarketplaceApp,
   useInstalledAppsDetails,
 } from '../api/queries';
 import { APP_REGISTRY } from '../config/registry';

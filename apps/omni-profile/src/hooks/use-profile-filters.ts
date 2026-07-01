@@ -1,5 +1,6 @@
+import type { BrowserProfile } from '@omnidesk/types';
 import { useState, useMemo } from 'react';
-import type { BrowserProfile } from '@omnidesk/browser-profiles';
+
 import { useDebounce } from 'use-debounce';
 
 export function useProfileFilters(profiles: BrowserProfile[]) {

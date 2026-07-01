@@ -1,4 +1,4 @@
-import type { PlatformAdapter } from '@omnidesk/core';
+import type { PlatformAdapter } from '@omnidesk/types';
 
 export const webAdapter: PlatformAdapter = {
   platform: 'web',

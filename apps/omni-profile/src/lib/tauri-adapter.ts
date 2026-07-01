@@ -1,4 +1,4 @@
-import type { PlatformAdapter } from '@omnidesk/core';
+import type { PlatformAdapter } from '@omnidesk/types';
 import { invoke } from '@tauri-apps/api/core';
 import { convertFileSrc } from '@tauri-apps/api/core';
 import { appDataDir } from '@tauri-apps/api/path';

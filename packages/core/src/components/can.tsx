@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 import { useAppConfig } from '../providers/config-provider';
-type Permission = any;
+import type { Permission } from '@omnidesk/types';
 
 interface CanProps {
   /** Permission required to render children (e.g., 'team:manage') */

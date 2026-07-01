@@ -23,20 +23,7 @@ import {
 } from '@tanstack/react-table';
 import { useVirtualizer } from '@tanstack/react-virtual';
 
-export type Workflow = {
-  id: string;
-  name: string;
-  description: string | null;
-  is_disabled: number | null;
-  updated_at: string | null;
-  created_at?: string | null;
-  drawflow?: { nodes?: any[]; edges?: any[]; [key: string]: any } | string | null;
-  global_data?: string | null;
-  table_data?: any[] | null;
-  settings?: Record<string, any> | string | null;
-  trigger?: { parameters?: any[]; triggers?: any[]; [key: string]: any } | string | null;
-  [key: string]: any;
-};
+import type { Workflow } from '@omnidesk/types';
 
 interface WorkflowsTableProps {
   workflows: Workflow[];

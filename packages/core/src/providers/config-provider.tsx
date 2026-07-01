@@ -1,18 +1,6 @@
 import { createContext, useContext, ReactNode, useMemo } from 'react';
 
-export interface NavItem {
-  title?: string;
-  name?: string;
-  url: string;
-  icon: any;
-  requiredPermission?: any;
-}
-
-export interface BreadcrumbEntry {
-  label: string;
-  url: string;
-  siblings?: BreadcrumbEntry[];
-}
+import type { NavItem, BreadcrumbEntry } from '@omnidesk/types';
 
 export interface AppConfig {
   appName?: string;

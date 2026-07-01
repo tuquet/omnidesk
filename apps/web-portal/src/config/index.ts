@@ -12,15 +12,7 @@ export {
   SIDEBAR_TRANSITION_DURATION,
   CHART_FREEZE_BUFFER,
 } from './layout';
-export {
-  NAV_MAIN,
-  NAV_SHOWCASE,
-  NAV_ERROR_PAGES,
-  NAV_CLOUDS,
-  NAV_SECONDARY,
-  NAV_DOCUMENTS,
-  BREADCRUMB_MAP,
-} from './navigation';
-export type { NavItem, NavGroup, DocumentItem, BreadcrumbEntry } from './navigation';
-export { RBAC_ENABLED, PERMISSIONS, hasPermission } from './rbac';
-export type { Permission } from './rbac';
+export * from './navigation';
+export type { NavItem, NavGroup, DocumentItem, BreadcrumbEntry } from '@omnidesk/types';
+export * from './rbac';
+export type { Permission } from '@omnidesk/types';

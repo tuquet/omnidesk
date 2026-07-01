@@ -10,10 +10,16 @@
     "./schemas": "./src/schemas/index.ts",
     "./enums": "./src/enums/index.ts"
   },
+  "scripts": {
+    "generate:client": "openapi-ts"
+  },
   "dependencies": {
+    "@hey-api/client-fetch": "^0.13.1",
     "zod": "^4.4.3"
   },
   "devDependencies": {
-    "@typescript/native-preview": "7.0.0-dev.20260421.2"
+    "@hey-api/openapi-ts": "^0.98.2",
+    "@typescript/native-preview": "7.0.0-dev.20260421.2",
+    "lucide-react": "^0.475.0"
   }
 }

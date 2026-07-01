@@ -20,7 +20,6 @@
     "@dnd-kit/sortable": "^10.0.0",
     "@dnd-kit/utilities": "^3.2.2",
     "@fontsource-variable/inter": "^5.2.8",
-    "@hey-api/client-fetch": "^0.13.1",
     "@omnidesk/app-automa": "workspace:*",
     "@omnidesk/app-launcher": "workspace:*",
     "@omnidesk/auth": "workspace:*",
@@ -59,7 +58,6 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.21.0",
-    "@hey-api/openapi-ts": "^0.98.2",
     "@omnidesk/config": "workspace:*",
     "@tailwindcss/vite": "^4.0.0",
     "@tanstack/react-query-devtools": "^5.101.0",
