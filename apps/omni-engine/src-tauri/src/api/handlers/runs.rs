@@ -52,13 +52,33 @@ async fn create_run(
     
     let p_id = payload.profile_id.unwrap_or_else(|| "default".to_string());
     
-    match crate::services::workflow_executor::WorkflowExecutor::execute(
-        &db, &app, &ws_tx, &payload.workflow_id, &p_id, payload.schedule_id.as_deref(), payload.variables
+    // Attempt to get workflow name
+    let workflow_name = sqlx::query_scalar::<_, String>("SELECT name FROM workflows WHERE id = ?")
+        .bind(&payload.workflow_id)
+        .fetch_optional(&db)
+        .await
+        .unwrap_or_default()
+        .unwrap_or_else(|| "Unknown Workflow".to_string());
+
+    match omni_shared::automa::executor::SharedWorkflowExecutor::execute(
+        &db, &ws_tx, &payload.workflow_id, &workflow_name, None, &p_id, payload.schedule_id.as_deref(), payload.variables, 1423
     ).await {
-        Ok(run) => Ok(Json(serde_json::json!({ "id": run.id, "status": run.status }))),
+        Ok(exec_result) => {
+            let run_id = match exec_result {
+                omni_shared::automa::executor::ExecutionResult::NeedsDefaultBrowser { run_id, bridge_url } => {
+                    use tauri_plugin_opener::OpenerExt;
+                    if let Err(e) = app.opener().open_url(&bridge_url, None::<&str>) {
+                        eprintln!("[Runs] Failed to open default browser: {}", e);
+                    }
+                    run_id
+                },
+                omni_shared::automa::executor::ExecutionResult::LaunchedProfile { run_id } => run_id,
+            };
+            Ok(Json(serde_json::json!({ "id": run_id, "status": "LAUNCHING" })))
+        },
         Err(e) => {
             eprintln!("Failed to execute workflow: {:?}", e);
-            Err(e)
+            Err(crate::error::AppError::Internal(format!("{:?}", e)))
         }
     }
 }

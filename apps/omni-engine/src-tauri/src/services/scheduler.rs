@@ -7,11 +7,11 @@ use uuid::Uuid as JobUuid;
 
 use crate::db::models::workflow::Schedule;
 use crate::error::AppError;
-use crate::services::workflow_executor::WorkflowExecutor;
+use omni_shared::automa::executor::{SharedWorkflowExecutor, ExecutionResult};
 use crate::db::models::workflow::WorkflowRun;
 use tauri::AppHandle;
 use tokio::sync::broadcast::Sender;
-use crate::api::handlers::automa::AutomaEvent;
+use omni_shared::automa::AutomaEvent;
 
 /// SchedulerService manages cron jobs for automated workflow execution.
 ///
@@ -101,9 +101,20 @@ impl SchedulerService {
                 .await;
 
                 // Execute the workflow
-                match WorkflowExecutor::execute(&db, &app_handle, &ws_tx, &workflow_id, &profile_id, Some(&schedule_id), None).await {
-                    Ok(run) => {
-                        println!("[Scheduler] Run {} completed with status: {}", run.id, run.status);
+                let workflow_name = schedule_name.clone(); // In a real scenario you might look this up
+                match SharedWorkflowExecutor::execute(&db, &ws_tx, &workflow_id, &workflow_name, None, &profile_id, Some(&schedule_id), None, 1423).await {
+                    Ok(exec_result) => {
+                        let run_id = match exec_result {
+                            ExecutionResult::NeedsDefaultBrowser { run_id, bridge_url } => {
+                                use tauri_plugin_opener::OpenerExt;
+                                if let Err(e) = app_handle.opener().open_url(&bridge_url, None::<&str>) {
+                                    eprintln!("[Scheduler] Failed to open default browser: {}", e);
+                                }
+                                run_id
+                            },
+                            ExecutionResult::LaunchedProfile { run_id } => run_id,
+                        };
+                        println!("[Scheduler] Run {} started successfully.", run_id);
                     }
                     Err(e) => {
                         eprintln!("[Scheduler] Execution failed: {:?}", e);
@@ -172,7 +183,42 @@ impl SchedulerService {
         .execute(db)
         .await;
 
-        // Execute
-        WorkflowExecutor::execute(db, &self.app_handle, &self.automa_ws_tx, &schedule.workflow_id, &schedule.profile_id, Some(&schedule.id), None).await
+        let workflow_name = schedule.name.clone();
+        let exec_result = SharedWorkflowExecutor::execute(
+            db, 
+            &self.automa_ws_tx, 
+            &schedule.workflow_id, 
+            &workflow_name, 
+            None, 
+            &schedule.profile_id, 
+            Some(&schedule.id), 
+            None, 
+            1423
+        ).await?;
+
+        let run_id = match exec_result {
+            ExecutionResult::NeedsDefaultBrowser { run_id, bridge_url } => {
+                use tauri_plugin_opener::OpenerExt;
+                if let Err(e) = self.app_handle.opener().open_url(&bridge_url, None::<&str>) {
+                    eprintln!("[Scheduler] Failed to open default browser: {}", e);
+                }
+                run_id
+            },
+            ExecutionResult::LaunchedProfile { run_id } => run_id,
+        };
+        
+        // Construct a dummy WorkflowRun for the response
+        Ok(WorkflowRun {
+            id: run_id,
+            workflow_id: schedule.workflow_id.clone(),
+            profile_id: Some(schedule.profile_id.clone()),
+            schedule_id: Some(schedule.id.clone()),
+            status: "LAUNCHING".to_string(),
+            started_at: Some(chrono::Utc::now().to_rfc3339()),
+            finished_at: None,
+            created_at: Some(chrono::Utc::now().to_rfc3339()),
+            error_message: None,
+            summary: None,
+        })
     }
 }

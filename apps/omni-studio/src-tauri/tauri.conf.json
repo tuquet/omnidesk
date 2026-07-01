@@ -5,7 +5,7 @@
   "identifier": "omnidesk-omni-studio",
   "build": {
     "beforeDevCommand": "pnpm dev",
-    "devUrl": "http://localhost:5173",
+    "devUrl": "http://localhost:14220",
     "beforeBuildCommand": "pnpm build",
     "frontendDist": "../dist"
   },

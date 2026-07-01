@@ -11,6 +11,13 @@ use uuid::Uuid;
 use axum::http::StatusCode;
 
 use crate::{api::AppState, services::mcp_service};
+use axum::routing::{get, post};
+
+pub fn router() -> axum::Router<AppState> {
+    axum::Router::new()
+        .route("/sse", get(mcp_sse))
+        .route("/messages", post(mcp_messages))
+}
 
 #[derive(Deserialize)]
 pub struct SessionQuery {

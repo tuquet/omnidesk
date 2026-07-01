@@ -167,6 +167,11 @@ pub async fn delete_profile(
 }
 
 
+#[derive(serde::Deserialize)]
+pub struct LaunchQuery {
+    pub startup_url: Option<String>,
+}
+
 #[utoipa::path(
     post,
     path = "/api/browser-profiles/{id}/launch",
@@ -174,12 +179,14 @@ pub async fn delete_profile(
         (status = 200, description = "Browser launched successfully")
     ),
     params(
-        ("id" = String, Path, description = "Browser profile ID")
+        ("id" = String, Path, description = "Browser profile ID"),
+        ("startup_url" = Option<String>, Query, description = "Optional URL to open on launch")
     )
 )]
 pub async fn launch_profile(
     State(state): State<AppState>,
     Path(id): Path<String>,
+    axum::extract::Query(query): axum::extract::Query<LaunchQuery>,
 ) -> Result<StatusCode, StatusCode> {
     let pool = &state.db;
     let app = state.app_handle.clone();
@@ -195,7 +202,7 @@ pub async fn launch_profile(
         }
     };
 
-    match BrowserProfileService::launch(pool, &app, &id).await {
+    match BrowserProfileService::launch(pool, &app, &id, query.startup_url.as_deref()).await {
         Ok(_) => Ok(StatusCode::OK),
         Err(e) => {
             eprintln!("Failed to launch browser: {:?}", e);

@@ -51,9 +51,14 @@ impl BrowserLauncher {
         &self,
         profile: &BrowserProfile,
         app: &tauri::AppHandle,
-        data_dir: &std::path::Path
+        data_dir: &std::path::Path,
+        startup_url: Option<&str>
     ) -> Result<u32, AppError> {
         let mut cmd = self.build_command(profile, app, data_dir).await?;
+        
+        if let Some(url) = startup_url {
+            cmd.arg(url);
+        }
         
         println!("[Tauri] Launching browser via Strategy: {:?}", cmd);
         

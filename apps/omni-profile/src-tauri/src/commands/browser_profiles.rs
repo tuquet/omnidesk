@@ -49,7 +49,7 @@ pub async fn launch_browser_profile(
     pool: State<'_, SqlitePool>,
     app: tauri::AppHandle,
 ) -> Result<(), String> {
-    BrowserProfileService::launch(&pool, &app, &id)
+    BrowserProfileService::launch(&pool, &app, &id, None)
         .await
         .map_err(String::from)
 }

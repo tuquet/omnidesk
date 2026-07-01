@@ -18,7 +18,12 @@ pub async fn init_db(app_dir: PathBuf) -> Result<SqlitePool, sqlx::Error> {
         .await?;
         
     // Run migrations automatically on startup
-    sqlx::migrate!("../../../packages-rs/omni-shared/migrations").run(&pool).await?;
-        
+    let mut shared_migrator = sqlx::migrate!("../../../packages-rs/omni-shared/migrations");
+    shared_migrator.set_ignore_missing(true);
+    shared_migrator.run(&pool).await?;
+
+    let mut automa_migrator = sqlx::migrate!("../../../packages-rs/omni-shared/migrations-automa");
+    automa_migrator.set_ignore_missing(true);
+    automa_migrator.run(&pool).await?;
     Ok(pool)
 }

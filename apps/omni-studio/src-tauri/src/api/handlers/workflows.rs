@@ -1,6 +1,6 @@
 use axum::{
     extract::{Path, Query, State},
-    routing::{get, post, put, delete},
+    routing::{get, post, delete},
     Json, Router,
 };
 use serde::{Deserialize, Serialize};
@@ -358,25 +358,87 @@ pub struct CreateRunPayload {
     tag = "workflows"
 )]
 async fn create_workflow_run(
+    State(state): State<AppState>,
     Json(payload): Json<CreateRunPayload>,
 ) -> Result<Json<serde_json::Value>, AppError> {
     let client = reqwest::Client::new();
+    let engine_health_url = "http://127.0.0.1:1423/health";
     let engine_url = "http://127.0.0.1:1423/api/engine/runs";
     
-    let res = client.post(engine_url).json(&payload).send().await;
+    // Check if we should fallback immediately
+    let is_default = payload.profile_id.as_deref() == Some("default");
     
-    match res {
-        Ok(r) if r.status().is_success() => {
-            let run: serde_json::Value = r.json().await.map_err(|e| AppError::Internal(format!("Failed to parse run: {}", e)))?;
-            Ok(Json(run))
-        },
-        Ok(r) => {
-            Err(AppError::Internal(format!("Engine returned {}", r.status())))
-        },
-        Err(e) => {
-            Err(AppError::Internal(format!("Failed to connect to Omni Engine: {}", e)))
+    let mut use_fallback = false;
+    let mut fallback_reason = String::new();
+    
+    if !is_default {
+        // Quick healthcheck to see if engine is alive
+        let health_res = client.get(engine_health_url).timeout(std::time::Duration::from_millis(500)).send().await;
+        if health_res.is_ok() && health_res.unwrap().status().is_success() {
+            let res = client.post(engine_url).json(&payload).send().await;
+            match res {
+                Ok(r) if r.status().is_success() => {
+                    let run: serde_json::Value = r.json().await.map_err(|e| AppError::Internal(format!("Failed to parse run: {}", e)))?;
+                    return Ok(Json(run));
+                },
+                Ok(r) => {
+                    // If it returned an error status, it means engine is reachable but rejected it.
+                    return Err(AppError::Internal(format!("Engine returned {}", r.status())));
+                },
+                Err(e) => {
+                    use_fallback = true;
+                    fallback_reason = format!("Engine reachable but POST failed ({})", e);
+                }
+            }
+        } else {
+            use_fallback = true;
+            fallback_reason = "Engine unreachable (healthcheck failed)".to_string();
         }
+    } else {
+        use_fallback = true;
+        fallback_reason = "Default profile requested".to_string();
     }
+    
+    if use_fallback {
+        println!("[Studio] Fallback executing workflow locally. Reason: {}", fallback_reason);
+        // Get the workflow to send down
+        let workflow = WorkflowService::get_by_id(&state.db, &payload.workflow_id).await?;
+        let api_workflow = ApiWorkflow::from(workflow.clone());
+        let workflow_json = serde_json::to_value(api_workflow).unwrap_or(serde_json::json!({
+            "id": payload.workflow_id,
+            "name": workflow.name.clone()
+        }));
+        
+        let exec_result = omni_shared::automa::executor::SharedWorkflowExecutor::execute(
+            &state.db,
+            &state.automa_ws_tx,
+            &payload.workflow_id,
+            &workflow.name,
+            Some(workflow_json),
+            payload.profile_id.as_deref().unwrap_or("default"),
+            payload.schedule_id.as_deref(),
+            payload.variables.clone(),
+            1422, // Studio port
+        ).await?;
+        
+        let run_id = match exec_result {
+            omni_shared::automa::executor::ExecutionResult::NeedsDefaultBrowser { run_id, bridge_url } => {
+                use tauri_plugin_opener::OpenerExt;
+                if let Err(e) = state.app_handle.opener().open_url(&bridge_url, None::<&str>) {
+                    eprintln!("[Studio] Failed to open default browser: {}", e);
+                }
+                run_id
+            },
+            omni_shared::automa::executor::ExecutionResult::LaunchedProfile { run_id } => run_id,
+        };
+        
+        return Ok(Json(serde_json::json!({
+            "run_id": run_id,
+            "status": "LAUNCHING"
+        })));
+    }
+    
+    Err(AppError::Internal("Unhandled fallback state".to_string()))
 }
 
 

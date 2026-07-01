@@ -23,7 +23,7 @@ pub struct AppState {
     pub mcp_sessions: Arc<RwLock<HashMap<String, mpsc::Sender<serde_json::Value>>>>,
     pub app_dir: PathBuf,
     pub app_handle: AppHandle,
-    pub automa_ws_tx: tokio::sync::broadcast::Sender<handlers::automa::AutomaEvent>,
+    pub automa_ws_tx: tokio::sync::broadcast::Sender<omni_shared::automa::AutomaEvent>,
     /// Cron scheduler for automated workflow execution (None if startup failed)
     pub scheduler: Option<crate::services::scheduler::SchedulerService>,
 }

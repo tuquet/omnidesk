@@ -1,6 +1,5 @@
 use sqlx::SqlitePool;
 use reqwest::Client;
-use tauri::AppHandle;
 use tokio::sync::broadcast::Sender;
 use std::time::Duration;
 use crate::error::AppError;
@@ -13,14 +12,17 @@ pub struct AutomaEvent {
     pub payload: Value,
 }
 
+pub enum ExecutionResult {
+    NeedsDefaultBrowser { run_id: String, bridge_url: String },
+    LaunchedProfile { run_id: String },
+}
+
 pub struct SharedWorkflowExecutor;
 
 impl SharedWorkflowExecutor {
-    /// Executes a workflow, either via Omni Engine/Profile or via the Default Browser
-    /// Returns the run_id of the created run.
+    /// Executes a workflow, returning the intent for the caller to handle side-effects (e.g. launching a browser).
     pub async fn execute(
         db: &SqlitePool,
-        app: &AppHandle,
         ws_tx: &Sender<AutomaEvent>,
         workflow_id: &str,
         workflow_name: &str,
@@ -29,7 +31,7 @@ impl SharedWorkflowExecutor {
         schedule_id: Option<&str>,
         variables: Option<Value>,
         server_port: u16,
-    ) -> Result<String, AppError> {
+    ) -> Result<ExecutionResult, AppError> {
         
         // 1. Profile Lock Check
         let active_runs: i64 = sqlx::query_scalar(
@@ -66,20 +68,17 @@ impl SharedWorkflowExecutor {
 
         println!("[SharedExecutor] Created run {} for workflow '{}'", run_id, workflow_name);
 
-        // 3. Launch browser
-        if profile_id == "default" {
-            let bridge_url = format!("http://127.0.0.1:{}/api/automa/bridge?run_id={}", server_port, run_id);
-            println!("[SharedExecutor] Launching default browser: {}", bridge_url);
-            
-            use tauri_plugin_opener::OpenerExt;
-            if let Err(e) = app.opener().open_url(&bridge_url, None::<&str>) {
-                eprintln!("[SharedExecutor] Failed to open default browser: {}", e);
-            }
+        // 3. Prepare launch instructions
+        let bridge_url = format!("http://127.0.0.1:{}/api/automa/bridge?run_id={}&profile_id={}", server_port, run_id, profile_id);
+        
+        let exec_result = if profile_id == "default" {
+            ExecutionResult::NeedsDefaultBrowser { run_id: run_id.clone(), bridge_url }
         } else {
             let client = Client::new();
             let profile_api_url = format!("http://127.0.0.1:1421/api/browser-profiles/{}/launch", profile_id);
             
             let launch_res = client.post(&profile_api_url)
+                .query(&[("startup_url", &bridge_url)])
                 .send()
                 .await;
                 
@@ -87,7 +86,8 @@ impl SharedWorkflowExecutor {
                 eprintln!("[SharedExecutor] Failed to call Profile API to launch browser: {}", e);
                 return Err(AppError::Internal(format!("Failed to launch profile: {}", e)));
             }
-        }
+            ExecutionResult::LaunchedProfile { run_id: run_id.clone() }
+        };
 
         // Wait briefly for the browser to launch and connect
         tokio::time::sleep(Duration::from_secs(3)).await;
@@ -115,6 +115,6 @@ impl SharedWorkflowExecutor {
             eprintln!("[SharedExecutor] Failed to send execute_workflow event to WS: {}", e);
         }
 
-        Ok(run_id)
+        Ok(exec_result)
     }
 }

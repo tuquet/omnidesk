@@ -239,7 +239,7 @@ impl BrowserProfileService {
         Ok(())
     }
 
-    pub async fn launch(pool: &SqlitePool, app: &tauri::AppHandle, id: &str) -> Result<(), AppError> {
+    pub async fn launch(pool: &SqlitePool, app: &tauri::AppHandle, id: &str, startup_url: Option<&str>) -> Result<(), AppError> {
         let profile = Self::get_by_id(pool, id).await?;
         
         use crate::services::browser_launcher::LauncherFactory;
@@ -266,7 +266,7 @@ impl BrowserProfileService {
                 .map_err(|e| crate::error::AppError::Internal(format!("Failed to create data dir: {}", e)))?;
         }
         
-        let pid = launcher.launch(&profile, app, &data_dir).await?;
+        let pid = launcher.launch(&profile, app, &data_dir, startup_url).await?;
         
         let _ = sqlx::query("UPDATE browser_profiles SET status = 'RUNNING', pid = ?, last_used_at = CURRENT_TIMESTAMP WHERE id = ?")
             .bind(pid as i32)
