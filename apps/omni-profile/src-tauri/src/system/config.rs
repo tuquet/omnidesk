@@ -38,7 +38,7 @@ pub fn write_config(app_handle: &tauri::AppHandle, config: &GlobalConfig) -> Res
 pub fn get_active_storage_path(app_handle: &tauri::AppHandle) -> Result<PathBuf, String> {
     let config = read_config(app_handle);
     if let Some(custom_path) = config.storage_path {
-        let path = PathBuf::from(custom_path);
+        let path = PathBuf::from(custom_path).join(".omnidesk");
         if path.exists() || std::fs::create_dir_all(&path).is_ok() {
             return Ok(path);
         }

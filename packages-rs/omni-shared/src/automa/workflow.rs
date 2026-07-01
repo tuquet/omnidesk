@@ -1,4 +1,73 @@
 use serde::{Deserialize, Serialize};
+use utoipa::ToSchema;
+
+#[derive(Serialize, Deserialize, ToSchema, Debug, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct Folder {
+    pub id: String,
+    pub name: String,
+    pub created_at: Option<String>,
+    pub updated_at: Option<String>,
+}
+
+#[derive(Serialize, Deserialize, utoipa::ToSchema, Debug, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct WorkflowParameter {
+    pub id: String,
+    pub name: String,
+    #[serde(rename = "type")]
+    pub param_type: String,
+    pub description: Option<String>,
+    pub default_value: Option<serde_json::Value>,
+    pub placeholder: Option<String>,
+    pub label: Option<String>,
+    #[schema(value_type = Object)]
+    pub data: Option<serde_json::Value>,
+}
+
+#[derive(Serialize, Deserialize, utoipa::ToSchema, Debug, Clone)]
+pub struct WorkflowTrigger {
+    pub id: Option<String>,
+    #[serde(rename = "type")]
+    pub trigger_type: String,
+    pub config: Option<serde_json::Value>,
+    pub data: Option<serde_json::Value>,
+    pub enabled: Option<bool>,
+}
+
+#[derive(Serialize, Deserialize, utoipa::ToSchema, Debug, Clone)]
+pub struct DrawflowNodeData {
+    pub parameters: Option<Vec<WorkflowParameter>>,
+    pub triggers: Option<Vec<WorkflowTrigger>>,
+}
+
+#[derive(Serialize, Deserialize, utoipa::ToSchema, Debug, Clone)]
+pub struct DrawflowNode {
+    pub id: Option<serde_json::Value>,
+    pub label: Option<String>,
+    #[serde(rename = "type")]
+    pub node_type: Option<String>,
+    pub data: Option<DrawflowNodeData>,
+}
+
+#[derive(Serialize, Deserialize, utoipa::ToSchema, Debug, Clone)]
+pub struct DrawflowEdge {
+    pub id: Option<serde_json::Value>,
+    pub source: serde_json::Value,
+    pub target: serde_json::Value,
+}
+
+#[derive(Serialize, Deserialize, utoipa::ToSchema, Debug, Clone)]
+pub struct DrawflowData {
+    pub nodes: Option<serde_json::Value>,
+    pub edges: Option<serde_json::Value>,
+}
+
+#[derive(Serialize, Deserialize, utoipa::ToSchema, Debug, Clone)]
+pub struct TriggerData {
+    pub parameters: Option<Vec<WorkflowParameter>>,
+    pub triggers: Option<Vec<WorkflowTrigger>>,
+}
 
 #[derive(Serialize, Deserialize, utoipa::ToSchema, Debug, Clone)]
 pub struct WorkflowPayload {
@@ -7,11 +76,11 @@ pub struct WorkflowPayload {
     pub icon: Option<String>,
     pub folder_id: Option<String>,
     pub description: Option<String>,
-    #[schema(value_type = Object)]
+    #[schema(value_type = DrawflowData)]
     pub drawflow: serde_json::Value,
     #[schema(value_type = Object)]
     pub settings: serde_json::Value,
-    #[schema(value_type = Option<Object>)]
+    #[schema(value_type = Option<TriggerData>)]
     pub trigger: Option<serde_json::Value>,
     #[schema(value_type = Option<Object>)]
     pub global_data: Option<serde_json::Value>,

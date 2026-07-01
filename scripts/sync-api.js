@@ -8,7 +8,7 @@ const TYPES_DIR = path.join(ROOT_DIR, 'packages', 'types');
 const TARGETS = [
   {
     app: 'omni-engine',
-    cmd: 'cargo test export_openapi_json',
+    cmd: 'cargo run --bin openapi_export',
     dir: 'apps/omni-engine/src-tauri',
     output: 'openapi-engine.json'
   },

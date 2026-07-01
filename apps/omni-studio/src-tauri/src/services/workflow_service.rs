@@ -11,7 +11,7 @@ impl WorkflowService {
     pub async fn get_all(pool: &SqlitePool) -> Result<Vec<Workflow>, AppError> {
         let workflows = sqlx::query_as::<_, Workflow>(
             r#"
-            SELECT id, name, icon, folder_id, description, drawflow, settings, trigger,
+            SELECT id, name, icon, folder_id, description, drawflow, settings, trigger, content, connected_table,
                    global_data, table_data, data_columns, version, is_disabled, source,
                    CAST(created_at AS TEXT) as created_at, CAST(updated_at AS TEXT) as updated_at,
                    CAST(deleted_at AS TEXT) as deleted_at, delete_source
@@ -29,7 +29,7 @@ impl WorkflowService {
     pub async fn get_trash(pool: &SqlitePool) -> Result<Vec<Workflow>, AppError> {
         let workflows = sqlx::query_as::<_, Workflow>(
             r#"
-            SELECT id, name, icon, folder_id, description, drawflow, settings, trigger,
+            SELECT id, name, icon, folder_id, description, drawflow, settings, trigger, content, connected_table,
                    global_data, table_data, data_columns, version, is_disabled, source,
                    CAST(created_at AS TEXT) as created_at, CAST(updated_at AS TEXT) as updated_at,
                    CAST(deleted_at AS TEXT) as deleted_at, delete_source
@@ -47,7 +47,7 @@ impl WorkflowService {
     pub async fn get_by_id(pool: &SqlitePool, id: &str) -> Result<Workflow, AppError> {
         let workflow = sqlx::query_as::<_, Workflow>(
             r#"
-            SELECT id, name, icon, folder_id, description, drawflow, settings, trigger,
+            SELECT id, name, icon, folder_id, description, drawflow, settings, trigger, content, connected_table,
                    global_data, table_data, data_columns, version, is_disabled, source,
                    CAST(created_at AS TEXT) as created_at, CAST(updated_at AS TEXT) as updated_at,
                    CAST(deleted_at AS TEXT) as deleted_at, delete_source
@@ -73,8 +73,8 @@ impl WorkflowService {
         sqlx::query(
             r#"
             INSERT INTO workflows (id, name, icon, folder_id, description, drawflow, settings,
-                                   trigger, global_data, table_data, data_columns, version, is_disabled, source)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                                   trigger, global_data, table_data, data_columns, version, is_disabled, source, content, connected_table)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             "#
         )
         .bind(&id)
@@ -91,6 +91,8 @@ impl WorkflowService {
         .bind(&workflow.version)
         .bind(workflow.is_disabled)
         .bind(&workflow.source)
+        .bind(&workflow.content)
+        .bind(&workflow.connected_table)
         .execute(pool)
         .await?;
 
@@ -107,7 +109,7 @@ impl WorkflowService {
             UPDATE workflows
             SET name = ?, icon = ?, folder_id = ?, description = ?, drawflow = ?, settings = ?,
                 trigger = ?, global_data = ?, table_data = ?, data_columns = ?, version = ?,
-                is_disabled = ?, source = ?, updated_at = CURRENT_TIMESTAMP
+                is_disabled = ?, source = ?, content = ?, connected_table = ?, updated_at = CURRENT_TIMESTAMP
             WHERE id = ?
             "#,
         )
@@ -124,6 +126,8 @@ impl WorkflowService {
         .bind(&workflow.version)
         .bind(workflow.is_disabled)
         .bind(&workflow.source)
+        .bind(&workflow.content)
+        .bind(&workflow.connected_table)
         .bind(id)
         .execute(pool)
         .await?;
@@ -153,8 +157,8 @@ impl WorkflowService {
         sqlx::query(
             r#"
             INSERT INTO workflows (id, name, icon, folder_id, description, drawflow, settings,
-                                   trigger, global_data, table_data, data_columns, version, is_disabled, source)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                                   trigger, global_data, table_data, data_columns, version, is_disabled, source, content, connected_table)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ON CONFLICT(id) DO UPDATE SET
                 name = excluded.name,
                 icon = excluded.icon,
@@ -169,6 +173,8 @@ impl WorkflowService {
                 version = excluded.version,
                 is_disabled = excluded.is_disabled,
                 source = excluded.source,
+                content = excluded.content,
+                connected_table = excluded.connected_table,
                 updated_at = CURRENT_TIMESTAMP,
                 deleted_at = NULL,
                 delete_source = NULL
@@ -188,6 +194,8 @@ impl WorkflowService {
         .bind(&workflow.version)
         .bind(workflow.is_disabled)
         .bind(&workflow.source)
+        .bind(&workflow.content)
+        .bind(&workflow.connected_table)
         .execute(pool)
         .await?;
 
@@ -256,7 +264,7 @@ impl WorkflowService {
     ) -> Result<Vec<Workflow>, AppError> {
         let workflows = sqlx::query_as::<_, Workflow>(
             r#"
-            SELECT id, name, icon, folder_id, description, drawflow, settings, trigger,
+            SELECT id, name, icon, folder_id, description, drawflow, settings, trigger, content, connected_table,
                    global_data, table_data, data_columns, version, is_disabled, source,
                    CAST(created_at AS TEXT) as created_at, CAST(updated_at AS TEXT) as updated_at,
                    CAST(deleted_at AS TEXT) as deleted_at, delete_source
@@ -358,7 +366,7 @@ impl WorkflowService {
             .join(",");
         let query_str = format!(
             r#"
-            SELECT id, name, icon, folder_id, description, drawflow, settings, trigger,
+            SELECT id, name, icon, folder_id, description, drawflow, settings, trigger, content, connected_table,
                    global_data, table_data, data_columns, version, is_disabled, source,
                    CAST(created_at AS TEXT) as created_at, CAST(updated_at AS TEXT) as updated_at,
                    CAST(deleted_at AS TEXT) as deleted_at, delete_source

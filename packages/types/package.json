@@ -9,7 +9,7 @@
     ".": "./src/index.ts",
     "./schemas": "./src/schemas/index.ts",
     "./enums": "./src/enums/index.ts",
-    "./client": "./src/client.ts"
+    "./client": "./src/client/index.ts"
   },
   "scripts": {
     "generate:client": "openapi-ts"

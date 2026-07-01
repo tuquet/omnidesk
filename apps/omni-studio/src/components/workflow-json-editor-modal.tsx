@@ -25,7 +25,7 @@ import { Loader2 } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { client } from '@/lib/api-client';
-import { getWorkflow, updateWorkflow, createWorkflow, type WorkflowPayload } from '@omnidesk/types/client';
+import { getWorkflow, updateWorkflow, createWorkflow } from '@omnidesk/types/client';
 import Editor from '@monaco-editor/react';
 import { useWorkspaceStore } from '@omnidesk/core';
 import { WorkflowVisualizer } from './workflow-visualizer';
@@ -178,12 +178,12 @@ export function WorkflowJsonEditorModal({
         response = await updateWorkflow({
           client,
           path: { id: workflowId as string },
-          body: parsedData as unknown as WorkflowPayload,
+          body: parsedData,
         });
       } else {
         response = await createWorkflow({
           client,
-          body: parsedData as unknown as WorkflowPayload,
+          body: parsedData,
         });
       }
       if (response.error) throw response.error;

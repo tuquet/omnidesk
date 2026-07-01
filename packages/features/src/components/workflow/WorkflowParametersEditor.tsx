@@ -49,7 +49,7 @@ export function WorkflowParametersEditor({ value = [], onChange }: WorkflowParam
       description: '',
       defaultValue: '',
       placeholder: 'Text',
-      data: { required: false },
+      data: { required: false } as any,
     };
     onChange([...value, newParam]);
   };
@@ -143,8 +143,8 @@ export function WorkflowParametersEditor({ value = [], onChange }: WorkflowParam
                                 ) : (
                                   <Input
                                     type={param.type === 'number' ? 'number' : 'text'}
-                                    value={param.defaultValue}
-                                    onChange={(e) => updateParam(index, { defaultValue: e.target.value })}
+                                    value={((param.defaultValue as any) || '') as string}
+                                    onChange={(e) => updateParam(index, { defaultValue: e.target.value as any })}
                                     placeholder="NULL"
                                     className="h-8 flex-1"
                                   />
@@ -182,9 +182,9 @@ export function WorkflowParametersEditor({ value = [], onChange }: WorkflowParam
                                   <div className="flex items-center space-x-2 mt-6">
                                     <Checkbox 
                                       id={`required-${param.id}`}
-                                      checked={param.data?.required}
+                                      checked={(param.data as any)?.required}
                                       onCheckedChange={(checked) => updateParam(index, { 
-                                        data: { ...param.data, required: !!checked }
+                                        data: { ...(param.data as any), required: !!checked }
                                       })}
                                     />
                                     <Label htmlFor={`required-${param.id}`} className="text-sm font-normal">

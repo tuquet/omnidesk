@@ -4,7 +4,7 @@ const os = require('os');
 
 function getAppDataDir(appName) {
     if (process.platform === 'win32') {
-        return path.join(os.homedir(), 'AppData', 'Local', appName);
+        return path.join(process.env.APPDATA || path.join(os.homedir(), 'AppData', 'Roaming'), appName);
     } else if (process.platform === 'darwin') {
         return path.join(os.homedir(), 'Library', 'Application Support', appName);
     } else {

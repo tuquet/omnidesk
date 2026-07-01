@@ -56,7 +56,24 @@ pub struct AppState {
             crate::db::models::workflow::Schedule,
             handlers::sync::PushWorkflowsPayload,
             handlers::sync::SyncStatusResponse,
-            handlers::sync::SyncLocalPayload
+            handlers::sync::SyncLocalPayload,
+            omni_shared::automa::workflow::WorkflowPayload,
+            omni_shared::automa::workflow::WorkflowParameter,
+            omni_shared::automa::workflow::WorkflowTrigger,
+            omni_shared::automa::workflow::DrawflowNodeData,
+            omni_shared::automa::workflow::DrawflowNode,
+            omni_shared::automa::workflow::DrawflowEdge,
+              omni_shared::automa::workflow::Folder,
+              omni_shared::automa::logs::LogItem,
+              omni_shared::automa::logs::LogHistory,
+              omni_shared::automa::logs::LogCtxData,
+              omni_shared::automa::logs::LogData,
+              omni_shared::automa::storage::TableItem,
+              omni_shared::automa::storage::TableData,
+              omni_shared::automa::storage::Variable,
+              omni_shared::automa::storage::Credential,
+            omni_shared::automa::workflow::DrawflowData,
+            omni_shared::automa::workflow::TriggerData
         )
     ),
     tags(

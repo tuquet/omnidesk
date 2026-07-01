@@ -48,12 +48,35 @@ pub struct AppState {
         handlers::schedules::delete_schedule,
         handlers::schedules::toggle_schedule,
         handlers::schedules::run_now,
+          handlers::folders::list_folders,
+          handlers::folders::create_folder,
+          handlers::folders::update_folder,
+          handlers::folders::delete_folder,
     ),
     components(
         schemas(
             crate::db::models::workflow::Schedule,
             handlers::schedules::CreateSchedulePayload,
-            handlers::schedules::UpdateSchedulePayload
+            handlers::schedules::UpdateSchedulePayload,
+            omni_shared::automa::workflow::WorkflowPayload,
+            omni_shared::automa::workflow::WorkflowParameter,
+            omni_shared::automa::workflow::WorkflowTrigger,
+            omni_shared::automa::workflow::DrawflowNodeData,
+            omni_shared::automa::workflow::DrawflowNode,
+            omni_shared::automa::workflow::DrawflowEdge,
+              omni_shared::automa::workflow::Folder,
+              handlers::folders::CreateFolderPayload,
+              handlers::folders::UpdateFolderPayload,
+              omni_shared::automa::logs::LogItem,
+              omni_shared::automa::logs::LogHistory,
+              omni_shared::automa::logs::LogCtxData,
+              omni_shared::automa::logs::LogData,
+              omni_shared::automa::storage::TableItem,
+              omni_shared::automa::storage::TableData,
+              omni_shared::automa::storage::Variable,
+              omni_shared::automa::storage::Credential,
+            omni_shared::automa::workflow::DrawflowData,
+            omni_shared::automa::workflow::TriggerData
         )
     ),
     tags(
@@ -112,6 +135,7 @@ pub async fn serve(pool: SqlitePool, app_dir: PathBuf, port: u16, app_handle: Ap
         .route("/api/me", get(me))
         .nest("/api/automa", handlers::automa::router())
         .nest("/api/automa/schedules", handlers::schedules::router())
+        .nest("/api/automa/folders", handlers::folders::router())
         .nest("/api/engine/runs", handlers::runs::router())
         .route("/mcp/sse", get(handlers::mcp::mcp_sse))
         .route("/mcp/messages", post(handlers::mcp::mcp_messages))
