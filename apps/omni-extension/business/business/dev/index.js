@@ -11,9 +11,8 @@
  * - Delete: Extension deletes → hard delete everywhere. OneDrive deletes → soft delete, notify Extension
  */
 
-const WORKFLOW_APP_PORT = 1422;
-const SYNC_PUSH_URL = `http://localhost:${WORKFLOW_APP_PORT}/api/automa/workflows/sync/push`;
-const SYNC_WS_URL = `ws://localhost:${WORKFLOW_APP_PORT}/api/automa/ws/sync`;
+const WORKFLOW_APP_PORT = process.env.VUE_APP_OMNI_STUDIO_PORT || 1422;
+const SYNC_WS_URL = `ws://127.0.0.1:${WORKFLOW_APP_PORT}/api/automa/ws/sync`;
 const RECONNECT_DELAY = 5000; // 5s reconnect delay
 const KEEPALIVE_INTERVAL = 25; // seconds (under MV3's 30s limit)
 
@@ -21,9 +20,9 @@ let ws = null;
 let wsConnected = false;
 let reconnectTimer = null;
 
-// Debounce for HTTP POST fallback
-let httpSyncTimer = null;
-let pendingHttpWorkflows = {};
+// Debounce for push via WS
+let wsSyncTimer = null;
+let pendingWorkflows = {};
 
 // ──────────────────────────────────────────────
 //  WebSocket Client (WFA → Extension direction)
@@ -230,7 +229,11 @@ function tryParse(val, fallback) {
   if (typeof val === 'object' && val !== null) return val;
   if (typeof val !== 'string') return fallback;
   try {
-    return JSON.parse(val);
+    let parsed = JSON.parse(val);
+    if (typeof parsed === 'string') {
+      parsed = JSON.parse(parsed);
+    }
+    return parsed;
   } catch {
     return fallback;
   }
@@ -277,27 +280,8 @@ function pushViaWs(workflows) {
   return false;
 }
 
-async function pushViaHttp(workflows) {
-  const workflowArray = Object.values(workflows).map(extensionToServer);
-
-  try {
-    const res = await fetch(SYNC_PUSH_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ workflows: workflowArray }),
-    });
-
-    if (res.ok) {
-      const data = await res.json();
-      console.log(`[SyncBridge] → Pushed ${data.synced} workflows via HTTP`);
-    }
-  } catch (err) {
-    console.debug('[SyncBridge] HTTP push failed:', err.message);
-  }
-}
-
 /**
- * Debounced push — tries WS first, falls back to HTTP
+ * Debounced push — tries WS first
  */
 function schedulePush(workflows) {
   if (isWorkerMode) {
@@ -305,18 +289,17 @@ function schedulePush(workflows) {
     return;
   }
 
-  pendingHttpWorkflows = { ...pendingHttpWorkflows, ...workflows };
-  if (httpSyncTimer) clearTimeout(httpSyncTimer);
-  httpSyncTimer = setTimeout(async () => {
-    const toPush = { ...pendingHttpWorkflows };
-    pendingHttpWorkflows = {};
-    httpSyncTimer = null;
+  pendingWorkflows = { ...pendingWorkflows, ...workflows };
+  if (wsSyncTimer) clearTimeout(wsSyncTimer);
+  wsSyncTimer = setTimeout(() => {
+    const toPush = { ...pendingWorkflows };
+    pendingWorkflows = {};
+    wsSyncTimer = null;
 
     if (Object.keys(toPush).length === 0) return;
 
-    // Try WS first, fall back to HTTP
     if (!pushViaWs(toPush)) {
-      await pushViaHttp(toPush);
+      console.debug('[SyncBridge] Omni Studio offline. Changes saved locally, will sync when online.');
     }
   }, 1000);
 }

@@ -60,3 +60,7 @@ export * from './components/landing/web-landing';
 
 // Landing Components
 export * from './components/ui/alert';
+
+// Workflow Components
+export * from './components/workflow/WorkflowParametersEditor';
+export * from './components/workflow/WorkflowTriggersEditor';

@@ -1,70 +1,44 @@
 use axum::{
     extract::{Path, Query, State},
+    http::StatusCode,
     routing::{get, post, delete},
     Json, Router,
 };
-use serde::{Deserialize, Serialize};
-use utoipa::ToSchema;
+use serde::Deserialize;
 use crate::api::AppState;
 use crate::db::models::workflow::Workflow;
 use crate::error::AppError;
 use crate::services::workflow_service::WorkflowService;
 
-#[derive(Serialize, Deserialize, ToSchema)]
-pub struct ApiWorkflow {
-    pub id: String,
-    pub name: String,
-    pub icon: Option<String>,
-    pub folder_id: Option<String>,
-    pub description: Option<String>,
-    #[schema(value_type = Object)]
-    pub drawflow: serde_json::Value,
-    #[schema(value_type = Object)]
-    pub settings: serde_json::Value,
-    #[schema(value_type = Option<Object>)]
-    pub trigger: Option<serde_json::Value>,
-    #[schema(value_type = Option<Object>)]
-    pub global_data: Option<serde_json::Value>,
-    #[schema(value_type = Option<Object>)]
-    pub table_data: Option<serde_json::Value>,
-    #[schema(value_type = Option<Object>)]
-    pub data_columns: Option<serde_json::Value>,
-    pub version: Option<String>,
-    pub is_disabled: Option<i64>,
-    pub source: Option<String>,
-    pub created_at: Option<String>,
-    pub updated_at: Option<String>,
-    pub deleted_at: Option<String>,
-    pub delete_source: Option<String>,
-}
+use omni_shared::automa::workflow::WorkflowPayload;
 
-impl From<Workflow> for ApiWorkflow {
+impl From<Workflow> for WorkflowPayload {
     fn from(w: Workflow) -> Self {
-        ApiWorkflow {
-            id: w.id,
-            name: w.name,
-            icon: w.icon,
-            folder_id: w.folder_id,
-            description: w.description,
-            drawflow: serde_json::from_str(&w.drawflow).unwrap_or_else(|_| serde_json::json!({})),
-            settings: serde_json::from_str(&w.settings).unwrap_or_else(|_| serde_json::json!({})),
-            trigger: w.trigger.and_then(|s| serde_json::from_str(&s).ok()),
-            global_data: w.global_data.and_then(|s| serde_json::from_str(&s).ok()),
-            table_data: w.table_data.and_then(|s| serde_json::from_str(&s).ok()),
-            data_columns: w.data_columns.and_then(|s| serde_json::from_str(&s).ok()),
-            version: w.version,
-            is_disabled: w.is_disabled,
-            source: w.source,
-            created_at: w.created_at,
-            updated_at: w.updated_at,
-            deleted_at: w.deleted_at,
-            delete_source: w.delete_source,
-        }
+        WorkflowPayload::from_raw(
+            w.id,
+            w.name,
+            w.icon,
+            w.folder_id,
+            w.description,
+            w.drawflow,
+            w.settings,
+            w.trigger,
+            w.global_data,
+            w.table_data,
+            w.data_columns,
+            w.version,
+            w.is_disabled,
+            w.source,
+            w.created_at,
+            w.updated_at,
+            w.deleted_at,
+            w.delete_source,
+        )
     }
 }
 
-impl From<ApiWorkflow> for Workflow {
-    fn from(aw: ApiWorkflow) -> Self {
+impl From<WorkflowPayload> for Workflow {
+    fn from(aw: WorkflowPayload) -> Self {
         Workflow {
             id: aw.id,
             name: aw.name,
@@ -90,6 +64,7 @@ impl From<ApiWorkflow> for Workflow {
 
 pub fn router() -> Router<AppState> {
     Router::new()
+        .nest("/sync", crate::api::handlers::sync::router())
         .route("/", get(list_workflows).post(create_workflow))
         .route("/shared", get(get_empty_list))
         .route("/hosted", get(get_empty_list))
@@ -129,13 +104,13 @@ pub struct ListWorkflowsQuery {
 async fn list_workflows(
     State(state): State<AppState>,
     Query(params): Query<ListWorkflowsQuery>,
-) -> Result<Json<Vec<ApiWorkflow>>, AppError> {
+) -> Result<Json<Vec<WorkflowPayload>>, AppError> {
     let workflows = if let Some(since) = params.since {
         WorkflowService::get_changed_since(&state.db, &since).await?
     } else {
         WorkflowService::get_all(&state.db).await?
     };
-    Ok(Json(workflows.into_iter().map(ApiWorkflow::from).collect()))
+    Ok(Json(workflows.into_iter().map(WorkflowPayload::from).collect()))
 }
 
 #[utoipa::path(
@@ -153,9 +128,9 @@ async fn list_workflows(
 async fn get_workflow(
     State(state): State<AppState>,
     Path(id): Path<String>,
-) -> Result<Json<ApiWorkflow>, AppError> {
+) -> Result<Json<WorkflowPayload>, AppError> {
     let workflow = WorkflowService::get_by_id(&state.db, &id).await?;
-    Ok(Json(ApiWorkflow::from(workflow)))
+    Ok(Json(WorkflowPayload::from(workflow)))
 }
 
 
@@ -163,15 +138,15 @@ async fn get_workflow(
     get,
     path = "/api/automa/workflows/trash",
     responses(
-        (status = 200, description = "List of trashed workflows", body = Vec<ApiWorkflow>)
+        (status = 200, description = "List of trashed workflows", body = Vec<WorkflowPayload>)
     ),
     tag = "workflows"
 )]
 async fn list_trash_workflows(
     State(state): State<AppState>,
-) -> Result<Json<Vec<ApiWorkflow>>, AppError> {
+) -> Result<Json<Vec<WorkflowPayload>>, AppError> {
     let workflows = WorkflowService::get_trash(&state.db).await?;
-    let api_workflows = workflows.into_iter().map(ApiWorkflow::from).collect();
+    let api_workflows = workflows.into_iter().map(WorkflowPayload::from).collect();
     Ok(Json(api_workflows))
 }
 
@@ -185,11 +160,11 @@ async fn list_trash_workflows(
 )]
 async fn create_workflow(
     State(state): State<AppState>,
-    Json(api_workflow): Json<ApiWorkflow>,
-) -> Result<Json<ApiWorkflow>, AppError> {
+    Json(api_workflow): Json<WorkflowPayload>,
+) -> Result<Json<WorkflowPayload>, AppError> {
     let workflow: Workflow = api_workflow.into();
     let created = WorkflowService::create(&state.db, &workflow).await?;
-    Ok(Json(ApiWorkflow::from(created)))
+    Ok(Json(WorkflowPayload::from(created)))
 }
 
 #[utoipa::path(
@@ -207,12 +182,12 @@ async fn create_workflow(
 async fn update_workflow(
     State(state): State<AppState>,
     Path(id): Path<String>,
-    Json(api_workflow): Json<ApiWorkflow>,
-) -> Result<Json<ApiWorkflow>, AppError> {
+    Json(api_workflow): Json<WorkflowPayload>,
+) -> Result<Json<WorkflowPayload>, AppError> {
     let mut workflow: Workflow = api_workflow.into();
     workflow.id = id.clone();
     let updated = WorkflowService::upsert(&state.db, &workflow).await?;
-    Ok(Json(ApiWorkflow::from(updated)))
+    Ok(Json(WorkflowPayload::from(updated)))
 }
 
 #[utoipa::path(
@@ -293,7 +268,7 @@ async fn restore_workflow(
 async fn duplicate_workflow(
     State(state): State<AppState>,
     Path(id): Path<String>,
-) -> Result<Json<ApiWorkflow>, AppError> {
+) -> Result<Json<WorkflowPayload>, AppError> {
     let duplicated = WorkflowService::duplicate(&state.db, &id).await?;
     
     // Export new workflow to local JSON
@@ -307,7 +282,7 @@ async fn duplicate_workflow(
     };
     let _ = state.sync_tx.send(event);
 
-    Ok(Json(ApiWorkflow::from(duplicated)))
+    Ok(Json(WorkflowPayload::from(duplicated)))
 }
 
 #[utoipa::path(
@@ -403,7 +378,7 @@ async fn create_workflow_run(
         println!("[Studio] Fallback executing workflow locally. Reason: {}", fallback_reason);
         // Get the workflow to send down
         let workflow = WorkflowService::get_by_id(&state.db, &payload.workflow_id).await?;
-        let api_workflow = ApiWorkflow::from(workflow.clone());
+        let api_workflow = WorkflowPayload::from(workflow.clone());
         let workflow_json = serde_json::to_value(api_workflow).unwrap_or(serde_json::json!({
             "id": payload.workflow_id,
             "name": workflow.name.clone()

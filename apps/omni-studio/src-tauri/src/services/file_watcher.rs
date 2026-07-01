@@ -67,7 +67,7 @@ impl FileWatcherService {
         });
 
         // Process events
-        println!("FileWatcher: Watching {:?} for workflow changes", watch_dir);
+        log::info!("FileWatcher: Watching {:?} for workflow changes", watch_dir);
         while let Some(event) = rx.recv().await {
             self.handle_event(&pool, &event).await;
         }
@@ -99,7 +99,7 @@ impl FileWatcherService {
                             let new_path = path.with_file_name(&expected_filename);
                             if std::fs::rename(&path, &new_path).is_ok() {
                                 final_path = new_path;
-                                println!("FileWatcher: Auto-renamed {:?} to {:?}", path, final_path);
+                                log::info!("FileWatcher: Auto-renamed {:?} to {:?}", path, final_path);
                             }
                         }
                         
@@ -122,7 +122,7 @@ impl FileWatcherService {
             }
         }
 
-        println!("FileWatcher: Reconciled {:?} - Imported {}, Soft-deleted {} missing workflows", self.watch_dir, count, deleted_count);
+        log::info!("FileWatcher: Reconciled {:?} - Imported {}, Soft-deleted {} missing workflows", self.watch_dir, count, deleted_count);
         Ok(())
     }
 
@@ -136,7 +136,7 @@ impl FileWatcherService {
 
             match event.kind {
                 EventKind::Create(_) | EventKind::Modify(_) => {
-                    println!("FileWatcher: Detected change in {:?}", path);
+                    log::info!("FileWatcher: Detected change in {:?}", path);
                     match self.import_workflow_file(path).await {
                         Ok(wf) => {
                             let expected_filename = format!("{}.automa.json", wf.id);
@@ -146,12 +146,12 @@ impl FileWatcherService {
                                 let new_path = path.with_file_name(&expected_filename);
                                 if std::fs::rename(path, &new_path).is_ok() {
                                     final_path = new_path;
-                                    println!("FileWatcher: Auto-renamed {:?} to {:?}", path, final_path);
+                                    log::info!("FileWatcher: Auto-renamed {:?} to {:?}", path, final_path);
                                 }
                             }
                             
                             self.path_to_id.lock().unwrap().insert(final_path, wf.id.clone());
-                            println!("FileWatcher: Upserted workflow '{}' ({})", wf.name, wf.id);
+                            log::info!("FileWatcher: Upserted workflow '{}' ({})", wf.name, wf.id);
                             // Broadcast change to WebSocket
                             let event = crate::api::handlers::sync_ws::SyncEvent {
                                 event_type: "workflows_changed".to_string(),
@@ -159,11 +159,11 @@ impl FileWatcherService {
                             };
                             let _ = self.sync_tx.send(event);
                         }
-                        Err(e) => eprintln!("FileWatcher: Failed to import {:?}: {:?}", path, e),
+                        Err(e) => log::error!("FileWatcher: Failed to import {:?}: {:?}", path, e),
                     }
                 }
                 EventKind::Remove(_) => {
-                    println!("FileWatcher: Detected deletion of {:?}", path);
+                    log::info!("FileWatcher: Detected deletion of {:?}", path);
                     
                     // Retrieve the ID associated with this path, fallback to filename parsing
                     let id_opt = {
@@ -175,14 +175,14 @@ impl FileWatcherService {
                         // Soft delete — don't permanently remove, user may want to recover
                         match WorkflowService::soft_delete(pool, &id, "file_watcher").await {
                             Ok(_) => {
-                                println!("FileWatcher: Soft-deleted workflow {}", id);
+                                log::info!("FileWatcher: Soft-deleted workflow {}", id);
                                 let event = crate::api::handlers::sync_ws::SyncEvent {
                                     event_type: "workflow_deleted".to_string(),
                                     payload: serde_json::json!({ "id": id, "source": "file_watcher" }),
                                 };
                                 let _ = self.sync_tx.send(event);
                             }
-                            Err(e) => eprintln!("FileWatcher: Failed to soft-delete {}: {:?}", id, e),
+                            Err(e) => log::error!("FileWatcher: Failed to soft-delete {}: {:?}", id, e),
                         }
                     }
                 }
@@ -211,8 +211,12 @@ impl FileWatcherService {
                 let name = name_str.to_string();
                 let icon = obj.get("icon").and_then(|v| v.as_str()).map(|s| s.to_string());
                 let description = obj.get("description").and_then(|v| v.as_str()).map(|s| s.to_string());
-                let drawflow = obj.get("drawflow").map(|v| v.to_string()).unwrap_or_else(|| "{}".to_string());
-                let settings = obj.get("settings").map(|v| v.to_string()).unwrap_or_else(|| "{}".to_string());
+                let drawflow = obj.get("drawflow").map(|v| {
+                    if v.is_string() { v.as_str().unwrap().to_string() } else { v.to_string() }
+                }).unwrap_or_else(|| "{}".to_string());
+                let settings = obj.get("settings").map(|v| {
+                    if v.is_string() { v.as_str().unwrap().to_string() } else { v.to_string() }
+                }).unwrap_or_else(|| "{}".to_string());
                 let global_data = obj.get("globalData").map(|v| {
                     if v.is_string() { v.as_str().unwrap().to_string() } else { v.to_string() }
                 });
@@ -257,7 +261,7 @@ impl FileWatcherService {
         std::fs::write(&path, &json)
             .map_err(|e| AppError::Internal(format!("Failed to write file: {}", e)))?;
 
-        println!("FileWatcher: Exported workflow '{}' to {:?}", workflow.name, path);
+        log::info!("FileWatcher: Exported workflow '{}' to {:?}", workflow.name, path);
         Ok(path)
     }
 

@@ -3,6 +3,6 @@ resolver = "2"
 members = [
     "apps/omni-engine/src-tauri",
     "apps/omni-profile/src-tauri",
-    "apps/omni-studio/src-tauri",
+    "apps/omni-studio/src-tauri", "checkdb",
     "packages-rs/*"
 ]

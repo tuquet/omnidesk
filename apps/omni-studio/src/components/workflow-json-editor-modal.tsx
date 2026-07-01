@@ -7,6 +7,12 @@ import {
   DialogDescription,
   DialogFooter,
   Button,
+  Tabs,
+  TabsList,
+  TabsTrigger,
+  TabsContent,
+  WorkflowParametersEditor,
+  WorkflowTriggersEditor,
 } from '@omnidesk/ui';
 import { Loader2 } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -34,7 +40,9 @@ const DEFAULT_JSON = {
     publicId: "",
     debugMode: false
   },
-  global_data: "{\n  \"key\": \"value\"\n}"
+  global_data: "{\n  \"key\": \"value\"\n}",
+  parameters: [],
+  triggers: []
 };
 
 export function WorkflowJsonEditorModal({
@@ -85,7 +93,7 @@ export function WorkflowJsonEditorModal({
       try {
         JSON.parse(value);
         setIsValidJson(true);
-      } catch (e) {
+      } catch {
         setIsValidJson(false);
       }
     }
@@ -96,29 +104,30 @@ export function WorkflowJsonEditorModal({
       const url = isEditMode ? `/api/automa/workflows/${workflowId}` : `/api/automa/workflows`;
       const method = isEditMode ? 'PUT' : 'POST';
       
-      const { data, error } = await client.request({
+      const response = await client.request({
         url,
-        method,
+        method: method as 'POST' | 'PUT',
         body: parsedData,
       });
-      if (error) throw error;
-      return data;
+      if (response.error) throw response.error;
+      return response.data;
     },
     onSuccess: () => {
       toast.success(`Workflow ${isEditMode ? 'updated' : 'created'} successfully!`);
       queryClient.invalidateQueries({ queryKey: ['workflows', selectedWorkspacePath] });
       onClose();
     },
-    onError: (err: any) => {
-      toast.error(`Failed to save workflow: ${err.message || 'Unknown error'}`);
+    onError: (err: unknown) => {
+      const msg = err instanceof Error ? err.message : 'Unknown error';
+      toast.error(`Failed to save workflow: ${msg}`);
     },
   });
 
   const handleSave = () => {
     try {
-      const parsed = JSON.parse(jsonValue);
+      const parsed = JSON.parse(jsonValue) as unknown;
       saveMutation.mutate(parsed);
-    } catch (e) {
+    } catch {
       toast.error('Invalid JSON format. Please fix the errors before saving.');
     }
   };
@@ -135,29 +144,81 @@ export function WorkflowJsonEditorModal({
           </DialogDescription>
         </DialogHeader>
 
-        <div className="flex-1 min-h-0 relative px-6 py-2">
+        <div className="flex-1 min-h-0 relative px-6 py-2 flex flex-col">
           {isFetching ? (
             <div className="absolute inset-0 flex items-center justify-center bg-background/50 z-10">
               <Loader2 className="h-8 w-8 animate-spin text-primary" />
             </div>
           ) : null}
-          <div className="h-full border rounded-md overflow-hidden">
-            <Editor
-              height="100%"
-              defaultLanguage="json"
-              value={jsonValue}
-              onChange={handleEditorChange}
-              theme="vs-dark"
-              options={{
-                minimap: { enabled: false },
-                formatOnPaste: true,
-                formatOnType: true,
-                scrollBeyondLastLine: false,
-                wordWrap: "on",
-                tabSize: 2,
-              }}
-            />
-          </div>
+          <Tabs defaultValue="json" className="flex-1 flex flex-col min-h-0">
+            <TabsList className="mb-2 self-start">
+              <TabsTrigger value="json">JSON Editor</TabsTrigger>
+              <TabsTrigger value="parameters" disabled={!isValidJson}>Parameters</TabsTrigger>
+              <TabsTrigger value="triggers" disabled={!isValidJson}>Triggers</TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="json" className="flex-1 min-h-0 border rounded-md overflow-hidden m-0">
+              <Editor
+                height="100%"
+                defaultLanguage="json"
+                value={jsonValue}
+                onChange={handleEditorChange}
+                theme="vs-dark"
+                options={{
+                  minimap: { enabled: false },
+                  formatOnPaste: true,
+                  formatOnType: true,
+                  scrollBeyondLastLine: false,
+                  wordWrap: "on",
+                  tabSize: 2,
+                }}
+              />
+            </TabsContent>
+
+            <TabsContent value="parameters" className="flex-1 min-h-0 overflow-auto border rounded-md p-4 m-0 bg-background">
+              {isValidJson && (
+                <WorkflowParametersEditor
+                  value={(() => {
+                    try { 
+                      const parsed = JSON.parse(jsonValue) as Record<string, unknown>;
+                      return (parsed.parameters as unknown[]) || []; 
+                    } catch { return []; }
+                  })()}
+                  onChange={(parameters) => {
+                    try {
+                      const parsed = JSON.parse(jsonValue) as Record<string, unknown>;
+                      parsed.parameters = parameters;
+                      setJsonValue(JSON.stringify(parsed, null, 2));
+                    } catch {
+                      // ignore
+                    }
+                  }}
+                />
+              )}
+            </TabsContent>
+
+            <TabsContent value="triggers" className="flex-1 min-h-0 overflow-auto border rounded-md p-4 m-0 bg-background">
+              {isValidJson && (
+                <WorkflowTriggersEditor
+                  value={(() => {
+                    try { 
+                      const parsed = JSON.parse(jsonValue) as Record<string, unknown>;
+                      return (parsed.triggers as unknown[]) || []; 
+                    } catch { return []; }
+                  })()}
+                  onChange={(triggers) => {
+                    try {
+                      const parsed = JSON.parse(jsonValue) as Record<string, unknown>;
+                      parsed.triggers = triggers;
+                      setJsonValue(JSON.stringify(parsed, null, 2));
+                    } catch {
+                      // ignore
+                    }
+                  }}
+                />
+              )}
+            </TabsContent>
+          </Tabs>
         </div>
 
         <DialogFooter className="p-6 pt-2 flex items-center justify-between sm:justify-between">

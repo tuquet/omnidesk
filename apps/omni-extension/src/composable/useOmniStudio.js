@@ -9,7 +9,7 @@ export function useOmniStudio() {
   function connect() {
     if (ws) return;
 
-    const baseUrl = process.env.VUE_APP_OMNI_STUDIO_API || 'http://localhost:1422';
+    const baseUrl = process.env.VUE_APP_OMNI_STUDIO_API || 'http://127.0.0.1:1422';
     const wsUrl = baseUrl.replace(/^http/, 'ws') + '/api/automa/ws/sync';
     
     try {

@@ -63,7 +63,7 @@ export function findTriggerBlock(drawflow = {}) {
 
     return blocks.find(({ name }) => name === 'trigger');
   }
-  if (drawflow.nodes) {
+  if (Array.isArray(drawflow.nodes)) {
     return drawflow.nodes.find((node) => node.label === 'trigger');
   }
 

@@ -13,7 +13,7 @@ class WorkflowLogger {
 
     // Send telemetry to Omni-Studio as fallback for full report
     try {
-      const baseUrl = process.env.VUE_APP_OMNI_STUDIO_API || 'http://localhost:1422';
+      const baseUrl = process.env.VUE_APP_OMNI_STUDIO_API || 'http://127.0.0.1:1422';
       await fetch(`${baseUrl}/api/reports`, {
         method: 'POST',
         headers: {

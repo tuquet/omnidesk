@@ -32,8 +32,8 @@ export const dashboardActions = {
       // Wait, omni-engine's API is on 1422? No, the engine dashboard fetched workflows from 1422 and profiles from 1421.
       // This is part of what needs to be solved.
       const [workflowsRes, profilesRes] = await Promise.all([
-        fetch('http://localhost:1422/api/automa/workflows').then(r => r.json() as Promise<{ id: string; name: string }[]>).catch(() => []),
-        fetch('http://localhost:1421/api/browser-profiles').then(r => r.json() as Promise<{ id: string; name: string }[]>).catch(() => []),
+        fetch('http://127.0.0.1:1422/api/automa/workflows').then(r => r.json() as Promise<{ id: string; name: string }[]>).catch(() => []),
+        fetch('http://127.0.0.1:1421/api/browser-profiles').then(r => r.json() as Promise<{ id: string; name: string }[]>).catch(() => []),
       ]);
 
       const workflows = Array.isArray(workflowsRes) ? workflowsRes : [];
@@ -106,7 +106,7 @@ export const dashboardActions = {
         dashboardActions.appendLog(`[SYSTEM] Requesting launch for Profile: ${profile.name}...`);
         try {
           const res = await fetch(
-            `http://localhost:1421/api/browser-profiles/${profile.id}/launch`,
+            `http://127.0.0.1:1421/api/browser-profiles/${profile.id}/launch`,
             { method: 'POST' }
           );
 

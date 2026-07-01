@@ -7,9 +7,9 @@ export const RUNTIME_PORT = import.meta.env.VITE_API_PORT || '1423';
 export const WORKFLOW_PORT = import.meta.env.VITE_WORKFLOW_PORT || '1422';
 export const PROFILE_PORT = import.meta.env.VITE_PROFILE_PORT || '1421';
 
-export const API_BASE_URL = `http://localhost:${RUNTIME_PORT}`;
-export const WORKFLOW_API_URL = `http://localhost:${WORKFLOW_PORT}`;
-export const PROFILE_API_URL = `http://localhost:${PROFILE_PORT}`;
+export const API_BASE_URL = `http://127.0.0.1:${RUNTIME_PORT}`;
+export const WORKFLOW_API_URL = `http://127.0.0.1:${WORKFLOW_PORT}`;
+export const PROFILE_API_URL = `http://127.0.0.1:${PROFILE_PORT}`;
 
 export function apiUrl(path: string): string {
   return `${API_BASE_URL}${path}`;

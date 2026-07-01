@@ -59,36 +59,45 @@ export const useHostedWorkflowStore = defineStore('hosted-workflows', {
     async fetchWorkflows(ids) {
       if (!ids || ids.length === 0) return null;
 
-      const response = await fetchApi('/workflows/hosted', {
-        auth: true,
-        method: 'POST',
-        body: JSON.stringify({ hosts: ids }),
-      });
-      const result = await response.json();
+      try {
+        const response = await fetchApi('/workflows/hosted', {
+          auth: true,
+          method: 'POST',
+          body: JSON.stringify({ hosts: ids }),
+        });
+        const result = await response.json();
 
-      if (!response.ok) throw new Error(result.message);
+        if (!response.ok) throw new Error(result.message);
 
-      const dataToReturn = [];
+        const dataToReturn = [];
 
-      result.forEach(({ hostId, status, data }) => {
-        if (status === 'deleted') {
-          delete this.workflows[hostId];
-          cleanWorkflowTriggers(hostId);
-          return;
+        result.forEach(({ hostId, status, data }) => {
+          if (status === 'deleted') {
+            delete this.workflows[hostId];
+            cleanWorkflowTriggers(hostId);
+            return;
+          }
+          if (status === 'updated') {
+            const triggerBlock = findTriggerBlock(data.drawflow);
+            registerWorkflowTrigger(hostId, triggerBlock);
+          }
+
+          data.hostId = hostId;
+          dataToReturn.push(data);
+          this.workflows[hostId] = data;
+        });
+
+        await this.saveToStorage('workflows');
+
+        return dataToReturn;
+      } catch (error) {
+        if (error.message === 'Failed to fetch') {
+          console.warn('Omni Studio is offline (Failed to fetch hosted workflows).');
+        } else {
+          console.error('Error fetching hosted workflows:', error);
         }
-        if (status === 'updated') {
-          const triggerBlock = findTriggerBlock(data.drawflow);
-          registerWorkflowTrigger(hostId, triggerBlock);
-        }
-
-        data.hostId = hostId;
-        dataToReturn.push(data);
-        this.workflows[hostId] = data;
-      });
-
-      await this.saveToStorage('workflows');
-
-      return dataToReturn;
+        return [];
+      }
     },
   },
 });

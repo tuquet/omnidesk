@@ -100,9 +100,43 @@ impl SchedulerService {
                 .execute(&db)
                 .await;
 
-                // Execute the workflow
-                let workflow_name = schedule_name.clone(); // In a real scenario you might look this up
-                match SharedWorkflowExecutor::execute(&db, &ws_tx, &workflow_id, &workflow_name, None, &profile_id, Some(&schedule_id), None, 1423).await {
+                // Fetch full workflow payload
+                // Fetch full workflow payload
+                let record = sqlx::query_as::<_, crate::db::models::workflow::Workflow>(
+                    "SELECT * FROM workflows WHERE id = ?"
+                )
+                .bind(&workflow_id)
+                .fetch_optional(&db)
+                .await
+                .unwrap_or_default();
+            
+                let (workflow_name, workflow_json) = if let Some(w) = record {
+                    let payload = omni_shared::automa::workflow::WorkflowPayload::from_raw(
+                        w.id,
+                        w.name.clone(),
+                        w.icon,
+                        w.folder_id,
+                        w.description,
+                        w.drawflow,
+                        w.settings,
+                        w.trigger,
+                        w.global_data,
+                        w.table_data,
+                        w.data_columns,
+                        w.version,
+                        w.is_disabled,
+                        w.source,
+                        w.created_at,
+                        w.updated_at,
+                        w.deleted_at,
+                        w.delete_source,
+                    );
+                    (w.name, Some(serde_json::to_value(&payload).unwrap_or(serde_json::json!({}))))
+                } else {
+                    (schedule_name.clone(), None)
+                };
+
+                match SharedWorkflowExecutor::execute(&db, &ws_tx, &workflow_id, &workflow_name, workflow_json, &profile_id, Some(&schedule_id), None, 1423).await {
                     Ok(exec_result) => {
                         let run_id = match exec_result {
                             ExecutionResult::NeedsDefaultBrowser { run_id, bridge_url } => {

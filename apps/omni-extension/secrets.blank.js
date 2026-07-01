@@ -1,3 +1,3 @@
 export default {
-  baseApiUrl: 'http://localhost:1422/api',
+  baseApiUrl: 'http://127.0.0.1:1422/api',
 };

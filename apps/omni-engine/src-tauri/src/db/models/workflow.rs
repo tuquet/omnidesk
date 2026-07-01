@@ -1,8 +1,28 @@
 use serde::{Deserialize, Serialize};
 use sqlx::FromRow;
 use utoipa::ToSchema;
-
-
+/// Workflow definition — mirrors the Automa Extension's workflow JSON structure.
+#[derive(Debug, Clone, Serialize, Deserialize, FromRow, ToSchema)]
+pub struct Workflow {
+    pub id: String,
+    pub name: String,
+    pub icon: Option<String>,
+    pub folder_id: Option<String>,
+    pub description: Option<String>,
+    pub drawflow: String,
+    pub settings: String,
+    pub trigger: Option<String>,
+    pub global_data: Option<String>,
+    pub table_data: Option<String>,
+    pub data_columns: Option<String>,
+    pub version: Option<String>,
+    pub is_disabled: Option<i64>,
+    pub source: Option<String>,
+    pub created_at: Option<String>,
+    pub updated_at: Option<String>,
+    pub deleted_at: Option<String>,
+    pub delete_source: Option<String>,
+}
 
 /// A single execution of a workflow.
 #[derive(Debug, Clone, Serialize, Deserialize, FromRow, ToSchema)]

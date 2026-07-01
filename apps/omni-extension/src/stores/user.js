@@ -37,7 +37,11 @@ export const useUserStore = defineStore('user', {
 
               return result;
             } catch (error) {
-              console.error(error);
+              if (error.message === 'Failed to fetch') {
+                console.warn('Omni Studio is offline or not running (Failed to fetch user profile).');
+              } else {
+                console.error('Error loading user:', error);
+              }
               return null;
             }
           },

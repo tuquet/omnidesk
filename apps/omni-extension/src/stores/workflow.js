@@ -71,28 +71,19 @@ export const fromStudioWorkflow = (workflow) => {
 
 
 
-const syncToOmniStudio = async (workflows) => {
+const syncToOmniStudio = (workflows) => {
   try {
     const payload = Array.isArray(workflows) ? workflows : [workflows];
     const studioPayload = payload.map(toStudioWorkflow);
     
-    // Attempt to send via WebSocket first
     const { sendWsMessage } = useOmniStudio();
     const sent = sendWsMessage('push_workflows', studioPayload);
     
-    // Fallback to HTTP if WS is not connected
     if (!sent) {
-      const baseUrl = process.env.VUE_APP_OMNI_STUDIO_API || 'http://localhost:1422';
-      await fetch(`${baseUrl}/api/automa/workflows/sync/push`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ workflows: studioPayload }),
-      });
+      console.debug('[SyncBridge] Omni Studio is offline. Workflows saved locally and will sync later.');
     }
   } catch (error) {
-    console.error('Failed to sync workflows to Omni Studio', error);
+    console.error('Failed to sync workflows via WebSocket', error);
   }
 };
 
@@ -166,10 +157,33 @@ const defaultWorkflow = (data = null, options = {}) => {
 function convertWorkflowsToObject(workflows) {
   if (Array.isArray(workflows)) {
     return workflows.reduce((acc, workflow) => {
+      if (typeof workflow.drawflow === 'string') {
+        try {
+          workflow.drawflow = JSON.parse(workflow.drawflow);
+          if (typeof workflow.drawflow === 'string') {
+            workflow.drawflow = JSON.parse(workflow.drawflow);
+          }
+        } catch (e) {
+          workflow.drawflow = { nodes: [], edges: [] };
+        }
+      }
       acc[workflow.id] = workflow;
 
       return acc;
     }, {});
+  } else if (typeof workflows === 'object' && workflows !== null) {
+    Object.values(workflows).forEach((workflow) => {
+      if (typeof workflow.drawflow === 'string') {
+        try {
+          workflow.drawflow = JSON.parse(workflow.drawflow);
+          if (typeof workflow.drawflow === 'string') {
+            workflow.drawflow = JSON.parse(workflow.drawflow);
+          }
+        } catch (e) {
+          workflow.drawflow = { nodes: [], edges: [] };
+        }
+      }
+    });
   }
 
   return workflows;

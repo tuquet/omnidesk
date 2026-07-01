@@ -10,7 +10,7 @@ const client = createClient({});
 // ─── Config ────────────────────────────────────────────────────────────────────
 
 client.setConfig({
-  baseUrl: 'http://localhost:1424', // Tauri Axum backend
+  baseUrl: 'http://127.0.0.1:1424', // Tauri Axum backend
   throwOnError: true,
 });
 

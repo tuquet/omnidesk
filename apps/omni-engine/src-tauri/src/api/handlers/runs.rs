@@ -52,16 +52,43 @@ async fn create_run(
     
     let p_id = payload.profile_id.unwrap_or_else(|| "default".to_string());
     
-    // Attempt to get workflow name
-    let workflow_name = sqlx::query_scalar::<_, String>("SELECT name FROM workflows WHERE id = ?")
-        .bind(&payload.workflow_id)
-        .fetch_optional(&db)
-        .await
-        .unwrap_or_default()
-        .unwrap_or_else(|| "Unknown Workflow".to_string());
+    // Fetch full workflow
+    let record = sqlx::query_as::<_, crate::db::models::workflow::Workflow>(
+        "SELECT * FROM workflows WHERE id = ?"
+    )
+    .bind(&payload.workflow_id)
+    .fetch_optional(&db)
+    .await
+    .unwrap_or_default();
+
+    let (workflow_name, workflow_json) = if let Some(w) = record {
+        let payload = omni_shared::automa::workflow::WorkflowPayload::from_raw(
+            w.id,
+            w.name.clone(),
+            w.icon,
+            w.folder_id,
+            w.description,
+            w.drawflow,
+            w.settings,
+            w.trigger,
+            w.global_data,
+            w.table_data,
+            w.data_columns,
+            w.version,
+            w.is_disabled,
+            w.source,
+            w.created_at,
+            w.updated_at,
+            w.deleted_at,
+            w.delete_source,
+        );
+        (w.name, Some(serde_json::to_value(&payload).unwrap_or(serde_json::json!({}))))
+    } else {
+        ("Unknown Workflow".to_string(), None)
+    };
 
     match omni_shared::automa::executor::SharedWorkflowExecutor::execute(
-        &db, &ws_tx, &payload.workflow_id, &workflow_name, None, &p_id, payload.schedule_id.as_deref(), payload.variables, 1423
+        &db, &ws_tx, &payload.workflow_id, &workflow_name, workflow_json, &p_id, payload.schedule_id.as_deref(), payload.variables, 1423
     ).await {
         Ok(exec_result) => {
             let run_id = match exec_result {

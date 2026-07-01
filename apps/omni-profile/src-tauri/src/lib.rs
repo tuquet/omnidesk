@@ -17,7 +17,7 @@ use tauri::{
 pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_single_instance::init(|app, args, _cwd| {
-            if let Some(url) = args.iter().find(|a| a.starts_with("omnidesk://")) {
+            if let Some(url) = args.iter().find(|a| a.starts_with("omnidesk-profile://")) {
                 let _ = app.emit("deep-link-received", url.clone());
             }
             let _ = app.get_webview_window("main").expect("no main window").set_focus();
@@ -105,7 +105,7 @@ pub fn run() {
             }
             
             // Smart user-mode deep link registration (bypasses UAC admin requirement)
-            system::deep_link::register_protocol_user_mode("omnidesk");
+            system::deep_link::register_protocol_user_mode("omnidesk-profile");
             
             let app_handle = app.handle().clone();
             

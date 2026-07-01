@@ -761,7 +761,7 @@ async function fetchSyncWorkflow() {
 
     await retrieveTriggerText();
 
-    const triggerBlock = convertedData.drawflow.nodes.find(
+    const triggerBlock = (convertedData.drawflow.nodes || []).find(
       (node) => node.label === 'trigger'
     );
     registerWorkflowTrigger(props.workflow.id, triggerBlock);

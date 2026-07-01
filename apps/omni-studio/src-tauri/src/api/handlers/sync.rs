@@ -202,7 +202,7 @@ async fn sync_local(
                     if path.file_name().and_then(|s| s.to_str()) != Some(&expected_filename) {
                         let new_path = path.with_file_name(&expected_filename);
                         if let Ok(_) = std::fs::rename(&path, &new_path) {
-                            println!("Sync: Auto-renamed {:?} to {:?}", path, new_path);
+                            log::info!("Sync: Auto-renamed {:?} to {:?}", path, new_path);
                         }
                     }
                     file_ids.insert(workflow.id.clone());
@@ -251,7 +251,7 @@ async fn sync_local(
                         if path.file_name().and_then(|s| s.to_str()) != Some(&expected_filename) {
                             let new_path = path.with_file_name(&expected_filename);
                             if let Ok(_) = std::fs::rename(&path, &new_path) {
-                                println!("Sync: Auto-renamed {:?} to {:?}", path, new_path);
+                                log::info!("Sync: Auto-renamed {:?} to {:?}", path, new_path);
                             }
                         }
                         

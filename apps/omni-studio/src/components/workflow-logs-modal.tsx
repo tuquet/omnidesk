@@ -268,7 +268,7 @@ export function WorkflowLogsModal({ workflowId, isOpen, onOpenChange }: Workflow
                                 value={(() => {
                                   try {
                                     return JSON.stringify(JSON.parse(log.data), null, 2);
-                                  } catch (e) {
+                                  } catch {
                                     return log.data;
                                   }
                                 })()}

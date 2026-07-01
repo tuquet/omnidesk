@@ -100,7 +100,6 @@ pub async fn serve(pool: SqlitePool, app_dir: PathBuf, port: u16, app_handle: Ap
         .nest("/api/automa/workflows", handlers::workflows::router())
         .nest("/api/workflows", handlers::workflows::router()) // Alias for Automa Extension
         .nest("/api/me/workflows", handlers::workflows::router()) // Alias for Automa Extension's /me/workflows
-        .nest("/api/sync", handlers::sync::router())
         .nest("/api/mcp", handlers::mcp::router())
         .nest("/api/git", handlers::git::router())
         .nest("/api/automa", handlers::automa::router())

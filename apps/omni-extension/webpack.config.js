@@ -147,8 +147,9 @@ const options = {
     new VueLoaderPlugin(),
     new webpack.DefinePlugin({
       BROWSER_TYPE: JSON.stringify(env.BROWSER),
-      'process.env.VUE_APP_OMNI_STUDIO_API': JSON.stringify(process.env.VUE_APP_OMNI_STUDIO_API || 'http://localhost:1422'),
-      'process.env.VUE_APP_OMNI_ENGINE_API': JSON.stringify(process.env.VUE_APP_OMNI_ENGINE_API || 'http://localhost:1423'),
+      'process.env.VUE_APP_OMNI_STUDIO_API': JSON.stringify(process.env.VUE_APP_OMNI_STUDIO_API || 'http://127.0.0.1:1422'),
+      'process.env.VUE_APP_OMNI_ENGINE_API': JSON.stringify(process.env.VUE_APP_OMNI_ENGINE_API || 'http://127.0.0.1:1423'),
+      __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: 'false',
     }),
     new webpack.ProgressPlugin(),
     // clean the build folder
@@ -235,6 +236,7 @@ const options = {
     new webpack.DefinePlugin({
       __VUE_OPTIONS_API__: true,
       __VUE_PROD_DEVTOOLS__: false,
+      __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: false,
     }),
     // Fix i18n warning
     new webpack.DefinePlugin({

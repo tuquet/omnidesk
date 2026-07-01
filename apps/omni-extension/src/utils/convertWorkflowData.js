@@ -7,7 +7,10 @@ const getFlowData = (workflow) =>
 
 export default function (workflow) {
   const data = getFlowData(workflow);
-  if (!data?.drawflow) return workflow;
+  if (!data?.drawflow) {
+    workflow.drawflow = data;
+    return workflow;
+  }
 
   const triggerBlock = findTriggerBlock(data);
   if (!triggerBlock) return workflow;

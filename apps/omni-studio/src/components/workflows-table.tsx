@@ -336,7 +336,7 @@ export function WorkflowsTable({
         enableResizing: false,
       }),
     ],
-    [onRun, onEdit, onDelete, onDuplicate, onRestore, onForceDelete, renderSortIcon, viewMode],
+    [onRun, onEdit, onDelete, onDuplicate, onRestore, onForceDelete, onViewLogs, renderSortIcon, viewMode],
   );
 
   const table = useReactTable({
