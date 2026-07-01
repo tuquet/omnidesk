@@ -248,7 +248,7 @@ export function WorkflowLogsModal({ workflowId, isOpen, onOpenChange }: Workflow
                   variant="outline"
                   className="bg-blue-500/10 text-blue-500 border-blue-500/20 animate-pulse"
                 >
-                  Live Stream
+                  Live
                 </Badge>
               )}
             </div>
