@@ -1,4 +1,4 @@
- 
+/* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-explicit-any */
 import { createFileRoute } from '@tanstack/react-router';
 import { listen } from '@tauri-apps/api/event';
 import { open } from '@tauri-apps/plugin-dialog';
@@ -62,7 +62,7 @@ function WorkflowsPage() {
 
   useEffect(() => {
     let unlistenFn: () => void;
-    
+
     listen('workflows-synced', (event) => {
       const payload = event.payload as { count: number };
       if (payload.count > 0) {
@@ -87,10 +87,7 @@ function WorkflowsPage() {
     };
   }, [queryClient]);
 
-  const {
-    data: workflows = [],
-    isLoading,
-  } = useQuery<Workflow[]>({
+  const { data: workflows = [], isLoading } = useQuery<Workflow[]>({
     queryKey: ['workflows', selectedWorkspacePath, viewMode],
     queryFn: async () => {
       if (!selectedWorkspacePath) return [];
@@ -124,7 +121,7 @@ function WorkflowsPage() {
       const { error } = await client.request({
         url: `/api/automa/workflows/${id}`,
         method: 'DELETE',
-        query: { workspacePath: selectedWorkspacePath }
+        query: { workspacePath: selectedWorkspacePath },
       });
       if (error) throw error;
     },
@@ -162,7 +159,7 @@ function WorkflowsPage() {
       const { error } = await client.request({
         url: `/api/automa/workflows/${id}/restore`,
         method: 'POST',
-        query: { workspacePath: selectedWorkspacePath }
+        query: { workspacePath: selectedWorkspacePath },
       });
       if (error) throw error;
     },
@@ -177,7 +174,7 @@ function WorkflowsPage() {
       const { error } = await client.request({
         url: `/api/automa/workflows/${id}/force`,
         method: 'DELETE',
-        query: { workspacePath: selectedWorkspacePath }
+        query: { workspacePath: selectedWorkspacePath },
       });
       if (error) throw error;
     },
@@ -196,7 +193,7 @@ function WorkflowsPage() {
       const { error } = await client.request({
         url: `/api/automa/workflows/${id}/duplicate`,
         method: 'POST',
-        query: { workspacePath: selectedWorkspacePath }
+        query: { workspacePath: selectedWorkspacePath },
       });
       if (error) throw error;
     },
@@ -209,7 +206,13 @@ function WorkflowsPage() {
   const bulkDeleteMutation = useMutation({
     mutationFn: async (ids: string[]) => {
       await Promise.all(
-        ids.map((id) => client.request({ url: `/api/automa/workflows/${id}`, method: 'DELETE', query: { workspacePath: selectedWorkspacePath } })),
+        ids.map((id) =>
+          client.request({
+            url: `/api/automa/workflows/${id}`,
+            method: 'DELETE',
+            query: { workspacePath: selectedWorkspacePath },
+          }),
+        ),
       );
     },
     onSuccess: () => {
@@ -223,7 +226,11 @@ function WorkflowsPage() {
     mutationFn: async (ids: string[]) => {
       await Promise.all(
         ids.map((id) =>
-          client.request({ url: `/api/automa/workflows/${id}/restore`, method: 'POST', query: { workspacePath: selectedWorkspacePath } }),
+          client.request({
+            url: `/api/automa/workflows/${id}/restore`,
+            method: 'POST',
+            query: { workspacePath: selectedWorkspacePath },
+          }),
         ),
       );
     },
@@ -238,7 +245,11 @@ function WorkflowsPage() {
     mutationFn: async (ids: string[]) => {
       await Promise.all(
         ids.map((id) =>
-          client.request({ url: `/api/automa/workflows/${id}/force`, method: 'DELETE', query: { workspacePath: selectedWorkspacePath } }),
+          client.request({
+            url: `/api/automa/workflows/${id}/force`,
+            method: 'DELETE',
+            query: { workspacePath: selectedWorkspacePath },
+          }),
         ),
       );
     },
@@ -308,14 +319,17 @@ function WorkflowsPage() {
     }
   };
 
-  const handleSortChange = useCallback((newSortBy: string) => {
-    if (sortBy === newSortBy) {
-      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
-    } else {
-      setSortBy(newSortBy);
-      setSortOrder('asc');
-    }
-  }, [sortBy, sortOrder]);
+  const handleSortChange = useCallback(
+    (newSortBy: string) => {
+      if (sortBy === newSortBy) {
+        setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+      } else {
+        setSortBy(newSortBy);
+        setSortOrder('asc');
+      }
+    },
+    [sortBy, sortOrder],
+  );
 
   const handleEdit = useCallback((wf: Workflow) => {
     setEditorWorkflowId(wf.id);
@@ -330,24 +344,34 @@ function WorkflowsPage() {
     setWorkflowToRun(id);
   }, []);
 
-  const handleDuplicate = useCallback((id: string) => {
-    duplicateMutation.mutate(id);
-  }, [duplicateMutation]);
+  const handleDuplicate = useCallback(
+    (id: string) => {
+      duplicateMutation.mutate(id);
+    },
+    [duplicateMutation],
+  );
 
-  const handleRestore = useCallback((id: string) => {
-    restoreMutation.mutate(id);
-  }, [restoreMutation]);
+  const handleRestore = useCallback(
+    (id: string) => {
+      restoreMutation.mutate(id);
+    },
+    [restoreMutation],
+  );
 
-  const handleForceDelete = useCallback(async (id: string) => {
-    const confirmed = await confirm({
-      title: 'Force Delete workflow?',
-      description: 'Are you sure you want to permanently delete this workflow? This cannot be undone.',
-      destructive: true,
-    });
-    if (confirmed) {
-      forceDeleteMutation.mutate(id);
-    }
-  }, [confirm, forceDeleteMutation]);
+  const handleForceDelete = useCallback(
+    async (id: string) => {
+      const confirmed = await confirm({
+        title: 'Force Delete workflow?',
+        description:
+          'Are you sure you want to permanently delete this workflow? This cannot be undone.',
+        destructive: true,
+      });
+      if (confirmed) {
+        forceDeleteMutation.mutate(id);
+      }
+    },
+    [confirm, forceDeleteMutation],
+  );
 
   const handleViewLogs = useCallback((id: string) => {
     setLogsWorkflowId(id);
@@ -372,7 +396,8 @@ function WorkflowsPage() {
   const handleBulkForceDelete = useCallback(async () => {
     const confirmed = await confirm({
       title: 'Force Delete workflows?',
-      description: 'Are you sure you want to permanently delete selected workflows? This cannot be undone.',
+      description:
+        'Are you sure you want to permanently delete selected workflows? This cannot be undone.',
       destructive: true,
     });
     if (confirmed) {
@@ -425,7 +450,7 @@ function WorkflowsPage() {
           <WorkflowIcon className="w-4 h-4 text-primary" />
           Workflows Sync
           {activeExtensions > 0 && (
-            <span 
+            <span
               className="bg-green-500/10 text-green-600 dark:text-green-400 text-xs px-2 py-0.5 rounded-full border border-green-500/20 ml-2 font-medium flex items-center gap-1.5"
               title={`${activeExtensions} Automa Extension(s) connected via WebSocket`}
             >
@@ -466,7 +491,7 @@ function WorkflowsPage() {
                 try {
                   const parsed = JSON.parse(content);
                   const workflows = Array.isArray(parsed) ? parsed : [parsed];
-                  
+
                   if (workflows.length === 0) {
                     throw new Error('No workflows found in file');
                   }
@@ -474,7 +499,7 @@ function WorkflowsPage() {
                   let successCount = 0;
                   for (const wf of workflows) {
                     if (!wf || typeof wf !== 'object') continue;
-                    
+
                     // Assign missing required fields
                     wf.id = wf.id || wf.extId || crypto.randomUUID();
                     wf.name = wf.name || 'Imported Workflow';
@@ -484,7 +509,7 @@ function WorkflowsPage() {
                     importMutation.mutate(wf);
                     successCount++;
                   }
-                  
+
                   if (successCount === 0) {
                     throw new Error('Invalid workflow format');
                   }

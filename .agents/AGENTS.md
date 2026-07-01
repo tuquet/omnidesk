@@ -49,3 +49,7 @@ As an AI Agent modifying the OmniDesk ecosystem, you MUST evaluate every code ch
 ## 7. Code Verification
 
 - **Always Check After Patching**: After patching or editing Rust code, you MUST always run `cargo check -p <domain>` (e.g., `cargo check -p omni-studio`) to verify that your changes compile successfully and do not introduce syntax or typing errors before ending your turn.
+
+## 8. Code Quality & Linting
+
+- **No Lint Bypassing**: NEVER use `eslint-disable` or similar directives to forcefully bypass ESLint rules just to achieve a goal or pass a typecheck. Always solve the underlying type or logic issues cleanly and correctly.

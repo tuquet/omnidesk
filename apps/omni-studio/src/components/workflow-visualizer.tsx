@@ -1,8 +1,6 @@
-/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-explicit-any */
 import { useEffect } from 'react';
-import type {
-  Edge,
-  Node} from '@xyflow/react';
+import type { Edge, Node } from '@xyflow/react';
 import {
   ReactFlow,
   Controls,
@@ -20,7 +18,7 @@ function WorkflowCardNode({ data }: { data: any }) {
   return (
     <>
       <Handle type="target" position={Position.Top} className="w-2 h-2" />
-      <Card 
+      <Card
         className="p-3 w-[260px] shadow-md bg-card text-card-foreground border-border"
         style={{ contentVisibility: 'auto', containIntrinsicSize: '260px 120px' }}
       >
@@ -48,7 +46,7 @@ const nodeTypes = {
 const getLayoutedElements = (nodes: Node[], edges: Edge[], direction = 'TB') => {
   const dagreGraph = new dagre.graphlib.Graph();
   dagreGraph.setDefaultEdgeLabel(() => ({}));
-  
+
   const nodeWidth = 260;
   const nodeHeight = 120;
 
@@ -85,28 +83,34 @@ export function WorkflowVisualizer({ parsedJson }: { parsedJson: any }) {
 
   useEffect(() => {
     if (!parsedJson?.drawflow) return;
-    
+
     let rawNodes = [];
     if (Array.isArray(parsedJson.drawflow.nodes)) {
       rawNodes = parsedJson.drawflow.nodes;
-    } else if (typeof parsedJson.drawflow.nodes === 'object' && parsedJson.drawflow.nodes !== null) {
+    } else if (
+      typeof parsedJson.drawflow.nodes === 'object' &&
+      parsedJson.drawflow.nodes !== null
+    ) {
       rawNodes = Object.values(parsedJson.drawflow.nodes);
     }
-    
+
     let rawEdges = [];
     if (Array.isArray(parsedJson.drawflow.edges)) {
       rawEdges = parsedJson.drawflow.edges;
-    } else if (typeof parsedJson.drawflow.edges === 'object' && parsedJson.drawflow.edges !== null) {
+    } else if (
+      typeof parsedJson.drawflow.edges === 'object' &&
+      parsedJson.drawflow.edges !== null
+    ) {
       rawEdges = Object.values(parsedJson.drawflow.edges);
     }
 
     const flowNodes: Node[] = rawNodes.map((n: any) => ({
       id: String(n.id || Math.random()),
       type: 'workflowCard',
-      data: { 
-        label: n.label || n.type || 'Unknown Node', 
+      data: {
+        label: n.label || n.type || 'Unknown Node',
         id: n.id,
-        details: n.data 
+        details: n.data,
       },
       position: { x: 0, y: 0 },
     }));
@@ -116,11 +120,14 @@ export function WorkflowVisualizer({ parsedJson }: { parsedJson: any }) {
       source: String(e.source),
       target: String(e.target),
       animated: true,
-      style: { stroke: 'hsl(var(--primary))', strokeWidth: 2 }
+      style: { stroke: 'hsl(var(--primary))', strokeWidth: 2 },
     }));
 
-    const { nodes: layoutedNodes, edges: layoutedEdges } = getLayoutedElements(flowNodes, flowEdges);
-    
+    const { nodes: layoutedNodes, edges: layoutedEdges } = getLayoutedElements(
+      flowNodes,
+      flowEdges,
+    );
+
     setNodes(layoutedNodes);
     setEdges(layoutedEdges);
   }, [parsedJson, setNodes, setEdges]);
