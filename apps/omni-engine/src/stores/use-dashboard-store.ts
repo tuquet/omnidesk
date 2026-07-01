@@ -48,7 +48,7 @@ export const dashboardActions = {
         ...s,
         workflows,
         profiles,
-        selectedWorkflow: workflows.length > 0 ? workflows[0].id : '',
+        selectedWorkflow: workflows.length > 0 ? (workflows[0]?.id ?? '') : '',
         selectedProfiles: initialSelection,
         isLoading: false,
       }));

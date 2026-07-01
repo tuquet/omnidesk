@@ -90,7 +90,6 @@ function WorkflowsPage() {
   const {
     data: workflows = [],
     isLoading,
-    isRefetching,
   } = useQuery<Workflow[]>({
     queryKey: ['workflows', selectedWorkspacePath, viewMode],
     queryFn: async () => {

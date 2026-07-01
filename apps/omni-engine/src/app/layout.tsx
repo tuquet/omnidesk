@@ -12,6 +12,7 @@ import {
   SidebarMenuButton,
 } from '@omnidesk/ui';
 import { MonitorPlay, Settings, Terminal, Zap } from 'lucide-react';
+import { DEFAULT_AUTHENTICATED_ROUTE } from '@/config/route-config';
 
 function EngineSidebar() {
   return (
@@ -29,7 +30,7 @@ function EngineSidebar() {
             <SidebarMenu>
               <SidebarMenuItem>
                 <SidebarMenuButton className="text-xs" asChild>
-                  <Link to="/dashboard">
+                  <Link to={DEFAULT_AUTHENTICATED_ROUTE}>
                     <Terminal />
                     <span>Execute Order</span>
                   </Link>
