@@ -11,9 +11,13 @@ import {
   TabsList,
   TabsTrigger,
   TabsContent,
+} from '@omnidesk/ui';
+import {
   WorkflowParametersEditor,
   WorkflowTriggersEditor,
-} from '@omnidesk/ui';
+  type WorkflowParameter,
+  type WorkflowTrigger,
+} from '@omnidesk/features';
 import { Loader2 } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
@@ -52,20 +56,20 @@ function getParameters(parsed: any) {
   if (parsed.drawflow && Array.isArray(parsed.drawflow.nodes)) {
     const triggerNode = parsed.drawflow.nodes.find((n: any) => n.label === 'trigger');
     if (triggerNode?.data?.parameters) {
-      return triggerNode.data.parameters;
+      return triggerNode.data.parameters as WorkflowParameter[];
     }
   }
-  return parsed.trigger?.parameters || [];
+  return (parsed.trigger?.parameters as WorkflowParameter[]) || [];
 }
 
 function getTriggers(parsed: any) {
   if (parsed.drawflow && Array.isArray(parsed.drawflow.nodes)) {
     const triggerNode = parsed.drawflow.nodes.find((n: any) => n.label === 'trigger');
     if (triggerNode?.data?.triggers) {
-      return triggerNode.data.triggers;
+      return triggerNode.data.triggers as WorkflowTrigger[];
     }
   }
-  return parsed.trigger?.triggers || [];
+  return (parsed.trigger?.triggers as WorkflowTrigger[]) || [];
 }
 
 function updateParameters(parsed: any, parameters: any[]) {
@@ -252,11 +256,11 @@ export function WorkflowJsonEditorModal({
             <TabsContent value="parameters" className="flex-1 min-h-0 overflow-auto border rounded-md p-4 m-0 bg-background">
               {isValidJson && (
                 <WorkflowParametersEditor
-                  value={parsedJson ? (getParameters(parsedJson) as any[]) : []}
+                  value={parsedJson ? (getParameters(parsedJson) as WorkflowParameter[]) : []}
                   onChange={(parameters) => {
                     try {
                       const parsed = JSON.parse(jsonValue) as any;
-                      updateParameters(parsed, parameters);
+                      updateParameters(parsed, parameters as WorkflowParameter[]);
                       setJsonValue(JSON.stringify(parsed, null, 2));
                     } catch {
                       // ignore
@@ -269,11 +273,11 @@ export function WorkflowJsonEditorModal({
             <TabsContent value="triggers" className="flex-1 min-h-0 overflow-auto border rounded-md p-4 m-0 bg-background">
               {isValidJson && (
                 <WorkflowTriggersEditor
-                  value={parsedJson ? (getTriggers(parsedJson) as any[]) : []}
+                  value={parsedJson ? (getTriggers(parsedJson) as WorkflowTrigger[]) : []}
                   onChange={(triggers) => {
                     try {
                       const parsed = JSON.parse(jsonValue) as any;
-                      updateTriggers(parsed, triggers);
+                      updateTriggers(parsed, triggers as WorkflowTrigger[]);
                       setJsonValue(JSON.stringify(parsed, null, 2));
                     } catch {
                       // ignore

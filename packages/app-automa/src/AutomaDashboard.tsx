@@ -1,6 +1,6 @@
 import { apiUrl } from './lib/api-config';
 import { useState, useEffect, useRef } from 'react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription, Button } from '@omnidesk/ui';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, Button } from '@omnidesk/ui';;
 import { Bug, Activity, ShieldCheck, PlayCircle, Clock, Terminal } from 'lucide-react';
 import { listen } from '@tauri-apps/api/event';
 import { createClient } from '@supabase/supabase-js';

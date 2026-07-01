@@ -1,14 +1,6 @@
 import { useState } from 'react';
 import { Bell } from 'lucide-react';
-import {
-  Button,
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuTrigger,
-  Badge,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-} from '@omnidesk/ui';
+import { Button, DropdownMenu, DropdownMenuContent, DropdownMenuTrigger, Badge, DropdownMenuLabel, DropdownMenuSeparator } from '@omnidesk/ui';;
 
 export function NotificationButton({ triggerNode }: { triggerNode?: React.ReactNode }) {
   const [isOpen, setIsOpen] = useState(false);

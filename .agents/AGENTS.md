@@ -53,3 +53,8 @@ As an AI Agent modifying the OmniDesk ecosystem, you MUST evaluate every code ch
 ## 8. Code Quality & Linting
 
 - **No Lint Bypassing**: NEVER use `eslint-disable` or similar directives to forcefully bypass ESLint rules just to achieve a goal or pass a typecheck. Always solve the underlying type or logic issues cleanly and correctly.
+
+## 9. Centralized API Requests & Error Handling
+
+- **No Local Try-Catch for APIs**: All API request operations MUST be centralized in a single location (e.g., dedicated API clients or hooks). Do NOT use `try-catch` blocks at the individual call sites.
+- **Global Interceptors**: Let the global interceptor layer handle all error reporting and logging in a single, centralized place.

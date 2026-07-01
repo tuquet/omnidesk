@@ -1,11 +1,5 @@
 import React from 'react';
-import {
-  SidebarProvider,
-  SidebarInset,
-  ResizablePanelGroup,
-  ResizablePanel,
-  ResizableHandle,
-} from '@omnidesk/ui';
+import { SidebarProvider, SidebarInset, ResizablePanelGroup, ResizablePanel, ResizableHandle } from '@omnidesk/ui';;
 import { useLayoutStore } from '../stores/use-layout-store';
 import { useDevStore } from '../stores/use-dev-store';
 import { DevToolsPane } from './dev-tools-pane';

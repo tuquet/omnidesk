@@ -46,24 +46,19 @@ export function useLocalInstalledApps() {
   return useQuery({
     queryKey: [...launcherKeys.all, 'local-installed-apps'] as const,
     queryFn: async (): Promise<MarketplaceApp[]> => {
-      try {
-        const { data } = await client.get({ url: '/api/apps/local' });
-        const localApps = data || [];
-        return localApps.map((app: any) => ({
-          id: app.id,
-          name: app.name || 'Unknown App',
-          description: app.description || '',
-          icon_name: app.icon || 'Box',
-          category: app.category || 'Utilities',
-          is_core: false,
-          sort_order: 999,
-          created_at: new Date().toISOString(),
-          current_version: app.version || '1.0.0',
-        }));
-      } catch (e) {
-        console.warn('Failed to fetch local apps:', e);
-        return [];
-      }
+      const { data } = await client.get({ url: '/api/apps/local' });
+      const localApps = data || [];
+      return localApps.map((app: any) => ({
+        id: app.id,
+        name: app.name || 'Unknown App',
+        description: app.description || '',
+        icon_name: app.icon || 'Box',
+        category: app.category || 'Utilities',
+        is_core: false,
+        sort_order: 999,
+        created_at: new Date().toISOString(),
+        current_version: app.version || '1.0.0',
+      }));
     },
     staleTime: 5000,
   });

@@ -249,6 +249,8 @@ async fn sync_local(
                         global_data,
                         table_data: None,
                         data_columns: None,
+                        content: None,
+                        connected_table: None,
                         version,
                         is_disabled: Some(0),
                         source: Some("local_sync".to_string()),

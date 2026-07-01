@@ -2,9 +2,10 @@ import { createRootRouteWithContext, useNavigate } from '@tanstack/react-router'
 import { useEffect, useMemo } from 'react';
 import { useDevStore } from '@omnidesk/core';
 import type { AuthState } from '@omnidesk/auth';
-import { Button, ConfirmDialogProvider } from '@omnidesk/ui';
+import { Button, ConfirmDialogProvider } from '@omnidesk/ui';;
 import { ArrowLeft, Ghost } from 'lucide-react';
-import { TitleBar, StatusBar } from '@omnidesk/core';
+import { TitleBar } from '@omnidesk/core';
+import { StatusBar } from '@omnidesk/features';
 import { AppConfigProvider } from '@omnidesk/core';
 import * as config from '@/config';
 import { useRBAC } from '@/hooks/use-rbac';
@@ -113,7 +114,7 @@ function RootComponent() {
   );
 }
 
-import { DefaultErrorFallback } from '@omnidesk/ui';
+import { DefaultErrorFallback } from '@omnidesk/ui';;
 import { ROUTES } from '@/config/route-config';
 
 export const Route = createRootRouteWithContext<MyRouterContext>()({

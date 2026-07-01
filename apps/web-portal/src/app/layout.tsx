@@ -1,5 +1,5 @@
 import { Outlet, useRouterState } from '@tanstack/react-router';
-import { SiteHeader } from '@omnidesk/core';
+import { SiteHeader } from '@omnidesk/features';
 import { RouteProgressBar } from '@omnidesk/core';
 
 export function AppLayout() {

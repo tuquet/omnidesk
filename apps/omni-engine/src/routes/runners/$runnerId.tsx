@@ -1,14 +1,5 @@
 import { createFileRoute, Link } from '@tanstack/react-router';
-import {
-  PageContainer,
-  PageHeader,
-  PageTitle,
-  Card,
-  CardHeader,
-  CardTitle,
-  CardContent,
-  Button,
-} from '@omnidesk/ui';
+import { PageContainer, PageHeader, PageTitle, Card, CardHeader, CardTitle, CardContent, Button } from '@omnidesk/ui';;
 import { TerminalSquare, ArrowLeft, Loader2, PlayCircle, Clock } from 'lucide-react';
 import { useDashboardStore } from '../../stores/use-dashboard-store';
 import { ROUTES } from '@/config/route-config';

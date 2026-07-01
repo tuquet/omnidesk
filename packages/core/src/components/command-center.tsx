@@ -134,8 +134,7 @@ export function CommandCenterDashboard() {
 
   useEffect(() => {
     async function fetchApps() {
-      try {
-        let savedOrder: string[] = [];
+      let savedOrder: string[] = [];
         let fetchedApps: InstalledApp[] = [];
         let userId = 'local';
         const token = localStorage.getItem('omnidesk_token') || '';
@@ -207,20 +206,15 @@ export function CommandCenterDashboard() {
           });
         }
         
-        setItems(allApps);
-      } catch (err) {
-        console.error('Failed to load apps:', err);
-      } finally {
-        setIsLoading(false);
-      }
+      setItems(allApps);
+      setIsLoading(false);
     }
 
     fetchApps();
   }, []);
 
   const saveOrder = async (order: string[]) => {
-    try {
-      const token = localStorage.getItem('omnidesk_token') || '';
+    const token = localStorage.getItem('omnidesk_token') || '';
       try {
          const res = await fetch(apiUrl('/api/users/home-layout'), {
              method: 'PUT',
@@ -243,9 +237,6 @@ export function CommandCenterDashboard() {
           updated_at: new Date().toISOString(),
         });
       }
-    } catch (e) {
-      console.error("Failed to save order:", e);
-    }
   };
 
   const handleDragEnd = async (event: DragEndEvent) => {

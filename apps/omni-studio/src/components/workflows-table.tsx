@@ -1,21 +1,6 @@
  
 import { memo, useRef, useMemo, useCallback } from 'react';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-  Badge,
-  Button,
-  Skeleton,
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-  Checkbox,
-} from '@omnidesk/ui';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, Badge, Button, Skeleton, Tooltip, TooltipContent, TooltipProvider, TooltipTrigger, Checkbox } from '@omnidesk/ui';;
 import {
   PlayIcon,
   EditIcon,

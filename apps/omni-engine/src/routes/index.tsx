@@ -1,26 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router';
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  Button,
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-  Checkbox,
-  Tabs,
-  TabsList,
-  TabsTrigger,
-  ScrollArea,
-  PageContainer,
-  PageHeader,
-  PageTitle,
-} from '@omnidesk/ui';
+import { Card, CardHeader, CardTitle, CardContent, CardDescription, CardFooter, Button, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Checkbox, Tabs, TabsList, TabsTrigger, ScrollArea, PageContainer, PageHeader, PageTitle } from '@omnidesk/ui';;
 import { Play, CalendarClock, Loader2 } from 'lucide-react';
 import { useEffect } from 'react';
 import { useDashboardStore, dashboardActions } from '../stores/use-dashboard-store';

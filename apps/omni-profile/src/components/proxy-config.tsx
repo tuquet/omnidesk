@@ -1,13 +1,4 @@
-import {
-  Label,
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-  Switch,
-  Input,
-} from '@omnidesk/ui';
+import { Label, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Switch, Input } from '@omnidesk/ui';;
 import { ShieldIcon } from 'lucide-react';
 
 export interface ProxyData {

@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { Badge, Button, Input } from '@omnidesk/ui';
+import { Badge, Button, Input } from '@omnidesk/ui';;
 import { PlusIcon } from 'lucide-react';
 import { useBrowserProfileStore, type BrowserProfile } from '@omnidesk/browser-profiles';
 import { toast } from 'sonner';

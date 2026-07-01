@@ -78,27 +78,25 @@ async fn handle_socket(socket: WebSocket, state: AppState) {
 
     // Spawn a task to receive messages from the WebSocket client and process them
     let mut recv_task = tokio::spawn(async move {
-        let _client = reqwest::Client::new();
-        let _studio_url = "http://127.0.0.1:1422";
-        
+
         while let Some(Ok(Message::Text(text))) = receiver.next().await {
             if let Ok(event) = serde_json::from_str::<AutomaEvent>(&text) {
                 println!("Received event from Automa Extension: {}", event.event_type);
                 
                 use tauri::Emitter;
-                let _ = app_clone.emit("e2e-log", format!("[AUTOMA] Received event: {}", event.event_type));
+                let _ = app_clone.emit(omni_tauri_core::constants::E2E_LOG_EVENT, format!("[AUTOMA] Received event: {}", event.event_type));
 
                 // Process events directly in Engine DB
                 let db = state.db.clone();
                 match event.event_type.as_str() {
                     "run_started" => {
-                        let _ = app_clone.emit("e2e-log", "Run started (tracked in engine DB)");
+                        let _ = app_clone.emit(omni_tauri_core::constants::E2E_LOG_EVENT, "Run started (tracked in engine DB)");
                     },
                     "run_finished" => {
                         if let Some(run_id) = event.payload.get("run_id").and_then(|v| v.as_str()) {
                             let status = event.payload.get("status").and_then(|v| v.as_str()).unwrap_or("COMPLETED");
                             let _ = crate::services::automa_service::mark_run_finished(&db, run_id, status).await;
-                            let _ = app_clone.emit("e2e-log", "Run finished (saved to engine DB)");
+                            let _ = app_clone.emit(omni_tauri_core::constants::E2E_LOG_EVENT, "Run finished (saved to engine DB)");
                         }
                     },
                     "log_added" => {
@@ -142,7 +140,7 @@ pub async fn run_e2e(
     
     // Broadcast an event to all connected extensions to run a workflow (just as an example)
     let event = AutomaEvent {
-        event_type: "execute_workflow".to_string(),
+        event_type: omni_tauri_core::constants::WS_EXECUTE_WORKFLOW.to_string(),
         payload: serde_json::json!({ "workflow_id": "test-id" }),
     };
     let _ = state.automa_ws_tx.send(event);

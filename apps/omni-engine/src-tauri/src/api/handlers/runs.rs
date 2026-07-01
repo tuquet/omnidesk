@@ -88,7 +88,7 @@ async fn create_run(
     };
 
     match omni_shared::automa::executor::SharedWorkflowExecutor::execute(
-        &db, &ws_tx, &payload.workflow_id, &workflow_name, workflow_json, &p_id, payload.schedule_id.as_deref(), payload.variables, 1423
+        &db, &ws_tx, &payload.workflow_id, &workflow_name, workflow_json, &p_id, payload.schedule_id.as_deref(), payload.variables, omni_tauri_core::constants::RUNTIME_PORT, omni_tauri_core::constants::PROFILE_PORT
     ).await {
         Ok(exec_result) => {
             let run_id = match exec_result {

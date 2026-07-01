@@ -3,7 +3,7 @@ import * as ReactDOM from 'react-dom';
 import * as LucideIcons from 'lucide-react';
 import * as OmnideskUI from '@omnidesk/ui';
 // Import UI if needed, but we will pass it dynamically
-import { Skeleton } from '@omnidesk/ui';
+import { Skeleton } from '@omnidesk/ui';;
 import { CommandCenterDashboard } from './command-center';
 import { usePlatform } from '../providers/platform-provider';
 

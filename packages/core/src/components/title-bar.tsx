@@ -8,24 +8,7 @@ import { useLayoutStore } from '../stores/use-layout-store';
 import { useDevStore } from '../stores/use-dev-store';
 import { useNavigate } from '@tanstack/react-router';
 
-import {
-  Menubar,
-  MenubarContent,
-  MenubarItem,
-  MenubarMenu,
-  MenubarSeparator,
-  MenubarShortcut,
-  MenubarTrigger,
-  MenubarSub,
-  MenubarSubContent,
-  MenubarSubTrigger,
-  Button,
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-  DropdownMenuSeparator,
-} from '@omnidesk/ui';
+import { Menubar, MenubarContent, MenubarItem, MenubarMenu, MenubarSeparator, MenubarShortcut, MenubarTrigger, MenubarSub, MenubarSubContent, MenubarSubTrigger, Button, DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from '@omnidesk/ui';;
 import {
   Menu,
   Home,

@@ -1,17 +1,9 @@
-import { cn } from '@omnidesk/ui';
+import { cn } from '@omnidesk/ui';;
 import { Link, useNavigate } from '@tanstack/react-router';
 import { Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useForm } from '@tanstack/react-form';
-import {
-  Button,
-  Field,
-  FieldDescription,
-  FieldGroup,
-  FieldLabel,
-  FieldSeparator,
-  Input,
-} from '@omnidesk/ui';
+import { Button, Field, FieldDescription, FieldGroup, FieldLabel, FieldSeparator, Input } from '@omnidesk/ui';;
 import { authActions } from '../stores/use-auth-store';
 import { loginFormSchema } from '../schemas';
 
@@ -28,24 +20,14 @@ export function LoginForm({
       password: 'password',
     },
     onSubmit: async ({ value }) => {
-      try {
-        await authActions.signInWithPassword(value.email, value.password);
-        toast.success('Login successful!');
-        navigate({ to: '/' });
-      } catch (err) {
-        const message = err instanceof Error ? err.message : 'Login failed';
-        toast.error(message);
-      }
+      await authActions.signInWithPassword(value.email, value.password);
+      toast.success('Login successful!');
+      navigate({ to: '/' });
     },
   });
 
   const handleGitHubLogin = async () => {
-    try {
-      await authActions.signInWithGitHub(platformApi);
-    } catch (err) {
-      const message = err instanceof Error ? err.message : 'GitHub login failed';
-      toast.error(message);
-    }
+    await authActions.signInWithGitHub(platformApi);
   };
 
   return (

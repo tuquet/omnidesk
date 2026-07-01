@@ -1,13 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { Languages } from 'lucide-react';
 
-import {
-  Button,
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@omnidesk/ui';
+import { Button, DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@omnidesk/ui';;
 
 const LANGUAGES = [
   { code: 'vi', label: '🇻🇳 Tiếng Việt' },

@@ -1,7 +1,7 @@
 import { createLazyFileRoute } from '@tanstack/react-router';
 import { usePlatform } from '@omnidesk/core';
-import { DesktopLanding } from '@omnidesk/ui';
-import { WebLanding } from '@omnidesk/ui';
+import { DesktopLanding } from '@omnidesk/features';;
+import { WebLanding } from '@omnidesk/features';;
 import { useAuth } from '@omnidesk/auth';
 
 export const Route = createLazyFileRoute('/')({

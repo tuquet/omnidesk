@@ -14,7 +14,7 @@ import {
   useLocalInstalledApps,
   type MarketplaceApp,
 } from '../api/queries';
-import { Button, Input, Skeleton, cn } from '@omnidesk/ui';
+import { Button, Input, Skeleton, cn } from '@omnidesk/ui';;
 import { Search, AlertCircle, RefreshCw, CloudUpload } from 'lucide-react';
 import { toast } from 'sonner';
 import { useNavigate } from '@tanstack/react-router';

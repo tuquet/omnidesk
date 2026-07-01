@@ -17,6 +17,16 @@ export const webAdapter: PlatformAdapter = {
     return '/';
   },
 
+  listen: async <T>(event: string, _callback: (payload: T) => void): Promise<() => void> => {
+    console.warn(`[WebAdapter] Ignored Tauri listen: ${event}`);
+    return () => {};
+  },
+
+  openDialog: async (): Promise<string | string[] | null> => {
+    console.warn('[WebAdapter] openDialog not supported on web natively');
+    return null;
+  },
+
   quitApp: async (): Promise<void> => {
     console.warn('[WebAdapter] quitApp not supported on web');
   },

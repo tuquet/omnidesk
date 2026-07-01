@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
-import { API_BASE_URL } from '@omnidesk/core';
+import { API_BASE_URL, usePlatform } from '@omnidesk/core';
 import { browserProfileStore } from '@omnidesk/browser-profiles';
 
 export function useBrowserEvents() {
+  const platformApi = usePlatform();
   // No longer extracting fetchProfiles as it is unused
   const [downloadProgress, setDownloadProgress] = useState<{
     status: string;
@@ -60,14 +61,11 @@ export function useBrowserEvents() {
   useEffect(() => {
     let unlisten: (() => void) | undefined;
 
-    // Dynamic import to prevent crash in non-Tauri environments
-    import('@tauri-apps/api/event')
-      .then(({ listen }) => {
-        listen('profile-status-changed', (event) => {
-          console.warn('Profile status changed event received', event);
-          const payload = event.payload as { id: string; status: string; last_used_at?: string };
+    platformApi
+      .listen('profile-status-changed', (payload: { id: string; status: string; last_used_at?: string }) => {
+        console.warn('Profile status changed event received', payload);
 
-          if (payload && payload.id) {
+        if (payload && payload.id) {
             browserProfileStore.setState((s) => ({
               ...s,
               profiles: s.profiles.map((p) =>
@@ -86,16 +84,14 @@ export function useBrowserEvents() {
           }
         }).then((u) => {
           unlisten = u;
+        }).catch((_e) => {
+          console.warn('Not in Tauri context, skipping event listener');
         });
-      })
-      .catch((_e) => {
-        console.warn('Not in Tauri context, skipping event listener');
-      });
 
     return () => {
       if (unlisten) unlisten();
     };
-  }, []);
+  }, [platformApi]);
 
   return { downloadProgress };
 }

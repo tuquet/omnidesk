@@ -1,14 +1,6 @@
 import { useState } from 'react';
 import { Bug, Copy, Trash2, XCircle, AlertTriangle, Info, Terminal } from 'lucide-react';
-import {
-  Button,
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuTrigger,
-  Badge,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-} from '@omnidesk/ui';
+import { Button, DropdownMenu, DropdownMenuContent, DropdownMenuTrigger, Badge, DropdownMenuLabel, DropdownMenuSeparator } from '@omnidesk/ui';;
 import { useConsoleStore } from '@omnidesk/core';
 import type { LogLevel } from '@omnidesk/core';
 import { toast } from 'sonner';

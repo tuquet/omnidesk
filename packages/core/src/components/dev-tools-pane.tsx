@@ -1,5 +1,5 @@
 import { useDevStore } from '../stores/use-dev-store';
-import { Tabs, TabsList, TabsTrigger, TabsContent, Button } from '@omnidesk/ui';
+import { Tabs, TabsList, TabsTrigger, TabsContent, Button } from '@omnidesk/ui';;
 import { X, TerminalSquare, Activity, Network, FileTerminal } from 'lucide-react';
 
 export function DevToolsPane() {

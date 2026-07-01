@@ -1,4 +1,5 @@
 import { useStore } from '@tanstack/react-store';
+import { STORAGE_KEYS } from '@omnidesk/types';
 import { createPersistentStore } from './utils';
 
 export interface LayoutState {
@@ -7,7 +8,7 @@ export interface LayoutState {
   panelSizes: number[];
 }
 
-export const layoutStore = createPersistentStore<LayoutState>('omnidesk-layout-state', {
+export const layoutStore = createPersistentStore<LayoutState>(STORAGE_KEYS.LAYOUT, {
   sidebarOpen: false,
   theme: 'system',
   panelSizes: [20, 80],

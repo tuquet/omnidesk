@@ -1,25 +1,9 @@
 import { useState, useEffect, useMemo } from 'react';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogFooter,
-  DialogTitle,
-  DialogDescription,
-  Button,
-  Input,
-  Label,
-  Switch,
-  Select,
-  SelectTrigger,
-  SelectValue,
-  SelectContent,
-  SelectItem,
-  Skeleton,
-} from '../../index';
+import { Dialog, DialogContent, DialogHeader, DialogFooter, DialogTitle, DialogDescription, Button, Input, Label, Switch, Select, SelectTrigger, SelectValue, SelectContent, SelectItem, Skeleton } from '@omnidesk/ui';;
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { PlayIcon } from 'lucide-react';
+
 
 interface TriggerParameter {
   name: string;
@@ -34,9 +18,11 @@ export interface RunWorkflowModalProps {
   isOpen: boolean;
   onClose: () => void;
   onRunSuccess?: () => void;
+  workflowApiUrl?: string;
+  profileApiUrl?: string;
 }
 
-export function RunWorkflowModal({ workflowId, profileId, isOpen, onClose, onRunSuccess }: RunWorkflowModalProps) {
+export function RunWorkflowModal({ workflowId, profileId, isOpen, onClose, onRunSuccess, workflowApiUrl = 'http://localhost:1421', profileApiUrl = 'http://localhost:1422' }: RunWorkflowModalProps) {
   const [selectedProfile, setSelectedProfile] = useState<string>(profileId || 'default');
   const [selectedWorkflow, setSelectedWorkflow] = useState<string>(workflowId || '');
   const [variables, setVariables] = useState<Record<string, any>>({});
@@ -55,7 +41,7 @@ export function RunWorkflowModal({ workflowId, profileId, isOpen, onClose, onRun
     queryKey: ['browser-profiles'],
     queryFn: async () => {
       try {
-        const res = await fetch('http://127.0.0.1:1421/api/browser-profiles');
+        const res = await fetch(`${profileApiUrl}/api/browser-profiles`);
         if (!res.ok) throw new Error('Failed to fetch profiles');
         return await res.json() as any[];
       } catch (err) {
@@ -71,7 +57,7 @@ export function RunWorkflowModal({ workflowId, profileId, isOpen, onClose, onRun
     queryKey: ['workflows-list'],
     queryFn: async () => {
       try {
-        const res = await fetch('http://127.0.0.1:1422/api/automa/workflows');
+        const res = await fetch(`${workflowApiUrl}/api/automa/workflows`);
         if (!res.ok) throw new Error('Failed to fetch workflows');
         return await res.json() as any[];
       } catch (err) {
@@ -88,7 +74,7 @@ export function RunWorkflowModal({ workflowId, profileId, isOpen, onClose, onRun
     queryFn: async () => {
       if (!selectedWorkflow) return null;
       try {
-        const res = await fetch(`http://127.0.0.1:1422/api/automa/workflows/${selectedWorkflow}`);
+        const res = await fetch(`${workflowApiUrl}/api/automa/workflows/${selectedWorkflow}`);
         if (!res.ok) throw new Error('Failed to fetch workflow');
         return await res.json() as any;
       } catch (err) {
@@ -151,7 +137,7 @@ export function RunWorkflowModal({ workflowId, profileId, isOpen, onClose, onRun
         payload.variables = variables;
       }
 
-      const res = await fetch('http://127.0.0.1:1422/api/automa/workflows/runs', {
+      const response = await fetch(`${workflowApiUrl}/api/automa/workflows/runs`, {
         method: 'POST',
         body: JSON.stringify(payload),
         headers: {
@@ -159,8 +145,8 @@ export function RunWorkflowModal({ workflowId, profileId, isOpen, onClose, onRun
         },
       });
       
-      if (!res.ok) {
-        const errData = await res.json().catch(() => null);
+      if (!response.ok) {
+        const errData = await response.json().catch(() => null);
         throw new Error(errData?.error || 'Failed to start execution');
       }
     },

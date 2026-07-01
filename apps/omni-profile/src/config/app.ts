@@ -11,9 +11,11 @@ export const APP_DESCRIPTION = 'Browser Profile Management';
 export const LOGO_SRC = '/logo.png';
 
 // ─── External URLs ───────────────────────────────────────────────────────────
+import { PROFILE_API_URL } from '@omnidesk/core';
+
 export const GITHUB_REPO = 'https://github.com/tuquet/omnidesk';
 export const GITHUB_ISSUES = `${GITHUB_REPO}/issues`;
-export const API_DOCS_URL = 'http://127.0.0.1:1421/scalar';
+export const API_DOCS_URL = `${PROFILE_API_URL}/scalar`;
 
 // ─── Default User (mock) ────────────────────────────────────────────────────
 export const DEFAULT_USER = {

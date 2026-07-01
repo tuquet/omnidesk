@@ -1,12 +1,12 @@
-import { Label } from '../ui/label';
-import { Input } from '../ui/input';
-import { Checkbox } from '../ui/checkbox';
+import { Label } from '@omnidesk/ui';
+import { Input } from '@omnidesk/ui';
+import { Checkbox } from '@omnidesk/ui';
 
-import { Button } from '../ui/button';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '../ui/collapsible';
+import { Button } from '@omnidesk/ui';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@omnidesk/ui';
 import { Trash2, ChevronDown, Plus } from 'lucide-react';
-import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '../ui/command';
+import { Popover, PopoverContent, PopoverTrigger } from '@omnidesk/ui';
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@omnidesk/ui';
 
 export interface WorkflowTrigger {
   id: string;

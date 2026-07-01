@@ -1,10 +1,10 @@
 import { RouterProvider, createRouter } from '@tanstack/react-router';
 import { QueryClientProvider } from '@tanstack/react-query';
-import { TooltipProvider, Toaster } from '@omnidesk/ui';
+import { TooltipProvider, Toaster } from '@omnidesk/ui';;
 import { ThemeProvider } from 'next-themes';
 import { queryClient } from './app/query-client';
-import { ErrorBoundary } from '@omnidesk/ui';
-import { ConfirmDialogProvider } from '@omnidesk/ui';
+import { ErrorBoundary } from '@omnidesk/ui';;
+import { ConfirmDialogProvider } from '@omnidesk/ui';;
 
 // Import the generated route tree
 import { routeTree } from './routeTree.gen';
@@ -31,7 +31,7 @@ declare module '@tanstack/react-router' {
 }
 
 import { isSupabaseConfigured } from './lib/supabase';
-import { EnvSetupWarning } from '@omnidesk/ui';
+import { EnvSetupWarning } from '@omnidesk/ui';;
 
 export default function App() {
   const auth = useStore(authStore);

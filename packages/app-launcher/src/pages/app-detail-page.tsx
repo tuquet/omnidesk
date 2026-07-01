@@ -8,7 +8,7 @@ import {
   useInstalledAppsDetails,
 } from '../api/queries';
 import { APP_REGISTRY } from '../config/registry';
-import { Button, Skeleton } from '@omnidesk/ui';
+import { Button, Skeleton } from '@omnidesk/ui';;
 import { ChevronLeft, Loader2, Share, Star, AlertCircle, Package, Shield } from 'lucide-react';
 import { toast } from 'sonner';
 

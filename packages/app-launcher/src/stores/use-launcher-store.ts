@@ -1,5 +1,6 @@
 import { Store } from '@tanstack/react-store';
 import { useStore } from '@tanstack/react-store';
+import { STORAGE_KEYS } from '@omnidesk/types';
 import { APP_REGISTRY } from '../config/registry';
 
 // Get default installed apps (core apps are always installed)
@@ -26,7 +27,7 @@ const enforceCoreApps = (apps: string[]) => {
 // Initialize from localStorage if available (offline-first fallback)
 const loadState = (): LauncherState => {
   try {
-    const stored = localStorage.getItem('omnidesk-launcher-state');
+    const stored = localStorage.getItem(STORAGE_KEYS.LAUNCHER);
     if (stored) {
       const parsed = JSON.parse(stored) as unknown as Partial<LauncherState>;
       return {
@@ -46,7 +47,7 @@ export const launcherStore = new Store<LauncherState>(loadState());
 launcherStore.subscribe(() => {
   try {
     localStorage.setItem(
-      'omnidesk-launcher-state',
+      STORAGE_KEYS.LAUNCHER,
       JSON.stringify({
         installedApps: launcherStore.state.installedApps,
       }),

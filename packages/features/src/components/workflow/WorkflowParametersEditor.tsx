@@ -1,13 +1,13 @@
 
 import { DragDropContext, Droppable, Draggable, type DropResult } from '@hello-pangea/dnd';
-import { Button } from '../ui/button';
-import { Input } from '../ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
-import { Checkbox } from '../ui/checkbox';
-import { Textarea } from '../ui/textarea';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '../ui/collapsible';
+import { Button } from '@omnidesk/ui';
+import { Input } from '@omnidesk/ui';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@omnidesk/ui';
+import { Checkbox } from '@omnidesk/ui';
+import { Textarea } from '@omnidesk/ui';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@omnidesk/ui';
 import { GripVertical, Trash2, ChevronDown, Plus } from 'lucide-react';
-import { Label } from '../ui/label';
+import { Label } from '@omnidesk/ui';
 
 export interface WorkflowParameter {
   id: string;

@@ -18,7 +18,7 @@ pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_single_instance::init(|app, args, _cwd| {
             if let Some(url) = args.iter().find(|a| a.starts_with("omnidesk-profile://")) {
-                let _ = app.emit("deep-link-received", url.clone());
+                let _ = app.emit(omni_tauri_core::constants::DEEP_LINK_RECEIVED_EVENT, url.clone());
             }
             let _ = app.get_webview_window("main").expect("no main window").set_focus();
         }))

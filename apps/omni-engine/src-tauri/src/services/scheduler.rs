@@ -136,7 +136,7 @@ impl SchedulerService {
                     (schedule_name.clone(), None)
                 };
 
-                match SharedWorkflowExecutor::execute(&db, &ws_tx, &workflow_id, &workflow_name, workflow_json, &profile_id, Some(&schedule_id), None, 1423).await {
+                match SharedWorkflowExecutor::execute(&db, &ws_tx, &workflow_id, &workflow_name, workflow_json, &profile_id, Some(&schedule_id), None, omni_tauri_core::constants::RUNTIME_PORT, omni_tauri_core::constants::PROFILE_PORT).await {
                     Ok(exec_result) => {
                         let run_id = match exec_result {
                             ExecutionResult::NeedsDefaultBrowser { run_id, bridge_url } => {
@@ -227,7 +227,8 @@ impl SchedulerService {
             &schedule.profile_id, 
             Some(&schedule.id), 
             None, 
-            1423
+            omni_tauri_core::constants::RUNTIME_PORT,
+            omni_tauri_core::constants::PROFILE_PORT
         ).await?;
 
         let run_id = match exec_result {

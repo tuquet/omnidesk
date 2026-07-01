@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { useRouterState } from '@tanstack/react-router';
 import { usePlatform } from '../providers/platform-provider';
-import { cn } from '@omnidesk/ui';
+import { cn } from '@omnidesk/ui';;
 
 
 export function RouteProgressBar() {

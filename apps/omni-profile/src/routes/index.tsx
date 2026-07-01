@@ -1,5 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { PageContainer, PageHeader, PageTitle, Button, RunWorkflowModal } from '@omnidesk/ui';
+import { PageContainer, PageHeader, PageTitle, Button } from '@omnidesk/ui';
+import { RunWorkflowModal } from '@omnidesk/features';;
 import { useState, useEffect } from 'react';
 import { useBrowserProfileStore, type BrowserProfile } from '@omnidesk/browser-profiles';
 import { LayoutGrid } from 'lucide-react';

@@ -1,32 +1,11 @@
 import * as React from "react"
 import { Area, AreaChart, CartesianGrid, XAxis } from "recharts"
 
-import { useIsMobile } from "../../hooks/use-mobile"
-import {
-  Card,
-  CardAction,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "../../components/ui/card"
-import {
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
-  type ChartConfig,
-} from "../../components/ui/chart"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "../../components/ui/select"
-import {
-  ToggleGroup,
-  ToggleGroupItem,
-} from "../../components/ui/toggle-group"
+import { useIsMobile } from '@omnidesk/ui'
+import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle } from '@omnidesk/ui';
+import { ChartContainer, ChartTooltip, ChartTooltipContent, type ChartConfig } from '@omnidesk/ui';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@omnidesk/ui';
+import { ToggleGroup, ToggleGroupItem } from '@omnidesk/ui';
 
 export const description = "An interactive area chart"
 

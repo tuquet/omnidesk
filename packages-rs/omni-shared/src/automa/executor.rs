@@ -31,6 +31,7 @@ impl SharedWorkflowExecutor {
         schedule_id: Option<&str>,
         variables: Option<Value>,
         server_port: u16,
+        profile_port: u16,
     ) -> Result<ExecutionResult, AppError> {
         
         // 1. Profile Lock Check
@@ -71,7 +72,7 @@ impl SharedWorkflowExecutor {
             ExecutionResult::NeedsDefaultBrowser { run_id: run_id.clone(), bridge_url }
         } else {
             let client = Client::new();
-            let profile_api_url = format!("http://127.0.0.1:1421/api/browser-profiles/{}/launch", profile_id);
+            let profile_api_url = format!("http://127.0.0.1:{}/api/browser-profiles/{}/launch", profile_port, profile_id);
             
             let launch_res = client.post(&profile_api_url)
                 .query(&[("startup_url", &bridge_url)])
@@ -103,7 +104,7 @@ impl SharedWorkflowExecutor {
         });
         
         let event = AutomaEvent {
-            event_type: "execute_workflow".to_string(),
+            event_type: omni_tauri_core::constants::WS_EXECUTE_WORKFLOW.to_string(),
             payload,
         };
         

@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-explicit-any */
 import { useEffect } from 'react';
 import type { Edge, Node } from '@xyflow/react';
 import {
@@ -12,9 +11,37 @@ import {
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import dagre from 'dagre';
-import { Card } from '@omnidesk/ui';
+import { Card } from '@omnidesk/ui';;
 
-function WorkflowCardNode({ data }: { data: any }) {
+interface DrawflowNode {
+  id?: string | number;
+  label?: string;
+  type?: string;
+  data?: unknown;
+}
+
+interface DrawflowEdge {
+  id?: string | number;
+  source: string | number;
+  target: string | number;
+}
+
+interface DrawflowData {
+  nodes?: DrawflowNode[] | Record<string, DrawflowNode>;
+  edges?: DrawflowEdge[] | Record<string, DrawflowEdge>;
+}
+
+interface WorkflowData {
+  drawflow?: DrawflowData;
+}
+
+interface WorkflowCardData {
+  label: string;
+  id?: string | number;
+  details?: unknown;
+}
+
+function WorkflowCardNode({ data }: { data: WorkflowCardData }) {
   return (
     <>
       <Handle type="target" position={Position.Top} className="w-2 h-2" />
@@ -27,7 +54,7 @@ function WorkflowCardNode({ data }: { data: any }) {
             <span className="font-semibold text-sm">{data.label}</span>
             <span className="text-[10px] text-muted-foreground">{data.id}</span>
           </div>
-          {data.details && Object.keys(data.details).length > 0 && (
+          {!!data.details && Object.keys(data.details as object).length > 0 && (
             <pre className="text-[10px] bg-muted text-muted-foreground p-1.5 rounded mt-2 overflow-hidden text-ellipsis whitespace-pre max-h-24">
               {JSON.stringify(data.details, null, 2)}
             </pre>
@@ -77,34 +104,35 @@ const getLayoutedElements = (nodes: Node[], edges: Edge[], direction = 'TB') => 
   return { nodes: newNodes, edges };
 };
 
-export function WorkflowVisualizer({ parsedJson }: { parsedJson: any }) {
+export function WorkflowVisualizer({ parsedJson }: { parsedJson: unknown }) {
   const [nodes, setNodes, onNodesChange] = useNodesState<Node>([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
 
   useEffect(() => {
-    if (!parsedJson?.drawflow) return;
+    const typedJson = parsedJson as WorkflowData | undefined;
+    if (!typedJson?.drawflow) return;
 
-    let rawNodes = [];
-    if (Array.isArray(parsedJson.drawflow.nodes)) {
-      rawNodes = parsedJson.drawflow.nodes;
+    let rawNodes: DrawflowNode[] = [];
+    if (Array.isArray(typedJson.drawflow.nodes)) {
+      rawNodes = typedJson.drawflow.nodes;
     } else if (
-      typeof parsedJson.drawflow.nodes === 'object' &&
-      parsedJson.drawflow.nodes !== null
+      typeof typedJson.drawflow.nodes === 'object' &&
+      typedJson.drawflow.nodes !== null
     ) {
-      rawNodes = Object.values(parsedJson.drawflow.nodes);
+      rawNodes = Object.values(typedJson.drawflow.nodes);
     }
 
-    let rawEdges = [];
-    if (Array.isArray(parsedJson.drawflow.edges)) {
-      rawEdges = parsedJson.drawflow.edges;
+    let rawEdges: DrawflowEdge[] = [];
+    if (Array.isArray(typedJson.drawflow.edges)) {
+      rawEdges = typedJson.drawflow.edges;
     } else if (
-      typeof parsedJson.drawflow.edges === 'object' &&
-      parsedJson.drawflow.edges !== null
+      typeof typedJson.drawflow.edges === 'object' &&
+      typedJson.drawflow.edges !== null
     ) {
-      rawEdges = Object.values(parsedJson.drawflow.edges);
+      rawEdges = Object.values(typedJson.drawflow.edges);
     }
 
-    const flowNodes: Node[] = rawNodes.map((n: any) => ({
+    const flowNodes: Node[] = rawNodes.map((n) => ({
       id: String(n.id || Math.random()),
       type: 'workflowCard',
       data: {
@@ -115,7 +143,7 @@ export function WorkflowVisualizer({ parsedJson }: { parsedJson: any }) {
       position: { x: 0, y: 0 },
     }));
 
-    const flowEdges: Edge[] = rawEdges.map((e: any) => ({
+    const flowEdges: Edge[] = rawEdges.map((e) => ({
       id: String(e.id || `${e.source}-${e.target}`),
       source: String(e.source),
       target: String(e.target),

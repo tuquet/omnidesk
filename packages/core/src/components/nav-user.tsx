@@ -1,14 +1,6 @@
-import { Avatar, AvatarFallback, AvatarImage } from '@omnidesk/ui';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@omnidesk/ui';
-import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from '@omnidesk/ui';
+import { Avatar, AvatarFallback, AvatarImage } from '@omnidesk/ui';;
+import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@omnidesk/ui';;
+import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from '@omnidesk/ui';;
 import {
   EllipsisVerticalIcon,
   CircleUserRoundIcon,

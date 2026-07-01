@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
-import { usePlatform } from '../providers/platform-provider';
+import { usePlatform } from '@omnidesk/core';
 import { Activity } from 'lucide-react';
-import { Button } from '@omnidesk/ui';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@omnidesk/ui';
+import { Button } from '@omnidesk/ui';;
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@omnidesk/ui';;
 
 interface HardwareUsage {
   cpu_percent: number;

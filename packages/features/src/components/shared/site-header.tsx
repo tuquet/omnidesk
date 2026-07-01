@@ -1,20 +1,12 @@
 import { memo } from 'react';
-import {
-  Button,
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuLabel,
-} from '@omnidesk/ui';
+import { Button, DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuLabel } from '@omnidesk/ui';;
 import { WrenchIcon, TrashIcon, BugIcon, LogOutIcon } from 'lucide-react';
 import { NotificationButton } from '@omnidesk/core';
 import { ConsoleLoggerButton } from '@omnidesk/core';
 import { SmartBreadcrumb } from '@omnidesk/core';
-import { GlobalSearch } from '@omnidesk/core';
+import { GlobalSearch } from './global-search';
 import { useDevStore } from '@omnidesk/core';
-import { HeaderUser } from './header-user';
+import { HeaderUser } from '@omnidesk/core';
 
 export const SiteHeader = memo(function SiteHeader() {
   const { isDevMode, setDevMode } = useDevStore();

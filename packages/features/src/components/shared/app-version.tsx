@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { usePlatform } from '../providers/platform-provider';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@omnidesk/ui';
+import { usePlatform } from '@omnidesk/core';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@omnidesk/ui';;
 
 export function AppVersion() {
   const platformApi = usePlatform();

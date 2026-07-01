@@ -1,5 +1,5 @@
 import { useTheme } from 'next-themes';
-import { Button } from '@omnidesk/ui';
+import { Button } from '@omnidesk/ui';;
 import { Moon, Sun } from 'lucide-react';
 import { useEffect, useState } from 'react';
 

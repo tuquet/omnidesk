@@ -1,13 +1,7 @@
 "use client"
 
-import { Button } from "../../components/ui/button"
-import {
-  SidebarGroup,
-  SidebarGroupContent,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-} from "../../components/ui/sidebar"
+import { Button } from '@omnidesk/ui';
+import { SidebarGroup, SidebarGroupContent, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@omnidesk/ui';
 import { CirclePlusIcon, MailIcon } from "lucide-react"
 
 export function NavMain({

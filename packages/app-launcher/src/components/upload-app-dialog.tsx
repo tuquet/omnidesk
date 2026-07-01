@@ -1,13 +1,8 @@
 import { useState } from 'react';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-} from '@omnidesk/ui';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@omnidesk/ui';
 import { FileArchive } from 'lucide-react';
 import { toast } from 'sonner';
+import { usePlatform } from '@omnidesk/core';
 
 interface UploadAppDialogProps {
   open: boolean;
@@ -17,12 +12,13 @@ interface UploadAppDialogProps {
 export function UploadAppDialog({ open, onOpenChange }: UploadAppDialogProps) {
   const [isUploading, setIsUploading] = useState(false);
 
+  const platformApi = usePlatform();
+
   const handleUpload = async () => {
+    setIsUploading(true);
+    
     try {
-      setIsUploading(true);
-      
-      const { open: openDialog } = await import('@tauri-apps/plugin-dialog');
-      const selectedPath = await openDialog({
+      const selectedPath = await platformApi.openDialog?.({
         multiple: false,
         filters: [{
           name: 'Omnidesk App Bundle',
@@ -31,31 +27,27 @@ export function UploadAppDialog({ open, onOpenChange }: UploadAppDialogProps) {
       });
 
       if (!selectedPath || typeof selectedPath !== 'string') {
+        setIsUploading(false);
         return; // User canceled
       }
 
       toast.loading('Installing App...', { id: 'installing' });
 
-      // Call the Rust command dynamically to avoid loading it on web browser
-      const { invoke } = await import('@tauri-apps/api/core');
-      const response = await invoke<{ success: boolean; message: string; app_id: string }>('install_local_app', {
+      // Call the Rust command via platform adapter (interceptor handles error toast)
+      const response = await platformApi.invoke<{ success: boolean; message: string; app_id: string }>('install_local_app', {
         zipPath: selectedPath
       });
 
       toast.dismiss('installing');
 
-      if (response.success) {
+      if (response && response.success) {
         toast.success('App installed successfully!', {
           description: `App ID: ${response.app_id} is now available in your Installed tab.`,
         });
         onOpenChange(false);
-      } else {
+      } else if (response) {
         toast.error('Installation failed', { description: response.message });
       }
-
-    } catch (error: any) {
-      toast.dismiss('installing');
-      toast.error('Failed to install app', { description: error.message || error });
     } finally {
       setIsUploading(false);
     }

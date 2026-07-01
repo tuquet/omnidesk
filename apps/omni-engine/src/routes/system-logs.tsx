@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { PageContainer, PageHeader, PageTitle } from '@omnidesk/ui';
+import { PageContainer, PageHeader, PageTitle } from '@omnidesk/ui';;
 
 export const Route = createFileRoute('/system-logs')({
   component: SystemLogsPage,

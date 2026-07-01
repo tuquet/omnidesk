@@ -1,18 +1,5 @@
 import { createFileRoute, Link } from '@tanstack/react-router';
-import {
-  PageContainer,
-  PageHeader,
-  PageTitle,
-  Card,
-  CardContent,
-  Table,
-  TableHeader,
-  TableRow,
-  TableHead,
-  TableBody,
-  TableCell,
-  Badge,
-} from '@omnidesk/ui';
+import { PageContainer, PageHeader, PageTitle, Card, CardContent, Table, TableHeader, TableRow, TableHead, TableBody, TableCell, Badge } from '@omnidesk/ui';;
 import { ROUTES } from '@/config/route-config';
 import { Clock, PlayCircle, CheckCircle2, XCircle, AlertCircle } from 'lucide-react';
 

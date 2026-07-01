@@ -9,6 +9,7 @@ export type {
 
 // API Response schema & error codes
 export * from './api-response';
+export * from './constants';
 
 export interface PlatformAdapter {
   platform: 'desktop' | 'web';

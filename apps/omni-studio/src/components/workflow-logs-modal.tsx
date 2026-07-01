@@ -1,15 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  ScrollArea,
-  Badge,
-  Skeleton,
-  cn,
-} from '@omnidesk/ui';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, ScrollArea, Badge, Skeleton, cn } from '@omnidesk/ui';;
 import { client } from '@/lib/api-client';
 import { CheckCircleIcon, XCircleIcon, ClockIcon, PlayCircleIcon } from 'lucide-react';
 import Editor from '@monaco-editor/react';

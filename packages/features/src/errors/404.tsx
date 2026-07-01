@@ -1,5 +1,5 @@
 import { useNavigate } from '@tanstack/react-router';
-import { Button } from '@omnidesk/ui';
+import { Button } from '@omnidesk/ui';;
 import { ArrowLeft, Ghost } from 'lucide-react';
 
 export function NotFoundPage() {

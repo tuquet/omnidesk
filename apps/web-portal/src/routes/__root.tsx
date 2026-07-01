@@ -7,7 +7,7 @@ import * as config from '@/config';
 import { useRBAC } from '@/hooks/use-rbac';
 import { NotFoundPage } from '@omnidesk/features';
 import { useDeepLinkAuth } from '@omnidesk/core';
-import { DefaultErrorFallback } from '@omnidesk/ui';
+import { DefaultErrorFallback } from '@omnidesk/ui';;
 
 interface MyRouterContext {
   auth: AuthState;

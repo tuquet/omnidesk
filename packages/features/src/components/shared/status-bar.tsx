@@ -1,6 +1,5 @@
-import { usePlatform } from '../providers/platform-provider';
-import { useAppConfig } from '../providers/config-provider';
-import { Button } from '@omnidesk/ui';
+import { usePlatform, useAppConfig } from '@omnidesk/core';
+import { Button } from '@omnidesk/ui';;
 import {
   Settings,
   Key,
@@ -15,11 +14,13 @@ import {
   FileJson,
   BookOpen,
 } from 'lucide-react';
-import { HeaderUser } from './header-user';
-import { NotificationButton } from './notification-button';
+import {
+  HeaderUser,
+  NotificationButton,
+  ThemeToggle,
+  LanguageSwitcher,
+} from '@omnidesk/core';
 import { GlobalSearch } from './global-search';
-import { ThemeToggle } from './theme-toggle';
-import { LanguageSwitcher } from './language-switcher';
 import { HardwareMonitor } from './hardware-monitor';
 import { NetworkStatus } from './network-status';
 import { AppVersion } from './app-version';

@@ -1,5 +1,5 @@
 import { Link } from '@tanstack/react-router';
-import { Button } from '@omnidesk/ui';
+import { Button } from '@omnidesk/ui';;
 import { ArrowLeft, Bug, RefreshCw } from 'lucide-react';
 
 export function Error500Page() {

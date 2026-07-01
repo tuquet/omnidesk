@@ -54,13 +54,11 @@ export interface UpdateBrowserProfilePayload {
 interface BrowserProfileState {
   profiles: BrowserProfile[];
   isLoading: boolean;
-  error: string | null;
 }
 
 export const browserProfileStore = new Store<BrowserProfileState>({
   profiles: [],
   isLoading: false,
-  error: null,
 });
 
 import { toast } from 'sonner';
@@ -97,142 +95,84 @@ export function useBrowserProfileStore() {
   const state = useStore(browserProfileStore);
 
   const fetchProfiles = useCallback(async (sortBy?: string, sortOrder?: 'asc' | 'desc') => {
-    browserProfileStore.setState((s) => ({ ...s, isLoading: true, error: null }));
-    try {
-      let url = '/api/browser-profiles';
-      if (sortBy) {
-        url += `?sort_by=${sortBy}&sort_order=${sortOrder || 'desc'}`;
-      }
-      const profiles = await fetchApi<BrowserProfile[]>(url);
-      browserProfileStore.setState((s) => ({ ...s, profiles, isLoading: false }));
-    } catch (e) {
-      browserProfileStore.setState((s) => ({
-        ...s,
-        error: e instanceof Error ? e.message : String(e),
-        isLoading: false,
-      }));
+    browserProfileStore.setState((s) => ({ ...s, isLoading: true }));
+    let url = '/api/browser-profiles';
+    if (sortBy) {
+      url += `?sort_by=${sortBy}&sort_order=${sortOrder || 'desc'}`;
     }
+    const profiles = await fetchApi<BrowserProfile[]>(url).finally(() => {
+      browserProfileStore.setState((s) => ({ ...s, isLoading: false }));
+    });
+    browserProfileStore.setState((s) => ({ ...s, profiles }));
   }, []);
 
   const createProfile = async (payload: CreateBrowserProfilePayload) => {
-    browserProfileStore.setState((s) => ({ ...s, error: null }));
-    try {
-      const newProfile = await fetchApi<BrowserProfile>('/api/browser-profiles', {
-        method: 'POST',
-        body: JSON.stringify(payload),
-      });
-      browserProfileStore.setState((s) => ({
-        ...s,
-        profiles: [newProfile, ...s.profiles],
-      }));
-    } catch (e) {
-      const errStr = e instanceof Error ? e.message : String(e);
-      browserProfileStore.setState((s) => ({ ...s, error: errStr }));
-      throw new Error(errStr);
-    }
+    const newProfile = await fetchApi<BrowserProfile>('/api/browser-profiles', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+    browserProfileStore.setState((s) => ({
+      ...s,
+      profiles: [newProfile, ...s.profiles],
+    }));
   };
 
   const updateProfile = async (payload: UpdateBrowserProfilePayload) => {
-    browserProfileStore.setState((s) => ({ ...s, error: null }));
-    try {
-      const updatedProfile = await fetchApi<BrowserProfile>(`/api/browser-profiles/${payload.id}`, {
-        method: 'PUT',
-        body: JSON.stringify(payload),
-      });
-      browserProfileStore.setState((s) => ({
-        ...s,
-        profiles: s.profiles.map((p) => (p.id === payload.id ? updatedProfile : p)),
-      }));
-    } catch (e) {
-      const errStr = e instanceof Error ? e.message : String(e);
-      browserProfileStore.setState((s) => ({ ...s, error: errStr }));
-      throw new Error(errStr);
-    }
+    const updatedProfile = await fetchApi<BrowserProfile>(`/api/browser-profiles/${payload.id}`, {
+      method: 'PUT',
+      body: JSON.stringify(payload),
+    });
+    browserProfileStore.setState((s) => ({
+      ...s,
+      profiles: s.profiles.map((p) => (p.id === payload.id ? updatedProfile : p)),
+    }));
   };
 
   const deleteProfile = async (id: string) => {
-    browserProfileStore.setState((s) => ({ ...s, error: null }));
-    try {
-      await fetchApi(`/api/browser-profiles/${id}`, { method: 'DELETE' });
-      browserProfileStore.setState((s) => ({
-        ...s,
-        profiles: s.profiles.filter((p) => p.id !== id),
-      }));
-    } catch (e) {
-      const errStr = e instanceof Error ? e.message : String(e);
-      browserProfileStore.setState((s) => ({ ...s, error: errStr }));
-      throw new Error(errStr);
-    }
+    await fetchApi(`/api/browser-profiles/${id}`, { method: 'DELETE' });
+    browserProfileStore.setState((s) => ({
+      ...s,
+      profiles: s.profiles.filter((p) => p.id !== id),
+    }));
   };
 
   const launchProfile = async (id: string, payload: Record<string, unknown> = {}) => {
-    browserProfileStore.setState((s) => ({ ...s, error: null }));
-    try {
-      await fetchApi(`/api/browser-profiles/${id}/launch`, {
-        method: 'POST',
-        body: JSON.stringify(payload),
-      });
-      // Optionally update local status optimistically
-      browserProfileStore.setState((s) => ({
-        ...s,
-        profiles: s.profiles.map((p) => (p.id === id ? { ...p, status: 'RUNNING', pid: 1 } : p)),
-      }));
-    } catch (e) {
-      const errStr = e instanceof Error ? e.message : String(e);
-      browserProfileStore.setState((s) => ({ ...s, error: errStr }));
-      throw new Error(errStr);
-    }
+    await fetchApi(`/api/browser-profiles/${id}/launch`, {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+    // Optionally update local status optimistically
+    browserProfileStore.setState((s) => ({
+      ...s,
+      profiles: s.profiles.map((p) => (p.id === id ? { ...p, status: 'RUNNING', pid: 1 } : p)),
+    }));
   };
 
   const stopProfile = async (id: string) => {
-    browserProfileStore.setState((s) => ({ ...s, error: null }));
-    try {
-      await fetchApi(`/api/browser-profiles/${id}/stop`, { method: 'POST' });
-      // Update local status optimistically
-      browserProfileStore.setState((s) => ({
-        ...s,
-        profiles: s.profiles.map((p) => (p.id === id ? { ...p, status: 'IDLE', pid: null } : p)),
-      }));
-    } catch (e) {
-      const errStr = e instanceof Error ? e.message : String(e);
-      browserProfileStore.setState((s) => ({ ...s, error: errStr }));
-      throw new Error(errStr);
-    }
+    await fetchApi(`/api/browser-profiles/${id}/stop`, { method: 'POST' });
+    // Update local status optimistically
+    browserProfileStore.setState((s) => ({
+      ...s,
+      profiles: s.profiles.map((p) => (p.id === id ? { ...p, status: 'IDLE', pid: null } : p)),
+    }));
   };
 
   const resetBrowserEngine = async () => {
-    browserProfileStore.setState((s) => ({ ...s, error: null }));
-    try {
-      await fetchApi(`/api/browser-profiles/browser-engine`, { method: 'DELETE' });
-    } catch (e) {
-      const errStr = e instanceof Error ? e.message : String(e);
-      browserProfileStore.setState((s) => ({ ...s, error: errStr }));
-      throw new Error(errStr);
-    }
+    await fetchApi(`/api/browser-profiles/browser-engine`, { method: 'DELETE' });
   };
 
   const fetchAvailableVersions = async (browserType: string) => {
-    try {
-      return await fetchApi<{ browser_version: string; executable_path: string }[]>(
-        `/api/browser-profiles/available-versions?browser_type=${browserType}`,
-      );
-    } catch (e) {
-      console.error('Failed to fetch versions', e);
-      return [];
-    }
+    return fetchApi<{ browser_version: string; executable_path: string }[]>(
+      `/api/browser-profiles/available-versions?browser_type=${browserType}`,
+    );
   };
 
   const fetchEngineStatus = async (browserType: string, version?: string) => {
-    try {
-      const qs = new URLSearchParams({ browser_type: browserType });
-      if (version) qs.set('version', version);
-      return await fetchApi<{ is_downloaded: boolean; exe_path: string | null }>(
-        `/api/browser-profiles/engine-status?${qs.toString()}`,
-      );
-    } catch (e) {
-      console.error('Failed to fetch engine status', e);
-      return { is_downloaded: false, exe_path: null };
-    }
+    const qs = new URLSearchParams({ browser_type: browserType });
+    if (version) qs.set('version', version);
+    return fetchApi<{ is_downloaded: boolean; exe_path: string | null }>(
+      `/api/browser-profiles/engine-status?${qs.toString()}`,
+    );
   };
 
   return {

@@ -1,13 +1,5 @@
 import { SearchIcon, ShieldIcon, XIcon } from 'lucide-react';
-import {
-  Input,
-  Button,
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@omnidesk/ui';
+import { Input, Button, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@omnidesk/ui';;
 
 interface ProfileToolbarProps {
   searchQuery: string;

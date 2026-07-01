@@ -48,19 +48,19 @@ async fn handle_socket(socket: WebSocket, state: AppState) {
                 println!("Received event from Automa Extension: {}", event.event_type);
                 
                 use tauri::Emitter;
-                let _ = app_clone.emit("e2e-log", format!("[AUTOMA] Received event: {}", event.event_type));
+                let _ = app_clone.emit(omni_tauri_core::constants::E2E_LOG_EVENT, format!("[AUTOMA] Received event: {}", event.event_type));
 
                 // Process events directly in Studio DB
                 let db = state.db.clone();
                 match event.event_type.as_str() {
                     "run_started" => {
-                        let _ = app_clone.emit("e2e-log", "Run started (tracked in studio DB)");
+                        let _ = app_clone.emit(omni_tauri_core::constants::E2E_LOG_EVENT, "Run started (tracked in studio DB)");
                     },
                     "run_finished" => {
                         if let Some(run_id) = event.payload.get("run_id").and_then(|v| v.as_str()) {
                             let status = event.payload.get("status").and_then(|v| v.as_str()).unwrap_or("COMPLETED");
                             let _ = crate::services::workflow_service::WorkflowService::finish_run(&db, run_id, status, None, None).await;
-                            let _ = app_clone.emit("e2e-log", "Run finished (saved to studio DB)");
+                            let _ = app_clone.emit(omni_tauri_core::constants::E2E_LOG_EVENT, "Run finished (saved to studio DB)");
                         }
                     },
                     "log_added" => {

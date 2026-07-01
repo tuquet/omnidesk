@@ -1,4 +1,4 @@
-import { Badge } from '@omnidesk/ui';
+import { Badge } from '@omnidesk/ui';;
 
 interface ProfileStatusBadgeProps {
   status: string | null;

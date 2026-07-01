@@ -206,6 +206,8 @@ function serverToExtension(wf) {
     dataColumns: tryParse(wf.data_columns, []),
     version: wf.version || '',
     isDisabled: wf.is_disabled === 1 || wf.is_disabled === true,
+    content: wf.content || null,
+    connectedTable: wf.connected_table || null,
     createdAt: wf.created_at ? new Date(wf.created_at).getTime() : Date.now(),
     updatedAt: wf.updated_at ? new Date(wf.updated_at).getTime() : Date.now(),
   };
@@ -218,9 +220,6 @@ function mergeWorkflow(existing, incoming) {
   return {
     ...existing,
     ...incoming,
-    // Preserve local-only fields that WFA doesn't track
-    content: existing.content,
-    connectedTable: existing.connectedTable,
   };
 }
 
@@ -260,6 +259,8 @@ function extensionToServer(wf) {
     data_columns: JSON.stringify(wf.dataColumns || []),
     version: wf.version || '',
     is_disabled: wf.isDisabled ? 1 : 0,
+    content: wf.content || null,
+    connected_table: wf.connectedTable || null,
     source: 'extension',
   };
 }

@@ -8,6 +8,7 @@
     "./*": "./src/*"
   },
   "dependencies": {
+    "@omnidesk/core": "workspace:*",
     "@omnidesk/auth": "workspace:*",
     "@omnidesk/app-automa": "workspace:*",
     "@omnidesk/types": "workspace:*",
@@ -24,7 +25,7 @@
     "@tanstack/store": "^0.11.0",
     "@tanstack/zod-form-adapter": "^0.42.1",
     "@tauri-apps/api": "^2.5.0",
-    "@tauri-apps/plugin-dialog": "2",
+    "@tauri-apps/plugin-dialog": "~2",
     "@tauri-apps/plugin-log": "2",
     "clsx": "^2.1.1",
     "lucide-react": "^0.475.0",
@@ -47,8 +48,8 @@
     "@types/react": "^19.1.0",
     "@types/react-dom": "^19.1.0",
     "@typescript/native-preview": "7.0.0-dev.20260421.2",
-    "vite": "^5.1.0",
-    "@vitejs/plugin-react": "^4.2.1"
+    "vite": "^8.1.0",
+    "@vitejs/plugin-react": "^4.5.0"
   },
   "imports": {
     "#*": "./src/*",

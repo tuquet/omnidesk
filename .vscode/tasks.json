@@ -7,7 +7,7 @@
     {
       "label": "🌐 Dev: Web (Vite)",
       "type": "shell",
-      "command": "node scripts/task-logger.mjs dev-web-vite.log \"pnpm --filter @omnidesk/web-portal dev\"",
+      "command": "node scripts/task-logger.mjs dev-web-vite.log pnpm --filter @omnidesk/web-portal dev",
       "group": "build",
       "isBackground": true,
       "problemMatcher": {
@@ -27,7 +27,7 @@
     {
       "label": "📚 Dev: Docs (VitePress)",
       "type": "shell",
-      "command": "node scripts/task-logger.mjs dev-docs-vitepress.log \"pnpm docs:dev\"",
+      "command": "node scripts/task-logger.mjs dev-docs-vitepress.log pnpm docs:dev",
       "group": "build",
       "isBackground": true,
       "problemMatcher": [],
@@ -40,7 +40,7 @@
     {
       "label": "🖥️ Dev: Omni Studio",
       "type": "shell",
-      "command": "node scripts/task-logger.mjs dev-omni-studio.log \"pnpm --filter @omnidesk/omni-studio tauri dev\"",
+      "command": "node scripts/task-logger.mjs dev-omni-studio.log pnpm --filter @omnidesk/omni-studio tauri dev",
       "group": "build",
       "isBackground": true,
       "problemMatcher": [],
@@ -53,7 +53,7 @@
     {
       "label": "🖥️ Dev: Omni Profile",
       "type": "shell",
-      "command": "node scripts/task-logger.mjs dev-omni-profile.log \"pnpm --filter @omnidesk/omni-profile tauri dev\"",
+      "command": "node scripts/task-logger.mjs dev-omni-profile.log pnpm --filter @omnidesk/omni-profile tauri dev",
       "group": "build",
       "isBackground": true,
       "problemMatcher": [],
@@ -66,7 +66,7 @@
     {
       "label": "🖥️ Dev: Omni Engine",
       "type": "shell",
-      "command": "node scripts/task-logger.mjs dev-omni-engine.log \"pnpm --filter @omnidesk/omni-engine tauri dev\"",
+      "command": "node scripts/task-logger.mjs dev-omni-engine.log pnpm --filter @omnidesk/omni-engine tauri dev",
       "group": "build",
       "isBackground": true,
       "problemMatcher": [],
@@ -79,7 +79,7 @@
     {
       "label": "🚀 Dev: All (Web + Docs)",
       "type": "shell",
-      "command": "node scripts/task-logger.mjs dev-all-web-docs.log \"pnpm dev:all\"",
+      "command": "node scripts/task-logger.mjs dev-all-web-docs.log pnpm dev:all",
       "group": "build",
       "isBackground": true,
       "problemMatcher": [],
@@ -92,7 +92,7 @@
     {
       "label": "🚀 Dev: All Automa (WF + PRF + RT)",
       "type": "shell",
-      "command": "node scripts/task-logger.mjs dev-all-automa-wf-prf-rt.log \"pnpm dev:omni\"",
+      "command": "node scripts/task-logger.mjs dev-all-automa-wf-prf-rt.log pnpm dev:omni",
       "group": "build",
       "isBackground": true,
       "problemMatcher": [],
@@ -105,7 +105,7 @@
     {
       "label": "🖥️ Dev: Automa Extension",
       "type": "shell",
-      "command": "node scripts/task-logger.mjs dev-automa-extension.log \"pnpm --filter @omnidesk/omni-extension dev\"",
+      "command": "node scripts/task-logger.mjs dev-automa-extension.log pnpm --filter @omnidesk/omni-extension dev",
       "group": "build",
       "isBackground": true,
       "problemMatcher": [],
@@ -121,7 +121,7 @@
     {
       "label": "⚡ TypeCheck: Native (tsgo)",
       "type": "shell",
-      "command": "node scripts/task-logger.mjs typecheck-native-tsgo.log \"pnpm typecheck:native\"",
+      "command": "node scripts/task-logger.mjs typecheck-native-tsgo.log pnpm typecheck:native",
       "group": "build",
       "problemMatcher": "$tsc",
       "presentation": {
@@ -133,7 +133,7 @@
     {
       "label": "🔍 TypeCheck: Standard (tsc)",
       "type": "shell",
-      "command": "node scripts/task-logger.mjs typecheck-standard-tsc.log \"pnpm turbo typecheck\"",
+      "command": "node scripts/task-logger.mjs typecheck-standard-tsc.log pnpm turbo typecheck",
       "group": "build",
       "problemMatcher": "$tsc",
       "presentation": {
@@ -149,7 +149,7 @@
     {
       "label": "🧹 Lint: All",
       "type": "shell",
-      "command": "node scripts/task-logger.mjs lint-all.log \"pnpm turbo lint\"",
+      "command": "node scripts/task-logger.mjs lint-all.log pnpm turbo lint",
       "group": "build",
       "problemMatcher": "$eslint-stylish",
       "presentation": {
@@ -161,7 +161,7 @@
     {
       "label": "✨ Format: All",
       "type": "shell",
-      "command": "node scripts/task-logger.mjs format-all.log \"pnpm format\"",
+      "command": "node scripts/task-logger.mjs format-all.log pnpm format",
       "group": "build",
       "problemMatcher": [],
       "presentation": {
@@ -172,7 +172,7 @@
     {
       "label": "📋 Format: Check",
       "type": "shell",
-      "command": "node scripts/task-logger.mjs format-check.log \"pnpm format:check\"",
+      "command": "node scripts/task-logger.mjs format-check.log pnpm format:check",
       "group": "build",
       "problemMatcher": [],
       "presentation": {
@@ -187,7 +187,7 @@
     {
       "label": "📦 Build: All (Turbo)",
       "type": "shell",
-      "command": "node scripts/task-logger.mjs build-all-turbo.log \"pnpm turbo build\"",
+      "command": "node scripts/task-logger.mjs build-all-turbo.log pnpm turbo build",
       "group": {
         "kind": "build",
         "isDefault": true
@@ -202,7 +202,7 @@
     {
       "label": "📦 Build: Web Only",
       "type": "shell",
-      "command": "node scripts/task-logger.mjs build-web-only.log \"pnpm --filter @omnidesk/web-portal build\"",
+      "command": "node scripts/task-logger.mjs build-web-only.log pnpm --filter @omnidesk/web-portal build",
       "group": "build",
       "problemMatcher": "$tsc",
       "presentation": {
@@ -214,7 +214,7 @@
     {
       "label": "📦 Build: All Tauri Apps",
       "type": "shell",
-      "command": "node scripts/task-logger.mjs build-all-tauri-apps.log \"pnpm --filter \\\"@omnidesk/omni-*\\\" tauri build\"",
+      "command": "node scripts/task-logger.mjs build-all-tauri-apps.log pnpm --filter \"@omnidesk/omni-*\" tauri build",
       "group": "build",
       "problemMatcher": [],
       "presentation": {
@@ -230,7 +230,7 @@
     {
       "label": "🧪 Test: All",
       "type": "shell",
-      "command": "node scripts/task-logger.mjs test-all.log \"pnpm turbo test\"",
+      "command": "node scripts/task-logger.mjs test-all.log pnpm turbo test",
       "group": {
         "kind": "test",
         "isDefault": true
@@ -249,7 +249,7 @@
     {
       "label": "📥 Install: Dependencies",
       "type": "shell",
-      "command": "node scripts/task-logger.mjs install-dependencies.log \"pnpm install\"",
+      "command": "node scripts/task-logger.mjs install-dependencies.log pnpm install",
       "problemMatcher": [],
       "presentation": {
         "reveal": "always",
@@ -259,7 +259,7 @@
     {
       "label": "🗑️ Clean: All",
       "type": "shell",
-      "command": "node scripts/task-logger.mjs clean-all.log \"pnpm clean\"",
+      "command": "node scripts/task-logger.mjs clean-all.log pnpm clean",
       "problemMatcher": [],
       "presentation": {
         "reveal": "always",
@@ -273,7 +273,7 @@
     {
       "label": "🦀 Rust: Check All",
       "type": "shell",
-      "command": "node scripts/task-logger.mjs rust-check-all.log \"cargo check\"",
+      "command": "node scripts/task-logger.mjs rust-check-all.log cargo check",
       "options": {
         "cwd": "${workspaceFolder}"
       },
@@ -287,7 +287,7 @@
     {
       "label": "🦀 Rust: Check Runtime",
       "type": "shell",
-      "command": "node scripts/task-logger.mjs rust-check-runtime.log \"cargo check\"",
+      "command": "node scripts/task-logger.mjs rust-check-runtime.log cargo check",
       "options": {
         "cwd": "${workspaceFolder}/apps/omni-engine/src-tauri"
       },
@@ -301,7 +301,7 @@
     {
       "label": "🦀 Rust: Check Workflow",
       "type": "shell",
-      "command": "node scripts/task-logger.mjs rust-check-workflow.log \"cargo check\"",
+      "command": "node scripts/task-logger.mjs rust-check-workflow.log cargo check",
       "options": {
         "cwd": "${workspaceFolder}/apps/omni-studio/src-tauri"
       },
@@ -315,7 +315,7 @@
     {
       "label": "🦀 Rust: Check Profile",
       "type": "shell",
-      "command": "node scripts/task-logger.mjs rust-check-profile.log \"cargo check\"",
+      "command": "node scripts/task-logger.mjs rust-check-profile.log cargo check",
       "options": {
         "cwd": "${workspaceFolder}/apps/omni-profile/src-tauri"
       },
@@ -333,7 +333,7 @@
     {
       "label": "📤 Git: Push",
       "type": "shell",
-      "command": "node scripts/task-logger.mjs git-push.log \"git push origin main\"",
+      "command": "node scripts/task-logger.mjs git-push.log git push origin main",
       "problemMatcher": [],
       "presentation": {
         "reveal": "always",
@@ -343,7 +343,7 @@
     {
       "label": "🚀 Deploy: Trigger GitHub Release",
       "type": "shell",
-      "command": "node scripts/task-logger.mjs deploy-trigger-github-release.log \"git tag ${input:releaseVersion} && git push origin ${input:releaseVersion}\"",
+      "command": "node scripts/task-logger.mjs deploy-trigger-github-release.log git tag ${input:releaseVersion} && git push origin ${input:releaseVersion}",
       "group": "build",
       "problemMatcher": [],
       "presentation": {

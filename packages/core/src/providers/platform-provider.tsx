@@ -1,4 +1,5 @@
 import React, { createContext, useContext, ReactNode } from 'react';
+import { toast } from 'sonner';
 
 export interface PlatformAdapter {
   platform: 'web' | 'desktop';
@@ -9,6 +10,10 @@ export interface PlatformAdapter {
   // File system / Path
   convertFileSrc: (path: string) => string;
   getAppDataDir: () => Promise<string>;
+  
+  // Events & Dialogs
+  listen: <T>(event: string, callback: (payload: T) => void) => Promise<() => void>;
+  openDialog?: (options?: { directory?: boolean; multiple?: boolean; title?: string; filters?: { name: string; extensions: string[] }[] }) => Promise<string | string[] | null>;
   
   // Application lifecycle
   quitApp: () => Promise<void>;
@@ -50,8 +55,46 @@ export interface PlatformProviderProps {
 }
 
 export const PlatformProvider: React.FC<PlatformProviderProps> = ({ adapter, children }) => {
+  const wrappedAdapter: PlatformAdapter = {
+    ...adapter,
+    invoke: async <T,>(cmd: string, args?: Record<string, unknown>) => {
+      try {
+        return await adapter.invoke<T>(cmd, args);
+      } catch (err) {
+        toast.error(`Platform Error (${cmd})`, {
+          description: err instanceof Error ? err.message : String(err)
+        });
+        throw err;
+      }
+    },
+    checkUpdate: async () => {
+      try {
+        const update = await adapter.checkUpdate();
+        if (update && update.downloadAndInstall) {
+          const origDownload = update.downloadAndInstall;
+          update.downloadAndInstall = async (onEvent: any) => {
+            try {
+              return await origDownload.call(update, onEvent);
+            } catch (err) {
+              toast.error('Platform Error (downloadAndInstall)', {
+                description: err instanceof Error ? err.message : String(err)
+              });
+              throw err;
+            }
+          };
+        }
+        return update;
+      } catch (err) {
+        toast.error('Platform Error (checkUpdate)', {
+          description: err instanceof Error ? err.message : String(err)
+        });
+        throw err;
+      }
+    }
+  };
+
   return (
-    <PlatformContext.Provider value={adapter}>
+    <PlatformContext.Provider value={wrappedAdapter}>
       {children}
     </PlatformContext.Provider>
   );

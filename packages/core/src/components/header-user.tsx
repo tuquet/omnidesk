@@ -1,14 +1,5 @@
-import { Avatar, AvatarFallback, AvatarImage } from '@omnidesk/ui';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-  Button,
-} from '@omnidesk/ui';
+import { Avatar, AvatarFallback, AvatarImage } from '@omnidesk/ui';;
+import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger, Button } from '@omnidesk/ui';;
 import {
   CircleUserRoundIcon,
   CreditCardIcon,

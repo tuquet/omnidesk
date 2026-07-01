@@ -1,9 +1,10 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import type { PlatformAdapter } from '@omnidesk/core';
 import { invoke } from '@tauri-apps/api/core';
 import { convertFileSrc } from '@tauri-apps/api/core';
 import { appDataDir } from '@tauri-apps/api/path';
 import { getCurrentWindow } from '@tauri-apps/api/window';
+import { IPC_EVENTS, OAUTH_REDIRECT } from '@omnidesk/types';
 
 export const tauriAdapter: PlatformAdapter = {
   platform: 'desktop',
@@ -18,6 +19,17 @@ export const tauriAdapter: PlatformAdapter = {
 
   getAppDataDir: async (): Promise<string> => {
     return appDataDir();
+  },
+
+  listen: async <T>(event: string, callback: (payload: T) => void): Promise<() => void> => {
+    const { listen } = await import('@tauri-apps/api/event');
+    const unlisten = await listen<T>(event, (e) => callback(e.payload));
+    return unlisten;
+  },
+
+  openDialog: async (options?: { directory?: boolean; multiple?: boolean; filters?: { name: string; extensions: string[] }[] }): Promise<string | string[] | null> => {
+    const { open } = await import('@tauri-apps/plugin-dialog');
+    return open(options) as Promise<string | string[] | null>;
   },
 
   quitApp: async (): Promise<void> => {
@@ -40,7 +52,7 @@ export const tauriAdapter: PlatformAdapter = {
     await openUrl(url);
   },
 
-  getOAuthRedirectUrl: () => 'omnidesk-workflow://auth/callback',
+  getOAuthRedirectUrl: () => OAUTH_REDIRECT,
   isOAuthSkipBrowserRedirect: () => true,
 
   listenToDeepLink: async (callback: (urls: string[]) => void): Promise<() => void> => {
@@ -52,7 +64,7 @@ export const tauriAdapter: PlatformAdapter = {
         callback(urls);
       });
 
-      const unlistenInstance = await listen<string>('deep-link-received', (event) => {
+      const unlistenInstance = await listen<string>(IPC_EVENTS.DEEP_LINK_RECEIVED, (event) => {
         callback([event.payload]);
       });
 

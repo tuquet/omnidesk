@@ -1,12 +1,5 @@
-import { Badge } from "../../components/ui/badge"
-import {
-  Card,
-  CardAction,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "../../components/ui/card"
+import { Badge } from '@omnidesk/ui';
+import { Card, CardAction, CardDescription, CardFooter, CardHeader, CardTitle } from '@omnidesk/ui';
 import { TrendingUpIcon, TrendingDownIcon } from "lucide-react"
 
 export function SectionCards() {

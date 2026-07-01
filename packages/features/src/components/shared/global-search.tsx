@@ -1,18 +1,7 @@
 import * as React from 'react';
 import { useNavigate } from '@tanstack/react-router';
-import {
-  Button,
-  Command,
-  CommandDialog,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-  CommandSeparator,
-} from '@omnidesk/ui';
-import { useDevStore } from '@omnidesk/core';
-import { useAppConfig } from '../providers/config-provider';
+import { Button, Command, CommandDialog, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList, CommandSeparator } from '@omnidesk/ui';;
+import { useDevStore, useAppConfig } from '@omnidesk/core';
 import { SearchIcon } from 'lucide-react';
 
 import { useTranslation } from 'react-i18next';

@@ -1,11 +1,12 @@
 import { useStore } from '@tanstack/react-store';
+import { STORAGE_KEYS } from '@omnidesk/types';
 import { createPersistentStore } from './utils';
 
 export interface WorkspaceState {
   selectedWorkspacePath: string | null;
 }
 
-export const workspaceStore = createPersistentStore<WorkspaceState>('omnidesk-workspace-state', {
+export const workspaceStore = createPersistentStore<WorkspaceState>(STORAGE_KEYS.WORKSPACE, {
   selectedWorkspacePath: null,
 });
 

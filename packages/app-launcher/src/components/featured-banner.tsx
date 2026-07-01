@@ -1,6 +1,6 @@
 import type { MarketplaceApp } from '../api/queries';
 import { APP_REGISTRY } from '../config/registry';
-import { Button } from '@omnidesk/ui';
+import { Button } from '@omnidesk/ui';;
 import { Package, Loader2 } from 'lucide-react';
 
 interface FeaturedBannerProps {

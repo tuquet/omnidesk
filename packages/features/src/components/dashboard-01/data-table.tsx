@@ -39,59 +39,19 @@ import { Area, AreaChart, CartesianGrid, XAxis } from "recharts"
 import { toast } from "sonner"
 import { z } from "zod"
 
-import { useIsMobile } from "../../hooks/use-mobile"
-import { Badge } from "../../components/ui/badge"
-import { Button } from "../../components/ui/button"
-import {
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
-  type ChartConfig,
-} from "../../components/ui/chart"
-import { Checkbox } from "../../components/ui/checkbox"
-import {
-  Drawer,
-  DrawerClose,
-  DrawerContent,
-  DrawerDescription,
-  DrawerFooter,
-  DrawerHeader,
-  DrawerTitle,
-  DrawerTrigger,
-} from "../../components/ui/drawer"
-import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "../../components/ui/dropdown-menu"
-import { Input } from "../../components/ui/input"
-import { Label } from "../../components/ui/label"
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "../../components/ui/select"
-import { Separator } from "../../components/ui/separator"
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "../../components/ui/table"
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "../../components/ui/tabs"
+import { useIsMobile } from '@omnidesk/ui'
+import { Badge } from '@omnidesk/ui';
+import { Button } from '@omnidesk/ui';
+import { ChartContainer, ChartTooltip, ChartTooltipContent, type ChartConfig } from '@omnidesk/ui';
+import { Checkbox } from '@omnidesk/ui';
+import { Drawer, DrawerClose, DrawerContent, DrawerDescription, DrawerFooter, DrawerHeader, DrawerTitle, DrawerTrigger } from '@omnidesk/ui';
+import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@omnidesk/ui';
+import { Input } from '@omnidesk/ui';
+import { Label } from '@omnidesk/ui';
+import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@omnidesk/ui';
+import { Separator } from '@omnidesk/ui';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@omnidesk/ui';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@omnidesk/ui';
 import { GripVerticalIcon, CircleCheckIcon, LoaderIcon, EllipsisVerticalIcon, Columns3Icon, ChevronDownIcon, PlusIcon, ChevronsLeftIcon, ChevronLeftIcon, ChevronRightIcon, ChevronsRightIcon, TrendingUpIcon } from "lucide-react"
 
 export const schema = z.object({

@@ -16,6 +16,8 @@ pub struct Workflow {
     pub global_data: Option<String>,
     pub table_data: Option<String>,
     pub data_columns: Option<String>,
+    pub content: Option<String>,
+    pub connected_table: Option<String>,
     pub version: Option<String>,
     pub is_disabled: Option<i64>,
     pub source: Option<String>,

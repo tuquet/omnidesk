@@ -1,17 +1,9 @@
-import { cn } from '@omnidesk/ui';
-import { Link } from '@tanstack/react-router';
+import { cn } from '@omnidesk/ui';;
+import { Link, useNavigate } from '@tanstack/react-router';
 import { toast } from 'sonner';
 import { useForm } from '@tanstack/react-form';
 import { Loader2 } from 'lucide-react';
-import {
-  Button,
-  Field,
-  FieldDescription,
-  FieldGroup,
-  FieldLabel,
-  FieldSeparator,
-  Input,
-} from '@omnidesk/ui';
+import { Button, Field, FieldDescription, FieldGroup, FieldLabel, FieldSeparator, Input } from '@omnidesk/ui';;
 
 import { authActions } from '../stores/use-auth-store';
 
@@ -20,6 +12,7 @@ export function SignupForm({
   platformApi,
   ...props
 }: React.ComponentPropsWithoutRef<'form'> & { platformApi?: any }) {
+  const navigate = useNavigate();
   const form = useForm({
     defaultValues: {
       name: '',
@@ -32,23 +25,14 @@ export function SignupForm({
         toast.error('Passwords do not match.');
         return;
       }
-      try {
-        await authActions.signUp(value.email, value.password);
-        toast.success('Account created! Please check your email to confirm.');
-      } catch (err) {
-        const message = err instanceof Error ? err.message : 'Sign up failed';
-        toast.error(message);
-      }
+      await authActions.signUp(value.email, value.password);
+      toast.success('Sign up successful! Please check your email.');
+      navigate({ to: '/login' });
     },
   });
 
   const handleGitHubSignup = async () => {
-    try {
-      await authActions.signInWithGitHub(platformApi);
-    } catch (err) {
-      const message = err instanceof Error ? err.message : 'GitHub signup failed';
-      toast.error(message);
-    }
+    await authActions.signInWithGitHub(platformApi);
   };
 
   return (

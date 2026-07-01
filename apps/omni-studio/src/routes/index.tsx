@@ -1,24 +1,6 @@
-/* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-explicit-any */
 import { createFileRoute } from '@tanstack/react-router';
-import { listen } from '@tauri-apps/api/event';
-import { open } from '@tauri-apps/plugin-dialog';
-import {
-  PageContainer,
-  PageHeader,
-  PageTitle,
-  Button,
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter,
-  Alert,
-  AlertTitle,
-  AlertDescription,
-  RunWorkflowModal,
-  useConfirmDialog,
-} from '@omnidesk/ui';
+import { PageContainer, PageHeader, PageTitle, Button, Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, Alert, AlertTitle, AlertDescription, useConfirmDialog } from '@omnidesk/ui';
+import { RunWorkflowModal } from '@omnidesk/features';;
 import { WorkflowIcon, FolderOpenIcon, AlertCircleIcon } from 'lucide-react';
 import { useState, useMemo, useDeferredValue, useCallback, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -63,8 +45,7 @@ function WorkflowsPage() {
   useEffect(() => {
     let unlistenFn: () => void;
 
-    listen('workflows-synced', (event) => {
-      const payload = event.payload as { count: number };
+    platformApi.listen('workflows-synced', (payload: { count: number }) => {
       if (payload.count > 0) {
         toast.info(`Extension online: Synced ${payload.count} workflow(s) to Studio`);
         queryClient.invalidateQueries({ queryKey: ['workflows'] });
@@ -74,8 +55,7 @@ function WorkflowsPage() {
     });
 
     let unlistenConnFn: () => void;
-    listen('extension-connections-changed', (event) => {
-      const payload = event.payload as { count: number };
+    platformApi.listen('extension-connections-changed', (payload: { count: number }) => {
       setActiveExtensions(payload.count);
     }).then((fn) => {
       unlistenConnFn = fn;
@@ -85,7 +65,7 @@ function WorkflowsPage() {
       if (unlistenFn) unlistenFn();
       if (unlistenConnFn) unlistenConnFn();
     };
-  }, [queryClient]);
+  }, [queryClient, platformApi]);
 
   const { data: workflows = [], isLoading } = useQuery<Workflow[]>({
     queryKey: ['workflows', selectedWorkspacePath, viewMode],
@@ -289,11 +269,11 @@ function WorkflowsPage() {
         return wf.name?.toLowerCase().includes(q) || wf.description?.toLowerCase().includes(q);
       })
       .sort((a, b) => {
-        let aVal = a[sortBy as keyof Workflow] || '';
-        let bVal = b[sortBy as keyof Workflow] || '';
+        let aVal: string | number = (a[sortBy as keyof Workflow] as string | number) ?? '';
+        let bVal: string | number = (b[sortBy as keyof Workflow] as string | number) ?? '';
         if (sortBy === 'is_disabled') {
-          aVal = a.is_disabled || 0;
-          bVal = b.is_disabled || 0;
+          aVal = a.is_disabled ? 1 : 0;
+          bVal = b.is_disabled ? 1 : 0;
         }
 
         if (aVal < bVal) return sortOrder === 'asc' ? -1 : 1;
@@ -304,10 +284,11 @@ function WorkflowsPage() {
 
   const handleSelectWorkspace = async () => {
     try {
-      const selected: unknown = await open({
+      if (!platformApi.openDialog) return;
+      const openDialogFn = platformApi.openDialog;
+      const selected = await openDialogFn({
         directory: true,
         multiple: false,
-        title: 'Select Workspace Folder',
       });
       if (selected && typeof selected === 'string') {
         setWorkspacePath(selected);
@@ -489,8 +470,10 @@ function WorkflowsPage() {
               }}
               onImport={(content) => {
                 try {
-                  const parsed = JSON.parse(content);
-                  const workflows = Array.isArray(parsed) ? parsed : [parsed];
+                  const parsed = JSON.parse(content) as unknown;
+                  const workflows: Partial<Workflow>[] = Array.isArray(parsed)
+                    ? (parsed as Partial<Workflow>[])
+                    : ([parsed] as Partial<Workflow>[]);
 
                   if (workflows.length === 0) {
                     throw new Error('No workflows found in file');
@@ -501,10 +484,10 @@ function WorkflowsPage() {
                     if (!wf || typeof wf !== 'object') continue;
 
                     // Assign missing required fields
-                    wf.id = wf.id || wf.extId || crypto.randomUUID();
+                    wf.id = wf.id || (wf as Record<string, string>).extId || crypto.randomUUID();
                     wf.name = wf.name || 'Imported Workflow';
-                    wf.drawflow = wf.drawflow || {};
-                    wf.settings = wf.settings || {};
+                    wf.drawflow = wf.drawflow || ({} as Workflow['drawflow']);
+                    wf.settings = wf.settings || ({} as Workflow['settings']);
 
                     importMutation.mutate(wf);
                     successCount++;
@@ -513,8 +496,9 @@ function WorkflowsPage() {
                   if (successCount === 0) {
                     throw new Error('Invalid workflow format');
                   }
-                } catch (e: any) {
-                  toast.error(`Import failed: ${e.message || 'Invalid JSON format'}`);
+                } catch (e: unknown) {
+                  const errMessage = e instanceof Error ? e.message : 'Invalid JSON format';
+                  toast.error(`Import failed: ${errMessage}`);
                 }
               }}
             />

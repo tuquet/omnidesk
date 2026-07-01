@@ -359,8 +359,9 @@ async fn create_workflow_run(
     Json(payload): Json<CreateRunPayload>,
 ) -> Result<Json<serde_json::Value>, AppError> {
     let client = reqwest::Client::new();
-    let engine_health_url = "http://127.0.0.1:1423/health";
-    let engine_url = "http://127.0.0.1:1423/api/engine/runs";
+    let runtime_api_url = omni_tauri_core::constants::get_runtime_api_url();
+    let engine_health_url = format!("{}/health", runtime_api_url);
+    let engine_url = format!("{}/api/engine/runs", runtime_api_url);
     
     // Check if we should fallback immediately
     let is_default = payload.profile_id.as_deref() == Some("default");
@@ -408,7 +409,8 @@ async fn create_workflow_run(
             payload.profile_id.as_deref().unwrap_or("default"),
             payload.schedule_id.as_deref(),
             payload.variables.clone(),
-            1422, // Studio port
+            omni_tauri_core::constants::WORKFLOW_PORT,
+            omni_tauri_core::constants::PROFILE_PORT,
         ).await?;
         
         let run_id = match exec_result {

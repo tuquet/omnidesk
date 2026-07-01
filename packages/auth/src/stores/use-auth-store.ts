@@ -2,9 +2,11 @@ import { Store } from '@tanstack/store';
 import { useStore } from '@tanstack/react-store';
 import { supabase } from '@omnidesk/supabase';
 import type { Session, User } from '@supabase/supabase-js';
-import type { PlatformAdapter } from '@omnidesk/types';
-
-export type Role = 'GUEST' | 'USER' | 'ADMIN';
+import type { PlatformAdapter, Role } from '@omnidesk/types';
+import { ROLES } from '@omnidesk/types';
+import { toast } from 'sonner';
+export type { Role };
+export { ROLES };
 
 export interface AuthState {
   role: Role;
@@ -15,7 +17,7 @@ export interface AuthState {
 }
 
 const initialState: AuthState = {
-  role: 'GUEST',
+  role: ROLES.GUEST,
   session: null,
   user: null,
   displayName: null,
@@ -29,13 +31,13 @@ export const authStore = new Store<AuthState>(initialState);
  * app_metadata is safe for authorization (not user-editable).
  */
 function deriveRole(user: User | null): Role {
-  if (!user) return 'GUEST';
+  if (!user) return ROLES.GUEST;
   // Anonymous users have is_anonymous flag
-  if (user.is_anonymous) return 'GUEST';
+  if (user.is_anonymous) return ROLES.GUEST;
   // Check app_metadata for admin role (set by Supabase Dashboard or Edge Function)
   const appMeta = user.app_metadata;
-  if (appMeta?.role === 'ADMIN') return 'ADMIN';
-  return 'USER';
+  if (appMeta?.role === ROLES.ADMIN) return ROLES.ADMIN;
+  return ROLES.USER;
 }
 
 function deriveDisplayName(user: User | null): string | null {
@@ -61,7 +63,10 @@ export const authActions = {
   /** Sign in with email and password */
   signInWithPassword: async (email: string, password: string) => {
     const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) throw error;
+    if (error) {
+      toast.error(error.message || 'Login failed');
+      throw error;
+    }
     // State will be updated by onAuthStateChange listener
     return data;
   },
@@ -75,12 +80,15 @@ export const authActions = {
         skipBrowserRedirect: platformApi.isOAuthSkipBrowserRedirect(),
       },
     });
-    if (error) throw error;
+    if (error) {
+      toast.error(error.message || 'GitHub login failed');
+      throw error;
+    }
     
     // If the platform skipped the browser redirect (e.g. desktop native auth flow),
     // we must manually open the URL using the platform's API
     if (platformApi.isOAuthSkipBrowserRedirect() && data.url) {
-      await platformApi.openUrl(data.url);
+      await platformApi.openUrl(data.url).catch(() => {});
     }
     
     return data;
@@ -96,14 +104,20 @@ export const authActions = {
         emailRedirectTo: `${window.location.origin}/auth/callback`,
       },
     });
-    if (error) throw error;
+    if (error) {
+      toast.error(error.message || 'Sign up failed');
+      throw error;
+    }
     return data;
   },
 
   /** Sign out */
   logout: async () => {
     const { error } = await supabase.auth.signOut();
-    if (error) throw error;
+    if (error) {
+      toast.error(error.message || 'Logout failed');
+      throw error;
+    }
     // State will be updated by onAuthStateChange listener
   },
 
@@ -139,10 +153,10 @@ export function useAuth() {
 
   return {
     ...state,
-    isGuest: state.role === 'GUEST' && !state.user?.is_anonymous,
+    isGuest: state.role === ROLES.GUEST && !state.user?.is_anonymous,
     isAnonymous: state.user?.is_anonymous ?? false,
-    isUser: state.role === 'USER',
-    isAdmin: state.role === 'ADMIN',
+    isUser: state.role === ROLES.USER,
+    isAdmin: state.role === ROLES.ADMIN,
     isAuthenticated: state.session !== null,
     isLoading: state.isLoading,
   };

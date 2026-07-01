@@ -17,6 +17,9 @@ CREATE TABLE IF NOT EXISTS workflows (
     -- Table/columns data
     table_data TEXT DEFAULT '[]',
     data_columns TEXT DEFAULT '[]',
+    -- Local-only extension fields
+    content TEXT,
+    connected_table TEXT,
     -- Automa version that created this workflow
     version TEXT DEFAULT '1.30.00',
     is_disabled INTEGER DEFAULT 0,

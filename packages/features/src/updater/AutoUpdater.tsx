@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react';
-import { check } from '@tauri-apps/plugin-updater';
-import { relaunch } from '@tauri-apps/plugin-process';
 import type { Update } from '@tauri-apps/plugin-updater';
+import { usePlatform } from '@omnidesk/core';
 import { Download, Rocket, X } from 'lucide-react';
-import { Button } from '@omnidesk/ui';
+import { Button } from '@omnidesk/ui';;
 
 export function AutoUpdater() {
+  const platformApi = usePlatform();
   const [update, setUpdate] = useState<Update | null>(null);
   const [isUpdating, setIsUpdating] = useState(false);
   const [progress, setProgress] = useState<{ downloaded: number; contentLength?: number } | null>(null);
@@ -17,13 +17,9 @@ export function AutoUpdater() {
     if (!(window as any).__TAURI_INTERNALS__) return;
 
     const checkForUpdates = async () => {
-      try {
-        const updateData = await check();
-        if (updateData?.available) {
-          setUpdate(updateData);
-        }
-      } catch (err) {
-        console.error('Failed to check for updates:', err);
+      const updateData = await platformApi.checkUpdate() as Update | null;
+      if (updateData?.available) {
+        setUpdate(updateData);
       }
     };
 
@@ -58,10 +54,8 @@ export function AutoUpdater() {
       });
 
       // Relaunch the app after update
-      await relaunch();
-    } catch (err) {
-      console.error('Failed to install update:', err);
-      setError(err instanceof Error ? err.message : String(err));
+      await platformApi.relaunchApp();
+    } finally {
       setIsUpdating(false);
     }
   };

@@ -1,5 +1,5 @@
 import { SearchIcon, PlusIcon, UploadIcon } from 'lucide-react';
-import { Input, Button } from '@omnidesk/ui';
+import { Input, Button } from '@omnidesk/ui';;
 import { useRef } from 'react';
 
 interface WorkflowsToolbarProps {

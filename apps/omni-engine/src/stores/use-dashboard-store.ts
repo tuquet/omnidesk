@@ -1,7 +1,8 @@
 import { Store } from '@tanstack/store';
 import { useStore } from '@tanstack/react-store';
-import { invoke } from '@tauri-apps/api/core';
 import { WORKFLOW_API_URL, PROFILE_API_URL } from '@omnidesk/core';
+import { IPC_COMMANDS, IPC_EVENTS } from '@omnidesk/types';
+import { tauriAdapter } from '../lib/tauri-adapter';
 
 export interface DashboardState {
   workflows: { id: string; name: string }[];
@@ -28,35 +29,29 @@ export const dashboardStore = new Store<DashboardState>(initialState);
 export const dashboardActions = {
   async fetchInitialData() {
     dashboardStore.setState((s) => ({ ...s, isLoading: true }));
-    try {
-      // For now, continuing to use fetch to bypass hey-api client since it has hardcoded base url 1424.
-      // Wait, omni-engine's API is on 1422? No, the engine dashboard fetched workflows from 1422 and profiles from 1421.
-      // This is part of what needs to be solved.
-      const [workflowsRes, profilesRes] = await Promise.all([
-        fetch(`${WORKFLOW_API_URL}/api/automa/workflows`).then(r => r.json() as Promise<{ id: string; name: string }[]>).catch(() => []),
-        fetch(`${PROFILE_API_URL}/api/browser-profiles`).then(r => r.json() as Promise<{ id: string; name: string }[]>).catch(() => []),
-      ]);
+    
+    // Using fetch directly as we need absolute URLs, but omitting local try-catch
+    const [workflowsRes, profilesRes] = await Promise.all([
+      fetch(`${WORKFLOW_API_URL}/api/automa/workflows`).then(r => r.json() as Promise<{ id: string; name: string }[]>),
+      fetch(`${PROFILE_API_URL}/api/browser-profiles`).then(r => r.json() as Promise<{ id: string; name: string }[]>),
+    ]);
 
-      const workflows = Array.isArray(workflowsRes) ? workflowsRes : [];
-      const profiles = Array.isArray(profilesRes) ? profilesRes : [];
+    const workflows = Array.isArray(workflowsRes) ? workflowsRes : [];
+    const profiles = Array.isArray(profilesRes) ? profilesRes : [];
 
-      const initialSelection: Record<string, boolean> = {};
-      profiles.slice(0, 3).forEach((p) => {
-        initialSelection[p.id] = true;
-      });
+    const initialSelection: Record<string, boolean> = {};
+    profiles.slice(0, 3).forEach((p) => {
+      initialSelection[p.id] = true;
+    });
 
-      dashboardStore.setState((s) => ({
-        ...s,
-        workflows,
-        profiles,
-        selectedWorkflow: workflows.length > 0 ? (workflows[0]?.id ?? '') : '',
-        selectedProfiles: initialSelection,
-        isLoading: false,
-      }));
-    } catch (error) {
-      console.error('Failed to fetch dashboard data:', error);
-      dashboardStore.setState((s) => ({ ...s, isLoading: false }));
-    }
+    dashboardStore.setState((s) => ({
+      ...s,
+      workflows,
+      profiles,
+      selectedWorkflow: workflows.length > 0 ? (workflows[0]?.id ?? '') : '',
+      selectedProfiles: initialSelection,
+      isLoading: false,
+    }));
   },
 
   setSelectedWorkflow(id: string) {
@@ -99,53 +94,39 @@ export const dashboardActions = {
       return;
     }
 
-    try {
-      await invoke('ensure_automa_extension');
-      dashboardActions.appendLog(`[SYSTEM] Allocated ${activeProfiles.length} browser profile(s).`);
+    await tauriAdapter.invoke(IPC_COMMANDS.ENSURE_AUTOMA_EXTENSION);
+    dashboardActions.appendLog(`[SYSTEM] Allocated ${activeProfiles.length} browser profile(s).`);
 
-      for (const profile of activeProfiles) {
-        dashboardActions.appendLog(`[SYSTEM] Requesting launch for Profile: ${profile.name}...`);
-        try {
-          const res = await fetch(
-            `${PROFILE_API_URL}/api/browser-profiles/${profile.id}/launch`,
-            { method: 'POST' }
-          );
+    for (const profile of activeProfiles) {
+      dashboardActions.appendLog(`[SYSTEM] Requesting launch for Profile: ${profile.name}...`);
+      
+      const res = await fetch(
+        `${PROFILE_API_URL}/api/browser-profiles/${profile.id}/launch`,
+        { method: 'POST' }
+      );
 
-          if (res.ok) {
-            dashboardActions.appendLog(`[PROFILE ${profile.name}] Browser launched successfully.`);
-          } else {
-            dashboardActions.appendLog(`[PROFILE ${profile.name}] ERROR: Failed to launch browser.`);
-          }
-        } catch {
-          dashboardActions.appendLog(`[PROFILE ${profile.name}] ERROR: API unreachable.`);
-        }
+      if (res.ok) {
+        dashboardActions.appendLog(`[PROFILE ${profile.name}] Browser launched successfully.`);
+      } else {
+        dashboardActions.appendLog(`[PROFILE ${profile.name}] ERROR: Failed to launch browser.`);
       }
-
-      dashboardActions.appendLog('[SYSTEM] Triggering workflow execution via WebSockets... (Pending)');
-
-      setTimeout(() => {
-        dashboardStore.setState((s) => ({
-          ...s,
-          isRunning: false,
-          logs: [...s.logs, '[SYSTEM] Orchestration complete.'],
-        }));
-      }, 3000);
-    } catch (e: unknown) {
-      dashboardActions.appendLog(`[SYSTEM] ERROR: ${e instanceof Error ? e.message : String(e)}`);
-      dashboardStore.setState((s) => ({ ...s, isRunning: false }));
     }
+
+    dashboardActions.appendLog('[SYSTEM] Triggering workflow execution via WebSockets... (Pending)');
+
+    setTimeout(() => {
+      dashboardStore.setState((s) => ({
+        ...s,
+        isRunning: false,
+        logs: [...s.logs, '[SYSTEM] Orchestration complete.'],
+      }));
+    }, 3000);
   },
 
   async initListeners() {
-    try {
-      const { listen } = await import('@tauri-apps/api/event');
-      return listen<string>('e2e-log', (event) => {
-        dashboardActions.appendLog(event.payload);
-      });
-    } catch (err) {
-      console.warn('Tauri event listener not available in this environment:', err);
-      return async () => {}; // dummy unlisten
-    }
+    return tauriAdapter.listen<string>(IPC_EVENTS.E2E_LOG, (payload) => {
+      dashboardActions.appendLog(payload);
+    });
   }
 };
 

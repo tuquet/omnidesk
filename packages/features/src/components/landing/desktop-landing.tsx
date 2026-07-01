@@ -1,5 +1,5 @@
 import { Link } from '@tanstack/react-router';
-import { Button } from '../../index';
+import { Button } from '@omnidesk/ui';;
 
 import { ArrowRight, CloudOff, Database, Network } from 'lucide-react';
 

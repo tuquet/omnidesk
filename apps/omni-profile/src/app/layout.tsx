@@ -1,16 +1,6 @@
 import { Outlet, useRouterState } from '@tanstack/react-router';
 import { OmniLayout } from '@omnidesk/core';
-import {
-  Sidebar,
-  SidebarContent,
-  SidebarHeader,
-  SidebarGroup,
-  SidebarGroupLabel,
-  SidebarGroupContent,
-  SidebarMenu,
-  SidebarMenuItem,
-  SidebarMenuButton,
-} from '@omnidesk/ui';
+import { Sidebar, SidebarContent, SidebarHeader, SidebarGroup, SidebarGroupLabel, SidebarGroupContent, SidebarMenu, SidebarMenuItem, SidebarMenuButton } from '@omnidesk/ui';;
 import { Database, FileJson } from 'lucide-react';
 
 function ProfileSidebar() {

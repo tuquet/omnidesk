@@ -1,14 +1,8 @@
-import { cn } from "../../lib/utils"
-import { Button } from "../../components/ui/button"
-import { Card, CardContent } from "../../components/ui/card"
-import {
-  Field,
-  FieldDescription,
-  FieldGroup,
-  FieldLabel,
-  FieldSeparator,
-} from "../../components/ui/field"
-import { Input } from "../../components/ui/input"
+import { cn } from '@omnidesk/ui'
+import { Button } from '@omnidesk/ui';
+import { Card, CardContent } from '@omnidesk/ui';
+import { Field, FieldDescription, FieldGroup, FieldLabel, FieldSeparator } from '@omnidesk/ui';
+import { Input } from '@omnidesk/ui';
 
 export function SignupForm({
   className,
