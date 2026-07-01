@@ -25,19 +25,16 @@ pub async fn create_schedule(
     payload: &CreateSchedulePayload,
 ) -> Result<Schedule, AppError> {
     let id = uuid::Uuid::new_v4().to_string();
-    let now = chrono::Utc::now().timestamp_millis();
 
     sqlx::query(
         "INSERT INTO schedules (id, name, workflow_id, profile_id, cron_expr, is_enabled, created_at, updated_at) 
-         VALUES (?, ?, ?, ?, ?, 1, ?, ?)"
+         VALUES (?, ?, ?, ?, ?, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)"
     )
     .bind(&id)
     .bind(&payload.name)
     .bind(&payload.workflow_id)
     .bind(&payload.profile_id)
     .bind(&payload.cron_expr)
-    .bind(now)
-    .bind(now)
     .execute(pool)
     .await?;
 
@@ -49,7 +46,6 @@ pub async fn update_schedule(
     id: &str,
     payload: &UpdateSchedulePayload,
 ) -> Result<Schedule, AppError> {
-    let now = chrono::Utc::now().timestamp_millis();
     let now_str = chrono::Utc::now().to_rfc3339();
     let mut schedule = get_schedule(pool, id).await?;
 
@@ -68,13 +64,12 @@ pub async fn update_schedule(
     schedule.updated_at = Some(now_str);
 
     sqlx::query(
-        "UPDATE schedules SET name = ?, workflow_id = ?, profile_id = ?, cron_expr = ?, updated_at = ? WHERE id = ?"
+        "UPDATE schedules SET name = ?, workflow_id = ?, profile_id = ?, cron_expr = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?"
     )
     .bind(&schedule.name)
     .bind(&schedule.workflow_id)
     .bind(&schedule.profile_id)
     .bind(&schedule.cron_expr)
-    .bind(now)
     .bind(id)
     .execute(pool)
     .await?;
@@ -99,12 +94,10 @@ pub async fn toggle_schedule(pool: &SqlitePool, id: &str) -> Result<Schedule, Ap
     let mut schedule = get_schedule(pool, id).await?;
 
     let new_val = if schedule.is_enabled == Some(1) { 0 } else { 1 };
-    let now = chrono::Utc::now().timestamp_millis();
     let now_str = chrono::Utc::now().to_rfc3339();
 
-    sqlx::query("UPDATE schedules SET is_enabled = ?, updated_at = ? WHERE id = ?")
+    sqlx::query("UPDATE schedules SET is_enabled = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?")
         .bind(new_val)
-        .bind(now)
         .bind(id)
         .execute(pool)
         .await?;

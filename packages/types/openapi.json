@@ -403,6 +403,29 @@
         }
       }
     },
+    "/api/automa/workflows/runs/{run_id}": {
+      "delete": {
+        "tags": [
+          "workflows"
+        ],
+        "operationId": "delete_workflow_run",
+        "parameters": [
+          {
+            "name": "run_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Run deleted successfully"
+          }
+        }
+      }
+    },
     "/api/automa/workflows/runs/{run_id}/logs": {
       "get": {
         "tags": [
@@ -654,6 +677,27 @@
         "responses": {
           "200": {
             "description": "List workflow runs"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "workflows"
+        ],
+        "operationId": "delete_all_workflow_runs",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "All runs for workflow deleted successfully"
           }
         }
       }

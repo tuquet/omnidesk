@@ -99,11 +99,9 @@ impl SchedulerService {
                     schedule_name, workflow_id, profile_id);
 
                 // Update run stats
-                let now = chrono::Utc::now().timestamp_millis();
                 let _ = sqlx::query(
-                    "UPDATE schedules SET last_run_at = ?, run_count = run_count + 1 WHERE id = ?"
+                    "UPDATE schedules SET last_run_at = CURRENT_TIMESTAMP, run_count = run_count + 1 WHERE id = ?"
                 )
-                .bind(now)
                 .bind(&schedule_id)
                 .execute(&db)
                 .await;
@@ -166,16 +164,13 @@ impl SchedulerService {
                         let run_id = uuid::Uuid::new_v4().to_string();
                         let _ = sqlx::query(
                             "INSERT INTO workflow_runs (id, workflow_id, profile_id, schedule_id, status, started_at, created_at, updated_at) 
-                             VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
+                             VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)"
                         )
                         .bind(&run_id)
                         .bind(&workflow_id)
                         .bind(&profile_id)
                         .bind(&schedule_id)
                         .bind("FAILED")
-                        .bind(now)
-                        .bind(now)
-                        .bind(now)
                         .execute(&db)
                         .await;
                     }
@@ -232,11 +227,9 @@ impl SchedulerService {
         );
 
         // Update run stats
-        let now = chrono::Utc::now().timestamp_millis();
         let _ = sqlx::query(
-            "UPDATE schedules SET last_run_at = ?, run_count = run_count + 1 WHERE id = ?",
+            "UPDATE schedules SET last_run_at = CURRENT_TIMESTAMP, run_count = run_count + 1 WHERE id = ?",
         )
-        .bind(now)
         .bind(&schedule.id)
         .execute(db)
         .await;

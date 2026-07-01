@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, ScrollArea, Badge, Skeleton, cn } from '@omnidesk/ui';;
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, Badge, Skeleton, cn, Button } from '@omnidesk/ui';
 import { client } from '@/lib/api-client';
-import { getWorkflowRuns, getRunLogs } from '@omnidesk/types/client';
-import { CheckCircleIcon, XCircleIcon, ClockIcon, PlayCircleIcon } from 'lucide-react';
+import { getWorkflowRuns, getRunLogs, deleteWorkflowRun, deleteAllWorkflowRuns } from '@omnidesk/types/client';
+import { CheckCircleIcon, XCircleIcon, ClockIcon, PlayCircleIcon, TrashIcon } from 'lucide-react';
 import Editor from '@monaco-editor/react';
 
 import type { WorkflowRun, WorkflowLog } from '@omnidesk/types';
@@ -16,6 +16,7 @@ interface WorkflowLogsModalProps {
 
 export function WorkflowLogsModal({ workflowId, isOpen, onOpenChange }: WorkflowLogsModalProps) {
   const [selectedRunId, setSelectedRunId] = useState<string | null>(null);
+  const queryClient = useQueryClient();
 
   // Fetch runs
   const { data: runs = [], isLoading: isRunsLoading } = useQuery<WorkflowRun[]>({
@@ -34,12 +35,53 @@ export function WorkflowLogsModal({ workflowId, isOpen, onOpenChange }: Workflow
     refetchInterval: 3000,
   });
 
-  // Automatically select the first run if none is selected and runs load
+  const deleteRunMutation = useMutation({
+    mutationFn: async (runId: string) => {
+      const { data, error } = await deleteWorkflowRun({
+        client,
+        path: { run_id: runId },
+      });
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: (_, runId) => {
+      if (selectedRunId === runId) {
+        setSelectedRunId(null);
+      }
+      queryClient.invalidateQueries({ queryKey: ['workflow-runs', workflowId] });
+    },
+  });
+
+  const clearAllRunsMutation = useMutation({
+    mutationFn: async () => {
+      if (!workflowId) return;
+      const { data, error } = await deleteAllWorkflowRuns({
+        client,
+        path: { id: workflowId },
+      });
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      setSelectedRunId(null);
+      queryClient.invalidateQueries({ queryKey: ['workflow-runs', workflowId] });
+    },
+  });
+
+  // Automatically select a valid run, or nullify if runs are empty
   useEffect(() => {
-    if (runs && runs.length > 0 && !selectedRunId) {
-      setSelectedRunId(runs[0]?.id || null);
+    if (!runs || isRunsLoading) return;
+    
+    if (runs.length === 0) {
+      if (selectedRunId !== null) {
+        setSelectedRunId(null);
+      }
+    } else {
+      if (!selectedRunId || !runs.some(r => r.id === selectedRunId)) {
+        setSelectedRunId(runs[0].id);
+      }
     }
-  }, [runs, selectedRunId]);
+  }, [runs, selectedRunId, isRunsLoading]);
 
   const selectedRun = runs.find((r) => r.id === selectedRunId);
   const isRunActive = selectedRun?.status === 'RUNNING';
@@ -71,8 +113,24 @@ export function WorkflowLogsModal({ workflowId, isOpen, onOpenChange }: Workflow
         <div className="flex-1 min-h-0 flex flex-row w-full h-full rounded-b-lg overflow-hidden">
           {/* Left Panel: List of Runs */}
           <div className="w-[320px] bg-muted/10 flex flex-col border-r shrink-0 min-h-0">
-            <div className="p-4 border-b bg-muted/20 font-medium text-sm text-muted-foreground uppercase tracking-wider shrink-0">
-              Execution History
+            <div className="p-4 border-b bg-muted/20 font-medium text-sm text-muted-foreground uppercase tracking-wider shrink-0 flex items-center justify-between">
+              <span>Execution History</span>
+              {runs.length > 0 && (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-6 w-6 text-muted-foreground hover:text-destructive"
+                  title="Clear All Runs"
+                  onClick={() => {
+                    if (window.confirm('Are you sure you want to delete all runs for this workflow?')) {
+                      clearAllRunsMutation.mutate();
+                    }
+                  }}
+                  disabled={clearAllRunsMutation.isPending}
+                >
+                  <TrashIcon className="h-4 w-4" />
+                </Button>
+              )}
             </div>
             <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar">
               {isRunsLoading ? (
@@ -92,7 +150,7 @@ export function WorkflowLogsModal({ workflowId, isOpen, onOpenChange }: Workflow
                       key={run.id}
                       onClick={() => setSelectedRunId(run.id)}
                       className={cn(
-                        'p-4 border-b cursor-pointer transition-colors hover:bg-muted/50',
+                        'group p-4 pr-10 border-b cursor-pointer transition-colors hover:bg-muted/50 relative',
                         selectedRunId === run.id
                           ? 'bg-muted/80 border-l-4 border-l-primary'
                           : 'border-l-4 border-l-transparent',
@@ -125,6 +183,20 @@ export function WorkflowLogsModal({ workflowId, isOpen, onOpenChange }: Workflow
                             minute: '2-digit',
                           }).format(new Date(run.started_at || Date.now()))}
                         </span>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-6 w-6 absolute top-3 right-2 opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-destructive"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            if (window.confirm('Are you sure you want to delete this run?')) {
+                              deleteRunMutation.mutate(run.id);
+                            }
+                          }}
+                          disabled={deleteRunMutation.isPending}
+                        >
+                          <TrashIcon className="h-4 w-4" />
+                        </Button>
                       </div>
 
                       {run.profile_id && (
@@ -232,7 +304,7 @@ export function WorkflowLogsModal({ workflowId, isOpen, onOpenChange }: Workflow
                             )}
                           </div>
 
-                          {log.data && (
+                          {log.data && log.data !== 'null' && log.data !== '{}' ? (
                             <div className="mt-2 h-48 border rounded-md overflow-hidden bg-background">
                               <Editor
                                 height="100%"
@@ -256,6 +328,10 @@ export function WorkflowLogsModal({ workflowId, isOpen, onOpenChange }: Workflow
                                   contextmenu: false,
                                 }}
                               />
+                            </div>
+                          ) : (
+                            <div className="mt-2 text-[11px] text-muted-foreground/50 italic bg-muted/20 px-2 py-1 rounded w-fit border border-muted/30">
+                              No output data
                             </div>
                           )}
                         </div>

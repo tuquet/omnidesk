@@ -157,8 +157,8 @@ impl WorkflowService {
         sqlx::query(
             r#"
             INSERT INTO workflows (id, name, icon, folder_id, description, drawflow, settings,
-                                   trigger, global_data, table_data, data_columns, version, is_disabled, source, content, connected_table)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                                   trigger, global_data, table_data, data_columns, version, is_disabled, source, content, connected_table, updated_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, COALESCE(?, CURRENT_TIMESTAMP))
             ON CONFLICT(id) DO UPDATE SET
                 name = excluded.name,
                 icon = excluded.icon,
@@ -175,9 +175,12 @@ impl WorkflowService {
                 source = excluded.source,
                 content = excluded.content,
                 connected_table = excluded.connected_table,
-                updated_at = CURRENT_TIMESTAMP,
+                updated_at = excluded.updated_at,
                 deleted_at = NULL,
                 delete_source = NULL
+            WHERE workflows.updated_at IS NULL 
+               OR excluded.updated_at IS NULL 
+               OR excluded.updated_at >= workflows.updated_at
             "#
         )
         .bind(&workflow.id)
@@ -196,6 +199,7 @@ impl WorkflowService {
         .bind(&workflow.source)
         .bind(&workflow.content)
         .bind(&workflow.connected_table)
+        .bind(&workflow.updated_at)
         .execute(pool)
         .await?;
 

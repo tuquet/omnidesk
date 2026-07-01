@@ -52,7 +52,7 @@ export function WorkflowTriggersEditor({ value = [], onChange }: WorkflowTrigger
     const newTriggers = [...value];
     newTriggers[index] = {
       ...newTriggers[index],
-      data: { ...newTriggers[index]?.data, ...dataUpdates }
+      data: { ...(newTriggers[index]?.data as any), ...dataUpdates }
     } as WorkflowTrigger;
     onChange(newTriggers);
   };

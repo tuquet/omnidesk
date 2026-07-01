@@ -29,7 +29,8 @@ pub fn router() -> Router<AppState> {
         .route("/:id/restore", post(restore_workflow))
         .route("/:id/force", delete(force_delete_workflow))
         .route("/runs", post(create_workflow_run))
-        .route("/:id/runs", get(get_workflow_runs))
+        .route("/runs/:run_id", delete(delete_workflow_run))
+        .route("/:id/runs", get(get_workflow_runs).delete(delete_all_workflow_runs))
         .route("/runs/:run_id/logs", get(get_run_logs))
 }
 
@@ -143,11 +144,35 @@ async fn create_workflow(
 async fn update_workflow(
     State(state): State<AppState>,
     Path(id): Path<String>,
+    Query(query): Query<WorkspaceQuery>,
     Json(api_workflow): Json<WorkflowPayload>,
 ) -> Result<Json<WorkflowPayload>, AppError> {
     let mut workflow: Workflow = api_workflow.into();
     workflow.id = id.clone();
+    
+    // Explicitly bump the updated_at timestamp when saving from the Studio UI
+    workflow.updated_at = Some(chrono::Utc::now().to_rfc3339());
+    
     let updated = WorkflowService::upsert(&state.db, &workflow).await?;
+
+    // Export new workflow to local JSON
+    let watch_dir = query
+        .workspace_path
+        .map(|p| std::path::PathBuf::from(p).join("workflows"))
+        .unwrap_or_else(|| state.app_dir.join("workflows"));
+    let _ = crate::services::file_watcher::FileWatcherService::export_workflow_file(
+        &watch_dir,
+        &updated,
+    )
+    .await;
+
+    // Broadcast to WebSocket so Extension adds/updates it
+    let event = crate::api::handlers::sync_ws::SyncEvent {
+        event_type: "workflows_changed".to_string(),
+        payload: serde_json::json!([WorkflowPayload::from(updated.clone())]),
+    };
+    let _ = state.sync_tx.send(event);
+
     Ok(Json(WorkflowPayload::from(updated)))
 }
 
@@ -440,4 +465,46 @@ async fn get_run_logs(
 ) -> Result<Json<Vec<crate::db::models::workflow::WorkflowLog>>, AppError> {
     let logs = WorkflowService::get_logs_by_run(&state.db, &run_id).await?;
     Ok(Json(logs))
+}
+
+#[utoipa::path(
+    delete,
+    path = "/api/automa/workflows/runs/{run_id}",
+    responses(
+        (status = 200, description = "Run deleted successfully")
+    ),
+    tag = "workflows"
+)]
+async fn delete_workflow_run(
+    State(state): State<AppState>,
+    Path(run_id): Path<String>,
+) -> Result<Json<serde_json::Value>, AppError> {
+    sqlx::query("DELETE FROM workflow_runs WHERE id = ?")
+        .bind(&run_id)
+        .execute(&state.db)
+        .await
+        .map_err(AppError::Database)?;
+
+    Ok(Json(serde_json::json!({ "success": true })))
+}
+
+#[utoipa::path(
+    delete,
+    path = "/api/automa/workflows/{id}/runs",
+    responses(
+        (status = 200, description = "All runs for workflow deleted successfully")
+    ),
+    tag = "workflows"
+)]
+async fn delete_all_workflow_runs(
+    State(state): State<AppState>,
+    Path(id): Path<String>,
+) -> Result<Json<serde_json::Value>, AppError> {
+    sqlx::query("DELETE FROM workflow_runs WHERE workflow_id = ?")
+        .bind(&id)
+        .execute(&state.db)
+        .await
+        .map_err(AppError::Database)?;
+
+    Ok(Json(serde_json::json!({ "success": true })))
 }

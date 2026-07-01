@@ -3,8 +3,7 @@ import { Dialog, DialogContent, DialogHeader, DialogFooter, DialogTitle, DialogD
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { PlayIcon } from 'lucide-react';
-import { WorkflowDataParsed } from '@omnidesk/types/client';
-import { WORKFLOW_API_URL, PROFILE_API_URL } from '@omnidesk/core/lib/api-config';
+import { WORKFLOW_API_URL, PROFILE_API_URL } from '@omnidesk/core';
 
 
 interface TriggerParameter {

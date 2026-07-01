@@ -127,7 +127,7 @@ export function WorkflowParametersEditor({ value = [], onChange }: WorkflowParam
                               
                               <div className="col-span-3">
                                 <Input
-                                  value={param.placeholder}
+                                  value={param.placeholder || ''}
                                   onChange={(e) => updateParam(index, { placeholder: e.target.value })}
                                   placeholder="A parameter"
                                   className="h-8"
@@ -175,7 +175,7 @@ export function WorkflowParametersEditor({ value = [], onChange }: WorkflowParam
                                   <Textarea 
                                     placeholder="Description" 
                                     className="h-16 resize-none"
-                                    value={param.description}
+                                    value={param.description || ''}
                                     onChange={(e) => updateParam(index, { description: e.target.value })}
                                   />
                                 </div>

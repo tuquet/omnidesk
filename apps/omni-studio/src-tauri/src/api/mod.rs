@@ -41,6 +41,8 @@ pub struct AppState {
         handlers::workflows::update_workflow,
         handlers::workflows::delete_workflow,
         handlers::workflows::get_workflow_runs,
+        handlers::workflows::delete_workflow_run,
+        handlers::workflows::delete_all_workflow_runs,
         handlers::workflows::get_run_logs,
         handlers::sync::push_workflows,
         handlers::sync::export_workflow,
