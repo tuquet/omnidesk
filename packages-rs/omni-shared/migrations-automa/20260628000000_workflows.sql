@@ -23,7 +23,9 @@ CREATE TABLE IF NOT EXISTS workflows (
     -- Source: 'extension' (synced from browser), 'local' (created in app), 'import' (from file)
     source TEXT DEFAULT 'local',
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    deleted_at TEXT DEFAULT NULL,
+    delete_source TEXT DEFAULT NULL
 );
 
 -- Index for folder filtering

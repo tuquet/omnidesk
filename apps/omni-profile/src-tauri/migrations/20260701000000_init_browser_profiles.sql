@@ -1,6 +1,3 @@
--- Drop the old table if it exists
-DROP TABLE IF EXISTS browser_profiles;
-
 -- Create Groups table
 CREATE TABLE IF NOT EXISTS profile_groups (
     id TEXT PRIMARY KEY,
@@ -17,8 +14,13 @@ CREATE TABLE IF NOT EXISTS browser_profiles (
     group_id TEXT,
     os TEXT DEFAULT 'win',
     browser_type TEXT DEFAULT 'chrome',
+    browser_version TEXT,
     data_dir_path TEXT NOT NULL,
     status TEXT DEFAULT 'IDLE',
+    notes TEXT DEFAULT '',
+    tags TEXT DEFAULT '[]',
+    pid INTEGER DEFAULT NULL,
+    cdp_url TEXT DEFAULT NULL,
     last_used_at DATETIME,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
