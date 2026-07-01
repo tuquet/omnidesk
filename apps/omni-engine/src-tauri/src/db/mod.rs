@@ -9,7 +9,8 @@ pub async fn init_db(app_dir: PathBuf) -> Result<SqlitePool, sqlx::Error> {
     let options = SqliteConnectOptions::new()
         .filename(&db_path)
         .create_if_missing(true)
-        .foreign_keys(true);
+        .foreign_keys(true)
+        .journal_mode(sqlx::sqlite::SqliteJournalMode::Wal);
         
     let pool = SqlitePoolOptions::new()
         .max_connections(5)

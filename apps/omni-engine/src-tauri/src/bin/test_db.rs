@@ -13,7 +13,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let options = SqliteConnectOptions::from_str(&db_url)
         .unwrap_or_else(|_| SqliteConnectOptions::new().filename(&db_path))
         .create_if_missing(true)
-        .foreign_keys(true);
+        .foreign_keys(true)
+        .journal_mode(sqlx::sqlite::SqliteJournalMode::Wal);
         
     let pool = SqlitePoolOptions::new()
         .max_connections(5)
