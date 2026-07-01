@@ -5,12 +5,13 @@
     :data="workflow"
     :menu="menu"
     @execute="RendererWorkflowService.executeWorkflow(workflow)"
-    @click="$router.push(`/workflows/${$event.hostId}/host`)"
+    @click="$router.push(ROUTES.WORKFLOW_HOST($event.hostId))"
     @menuSelected="deleteWorkflow(workflow)"
   />
 </template>
 <script setup>
 import SharedCard from '@/components/newtab/shared/SharedCard.vue';
+import { ROUTES } from '@/config/route-config';
 import { useDialog } from '@/composable/dialog';
 import RendererWorkflowService from '@/service/renderer/RendererWorkflowService';
 import { useHostedWorkflowStore } from '@/stores/hostedWorkflow';

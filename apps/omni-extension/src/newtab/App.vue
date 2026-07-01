@@ -99,6 +99,7 @@ import { compare } from 'compare-versions';
 import { reactive, ref, watch } from 'vue';;
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
+import { ROUTES } from '@/config/route-config';
 import browser from 'webextension-polyfill';
 
 const iconElement = document.createElement('link');
@@ -381,7 +382,7 @@ watch(
 
     const { isRecording } = await browser.storage.local.get('isRecording');
     if (isRecording) {
-      router.push('/recording');
+      router.push(ROUTES.RECORDING);
 
       await (browser.action || browser.browserAction).setBadgeBackgroundColor({
         color: '#ef4444',

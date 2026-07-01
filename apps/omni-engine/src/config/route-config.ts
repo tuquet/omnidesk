@@ -33,4 +33,6 @@ export const ROUTES = {
   ACTIVE_JOBS: '/active-jobs',
   SETTINGS: '/settings',
   LOGIN: '/login',
+  RUNNERS: '/runners',
+  RUNNER_DETAIL: '/runners/$runnerId',
 } as const;

@@ -60,7 +60,7 @@
     <router-link
       v-if="userStore.user"
       v-tooltip:right.group="t('settings.menu.profile')"
-      to="/profile"
+      :to="ROUTES.PROFILE"
       class="bg-box-transparent inline-block rounded-full p-1 transition-transform hover:scale-110"
     >
       <img
@@ -91,13 +91,13 @@
         </ui-list-item>
       </ui-list>
     </ui-popover>
-    <router-link v-tooltip:right.group="t('settings.menu.about')" to="/about">
+    <router-link v-tooltip:right.group="t('settings.menu.about')" :to="ROUTES.ABOUT">
       <v-remixicon class="cursor-pointer" name="riInformationLine" />
     </router-link>
   </aside>
 </template>
 <script setup>
-import { ref, computed } from 'vue';;
+import { ref, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 import { useToast } from 'vue-toastification';
@@ -105,6 +105,7 @@ import browser from 'webextension-polyfill';
 import { useUserStore } from '@/stores/user';
 import { useWorkflowStore } from '@/stores/workflow';
 import { useShortcut, getShortcut } from '@/composable/shortcut';
+import { ROUTES } from '@/config/route-config';
 import { useGroupTooltip } from '@/composable/groupTooltip';
 import { communities } from '@/utils/shared';
 import { initElementSelector } from '@/newtab/utils/elementSelector';

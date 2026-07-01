@@ -55,6 +55,7 @@
 </template>
 <script setup>
 import SharedCard from '@/components/newtab/shared/SharedCard.vue';
+import { ROUTES } from '@/config/route-config';
 import { useDialog } from '@/composable/dialog';
 import RendererWorkflowService from '@/service/renderer/RendererWorkflowService';
 import { useTeamWorkflowStore } from '@/stores/teamWorkflow';
@@ -194,6 +195,6 @@ function onMenuSelected({ id, data }) {
 function openWorkflowPage({ id }) {
   if (isUnknownTeam.value) return;
 
-  router.push(`/teams/${props.teamId}/workflows/${id}`);
+  router.push(ROUTES.TEAM_WORKFLOW(props.teamId, id));
 }
 </script>

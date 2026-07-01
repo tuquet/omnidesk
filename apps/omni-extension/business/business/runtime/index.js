@@ -21,7 +21,9 @@ import BackgroundWorkflowUtils from '@/background/BackgroundWorkflowUtils';
 let ws = null;
 let profileId = null;
 let currentRunId = null;
-let RUNTIME_WS_URL = `ws://127.0.0.1:1423/api/automa/ws`;
+
+const DEFAULT_RUNTIME_PORT = '1423';
+let RUNTIME_WS_URL = `ws://127.0.0.1:${DEFAULT_RUNTIME_PORT}/api/automa/ws`;
 
 // The WorkflowEngine injected by the background script
 const engineRef = null;
@@ -83,7 +85,7 @@ export default function (context, message) {
     const incomingRunId = url.searchParams.get('run_id');
     profileId = url.searchParams.get('profile_id') || 'default';
     
-    const port = url.port || '80';
+    const port = url.port || DEFAULT_RUNTIME_PORT;
     RUNTIME_WS_URL = `ws://127.0.0.1:${port}/api/automa/ws`;
     
     console.log(`[RuntimeBridge] Captured run_id: ${incomingRunId}, profile_id: ${profileId}, port: ${port}`);

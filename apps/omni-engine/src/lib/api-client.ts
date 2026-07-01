@@ -4,13 +4,14 @@ import i18n from '@/lib/i18n';
 import { authActions, authStore } from '@omnidesk/auth';
 import type { ApiResponse, ApiError } from '@omnidesk/types';
 import { ERROR_CODES } from '@omnidesk/types';
+import { ENGINE_API_URL } from '@omnidesk/core';
 
 const client = createClient({});
 
 // ─── Config ────────────────────────────────────────────────────────────────────
 
 client.setConfig({
-  baseUrl: 'http://127.0.0.1:1424', // Tauri Axum backend
+  baseUrl: ENGINE_API_URL, // Dynamic base url
   throwOnError: true,
 });
 

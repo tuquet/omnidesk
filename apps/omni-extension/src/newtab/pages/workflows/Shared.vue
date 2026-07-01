@@ -149,6 +149,8 @@
   </ui-modal>
 </template>
 <script setup>
+import EditorLocalActions from '@/components/newtab/workflow/editor/EditorLocalActions.vue';
+import { ROUTES } from '@/config/route-config';
 import WorkflowEditor from '@/components/newtab/workflow/WorkflowEditor.vue';
 import WorkflowShare from '@/components/newtab/workflow/WorkflowShare.vue';
 import { useDialog } from '@/composable/dialog';
@@ -372,7 +374,7 @@ watch(workflow, () => {
 
 onMounted(() => {
   if (!workflow.value) {
-    router.push('/workflows');
+    router.push(ROUTES.WORKFLOWS);
     return;
   }
 

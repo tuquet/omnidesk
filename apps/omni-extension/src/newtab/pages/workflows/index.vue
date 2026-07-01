@@ -203,7 +203,7 @@
             >
               <ui-button
                 tag="router-link"
-                to="/backup"
+                :to="ROUTES.BACKUP"
                 class="inline-block"
                 icon
               >
@@ -390,6 +390,7 @@ import { fetchApi } from '@/utils/api';
 import { findTriggerBlock, isWhitespace } from '@/utils/helper';
 import { getWorkflowPermissions, importWorkflow } from '@/utils/workflowData';
 import { registerWorkflowTrigger } from '@/utils/workflowTrigger';
+import { ROUTES } from '@/config/route-config';
 import { computed, onMounted, shallowReactive, watch } from 'vue';;
 import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
@@ -453,7 +454,7 @@ function startRecordWorkflow() {
     name: addWorkflowModal.name,
     description: addWorkflowModal.description,
   }).then(() => {
-    router.push('/recording');
+    router.push(ROUTES.RECORDING);
   });
 }
 async function updateActiveTab(data = {}) {
@@ -488,7 +489,7 @@ function addWorkflow() {
     })
     .then((workflows) => {
       const workflowId = Object.keys(workflows)[0];
-      router.push(`/workflows/${workflowId}`);
+      router.push(ROUTES.WORKFLOW_DETAIL(workflowId));
     })
     .finally(clearAddWorkflowModal);
 }

@@ -11,6 +11,7 @@ import {
 } from '@omnidesk/ui';
 import { TerminalSquare, ArrowLeft, Loader2, PlayCircle, Clock } from 'lucide-react';
 import { useDashboardStore } from '../../stores/use-dashboard-store';
+import { ROUTES } from '@/config/route-config';
 
 export const Route = createFileRoute('/runners/$runnerId')({
   component: RunnerDetailPage,
@@ -30,7 +31,7 @@ function RunnerDetailPage() {
       <PageHeader className="pb-6 flex-none">
         <div className="flex items-center gap-4">
           <Button variant="ghost" size="icon" asChild className="rounded-full h-10 w-10">
-            <Link to="/runners">
+            <Link to={ROUTES.RUNNERS}>
               <ArrowLeft className="h-5 w-5" />
             </Link>
           </Button>

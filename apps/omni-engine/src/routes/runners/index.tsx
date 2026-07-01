@@ -13,6 +13,7 @@ import {
   TableCell,
   Badge,
 } from '@omnidesk/ui';
+import { ROUTES } from '@/config/route-config';
 import { Clock, PlayCircle, CheckCircle2, XCircle, AlertCircle } from 'lucide-react';
 
 export const Route = createFileRoute('/runners/')({
@@ -109,7 +110,7 @@ function RunnersPage() {
               {MOCK_RUNNERS.map((runner) => (
                 <TableRow key={runner.id} className="group hover:bg-muted/40 cursor-pointer transition-colors">
                   <TableCell className="font-medium">
-                    <Link to="/runners/$runnerId" params={{ runnerId: runner.id }} className="flex items-center text-primary group-hover:underline">
+                    <Link to={ROUTES.RUNNER_DETAIL} params={{ runnerId: runner.id }} className="flex items-center text-primary group-hover:underline">
                       {runner.id}
                     </Link>
                   </TableCell>
