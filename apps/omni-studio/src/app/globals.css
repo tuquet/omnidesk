@@ -189,3 +189,15 @@
   animation: none;
   opacity: 1;
 }
+
+/* React Flow Dark Mode Overrides */
+.dark .react-flow__controls-button {
+  background-color: var(--card);
+  border-bottom-color: var(--border);
+}
+.dark .react-flow__controls-button svg {
+  fill: var(--foreground);
+}
+.dark .react-flow__controls-button:hover {
+  background-color: var(--accent);
+}
