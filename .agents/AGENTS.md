@@ -85,3 +85,8 @@ As an AI Agent modifying the OmniDesk ecosystem, you MUST evaluate every code ch
 
 - **Mandatory Sync**: Whenever you add, remove, or modify a backend API endpoint (e.g., an Axum handler or Utoipa macro) in the Rust backend, you MUST run the API synchronization script: `pnpm run sync:api`.
 - **Workflow**: The `pnpm run sync:api` command will automatically generate the `openapi.json` from the Rust code and use `openapi-ts` to regenerate the TypeScript API clients in `@omnidesk/types`. Failure to run this script will result in the Frontend being out-of-sync with the Backend, leading to runtime or typecheck errors.
+
+## 15. Task Execution (VS Code Tasks)
+
+- **Strict Command Matching**: Whenever you are asked to activate a specific command or task (e.g., "chạy 🖥️ Dev: Automa Extension"), you MUST NOT guess or construct the `pnpm` or `npm` command yourself.
+- **Workflow**: You MUST first read the `.vscode/tasks.json` file in the workspace root, find the exact label of the task, and run the exact `command` (or `args`) specified in that task definition. Failure to do so may lead to missing environment variables or logging wrappers.

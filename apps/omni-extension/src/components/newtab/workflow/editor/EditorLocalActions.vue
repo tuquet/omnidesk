@@ -348,8 +348,6 @@ import { computed, reactive } from 'vue';;
 import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 import { useToast } from 'vue-toastification';
-import defu from 'defu';
-import { ROUTES } from '@/config/route-config';
 import browser from 'webextension-polyfill';
 import { useOmniStudio } from '@/composable/useOmniStudio';
 
@@ -589,7 +587,7 @@ function shareWorkflowWithTeam() {
 function shareWorkflow(disabled = false) {
   if (disabled) return;
   if (shared.value) {
-    router.push(ROUTES.WORKFLOW_SHARED(props.workflow.id));
+    router.push(`/workflows/${props.workflow.id}/shared`);
     return;
   }
 

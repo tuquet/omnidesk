@@ -4,7 +4,7 @@
     :data-workflow="workflow.id"
     draggable="true"
     class="local-workflow cursor-default select-none ring-accent"
-    @click="$router.push(ROUTES.WORKFLOW_DETAIL(workflow.id))"
+    @click="$router.push(`/workflows/${$event.id}`)"
   >
     <template #header>
       <div class="mb-4 flex items-center">
@@ -90,7 +90,6 @@
 <script setup>
 import { useI18n } from 'vue-i18n';
 import SharedCard from '@/components/newtab/shared/SharedCard.vue';
-import { ROUTES } from '@/config/route-config';
 
 defineProps({
   workflow: {

@@ -17,13 +17,12 @@
       :data="workflow"
       :show-details="false"
       @execute="RendererWorkflowService.executeWorkflow(workflow)"
-      @click="$router.push(ROUTES.WORKFLOW_SHARED(workflow.id))"
+      @click="$router.push(`/workflows/${$event.id}/shared`)"
     />
   </div>
 </template>
 <script setup>
 import SharedCard from '@/components/newtab/shared/SharedCard.vue';
-import { ROUTES } from '@/config/route-config';
 import RendererWorkflowService from '@/service/renderer/RendererWorkflowService';
 import { useSharedWorkflowStore } from '@/stores/sharedWorkflow';
 import { arraySorter } from '@/utils/helper';

@@ -105,8 +105,7 @@
   </div>
 </template>
 <script setup>
-import { ROUTES } from '@/config/route-config';
-import { computed, reactive, onMounted, watch } from 'vue';
+import { computed, reactive, onMounted, watch } from 'vue';;
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
 import { useHead } from '@vueuse/head';
@@ -181,7 +180,7 @@ function syncWorkflow() {
     .fetchWorkflows([hostId])
     .then(() => {
       if (!workflow.value) {
-        router.replace(ROUTES.WORKFLOWS);
+        router.replace('/workflows');
       }
       /* eslint-disable-next-line */
       retrieveTriggerText();
@@ -201,7 +200,7 @@ async function deleteWorkflowHost() {
       try {
         await hostedWorkflowStore.delete(workflowId);
 
-        router.replace(ROUTES.WORKFLOWS);
+        router.replace('/workflows');
       } catch (error) {
         console.error(error);
       }
@@ -238,7 +237,7 @@ watch(workflow, () => {
 onMounted(() => {
   const currentWorkflow = hostedWorkflowStore.workflows[workflowId];
   if (!currentWorkflow) {
-    router.push(ROUTES.WORKFLOWS);
+    router.push('/workflows');
     return;
   }
 
