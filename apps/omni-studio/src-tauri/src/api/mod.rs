@@ -26,6 +26,7 @@ pub struct AppState {
     pub sync_tx: tokio::sync::broadcast::Sender<handlers::sync_ws::SyncEvent>,
     /// Broadcast channel for automa WS — notifies Extension to execute workflows
     pub automa_ws_tx: tokio::sync::broadcast::Sender<omni_shared::automa::AutomaEvent>,
+    pub active_sync_connections: Arc<std::sync::atomic::AtomicUsize>,
 }
 
 #[derive(OpenApi)]
@@ -76,6 +77,7 @@ pub async fn serve(pool: SqlitePool, app_dir: PathBuf, port: u16, app_handle: Ap
         app_handle,
         sync_tx: sync_tx.clone(),
         automa_ws_tx,
+        active_sync_connections: Arc::new(std::sync::atomic::AtomicUsize::new(0)),
     };
 
     let watch_dir = app_dir.join("workflows");

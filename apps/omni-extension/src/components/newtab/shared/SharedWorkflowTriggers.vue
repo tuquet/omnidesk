@@ -143,7 +143,7 @@ const triggersTypes = props.exclude
   : Object.keys(triggersData);
 
 const { t } = useI18n();
-const triggersList = ref([...(props.triggers || [])]);
+const triggersList = ref([...(Array.isArray(props.triggers) ? props.triggers : [])]);
 
 function addTrigger(type) {
   if (triggersData[type].onlyOne) {

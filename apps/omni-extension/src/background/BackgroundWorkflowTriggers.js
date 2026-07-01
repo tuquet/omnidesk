@@ -68,7 +68,9 @@ class BackgroundWorkflowTriggers {
       }
 
       if (triggerId) {
+      if (Array.isArray(data.triggers)) {
         data = data.triggers.find((trigger) => trigger.id === triggerId);
+      }
         if (data) data = { ...data, ...data.data };
       }
 
@@ -190,7 +192,7 @@ class BackgroundWorkflowTriggers {
         if (isStartup && triggerBlock.type === 'on-startup') {
           BackgroundWorkflowUtils.instance.executeWorkflow(currWorkflow);
         } else {
-          if (isStartup && triggerBlock.triggers) {
+          if (isStartup && Array.isArray(triggerBlock.triggers)) {
             for (const trigger of triggerBlock.triggers) {
               if (trigger.type === 'on-startup') {
                 await BackgroundWorkflowUtils.executeWorkflow(currWorkflow);

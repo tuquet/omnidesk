@@ -574,7 +574,16 @@ const workflowColumns = computed(() => {
 const editorData = computed(() => {
   if (isPackage) return workflow.value.data;
 
-  return workflow.value.drawflow;
+  const drawflow = workflow.value.drawflow;
+  if (drawflow && Array.isArray(drawflow.nodes)) {
+    drawflow.nodes.forEach(node => {
+      if (node.handleBounds) {
+        if (!Array.isArray(node.handleBounds.source)) node.handleBounds.source = [];
+        if (!Array.isArray(node.handleBounds.target)) node.handleBounds.target = [];
+      }
+    });
+  }
+  return drawflow;
 });
 
 const updateBlockData = debounce((data) => {

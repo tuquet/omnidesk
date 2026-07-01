@@ -57,7 +57,7 @@ export async function validateTrigger(data) {
     },
   };
 
-  if (data.triggers) {
+  if (Array.isArray(data.triggers)) {
     for (const trigger of data.triggers) {
       const validate = triggersValidation[trigger.type];
       if (validate) await validate(trigger.data);

@@ -49,20 +49,16 @@ impl SharedWorkflowExecutor {
 
         // 2. Create run record in the local database
         let run_id = uuid::Uuid::new_v4().to_string();
-        let now = chrono::Utc::now().timestamp_millis();
         
         sqlx::query(
-            "INSERT INTO workflow_runs (id, workflow_id, profile_id, schedule_id, status, started_at, created_at, updated_at) 
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
+            "INSERT INTO workflow_runs (id, workflow_id, profile_id, schedule_id, status, started_at) 
+             VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP)"
         )
         .bind(&run_id)
         .bind(workflow_id)
         .bind(profile_id)
         .bind(schedule_id)
         .bind("RUNNING")
-        .bind(now)
-        .bind(now)
-        .bind(now)
         .execute(db)
         .await?;
 

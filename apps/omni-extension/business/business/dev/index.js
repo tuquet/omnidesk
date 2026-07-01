@@ -11,7 +11,7 @@
  * - Delete: Extension deletes → hard delete everywhere. OneDrive deletes → soft delete, notify Extension
  */
 
-const WORKFLOW_APP_PORT = process.env.VUE_APP_OMNI_STUDIO_PORT || 1422;
+const WORKFLOW_APP_PORT = 1422;
 const SYNC_WS_URL = `ws://127.0.0.1:${WORKFLOW_APP_PORT}/api/automa/ws/sync`;
 const RECONNECT_DELAY = 5000; // 5s reconnect delay
 const KEEPALIVE_INTERVAL = 25; // seconds (under MV3's 30s limit)
@@ -148,10 +148,9 @@ async function handleSyncEvent(syncEvent) {
       }
 
       if (changed) {
-        // Set flag to prevent echo sync back to WFA
-        currentWorkflows.__syncFromServer = true;
+        // Use a timestamp to prevent echo sync back to WFA
+        lastSyncFromServerTime = Date.now();
         await browser.storage.local.set({ workflows: currentWorkflows });
-        delete currentWorkflows.__syncFromServer;
       }
 
       if (event_type === 'full_sync') {
@@ -332,6 +331,8 @@ function setupKeepalive() {
 //  Main Entry Point
 // ──────────────────────────────────────────────
 
+let lastSyncFromServerTime = 0;
+
 export default function (context, message) {
   if (context !== 'background') return;
 
@@ -370,8 +371,11 @@ export default function (context, message) {
 
     if (!newValue || typeof newValue !== 'object') return;
 
-    // Skip echo: don't push back changes that came from the server
-    if (newValue.__syncFromServer) return;
+    // Skip echo: don't push back changes that came from the server within the last 2 seconds
+    if (Date.now() - lastSyncFromServerTime < 2000) {
+      console.debug('[SyncBridge] Ignoring storage change (echo from server)');
+      return;
+    }
 
     schedulePush(newValue);
   });

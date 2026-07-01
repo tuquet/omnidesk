@@ -113,8 +113,9 @@ export function RunWorkflowModal({ workflowId, profileId, isOpen, onClose, onRun
       const nodesList = Array.isArray(nodes) ? nodes : Object.values(nodes);
       const triggerNode: any = nodesList.find((n: any) => n.name === 'trigger' || n.label === 'trigger');
       
-      if (triggerNode && triggerNode.data && Array.isArray(triggerNode.data.parameters)) {
-        return triggerNode.data.parameters;
+      if (triggerNode && triggerNode.data && triggerNode.data.parameters) {
+        const params = triggerNode.data.parameters;
+        return Array.isArray(params) ? params : Object.values(params);
       }
     } catch (err) {
       console.error('Failed to parse drawflow', err);

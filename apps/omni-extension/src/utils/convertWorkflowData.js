@@ -12,6 +12,15 @@ const getFlowData = (workflow) => {
     if (data.edges && !Array.isArray(data.edges)) {
       data.edges = typeof data.edges === 'object' ? Object.values(data.edges) : [];
     }
+    
+    if (Array.isArray(data.nodes)) {
+      data.nodes.forEach(node => {
+        if (node.handleBounds) {
+          if (!Array.isArray(node.handleBounds.source)) node.handleBounds.source = [];
+          if (!Array.isArray(node.handleBounds.target)) node.handleBounds.target = [];
+        }
+      });
+    }
   }
   return data;
 };

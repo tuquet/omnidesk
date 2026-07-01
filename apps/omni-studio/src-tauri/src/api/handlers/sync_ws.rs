@@ -42,10 +42,16 @@ pub async fn ws_sync_handler(
 }
 
 async fn handle_sync_socket(socket: WebSocket, state: AppState, profile_id: Option<String>) {
+    use std::sync::atomic::Ordering;
+    use tauri::Emitter;
+
+    let active_count = state.active_sync_connections.fetch_add(1, Ordering::SeqCst) + 1;
+    let _ = state.app_handle.emit("extension-connections-changed", serde_json::json!({ "count": active_count }));
+
     let (mut sender, mut receiver) = socket.split();
     let mut rx = state.sync_tx.subscribe();
 
-    println!("[SyncWS] Extension connected. Preparing sync payload...");
+    println!("[SyncWS] Extension connected (total: {}). Preparing sync payload...", active_count);
 
     // Send initial full sync on connect
     let workflows_to_sync = if let Some(ref pid) = profile_id {
@@ -87,14 +93,15 @@ async fn handle_sync_socket(socket: WebSocket, state: AppState, profile_id: Opti
     let sync_tx = state.sync_tx.clone();
     let app_dir = state.app_dir.clone();
     let profile_id_clone = profile_id.clone();
-    let mut recv_task = tokio::spawn(async move {
-        while let Some(Ok(msg)) = receiver.next().await {
-            match msg {
-                Message::Text(text) => {
-                    if let Ok(ext_msg) = serde_json::from_str::<ExtensionMessage>(&text) {
-                        handle_extension_message(&db, &sync_tx, &app_dir, ext_msg, profile_id_clone.as_deref()).await;
+        let app_handle_clone = state.app_handle.clone();
+        let mut recv_task = tokio::spawn(async move {
+            while let Some(Ok(msg)) = receiver.next().await {
+                match msg {
+                    Message::Text(text) => {
+                        if let Ok(ext_msg) = serde_json::from_str::<ExtensionMessage>(&text) {
+                            handle_extension_message(&db, &sync_tx, &app_dir, &app_handle_clone, ext_msg, profile_id_clone.as_deref()).await;
+                        }
                     }
-                }
                 Message::Ping(data) => {
                     // Pong is sent automatically by axum
                     println!("[SyncWS] Received ping ({} bytes)", data.len());
@@ -114,7 +121,9 @@ async fn handle_sync_socket(socket: WebSocket, state: AppState, profile_id: Opti
         _ = (&mut recv_task) => send_task.abort(),
     }
 
-    println!("[SyncWS] Connection closed");
+    let active_count = state.active_sync_connections.fetch_sub(1, Ordering::SeqCst) - 1;
+    let _ = state.app_handle.emit("extension-connections-changed", serde_json::json!({ "count": active_count }));
+    println!("[SyncWS] Connection closed (remaining: {})", active_count);
 }
 
 /// Handle a message received from the Extension
@@ -122,6 +131,7 @@ async fn handle_extension_message(
     db: &sqlx::SqlitePool,
     sync_tx: &tokio::sync::broadcast::Sender<SyncEvent>,
     app_dir: &std::path::Path,
+    app_handle: &tauri::AppHandle,
     msg: ExtensionMessage,
     profile_id: Option<&str>,
 ) {
@@ -139,6 +149,19 @@ async fn handle_extension_message(
 
                     let mut count = 0;
                     for wf in &workflows {
+                        // If it is soft-deleted in Studio, DO NOT upsert. Tell extension to delete it.
+                        if let Ok(existing) = WorkflowService::get_by_id(db, &wf.id).await {
+                            if existing.deleted_at.is_some() {
+                                println!("[SyncWS] Workflow {} is soft-deleted in Studio. Telling Extension to delete it.", wf.id);
+                                let event = SyncEvent {
+                                    event_type: "workflow_deleted".to_string(),
+                                    payload: serde_json::json!({ "id": wf.id, "source": "studio" }),
+                                };
+                                let _ = sync_tx.send(event);
+                                continue;
+                            }
+                        }
+
                         if WorkflowService::upsert(db, wf).await.is_ok() {
                             // Export to JSON for OneDrive sync
                             let _ = crate::services::file_watcher::FileWatcherService::export_workflow_file(&watch_dir, wf).await;
@@ -146,6 +169,11 @@ async fn handle_extension_message(
                         }
                     }
                     println!("[SyncWS] Received {} workflows from Extension", count);
+                    
+                    if count > 0 {
+                        use tauri::Emitter;
+                        app_handle.emit("workflows-synced", serde_json::json!({ "count": count })).ok();
+                    }
                 }
             }
         }

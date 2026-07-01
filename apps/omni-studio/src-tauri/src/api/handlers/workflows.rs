@@ -91,7 +91,8 @@ pub struct ListWorkflowsQuery {
 
 #[derive(Deserialize)]
 pub struct WorkspaceQuery {
-    pub workspacePath: Option<String>,
+    #[serde(rename = "workspacePath")]
+    pub workspace_path: Option<String>,
 }
 
 #[utoipa::path(
@@ -216,7 +217,7 @@ async fn delete_workflow(
     WorkflowService::soft_delete(&state.db, &id, "api").await?;
 
     // Delete from Local File (if we do soft delete, we also delete the local JSON so it doesn't get synced back)
-    let watch_dir = query.workspacePath
+    let watch_dir = query.workspace_path
         .map(|p| std::path::PathBuf::from(p).join("workflows"))
         .unwrap_or_else(|| state.app_dir.join("workflows"));
         
@@ -258,7 +259,7 @@ async fn restore_workflow(
     
     // Fetch and export to JSON
     if let Ok(wf) = WorkflowService::get_by_id(&state.db, &id).await {
-        let watch_dir = query.workspacePath
+        let watch_dir = query.workspace_path
             .map(|p| std::path::PathBuf::from(p).join("workflows"))
             .unwrap_or_else(|| state.app_dir.join("workflows"));
         let _ = crate::services::file_watcher::FileWatcherService::export_workflow_file(&watch_dir, &wf).await;
@@ -287,7 +288,7 @@ async fn duplicate_workflow(
     let duplicated = WorkflowService::duplicate(&state.db, &id).await?;
     
     // Export new workflow to local JSON
-    let watch_dir = query.workspacePath
+    let watch_dir = query.workspace_path
         .map(|p| std::path::PathBuf::from(p).join("workflows"))
         .unwrap_or_else(|| state.app_dir.join("workflows"));
     let _ = crate::services::file_watcher::FileWatcherService::export_workflow_file(&watch_dir, &duplicated).await;
@@ -322,7 +323,7 @@ async fn force_delete_workflow(
     WorkflowService::delete(&state.db, &id).await?;
     
     // Delete from Local File (if it exists)
-    let watch_dir = query.workspacePath
+    let watch_dir = query.workspace_path
         .map(|p| std::path::PathBuf::from(p).join("workflows"))
         .unwrap_or_else(|| state.app_dir.join("workflows"));
     let file_path = watch_dir.join(format!("{}.automa.json", id));
@@ -364,10 +365,7 @@ async fn create_workflow_run(
     // Check if we should fallback immediately
     let is_default = payload.profile_id.as_deref() == Some("default");
     
-    let mut use_fallback = false;
-    let mut fallback_reason = String::new();
-    
-    if !is_default {
+    let fallback_reason = if !is_default {
         // Quick healthcheck to see if engine is alive
         let health_res = client.get(engine_health_url).timeout(std::time::Duration::from_millis(500)).send().await;
         if health_res.is_ok() && health_res.unwrap().status().is_success() {
@@ -382,21 +380,17 @@ async fn create_workflow_run(
                     return Err(AppError::Internal(format!("Engine returned {}", r.status())));
                 },
                 Err(e) => {
-                    use_fallback = true;
-                    fallback_reason = format!("Engine reachable but POST failed ({})", e);
+                    format!("Engine reachable but POST failed ({})", e)
                 }
             }
         } else {
-            use_fallback = true;
-            fallback_reason = "Engine unreachable (healthcheck failed)".to_string();
+            "Engine unreachable (healthcheck failed)".to_string()
         }
     } else {
-        use_fallback = true;
-        fallback_reason = "Default profile requested".to_string();
-    }
+        "Default profile requested".to_string()
+    };
     
-    if use_fallback {
-        println!("[Studio] Fallback executing workflow locally. Reason: {}", fallback_reason);
+    println!("[Studio] Fallback executing workflow locally. Reason: {}", fallback_reason);
         // Get the workflow to send down
         let workflow = WorkflowService::get_by_id(&state.db, &payload.workflow_id).await?;
         let api_workflow = WorkflowPayload::from(workflow.clone());
@@ -432,9 +426,7 @@ async fn create_workflow_run(
             "run_id": run_id,
             "status": "LAUNCHING"
         })));
-    }
-    
-    Err(AppError::Internal("Unhandled fallback state".to_string()))
+
 }
 
 

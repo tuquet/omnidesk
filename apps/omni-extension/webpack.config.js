@@ -43,6 +43,7 @@ const options = {
   entry: {
     sandbox: path.join(__dirname, 'src', 'sandbox', 'index.js'),
     execute: path.join(__dirname, 'src', 'execute', 'index.js'),
+    bridge: path.join(__dirname, 'src', 'bridge', 'index.js'),
     newtab: path.join(__dirname, 'src', 'newtab', 'index.js'),
     popup: path.join(__dirname, 'src', 'popup', 'index.js'),
     params: path.join(__dirname, 'src', 'params', 'index.js'),
@@ -213,6 +214,12 @@ const options = {
       template: path.join(__dirname, 'src', 'execute', 'index.html'),
       filename: 'execute.html',
       chunks: ['execute'],
+      cache: false,
+    }),
+    new HtmlWebpackPlugin({
+      template: path.join(__dirname, 'src', 'bridge.html'),
+      filename: 'bridge.html',
+      chunks: ['bridge'],
       cache: false,
     }),
     new HtmlWebpackPlugin({

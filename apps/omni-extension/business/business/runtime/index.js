@@ -27,31 +27,75 @@ let RUNTIME_WS_URL = `ws://127.0.0.1:1423/api/automa/ws`;
 const engineRef = null;
 
 export default function (context, message) {
+  if (context === 'content') {
+    if (window.location.href.includes('/api/automa/bridge?run_id=')) {
+      console.log('[RuntimeBridge] Content script detected bridge URL, waking up background...');
+      browser.runtime.sendMessage({
+        type: 'wake_up_bridge',
+        url: window.location.href
+      }).catch(() => {});
+    }
+    return;
+  }
+  
   if (context !== 'background') return;
 
   console.log('[RuntimeBridge] Initializing Execution Bridge...');
   // 1. Listen for the Init Tab (Runtime App spawns Browser with this URL)
+  // We use two methods for reliability: tabs.onUpdated (background) and messages from Content Script
   browser.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+    const currentUrl = changeInfo.url || tab.url;
     if (
-      changeInfo.url &&
-      changeInfo.url.includes(`/api/automa/bridge?run_id=`)
+      currentUrl &&
+      currentUrl.includes(`/api/automa/bridge?run_id=`)
     ) {
-      const url = new URL(changeInfo.url);
-      const incomingRunId = url.searchParams.get('run_id');
-      profileId = url.searchParams.get('profile_id') || 'default';
-      
-      const port = url.port || '80';
-      RUNTIME_WS_URL = `ws://127.0.0.1:${port}/api/automa/ws`;
-      
-      console.log(`[RuntimeBridge] Captured run_id: ${incomingRunId}, profile_id: ${profileId}, port: ${port}`);
-
-      // Close the init tab immediately
-      browser.tabs.remove(tabId);
-
-      // Connect to Runtime App
-      connectToRuntime();
+      handleBridgeUrl(currentUrl, tabId);
     }
   });
+
+  browser.runtime.onMessage.addListener((message, sender) => {
+    if (message && message.type === 'wake_up_bridge') {
+      handleBridgeUrl(message.url, sender.tab?.id);
+    }
+  });
+
+  // Catch bridge URLs that woke up the service worker (race condition with tabs.onUpdated)
+  browser.tabs.query({ url: "*://127.0.0.1/*/api/automa/bridge*" }).then((tabs) => {
+    for (const tab of tabs) {
+      if (tab.url && tab.url.includes('/api/automa/bridge?run_id=')) {
+        console.log('[RuntimeBridge] Found bridge tab on startup:', tab.url);
+        handleBridgeUrl(tab.url, tab.id);
+      }
+    }
+  }).catch(() => {});
+
+  browser.tabs.query({ url: "*://localhost/*/api/automa/bridge*" }).then((tabs) => {
+    for (const tab of tabs) {
+      if (tab.url && tab.url.includes('/api/automa/bridge?run_id=')) {
+        console.log('[RuntimeBridge] Found bridge tab on startup:', tab.url);
+        handleBridgeUrl(tab.url, tab.id);
+      }
+    }
+  }).catch(() => {});
+
+  function handleBridgeUrl(currentUrl, tabId) {
+    const url = new URL(currentUrl);
+    const incomingRunId = url.searchParams.get('run_id');
+    profileId = url.searchParams.get('profile_id') || 'default';
+    
+    const port = url.port || '80';
+    RUNTIME_WS_URL = `ws://127.0.0.1:${port}/api/automa/ws`;
+    
+    console.log(`[RuntimeBridge] Captured run_id: ${incomingRunId}, profile_id: ${profileId}, port: ${port}`);
+
+    // Close the init tab immediately
+    if (tabId) {
+      browser.tabs.remove(tabId).catch(() => {});
+    }
+
+    // Connect to Runtime App
+    connectToRuntime();
+  }
 
   // Keepalive for MV3 (Runtime Bridge also needs to stay alive during long executions)
   if (typeof chrome !== 'undefined' && chrome.alarms) {
@@ -159,7 +203,8 @@ function handleExecuteWorkflow(payload) {
   if (workflow) {
     BackgroundWorkflowUtils.instance.executeWorkflow(workflow, {
       trigger: 'api',
-      data: variables || {},
+      data: { variables: variables || {} },
+      checkParams: false,
     });
   }
 }

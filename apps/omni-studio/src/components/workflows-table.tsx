@@ -1,5 +1,5 @@
  
-import { useRef, useMemo, useCallback } from 'react';
+import { memo, useRef, useMemo, useCallback } from 'react';
 import {
   Table,
   TableBody,
@@ -73,7 +73,7 @@ interface WorkflowsTableProps {
 
 const columnHelper = createColumnHelper<Workflow>();
 
-export function WorkflowsTable({
+export const WorkflowsTable = memo(function WorkflowsTable({
   workflows,
   isLoading,
   onEdit,
@@ -513,4 +513,4 @@ export function WorkflowsTable({
       </div>
     </TooltipProvider>
   );
-}
+});

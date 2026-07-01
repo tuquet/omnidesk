@@ -284,7 +284,7 @@ export async function registerWorkflowTrigger(workflowId, { data }) {
   try {
     await cleanWorkflowTriggers(workflowId, data && data?.triggers);
 
-    if (data.triggers) {
+    if (Array.isArray(data.triggers)) {
       for (const trigger of data.triggers) {
         const handler = workflowTriggersMap[trigger.type];
         if (handler)

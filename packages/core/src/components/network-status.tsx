@@ -27,22 +27,25 @@ export function NetworkStatus() {
     };
 
     checkRealNetwork(); // initial check
-    const interval = setInterval(checkRealNetwork, 10000); // Check every 10 seconds
 
     // Still listen to DOM events for immediate feedback
     const handleOnline = () => checkRealNetwork();
     const handleOffline = () => {
       if (isMounted) setIsOnline(false);
     };
+    
+    // Check when window gains focus instead of spamming setInterval
+    const handleFocus = () => checkRealNetwork();
 
     window.addEventListener('online', handleOnline);
     window.addEventListener('offline', handleOffline);
+    window.addEventListener('focus', handleFocus);
 
     return () => {
       isMounted = false;
-      clearInterval(interval);
       window.removeEventListener('online', handleOnline);
       window.removeEventListener('offline', handleOffline);
+      window.removeEventListener('focus', handleFocus);
     };
   }, [platformApi, isOnline]);
 

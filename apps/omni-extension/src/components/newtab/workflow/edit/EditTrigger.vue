@@ -62,7 +62,7 @@ const { t } = useI18n();
 const state = reactive({
   showParamModal: false,
   showTriggersModal: false,
-  triggers: [...(props.data?.triggers || [])],
+  triggers: [...(Array.isArray(props.data?.triggers) ? props.data.triggers : [])],
 });
 
 function updateData(value) {

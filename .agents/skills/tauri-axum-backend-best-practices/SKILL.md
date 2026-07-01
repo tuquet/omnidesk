@@ -97,3 +97,21 @@ When refactoring or adding new Axum routes/Tauri commands, watch out for these c
 - **Unused imports**: Always clean up unused imports (like \http::StatusCode\) when refactoring to avoid compiler warnings.
 - **Strict Typing (ny) in TypeScript**: (Note for Frontend/UI) When interacting with untyped JSON data from Tauri/Axum, avoid using \ny\ as it triggers strict ESLint rules (\@typescript-eslint/no-unsafe-assignment\). Provide proper TypeScript types (e.g., \Record<string, unknown>\ or extend types) when parsing SQLite/JSON structures.
 
+
+## 7. Effective Log Checking for API Errors in Tauri Apps
+
+When encountering an API error (e.g., 500 Internal Server Error) in the Tauri backend, follow this systematic approach to investigate logs instead of guessing:
+
+1. **Find the Log File Location**:
+   - Determine the app identifier by checking "tauri.conf.json" (e.g., "identifier: omnidesk-omni-studio").
+   - On Windows, "tauri-plugin-log" outputs crash and runtime logs to: "%LOCALAPPDATA%\<app-identifier>\logs".
+   
+2. **Read the Correct Log Data**:
+   - Locate the most recently modified ".log" file in that directory.
+   - Use PowerShell commands to retrieve lines around the timestamp of the error, rather than just the latest tail. 
+   - *Example Command:* "Get-ChildItem -Path C:\Users\Admin\AppData\Local\<app-identifier>\logs -Filter *.log | Sort-Object LastWriteTime -Descending | Select-Object -First 1 | Get-Content | Select-String -Pattern '500|Error|error|WARN' -Context 5,5"
+
+3. **Check the Endpoint implementation**:
+   - Correlate the URL/endpoint that failed (e.g., "DELETE /api/automa/workflows/:id/force") with the corresponding Axum handler in "src/api/handlers/".
+   - Trace the business logic down to the Service/DB layer.
+   - Look for specific constraints that might trigger SQLx errors (e.g., "AppError::Database"), such as Missing "ON DELETE CASCADE" in referencing tables, which would surface as 500 errors if "sqlx" panics on foreign key constraints.

@@ -29,9 +29,11 @@ const extractBlocksAutocomplete = {
   trigger(blockId, data) {
     if (!this[blockId].variables) this[blockId].variables = {};
 
-    data.parameters?.forEach((param) => {
-      this[blockId].variables[param.name] = '';
-    });
+    if (Array.isArray(data.parameters)) {
+      data.parameters.forEach((param) => {
+        this[blockId].variables[param.name] = '';
+      });
+    }
 
     if (data.type === 'context-menu') {
       Object.assign(this[blockId].variables, {
@@ -50,11 +52,13 @@ const extractBlocksAutocomplete = {
   'insert-data': function (blockId, data) {
     if (!this[blockId].variables) this[blockId].variables = {};
 
-    data.dataList.forEach((item) => {
-      if (item.type !== 'variable' || !item.name.trim()) return;
+    if (Array.isArray(data.dataList)) {
+      data.dataList.forEach((item) => {
+        if (item.type !== 'variable' || !item.name.trim()) return;
 
-      this[blockId].variables[item.name] = '';
-    });
+        this[blockId].variables[item.name] = '';
+      });
+    }
   },
 };
 

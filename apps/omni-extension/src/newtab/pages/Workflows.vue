@@ -21,12 +21,20 @@
             class="hoverable flex h-full cursor-default items-center border-b-2 px-4 focus:ring-0"
             @click="state.activeTab = tab.id"
           >
-            <p
-              :title="tab.name"
-              class="text-overflow mr-2 max-w-[170px] flex-1"
-            >
-              {{ tab.name }}
-            </p>
+            <div class="flex flex-1 items-center gap-2 mr-2 min-w-0">
+              <p
+                :title="tab.name"
+                class="text-overflow max-w-[170px] truncate"
+              >
+                {{ tab.name }}
+              </p>
+              <span
+                v-if="tab.path === '/' || tab.path === '/workflows'"
+                class="h-2 w-2 rounded-full flex-shrink-0"
+                :class="isConnected ? 'bg-green-500' : 'bg-red-500'"
+                :title="isConnected ? 'Connected to Studio' : 'Disconnected from Studio'"
+              ></span>
+            </div>
             <span
               class="hoverable rounded-full p-0.5 text-gray-600 dark:text-gray-300"
               title="Close tab"
@@ -53,14 +61,16 @@
 <script setup>
 import { parseJSON } from '@/utils/helper';
 import { nanoid } from 'nanoid/non-secure';
-import { onMounted, reactive, watch } from 'vue';;
+import { onMounted, reactive, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import Draggable from 'vuedraggable';
+import { useOmniStudio } from '@/composable/useOmniStudio';
 
 let tabTitleTimeout = null;
 
 const route = useRoute();
 const router = useRouter();
+const { isConnected } = useOmniStudio();
 
 const state = reactive({
   tabs: [],

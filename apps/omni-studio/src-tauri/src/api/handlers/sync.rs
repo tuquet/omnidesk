@@ -124,9 +124,21 @@ async fn export_workflow(
 )]
 async fn import_workflow(
     State(state): State<AppState>,
-    Json(workflow): Json<Workflow>,
+    Json(payload): Json<omni_shared::automa::workflow::WorkflowPayload>,
 ) -> Result<Json<Workflow>, AppError> {
+    let workflow: Workflow = payload.into();
     let upserted = WorkflowService::upsert(&state.db, &workflow).await?;
+    let watch_dir = state.app_dir.join("workflows");
+    let _ = std::fs::create_dir_all(&watch_dir);
+    let _ = crate::services::file_watcher::FileWatcherService::export_workflow_file(&watch_dir, &upserted).await;
+    
+    // Broadcast to Extension that there's a new workflow
+    let event = crate::api::handlers::sync_ws::SyncEvent {
+        event_type: "workflows_changed".to_string(),
+        payload: serde_json::json!([upserted]),
+    };
+    let _ = state.sync_tx.send(event);
+
     Ok(Json(upserted))
 }
 

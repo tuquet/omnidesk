@@ -23,6 +23,7 @@ pub async fn bridge_html() -> impl IntoResponse {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Omni Extension Bridge</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚡</text></svg>">
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -67,8 +68,21 @@ pub async fn bridge_html() -> impl IntoResponse {
         <div class="loader"></div>
     </div>
     <script>
-        // The extension intercepts this page via tabs.onUpdated.
-        // If it reaches here and stays open, the extension might not be installed or enabled.
+        const EXTENSION_ID = "nblegfhjkilmmjeaedgkgmcjjpomcobh";
+        
+        // Extract params
+        const urlParams = new URLSearchParams(window.location.search);
+        const runId = urlParams.get('run_id');
+        const profileId = urlParams.get('profile_id');
+        const port = window.location.port || '80';
+
+        // Construct the Chrome extension bridge URL
+        const extensionUrl = `chrome-extension://${EXTENSION_ID}/bridge.html?run_id=${runId}&profile_id=${profileId}&port=${port}`;
+
+        // Redirect immediately
+        window.location.href = extensionUrl;
+
+        // Fallback message if redirect fails (e.g. extension not installed)
         setTimeout(() => {
             document.querySelector('p').innerHTML = 'It seems the Omni Extension is not responding.<br>Please ensure it is installed and enabled in this browser.';
             document.querySelector('.loader').style.display = 'none';

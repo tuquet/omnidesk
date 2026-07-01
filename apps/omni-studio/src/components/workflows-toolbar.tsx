@@ -1,5 +1,6 @@
-import { SearchIcon, PlusIcon } from 'lucide-react';
+import { SearchIcon, PlusIcon, UploadIcon } from 'lucide-react';
 import { Input, Button } from '@omnidesk/ui';
+import { useRef } from 'react';
 
 interface WorkflowsToolbarProps {
   searchQuery: string;
@@ -7,6 +8,7 @@ interface WorkflowsToolbarProps {
   viewMode: 'active' | 'trash';
   setViewMode: (mode: 'active' | 'trash') => void;
   onAdd?: () => void;
+  onImport?: (fileContent: string) => void;
 }
 
 export function WorkflowsToolbar({
@@ -15,7 +17,22 @@ export function WorkflowsToolbar({
   viewMode,
   setViewMode,
   onAdd,
+  onImport,
 }: WorkflowsToolbarProps) {
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const content = e.target?.result as string;
+      onImport?.(content);
+    };
+    reader.readAsText(file);
+    e.target.value = ''; // reset
+  };
+
   return (
     <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between bg-card p-4 rounded-lg border shadow-sm w-full">
       <div className="flex items-center gap-4 w-full sm:w-auto">
@@ -45,14 +62,29 @@ export function WorkflowsToolbar({
           />
         </div>
       </div>
-      {onAdd && (
-        <div className="flex items-center">
+      <div className="flex items-center gap-2">
+        {onImport && (
+          <>
+            <input 
+              type="file" 
+              accept=".json" 
+              className="hidden" 
+              ref={fileInputRef} 
+              onChange={handleFileChange} 
+            />
+            <Button onClick={() => fileInputRef.current?.click()} size="sm" variant="outline" className="font-medium bg-background hover:bg-muted">
+              <UploadIcon className="mr-2 h-4 w-4" />
+              Import Workflow
+            </Button>
+          </>
+        )}
+        {onAdd && (
           <Button onClick={onAdd} size="sm" className="font-medium">
             <PlusIcon className="mr-2 h-4 w-4" />
             New Workflow
           </Button>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 }
