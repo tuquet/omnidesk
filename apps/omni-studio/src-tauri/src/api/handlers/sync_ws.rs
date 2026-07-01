@@ -309,7 +309,25 @@ async fn handle_extension_message(
                     }
                     
                     let error = payload.get("error").and_then(|v| v.as_str());
+                    let error_block_id = payload.get("errorBlockId").and_then(|v| v.as_str());
+                    let error_block_name = payload.get("errorBlockName").and_then(|v| v.as_str());
                     let summary = payload.get("summary").and_then(|v| v.as_str());
+
+                    // If we have an error and a block ID, insert a synthetic log for the failed block
+                    if let (Some(err_msg), Some(block_id)) = (error, error_block_id) {
+                        let block_name = error_block_name.unwrap_or("Failed Block");
+                        let err_data = serde_json::json!({ "error": err_msg }).to_string();
+                        let _ = WorkflowService::add_log(
+                            db,
+                            run_id,
+                            block_id,
+                            block_name,
+                            "error",
+                            Some(0),
+                            Some(&err_data),
+                        ).await;
+                        println!("[SyncWS] Added synthetic error log for block {}", block_id);
+                    }
 
                     let _ = WorkflowService::finish_run(db, run_id, &status, error, summary).await;
                     println!("[SyncWS] Workflow run finished: {}", run_id);

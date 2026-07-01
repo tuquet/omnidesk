@@ -93,6 +93,8 @@ class WorkflowManager {
           runId: id,
           status,
           error: status === 'error' ? getBlockMessage(blockDetail) : null,
+          errorBlockId: status === 'error' && blockDetail ? blockDetail.id || blockDetail.blockId : null,
+          errorBlockName: status === 'error' && blockDetail ? blockDetail.name || blockDetail.type : null,
           summary: null
         });
       });
