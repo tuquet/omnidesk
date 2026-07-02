@@ -182,6 +182,12 @@ async fn handle_extension_message(
 
                     let mut count = 0;
                     for wf in &workflows {
+                        // Ignore zombie workflows with empty ID
+                        if wf.id.trim().is_empty() {
+                            println!("[SyncWS] Ignored push_workflows with empty ID: {:?}", wf.name);
+                            continue;
+                        }
+
                         // If it is soft-deleted in Studio, DO NOT upsert. Tell extension to delete it.
                         if let Ok(existing) = WorkflowService::get_by_id(db, &wf.id).await {
                             if existing.deleted_at.is_some() {

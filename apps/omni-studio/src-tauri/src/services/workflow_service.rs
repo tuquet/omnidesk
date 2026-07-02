@@ -16,7 +16,7 @@ impl WorkflowService {
                    CAST(created_at AS TEXT) as created_at, CAST(updated_at AS TEXT) as updated_at,
                    CAST(deleted_at AS TEXT) as deleted_at, delete_source
             FROM workflows
-            WHERE deleted_at IS NULL
+            WHERE deleted_at IS NULL AND id != ''
             ORDER BY updated_at DESC
             "#,
         )

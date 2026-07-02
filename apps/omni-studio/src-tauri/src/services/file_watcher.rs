@@ -234,6 +234,14 @@ impl FileWatcherService {
 
         // First try to parse as strict Workflow
         if let Ok(workflow) = serde_json::from_str::<Workflow>(&content) {
+            if workflow.id.trim().is_empty() {
+                return Err(AppError::Internal("Workflow ID is empty".into()));
+            }
+            if let Ok(existing) = WorkflowService::get_by_id(&self.pool, &workflow.id).await {
+                if existing.deleted_at.is_some() {
+                    return Err(AppError::Internal("Workflow is soft-deleted".into()));
+                }
+            }
             return WorkflowService::upsert(&self.pool, &workflow).await;
         }
 
@@ -281,6 +289,17 @@ impl FileWatcherService {
                         }
                     })
                     .unwrap_or_else(|| "{}".to_string());
+                let _is_disabled = obj.get("isDisabled").and_then(|v| v.as_bool()).unwrap_or(false);
+
+                if id.trim().is_empty() {
+                    return Err(AppError::Internal("Workflow ID is empty".into()));
+                }
+                if let Ok(existing) = WorkflowService::get_by_id(&self.pool, &id).await {
+                    if existing.deleted_at.is_some() {
+                        return Err(AppError::Internal("Workflow is soft-deleted".into()));
+                    }
+                }
+
                 let global_data = obj.get("globalData").map(|v| {
                     if v.is_string() {
                         v.as_str().unwrap().to_string()

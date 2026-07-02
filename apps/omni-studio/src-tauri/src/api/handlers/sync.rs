@@ -124,8 +124,21 @@ async fn export_workflow(
 )]
 async fn import_workflow(
     State(state): State<AppState>,
-    Json(payload): Json<omni_shared::automa::workflow::WorkflowPayload>,
+    Json(mut payload): Json<omni_shared::automa::workflow::WorkflowPayload>,
 ) -> Result<Json<Workflow>, AppError> {
+    // Agent-generated files might have empty IDs or names
+    if payload.id.trim().is_empty() {
+        let name_bytes = if payload.name.trim().is_empty() {
+            b"Untitled Workflow"
+        } else {
+            payload.name.as_bytes()
+        };
+        payload.id = uuid::Uuid::new_v5(&uuid::Uuid::NAMESPACE_OID, name_bytes).to_string();
+    }
+    if payload.name.trim().is_empty() {
+        payload.name = "Untitled Workflow".to_string();
+    }
+
     let workflow: Workflow = payload.into();
     let upserted = WorkflowService::upsert(&state.db, &workflow).await?;
     let watch_dir = state.app_dir.join("workflows");
@@ -216,6 +229,17 @@ async fn sync_local(
 
             // First try to parse as strict Workflow
             if let Ok(workflow) = serde_json::from_str::<Workflow>(&content) {
+                if workflow.id.trim().is_empty() {
+                    continue;
+                }
+                
+                // Do not resurrect soft-deleted workflows from local disk
+                if let Ok(existing) = WorkflowService::get_by_id(&state.db, &workflow.id).await {
+                    if existing.deleted_at.is_some() {
+                        continue;
+                    }
+                }
+
                 if WorkflowService::upsert(&state.db, &workflow).await.is_ok() {
                     let expected_filename = format!("{}.automa.json", workflow.id);
                     if path.file_name().and_then(|s| s.to_str()) != Some(&expected_filename) {
@@ -260,6 +284,19 @@ async fn sync_local(
                         .get("settings")
                         .map(|v| v.to_string())
                         .unwrap_or_else(|| "{}".to_string());
+                    let _is_disabled = obj.get("isDisabled").and_then(|v| v.as_bool()).unwrap_or(false);
+
+                    if id.trim().is_empty() {
+                        continue;
+                    }
+
+                    // Do not resurrect soft-deleted workflows from local disk
+                    if let Ok(existing) = WorkflowService::get_by_id(&state.db, &id).await {
+                        if existing.deleted_at.is_some() {
+                            continue;
+                        }
+                    }
+
                     let global_data = obj.get("globalData").map(|v| {
                         if v.is_string() {
                             v.as_str().unwrap().to_string()

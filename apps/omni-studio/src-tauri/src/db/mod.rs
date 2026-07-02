@@ -51,6 +51,11 @@ pub async fn init_db(app_dir: PathBuf) -> Result<SqlitePool, sqlx::Error> {
         .execute(&pool)
         .await;
 
+    // Clean up any zombie workflows with empty ID (fixes UI bugs)
+    let _ = sqlx::query("DELETE FROM workflows WHERE id = ''")
+        .execute(&pool)
+        .await;
+
     // Run migrations automatically on startup
     omni_shared::db::run_migrations(
         &pool,
