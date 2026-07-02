@@ -131,7 +131,6 @@ pub fn run() {
                             // Manage state for Tauri commands before UI can call them
                             app_handle.manage(pool.clone());
                             let pool_for_worker = pool.clone();
-                            omni_shared::worker::start_background_worker(pool_for_worker);
 
                             let _pool_for_rt = pool.clone();
                             let app_dir = system::config::get_active_storage_path(&app_handle)
@@ -139,6 +138,9 @@ pub fn run() {
                             let app_handle_clone = app_handle.clone();
 
                             tauri::async_runtime::spawn(async move {
+                                // Start background worker in async context
+                                omni_shared::worker::start_background_worker(pool_for_worker);
+
                                 // Realtime listener has been extracted/removed
 
                                 // Only run Axum if not disabled

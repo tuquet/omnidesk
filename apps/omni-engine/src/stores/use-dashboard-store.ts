@@ -33,8 +33,8 @@ export const dashboardActions = {
     
     // Using typed SDK methods with specific micro-app clients
     const [workflowsRes, profilesRes] = await Promise.all([
-      listWorkflows({ client: workflowClient }),
-      listProfiles({ client: profileClient }),
+      listWorkflows({ client: workflowClient as any }),
+      listProfiles({ client: profileClient as any }),
     ]);
 
     const workflows = Array.isArray(workflowsRes.data) ? (workflowsRes.data as unknown as { id: string; name: string }[]) : [];
@@ -102,7 +102,7 @@ export const dashboardActions = {
       dashboardActions.appendLog(`[SYSTEM] Requesting launch for Profile: ${profile.name}...`);
       
       const { error } = await launchProfile({
-        client: profileClient,
+        client: profileClient as any,
         path: { id: profile.id }
       });
 

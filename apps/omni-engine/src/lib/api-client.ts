@@ -5,9 +5,8 @@ import { authActions, authStore } from '@omnidesk/auth';
 import type { ApiResponse, ApiError } from '@omnidesk/types';
 import { ERROR_CODES } from '@omnidesk/types';
 import { ENGINE_API_URL, WORKFLOW_API_URL, PROFILE_API_URL } from '@omnidesk/core';
-import type { Client } from '@omnidesk/types/client';
 
-const client = createClient({}) as unknown as Client;
+const client = createClient({});
 
 // ─── Config ────────────────────────────────────────────────────────────────────
 
@@ -19,12 +18,12 @@ client.setConfig({
 const workflowClient = createClient({
   baseUrl: WORKFLOW_API_URL,
   throwOnError: true,
-}) as unknown as Client;
+}) ;
 
 const profileClient = createClient({
   baseUrl: PROFILE_API_URL,
   throwOnError: true,
-}) as unknown as Client;
+});
 
 // ─── Request Interceptor: Auto-attach Bearer Token ─────────────────────────────
 

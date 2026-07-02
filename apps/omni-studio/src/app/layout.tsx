@@ -1,8 +1,8 @@
 import { Outlet, useRouterState, Link } from '@tanstack/react-router';
 import { OmniLayout } from '@omnidesk/core';
-import { Sidebar, SidebarContent, SidebarHeader, SidebarGroup, SidebarGroupLabel, SidebarGroupContent, SidebarMenu, SidebarMenuItem, SidebarMenuButton } from '@omnidesk/ui';;
-import { Workflow, Blocks } from 'lucide-react';
-import { ROUTES } from '@/config/route-config';
+import { Sidebar, SidebarContent, SidebarHeader, SidebarGroup, SidebarGroupLabel, SidebarGroupContent, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarFooter } from '@omnidesk/ui';
+import { Workflow, Blocks, CalendarClock, ActivityIcon, HistoryIcon } from 'lucide-react';
+import { EngineStatusIndicator } from '@/components/engine-status';
 
 function StudioSidebar() {
   return (
@@ -20,9 +20,41 @@ function StudioSidebar() {
             <SidebarMenu>
               <SidebarMenuItem>
                 <SidebarMenuButton className="text-xs" asChild>
-                  <Link to={ROUTES.HOME}>
+                  <Link to="/">
                     <Blocks />
                     <span>My Workflows</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton className="text-xs" asChild>
+                  <Link to="/schedules">
+                    <CalendarClock />
+                    <span>Schedules</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        <SidebarGroup>
+          <SidebarGroupLabel>Monitoring</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              <SidebarMenuItem>
+                <SidebarMenuButton className="text-xs" asChild>
+                  <Link to="/active-runs">
+                    <ActivityIcon />
+                    <span>Active Runs</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton className="text-xs" asChild>
+                  <Link to="/history">
+                    <HistoryIcon />
+                    <span>Run History</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
@@ -30,6 +62,9 @@ function StudioSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
+      <SidebarFooter>
+        <EngineStatusIndicator />
+      </SidebarFooter>
     </Sidebar>
   );
 }

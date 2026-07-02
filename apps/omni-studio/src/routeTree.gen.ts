@@ -10,9 +10,12 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SignupRouteImport } from './routes/signup'
+import { Route as SchedulesRouteImport } from './routes/schedules'
 import { Route as MaintenanceRouteImport } from './routes/maintenance'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as HistoryRouteImport } from './routes/history'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
+import { Route as ActiveRunsRouteImport } from './routes/active-runs'
 import { Route as R503RouteImport } from './routes/503'
 import { Route as R500RouteImport } from './routes/500'
 import { Route as R404RouteImport } from './routes/404'
@@ -27,6 +30,11 @@ const SignupRoute = SignupRouteImport.update({
   path: '/signup',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SchedulesRoute = SchedulesRouteImport.update({
+  id: '/schedules',
+  path: '/schedules',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const MaintenanceRoute = MaintenanceRouteImport.update({
   id: '/maintenance',
   path: '/maintenance',
@@ -37,9 +45,19 @@ const LoginRoute = LoginRouteImport.update({
   path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
+const HistoryRoute = HistoryRouteImport.update({
+  id: '/history',
+  path: '/history',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
   id: '/forgot-password',
   path: '/forgot-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ActiveRunsRoute = ActiveRunsRouteImport.update({
+  id: '/active-runs',
+  path: '/active-runs',
   getParentRoute: () => rootRouteImport,
 } as any)
 const R503Route = R503RouteImport.update({
@@ -90,9 +108,12 @@ export interface FileRoutesByFullPath {
   '/404': typeof R404Route
   '/500': typeof R500Route
   '/503': typeof R503Route
+  '/active-runs': typeof ActiveRunsRoute
   '/forgot-password': typeof ForgotPasswordRoute
+  '/history': typeof HistoryRoute
   '/login': typeof LoginRoute
   '/maintenance': typeof MaintenanceRoute
+  '/schedules': typeof SchedulesRoute
   '/signup': typeof SignupRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/automa/auth': typeof AutomaAuthRoute
@@ -104,9 +125,12 @@ export interface FileRoutesByTo {
   '/404': typeof R404Route
   '/500': typeof R500Route
   '/503': typeof R503Route
+  '/active-runs': typeof ActiveRunsRoute
   '/forgot-password': typeof ForgotPasswordRoute
+  '/history': typeof HistoryRoute
   '/login': typeof LoginRoute
   '/maintenance': typeof MaintenanceRoute
+  '/schedules': typeof SchedulesRoute
   '/signup': typeof SignupRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/automa/auth': typeof AutomaAuthRoute
@@ -119,9 +143,12 @@ export interface FileRoutesById {
   '/404': typeof R404Route
   '/500': typeof R500Route
   '/503': typeof R503Route
+  '/active-runs': typeof ActiveRunsRoute
   '/forgot-password': typeof ForgotPasswordRoute
+  '/history': typeof HistoryRoute
   '/login': typeof LoginRoute
   '/maintenance': typeof MaintenanceRoute
+  '/schedules': typeof SchedulesRoute
   '/signup': typeof SignupRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/automa/auth': typeof AutomaAuthRoute
@@ -135,9 +162,12 @@ export interface FileRouteTypes {
     | '/404'
     | '/500'
     | '/503'
+    | '/active-runs'
     | '/forgot-password'
+    | '/history'
     | '/login'
     | '/maintenance'
+    | '/schedules'
     | '/signup'
     | '/auth/callback'
     | '/automa/auth'
@@ -149,9 +179,12 @@ export interface FileRouteTypes {
     | '/404'
     | '/500'
     | '/503'
+    | '/active-runs'
     | '/forgot-password'
+    | '/history'
     | '/login'
     | '/maintenance'
+    | '/schedules'
     | '/signup'
     | '/auth/callback'
     | '/automa/auth'
@@ -163,9 +196,12 @@ export interface FileRouteTypes {
     | '/404'
     | '/500'
     | '/503'
+    | '/active-runs'
     | '/forgot-password'
+    | '/history'
     | '/login'
     | '/maintenance'
+    | '/schedules'
     | '/signup'
     | '/auth/callback'
     | '/automa/auth'
@@ -178,9 +214,12 @@ export interface RootRouteChildren {
   R404Route: typeof R404Route
   R500Route: typeof R500Route
   R503Route: typeof R503Route
+  ActiveRunsRoute: typeof ActiveRunsRoute
   ForgotPasswordRoute: typeof ForgotPasswordRoute
+  HistoryRoute: typeof HistoryRoute
   LoginRoute: typeof LoginRoute
   MaintenanceRoute: typeof MaintenanceRoute
+  SchedulesRoute: typeof SchedulesRoute
   SignupRoute: typeof SignupRoute
   AuthCallbackRoute: typeof AuthCallbackRoute
   AutomaAuthRoute: typeof AutomaAuthRoute
@@ -193,6 +232,13 @@ declare module '@tanstack/react-router' {
       path: '/signup'
       fullPath: '/signup'
       preLoaderRoute: typeof SignupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/schedules': {
+      id: '/schedules'
+      path: '/schedules'
+      fullPath: '/schedules'
+      preLoaderRoute: typeof SchedulesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/maintenance': {
@@ -209,11 +255,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/history': {
+      id: '/history'
+      path: '/history'
+      fullPath: '/history'
+      preLoaderRoute: typeof HistoryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/forgot-password': {
       id: '/forgot-password'
       path: '/forgot-password'
       fullPath: '/forgot-password'
       preLoaderRoute: typeof ForgotPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/active-runs': {
+      id: '/active-runs'
+      path: '/active-runs'
+      fullPath: '/active-runs'
+      preLoaderRoute: typeof ActiveRunsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/503': {
@@ -282,9 +342,12 @@ const rootRouteChildren: RootRouteChildren = {
   R404Route: R404Route,
   R500Route: R500Route,
   R503Route: R503Route,
+  ActiveRunsRoute: ActiveRunsRoute,
   ForgotPasswordRoute: ForgotPasswordRoute,
+  HistoryRoute: HistoryRoute,
   LoginRoute: LoginRoute,
   MaintenanceRoute: MaintenanceRoute,
+  SchedulesRoute: SchedulesRoute,
   SignupRoute: SignupRoute,
   AuthCallbackRoute: AuthCallbackRoute,
   AutomaAuthRoute: AutomaAuthRoute,

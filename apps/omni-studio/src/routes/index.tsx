@@ -9,6 +9,7 @@ import { toast } from 'sonner';
 import { client } from '@/lib/api-client';
 import { useWorkspaceStore, usePlatform } from '@omnidesk/core';
 import { WorkflowsTable } from '../components/workflows-table';
+import { FolderPanel } from '../components/folder-panel';
 import type { Workflow } from '@omnidesk/types';
 import {
   listWorkflows,
@@ -62,6 +63,7 @@ function WorkflowsPage() {
   const [workflowToRun, setWorkflowToRun] = useState<string | null>(null);
   const [rowSelection, setRowSelection] = useState<Record<string, boolean>>({});
   const [viewMode, setViewMode] = useState<'active' | 'trash'>('active');
+  const [activeFolderId, setActiveFolderId] = useState<string | null>(null);
   const [activeExtensions, setActiveExtensions] = useState<number>(0);
 
   const deferredSearchQuery = useDeferredValue(searchQuery);
@@ -295,6 +297,7 @@ function WorkflowsPage() {
   const filteredWorkflows = useMemo(() => {
     return workflows
       .filter((wf) => {
+        if (activeFolderId && wf.folder_id !== activeFolderId) return false;
         if (!deferredSearchQuery) return true;
         const q = deferredSearchQuery.toLowerCase();
         return wf.name?.toLowerCase().includes(q) || wf.description?.toLowerCase().includes(q);
@@ -311,7 +314,7 @@ function WorkflowsPage() {
         if (aVal > bVal) return sortOrder === 'asc' ? 1 : -1;
         return 0;
       });
-  }, [workflows, deferredSearchQuery, sortBy, sortOrder]);
+  }, [workflows, deferredSearchQuery, sortBy, sortOrder, activeFolderId]);
 
   const handleSelectWorkspace = async () => {
     try {
@@ -510,157 +513,166 @@ function WorkflowsPage() {
       </PageHeader>
 
       {isWorkspaceSelected && (
-        <div className="flex flex-col gap-4">
-          <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center justify-between">
-            <WorkflowsToolbar
-              searchQuery={searchQuery}
-              setSearchQuery={setSearchQuery}
-              viewMode={viewMode}
-              setViewMode={setViewMode}
-              onAdd={() => {
-                setEditorWorkflowId(null);
-                setIsEditorOpen(true);
-              }}
-              onImport={(content) => {
-                try {
-                  const rawParsed = JSON.parse(content);
-                  const workflowsToProcess: any[] = [];
+        <div className="flex h-[calc(100vh-140px)] gap-6">
+          <FolderPanel activeFolderId={activeFolderId} onSelectFolder={setActiveFolderId} />
+          <div className="flex-1 flex flex-col gap-4 min-w-0 overflow-y-auto pr-2">
+            <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center justify-between">
+              <WorkflowsToolbar
+                searchQuery={searchQuery}
+                setSearchQuery={setSearchQuery}
+                viewMode={viewMode}
+                setViewMode={setViewMode}
+                onAdd={() => {
+                  setEditorWorkflowId(null);
+                  setIsEditorOpen(true);
+                }}
+                onImport={(content) => {
+                  try {
+                    const rawParsed = JSON.parse(content);
+                    const workflowsToProcess: any[] = [];
 
-                  const processRaw = (raw: any) => {
-                    if (!raw || typeof raw !== 'object') return;
-                    workflowsToProcess.push(raw);
-                    
-                    if (raw.includedWorkflows) {
-                      Object.keys(raw.includedWorkflows).forEach((workflowId) => {
-                        const subWf = raw.includedWorkflows[workflowId];
-                        if (subWf) {
-                          subWf.id = workflowId;
-                          workflowsToProcess.push(subWf);
+                    const processRaw = (raw: any) => {
+                      if (!raw || typeof raw !== 'object') return;
+                      workflowsToProcess.push(raw);
+                      
+                      if (raw.includedWorkflows) {
+                        Object.keys(raw.includedWorkflows).forEach((workflowId) => {
+                          const subWf = raw.includedWorkflows[workflowId];
+                          if (subWf) {
+                            subWf.id = workflowId;
+                            workflowsToProcess.push(subWf);
+                          }
+                        });
+                      }
+                    };
+
+                    if (Array.isArray(rawParsed)) {
+                      rawParsed.forEach(processRaw);
+                    } else {
+                      processRaw(rawParsed);
+                    }
+
+                    if (workflowsToProcess.length === 0) {
+                      throw new Error('No workflows found in file');
+                    }
+
+                    let successCount = 0;
+                    for (const rawWf of workflowsToProcess) {
+                      if (rawWf.extId && !rawWf.id) {
+                        rawWf.id = rawWf.extId;
+                      }
+                      
+                      const result = ImportWorkflowSchema.safeParse(rawWf);
+                      
+                      if (!result.success) {
+                        const errorMessages = result.error.issues.map((e: z.ZodIssue) => `${e.path.join('.')}: ${e.message}`).join(', ');
+                        throw new Error(`Invalid format for "${rawWf.name || 'Unknown'}": ${errorMessages}`);
+                      }
+
+                      // If importing while inside a folder, assign that folder to the new workflow
+                      const importData = result.data as WorkflowPayload;
+                      if (activeFolderId && !importData.folder_id) {
+                        importData.folder_id = activeFolderId;
+                      }
+
+                      importMutation.mutate(importData);
+                      successCount++;
+                    }
+
+                    if (successCount === 0) {
+                      throw new Error('Invalid workflow format');
+                    }
+                  } catch (e: unknown) {
+                    const errMessage = e instanceof Error ? e.message : 'Invalid JSON format';
+                    toast.error(`Import failed: ${errMessage}`);
+                  }
+                }}
+              />
+              {Object.keys(rowSelection).length > 0 && (
+                <div className="flex items-center gap-2 bg-muted/50 p-1.5 rounded-md border border-border/50 text-sm">
+                  <span className="px-2 text-muted-foreground">
+                    {Object.keys(rowSelection).length} selected
+                  </span>
+
+                  {viewMode === 'active' ? (
+                    <>
+                      <Button
+                        variant="secondary"
+                        size="sm"
+                        onClick={() =>
+                          bulkUpdateStatusMutation.mutate({
+                            ids: Object.keys(rowSelection),
+                            isDisabled: 0,
+                          })
                         }
-                      });
-                    }
-                  };
+                        disabled={bulkUpdateStatusMutation.isPending}
+                      >
+                        Enable
+                      </Button>
+                      <Button
+                        variant="secondary"
+                        size="sm"
+                        onClick={() =>
+                          bulkUpdateStatusMutation.mutate({
+                            ids: Object.keys(rowSelection),
+                            isDisabled: 1,
+                          })
+                        }
+                        disabled={bulkUpdateStatusMutation.isPending}
+                      >
+                        Disable
+                      </Button>
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        onClick={handleBulkDelete}
+                        disabled={bulkDeleteMutation.isPending}
+                      >
+                        Delete
+                      </Button>
+                    </>
+                  ) : (
+                    <>
+                      <Button
+                        variant="secondary"
+                        size="sm"
+                        onClick={handleBulkRestore}
+                        disabled={bulkRestoreMutation.isPending}
+                      >
+                        Restore
+                      </Button>
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        onClick={handleBulkForceDelete}
+                        disabled={bulkForceDeleteMutation.isPending}
+                      >
+                        Force Delete
+                      </Button>
+                    </>
+                  )}
+                </div>
+              )}
+            </div>
 
-                  if (Array.isArray(rawParsed)) {
-                    rawParsed.forEach(processRaw);
-                  } else {
-                    processRaw(rawParsed);
-                  }
-
-                  if (workflowsToProcess.length === 0) {
-                    throw new Error('No workflows found in file');
-                  }
-
-                  let successCount = 0;
-                  for (const rawWf of workflowsToProcess) {
-                    if (rawWf.extId && !rawWf.id) {
-                      rawWf.id = rawWf.extId;
-                    }
-                    
-                    const result = ImportWorkflowSchema.safeParse(rawWf);
-                    
-                    if (!result.success) {
-                      const errorMessages = result.error.issues.map((e: z.ZodIssue) => `${e.path.join('.')}: ${e.message}`).join(', ');
-                      throw new Error(`Invalid format for "${rawWf.name || 'Unknown'}": ${errorMessages}`);
-                    }
-
-                    importMutation.mutate(result.data as WorkflowPayload);
-                    successCount++;
-                  }
-
-                  if (successCount === 0) {
-                    throw new Error('Invalid workflow format');
-                  }
-                } catch (e: unknown) {
-                  const errMessage = e instanceof Error ? e.message : 'Invalid JSON format';
-                  toast.error(`Import failed: ${errMessage}`);
-                }
-              }}
+            <WorkflowsTable
+              workflows={filteredWorkflows}
+              isLoading={isLoading}
+              onEdit={handleEdit}
+              onDelete={handleDelete}
+              onRun={handleRun}
+              onDuplicate={handleDuplicate}
+              viewMode={viewMode}
+              onRestore={handleRestore}
+              onForceDelete={handleForceDelete}
+              onViewLogs={handleViewLogs}
+              sortBy={sortBy}
+              sortOrder={sortOrder}
+              onSortChange={handleSortChange}
+              rowSelection={rowSelection}
+              onRowSelectionChange={setRowSelection}
             />
-            {Object.keys(rowSelection).length > 0 && (
-              <div className="flex items-center gap-2 bg-muted/50 p-1.5 rounded-md border border-border/50 text-sm">
-                <span className="px-2 text-muted-foreground">
-                  {Object.keys(rowSelection).length} selected
-                </span>
-
-                {viewMode === 'active' ? (
-                  <>
-                    <Button
-                      variant="secondary"
-                      size="sm"
-                      onClick={() =>
-                        bulkUpdateStatusMutation.mutate({
-                          ids: Object.keys(rowSelection),
-                          isDisabled: 0,
-                        })
-                      }
-                      disabled={bulkUpdateStatusMutation.isPending}
-                    >
-                      Enable
-                    </Button>
-                    <Button
-                      variant="secondary"
-                      size="sm"
-                      onClick={() =>
-                        bulkUpdateStatusMutation.mutate({
-                          ids: Object.keys(rowSelection),
-                          isDisabled: 1,
-                        })
-                      }
-                      disabled={bulkUpdateStatusMutation.isPending}
-                    >
-                      Disable
-                    </Button>
-                    <Button
-                      variant="destructive"
-                      size="sm"
-                      onClick={handleBulkDelete}
-                      disabled={bulkDeleteMutation.isPending}
-                    >
-                      Delete
-                    </Button>
-                  </>
-                ) : (
-                  <>
-                    <Button
-                      variant="secondary"
-                      size="sm"
-                      onClick={handleBulkRestore}
-                      disabled={bulkRestoreMutation.isPending}
-                    >
-                      Restore
-                    </Button>
-                    <Button
-                      variant="destructive"
-                      size="sm"
-                      onClick={handleBulkForceDelete}
-                      disabled={bulkForceDeleteMutation.isPending}
-                    >
-                      Force Delete
-                    </Button>
-                  </>
-                )}
-              </div>
-            )}
           </div>
-
-          <WorkflowsTable
-            workflows={filteredWorkflows}
-            isLoading={isLoading}
-            onEdit={handleEdit}
-            onDelete={handleDelete}
-            onRun={handleRun}
-            onDuplicate={handleDuplicate}
-            viewMode={viewMode}
-            onRestore={handleRestore}
-            onForceDelete={handleForceDelete}
-            onViewLogs={handleViewLogs}
-            sortBy={sortBy}
-            sortOrder={sortOrder}
-            onSortChange={handleSortChange}
-            rowSelection={rowSelection}
-            onRowSelectionChange={setRowSelection}
-          />
         </div>
       )}
 

@@ -1,10 +1,15 @@
 import { type NavItem, type NavGroup, type DocumentItem, type BreadcrumbEntry, type Permission } from '@omnidesk/types';
 export type { NavItem, NavGroup, DocumentItem, BreadcrumbEntry, Permission };
-import { WorkflowIcon, StoreIcon } from 'lucide-react';
+import { WorkflowIcon, CalendarClockIcon, StoreIcon, ActivityIcon, HistoryIcon } from 'lucide-react';
 
 // ─── Navigation Groups ──────────────────────────────────────────────────────
 
-export const NAV_MAIN: NavItem[] = [{ title: 'Workflows Sync', url: '/', icon: WorkflowIcon }];
+export const NAV_MAIN: NavItem[] = [
+  { title: 'My Workflows', url: '/', icon: WorkflowIcon },
+  { title: 'Schedules', url: '/schedules', icon: CalendarClockIcon },
+  { title: 'Active Runs', url: '/active-runs', icon: ActivityIcon },
+  { title: 'Run History', url: '/history', icon: HistoryIcon },
+];
 
 export const NAV_SHOWCASE: NavGroup = {
   label: '',

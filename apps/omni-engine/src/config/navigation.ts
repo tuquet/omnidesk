@@ -1,13 +1,13 @@
 import { type NavItem, type NavGroup, type DocumentItem, type BreadcrumbEntry, type Permission } from '@omnidesk/types';
 export type { NavItem, NavGroup, DocumentItem, BreadcrumbEntry, Permission };
-import { CalendarIcon, ActivityIcon, LayoutDashboardIcon, TerminalIcon, SettingsIcon, StoreIcon } from 'lucide-react';
+import { PlayIcon, ActivityIcon, ZapIcon, TerminalIcon, SettingsIcon, StoreIcon } from 'lucide-react';
 
 // ─── Navigation Groups ──────────────────────────────────────────────────────
 
 export const NAV_MAIN: NavItem[] = [
-  { title: 'Scheduler', url: '/', icon: CalendarIcon },
-  { title: 'Batch Runners', url: '/runners', icon: ActivityIcon },
-  { title: 'Active Jobs', url: '/active-jobs', icon: LayoutDashboardIcon },
+  { title: 'Dashboard', url: '/', icon: PlayIcon },
+  { title: 'Active Runs', url: '/active-jobs', icon: ZapIcon },
+  { title: 'Run History', url: '/runners', icon: ActivityIcon },
   { title: 'System Logs', url: '/system-logs', icon: TerminalIcon },
   { title: 'Settings', url: '/settings', icon: SettingsIcon },
 ];
