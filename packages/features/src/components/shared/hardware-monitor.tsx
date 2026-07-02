@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { usePlatform } from '@omnidesk/core';
 import { Activity } from 'lucide-react';
-import { Button } from '@omnidesk/ui';;
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@omnidesk/ui';;
+import { Button } from '@omnidesk/ui';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@omnidesk/ui';
 
 interface HardwareUsage {
   cpu_percent: number;
@@ -19,21 +19,26 @@ export function HardwareMonitor() {
 
     let isMounted = true;
 
-    const fetchHardware = async () => {
-      try {
-        const result = (await platformApi.invoke('get_hardware_usage')) as HardwareUsage;
-        if (isMounted) setUsage(result);
-      } catch (err) {
-        console.error('Failed to fetch hardware usage', err);
-      }
-    };
+    const unlistenPromise = platformApi.listen(
+      'hardware_usage_update',
+      (payload: HardwareUsage) => {
+        if (isMounted) setUsage(payload);
+      },
+    );
 
-    fetchHardware(); // initial fetch
-    const interval = setInterval(fetchHardware, 3000); // refresh every 3 seconds
+    // Optional: fetch initially to get data right away before the first event
+    platformApi
+      .invoke('get_hardware_usage')
+      .then((res) => {
+        if (isMounted) setUsage(res as HardwareUsage);
+      })
+      .catch((err) => console.error('Failed initial fetch', err));
 
     return () => {
       isMounted = false;
-      clearInterval(interval);
+      unlistenPromise.then((unlisten) => {
+        if (typeof unlisten === 'function') unlisten();
+      });
     };
   }, [platformApi]);
 
@@ -65,7 +70,9 @@ export function HardwareMonitor() {
         <TooltipContent side="top" className="text-xs">
           <p>Total Memory: {memTotalGb} GB</p>
           <p>Memory Usage: {(memRatio * 100).toFixed(0)}%</p>
-          {isHighMem ? <p className="text-destructive mt-1 font-semibold">High Memory Usage!</p> : null}
+          {isHighMem ? (
+            <p className="text-destructive mt-1 font-semibold">High Memory Usage!</p>
+          ) : null}
         </TooltipContent>
       </Tooltip>
     </TooltipProvider>

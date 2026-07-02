@@ -6,9 +6,27 @@ import { usePlatform } from '../providers/platform-provider';
 import { useAppConfig } from '../providers/config-provider';
 import { useLayoutStore } from '../stores/use-layout-store';
 import { useDevStore } from '../stores/use-dev-store';
+import { useWorkspaceStore } from '../stores/use-workspace-store';
 import { useNavigate } from '@tanstack/react-router';
 
-import { Menubar, MenubarContent, MenubarItem, MenubarMenu, MenubarSeparator, MenubarShortcut, MenubarTrigger, MenubarSub, MenubarSubContent, MenubarSubTrigger, Button, DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from '@omnidesk/ui';;
+import {
+  Menubar,
+  MenubarContent,
+  MenubarItem,
+  MenubarMenu,
+  MenubarSeparator,
+  MenubarShortcut,
+  MenubarTrigger,
+  MenubarSub,
+  MenubarSubContent,
+  MenubarSubTrigger,
+  Button,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuSeparator,
+} from '@omnidesk/ui';
 import {
   Menu,
   Home,
@@ -29,6 +47,7 @@ export function TitleBar() {
   const { config } = useAppConfig();
   const { toggleSidebar, sidebarOpen } = useLayoutStore();
   const { toggleDevMode, isDevMode } = useDevStore();
+  const { selectedWorkspacePath } = useWorkspaceStore();
   const [isPinned, setIsPinned] = useState(false);
   const navigate = useNavigate();
 
@@ -90,7 +109,21 @@ export function TitleBar() {
                     }}
                   >
                     <FolderOpen className="mr-2 h-4 w-4" />
-                    Open App Folder
+                    Open App Data Folder
+                  </MenubarItem>
+                  <MenubarItem
+                    disabled={!selectedWorkspacePath}
+                    onClick={async () => {
+                      if (!selectedWorkspacePath) return;
+                      try {
+                        await platformApi.invoke('open_folder', { path: selectedWorkspacePath });
+                      } catch (e) {
+                        toast.error('Could not open workspace folder: ' + String(e));
+                      }
+                    }}
+                  >
+                    <FolderOpen className="mr-2 h-4 w-4" />
+                    Open Workspace Folder
                   </MenubarItem>
                   <MenubarSeparator />
                   <MenubarItem onClick={() => platformApi.quitApp()}>

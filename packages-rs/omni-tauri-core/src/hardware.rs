@@ -7,7 +7,7 @@ fn get_sys() -> &'static Mutex<System> {
     SYS.get_or_init(|| Mutex::new(System::new_all()))
 }
 
-#[derive(serde::Serialize)]
+#[derive(Clone, serde::Serialize)]
 pub struct HardwareUsage {
     pub cpu_percent: f32,
     pub used_memory_kb: u64,
@@ -29,4 +29,25 @@ pub fn get_hardware_usage() -> Result<HardwareUsage, String> {
         used_memory_kb,
         total_memory_kb,
     })
+}
+
+pub fn init_monitor(app: tauri::AppHandle) {
+    use tauri::Emitter;
+    std::thread::spawn(move || {
+        loop {
+            std::thread::sleep(std::time::Duration::from_secs(2));
+            if let Ok(mut sys) = get_sys().lock() {
+                sys.refresh_cpu_all();
+                sys.refresh_memory();
+                
+                let usage = HardwareUsage {
+                    cpu_percent: sys.global_cpu_usage(),
+                    used_memory_kb: sys.used_memory(),
+                    total_memory_kb: sys.total_memory(),
+                };
+                
+                let _ = app.emit("hardware_usage_update", usage);
+            }
+        }
+    });
 }

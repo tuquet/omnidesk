@@ -43,6 +43,7 @@ pub fn run() {
             }
         })
         .setup(|app| {
+            omni_tauri_core::hardware::init_monitor(app.handle().clone());
             // Setup System Tray
             let quit_i = MenuItem::with_id(app, "quit", "Quit Omni Engine", true, None::<&str>)?;
             let toggle_i =
