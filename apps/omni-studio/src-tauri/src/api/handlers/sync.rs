@@ -237,6 +237,7 @@ async fn sync_local(
                     let id = obj
                         .get("id")
                         .and_then(|v| v.as_str())
+                        .filter(|s| !s.is_empty())
                         .map(|s| s.to_string())
                         .unwrap_or_else(|| {
                             uuid::Uuid::new_v5(&uuid::Uuid::NAMESPACE_OID, name_str.as_bytes())

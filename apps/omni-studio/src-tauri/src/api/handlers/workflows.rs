@@ -192,12 +192,14 @@ async fn update_workflow(
 async fn delete_workflow(
     State(state): State<AppState>,
     Path(id): Path<String>,
-    Query(query): Query<WorkspaceQuery>,
+    Query(_query): Query<WorkspaceQuery>,
 ) -> Result<Json<serde_json::Value>, AppError> {
     // Soft Delete from SQLite
     WorkflowService::soft_delete(&state.db, &id, "api").await?;
 
     // Delete from Local File (if we do soft delete, we also delete the local JSON so it doesn't get synced back)
+    // USER INSTRUCTION: "khi xóa files ở db thì đừng xóa file ở folder nhé" -> commented out
+    /*
     let watch_dir = query
         .workspace_path
         .map(|p| std::path::PathBuf::from(p).join("workflows"))
@@ -209,6 +211,7 @@ async fn delete_workflow(
             eprintln!("Failed to delete workflow file {:?}: {}", file_path, e);
         }
     }
+    */
 
     // Broadcast to WebSocket so Extension deletes it
     let event = crate::api::handlers::sync_ws::SyncEvent {
@@ -295,11 +298,13 @@ async fn duplicate_workflow(
 async fn force_delete_workflow(
     State(state): State<AppState>,
     Path(id): Path<String>,
-    Query(query): Query<WorkspaceQuery>,
+    Query(_query): Query<WorkspaceQuery>,
 ) -> Result<Json<serde_json::Value>, AppError> {
     WorkflowService::delete(&state.db, &id).await?;
 
     // Delete from Local File (if it exists)
+    // USER INSTRUCTION: "khi xóa files ở db thì đừng xóa file ở folder nhé" -> commented out
+    /*
     let watch_dir = query
         .workspace_path
         .map(|p| std::path::PathBuf::from(p).join("workflows"))
@@ -310,6 +315,7 @@ async fn force_delete_workflow(
             eprintln!("Failed to delete workflow file {:?}: {}", file_path, e);
         }
     }
+    */
 
     Ok(Json(serde_json::json!({ "force_deleted": true })))
 }
