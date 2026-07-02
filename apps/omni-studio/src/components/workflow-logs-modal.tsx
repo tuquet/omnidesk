@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, Badge, Skeleton, cn, Button } from '@omnidesk/ui';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, Badge, Skeleton, cn, Button, ScrollArea } from '@omnidesk/ui';
 import { client } from '@/lib/api-client';
 import { getWorkflowRuns, getRunLogs, deleteWorkflowRun, deleteAllWorkflowRuns } from '@omnidesk/types/client';
 import { CheckCircleIcon, XCircleIcon, ClockIcon, PlayCircleIcon, TrashIcon } from 'lucide-react';
@@ -123,14 +123,14 @@ export function WorkflowLogsModal({ workflowId, isOpen, onOpenChange }: Workflow
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-6xl sm:max-w-6xl w-[90vw] h-[85vh] p-0 flex flex-col overflow-hidden">
-        <DialogHeader className="p-4 border-b shrink-0">
+        <DialogHeader className="p-3 border-b shrink-0">
           <DialogTitle>Workflow Logs & History</DialogTitle>
         </DialogHeader>
 
         <div className="flex-1 min-h-0 flex flex-row w-full h-full rounded-b-lg overflow-hidden">
           {/* Left Panel: List of Runs */}
           <div className="w-[320px] bg-muted/10 flex flex-col border-r shrink-0 min-h-0">
-            <div className="p-4 border-b bg-muted/20 font-medium text-sm text-muted-foreground uppercase tracking-wider shrink-0 flex items-center justify-between">
+            <div className="p-3 border-b bg-muted/20 font-medium text-sm text-muted-foreground uppercase tracking-wider shrink-0 flex items-center justify-between">
               <span>Execution History</span>
               {runs.length > 0 && (
                 <Button
@@ -149,15 +149,15 @@ export function WorkflowLogsModal({ workflowId, isOpen, onOpenChange }: Workflow
                 </Button>
               )}
             </div>
-            <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar">
+            <ScrollArea className="flex-1 min-h-0">
               {isRunsLoading ? (
-                <div className="p-4 space-y-3">
+                <div className="p-3 flex flex-col gap-3">
                   <Skeleton className="h-16 w-full" />
                   <Skeleton className="h-16 w-full" />
                   <Skeleton className="h-16 w-full" />
                 </div>
               ) : runs.length === 0 ? (
-                <div className="p-8 text-center text-muted-foreground text-sm">
+                <div className="p-4 text-center text-muted-foreground text-sm">
                   No runs found for this workflow.
                 </div>
               ) : (
@@ -167,7 +167,7 @@ export function WorkflowLogsModal({ workflowId, isOpen, onOpenChange }: Workflow
                       key={run.id}
                       onClick={() => setSelectedRunId(run.id)}
                       className={cn(
-                        'group p-4 pr-10 border-b cursor-pointer transition-colors hover:bg-muted/50 relative',
+                        'group p-3 pr-10 border-b cursor-pointer transition-colors hover:bg-muted/50 relative',
                         selectedRunId === run.id
                           ? 'bg-muted/80 border-l-4 border-l-primary'
                           : 'border-l-4 border-l-transparent',
@@ -236,12 +236,12 @@ export function WorkflowLogsModal({ workflowId, isOpen, onOpenChange }: Workflow
                   ))}
                 </div>
               )}
-            </div>
+            </ScrollArea>
           </div>
 
           {/* Right Panel: Logs for Selected Run */}
           <div className="flex-1 flex flex-col min-w-0 bg-background min-h-0">
-            <div className="p-4 border-b bg-muted/5 font-medium text-sm text-muted-foreground uppercase tracking-wider flex items-center justify-between shrink-0">
+            <div className="p-3 border-b bg-muted/5 font-medium text-sm text-muted-foreground uppercase tracking-wider flex items-center justify-between shrink-0">
               <span>Block Execution Logs</span>
               {isRunActive && (
                 <Badge
@@ -252,32 +252,32 @@ export function WorkflowLogsModal({ workflowId, isOpen, onOpenChange }: Workflow
                 </Badge>
               )}
             </div>
-            <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar">
+            <ScrollArea className="flex-1 min-h-0">
               {!selectedRunId ? (
                 <div className="flex items-center justify-center h-full text-muted-foreground">
                   Select a run to view logs
                 </div>
               ) : isLogsLoading ? (
-                <div className="p-6 space-y-4">
+                <div className="p-3 flex flex-col gap-4">
                   <Skeleton className="h-12 w-full" />
                   <Skeleton className="h-12 w-3/4" />
                   <Skeleton className="h-12 w-5/6" />
                 </div>
               ) : logs.length === 0 ? (
-                <div className="p-8 text-center text-muted-foreground">
+                <div className="p-4 text-center text-muted-foreground">
                   No block logs recorded for this run.
                 </div>
               ) : (
-                <div className="p-6 space-y-6">
+                <div className="p-3 flex flex-col gap-6">
                   {/* Run Error Summary if exists */}
                   {selectedRun?.error_message && (
-                    <div className="p-4 rounded-md bg-destructive/10 border border-destructive/20 text-destructive text-sm font-mono whitespace-pre-wrap">
+                    <div className="p-3 rounded-md bg-destructive/10 border border-destructive/20 text-destructive text-sm font-mono whitespace-pre-wrap">
                       <strong>Workflow Error:</strong> {selectedRun.error_message}
                     </div>
                   )}
 
                   {/* Log Timeline */}
-                  <div className="space-y-4">
+                  <div className="flex flex-col gap-4">
                     {logs.map((log, index) => (
                       <div key={log.id} className="flex gap-4 relative">
                         {/* Timeline vertical line */}
@@ -358,7 +358,7 @@ export function WorkflowLogsModal({ workflowId, isOpen, onOpenChange }: Workflow
                   </div>
                 </div>
               )}
-            </div>
+            </ScrollArea>
           </div>
         </div>
       </DialogContent>

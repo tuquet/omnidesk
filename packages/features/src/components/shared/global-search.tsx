@@ -1,7 +1,7 @@
 import type { AppDefinition } from '@omnidesk/types';
 import * as React from 'react';
 import { useNavigate } from '@tanstack/react-router';
-import { Button, Command, CommandDialog, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList, CommandSeparator } from '@omnidesk/ui';;
+import { Button, Command, CommandDialog, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList, CommandSeparator, ScrollArea } from '@omnidesk/ui';
 import { useDevStore, useAppConfig } from '@omnidesk/core';
 import { SearchIcon } from 'lucide-react';
 
@@ -63,7 +63,8 @@ export function GlobalSearch({ triggerNode }: { triggerNode?: React.ReactNode })
         <Command>
           <CommandInput placeholder="Type a command or search..." />
           <CommandList>
-            <CommandEmpty>No results found.</CommandEmpty>
+            <ScrollArea className="max-h-[300px]">
+              <CommandEmpty>No results found.</CommandEmpty>
 
             {mainItems.length > 0 && (
               <CommandGroup heading={t('nav.Main', 'Main')}>
@@ -173,6 +174,7 @@ export function GlobalSearch({ triggerNode }: { triggerNode?: React.ReactNode })
                 </CommandGroup>
               </>
             )}
+              </ScrollArea>
           </CommandList>
         </Command>
       </CommandDialog>

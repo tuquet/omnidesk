@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogFooter, DialogTitle, DialogDescription, Button, Input, Label, Switch, Select, SelectTrigger, SelectValue, SelectContent, SelectItem, Skeleton } from '@omnidesk/ui';
+import { Dialog, DialogContent, DialogHeader, DialogFooter, DialogTitle, DialogDescription, Button, Input, Label, Switch, Select, SelectTrigger, SelectValue, SelectContent, SelectItem, Skeleton, ScrollArea } from '@omnidesk/ui';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { PlayIcon } from 'lucide-react';
@@ -210,24 +210,24 @@ export function RunWorkflowModal({ workflowId, profileId, isOpen, onClose, onRun
         </DialogHeader>
 
         {isLoading ? (
-          <div className="space-y-6 py-4">
+          <div className="flex flex-col gap-6 py-2">
             <Skeleton className="h-16 w-full rounded-md" />
             <Skeleton className="h-32 w-full rounded-md" />
             <Skeleton className="h-12 w-full rounded-md" />
           </div>
         ) : (
-          <div className="space-y-6 py-4 max-h-[60vh] overflow-y-auto custom-scrollbar">
+          <ScrollArea className="flex flex-col gap-6 py-2 max-h-[60vh]">
             
             {/* Step 1: Workflow Selection (If not provided) */}
             {!workflowId && (
-              <div className="space-y-4">
+              <div className="flex flex-col gap-4">
                 <div className="flex items-center gap-3">
                   <div className="flex items-center justify-center w-6 h-6 rounded-full bg-primary/10 text-primary text-xs font-medium">
                     1
                   </div>
                   <Label className="text-base font-semibold">Select Workflow</Label>
                 </div>
-                <div className="pl-9">
+                <div className="pl-2">
                   <Select value={selectedWorkflow || undefined} onValueChange={setSelectedWorkflow}>
                     <SelectTrigger className="w-full">
                       <SelectValue placeholder="Choose a workflow to run..." />
@@ -246,14 +246,14 @@ export function RunWorkflowModal({ workflowId, profileId, isOpen, onClose, onRun
 
             {/* Step 2: Profile Selection (If not provided) */}
             {!profileId && (
-              <div className="space-y-4">
+              <div className="flex flex-col gap-4">
                 <div className="flex items-center gap-3">
                   <div className="flex items-center justify-center w-6 h-6 rounded-full bg-primary/10 text-primary text-xs font-medium">
                     {workflowId ? '1' : '2'}
                   </div>
                   <Label className="text-base font-semibold">Target Profile</Label>
                 </div>
-                <div className="pl-9">
+                <div className="pl-2">
                   <Select value={selectedProfile || undefined} onValueChange={setSelectedProfile}>
                     <SelectTrigger className="w-full">
                       <SelectValue placeholder="Select a browser profile..." />
@@ -278,7 +278,7 @@ export function RunWorkflowModal({ workflowId, profileId, isOpen, onClose, onRun
 
             {/* Step 3: Dynamic Trigger Variables */}
             {triggerParams.length > 0 && selectedWorkflow && (
-              <div className="space-y-4">
+              <div className="flex flex-col gap-4">
                 <div className="flex items-center gap-3">
                   <div className="flex items-center justify-center w-6 h-6 rounded-full bg-primary/10 text-primary text-xs font-medium">
                     {(!workflowId && !profileId) ? '3' : (!workflowId || !profileId) ? '2' : '1'}
@@ -286,10 +286,10 @@ export function RunWorkflowModal({ workflowId, profileId, isOpen, onClose, onRun
                   <Label className="text-base font-semibold">Trigger Parameters</Label>
                 </div>
                 
-                <div className="pl-9 space-y-4">
-                  <div className="p-3 rounded-md border bg-muted/50 space-y-4">
+                <div className="pl-2 flex flex-col gap-4">
+                  <div className="p-3 rounded-md border bg-muted/50 flex flex-col gap-4">
                     {triggerParams.map((param) => (
-                      <div key={param.name} className="space-y-2 flex flex-col">
+                      <div key={param.name} className="flex flex-col gap-2">
                         <Label htmlFor={`var-${param.name}`}>
                           {param.label || param.name}
                         </Label>
@@ -322,7 +322,7 @@ export function RunWorkflowModal({ workflowId, profileId, isOpen, onClose, onRun
                 </div>
               </div>
             )}
-          </div>
+          </ScrollArea>
         )}
 
         <DialogFooter>

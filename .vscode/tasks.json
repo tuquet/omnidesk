@@ -5,7 +5,7 @@
     // === Database Management
     // ==========================================
     {
-      "label": "🔄 Reset Local Databases (db:reset)",
+      "label": "db-reset",
       "type": "shell",
       "command": "pnpm db:reset",
       "group": "build",
@@ -19,7 +19,7 @@
     // === Development Servers
     // ==========================================
     {
-      "label": "🌐 Dev: Web (Vite)",
+      "label": "dev-web-vite",
       "type": "shell",
       "command": "node scripts/task-logger.mjs dev-web-vite.log pnpm --filter @omnidesk/web-portal dev",
       "group": "build",
@@ -39,7 +39,7 @@
       }
     },
     {
-      "label": "📚 Dev: Docs (VitePress)",
+      "label": "dev-docs-vitepress",
       "type": "shell",
       "command": "node scripts/task-logger.mjs dev-docs-vitepress.log pnpm docs:dev",
       "group": "build",
@@ -52,7 +52,7 @@
       }
     },
     {
-      "label": "🖥️ Dev: Omni Studio",
+      "label": "dev-omni-studio",
       "type": "shell",
       "command": "node scripts/task-logger.mjs dev-omni-studio.log pnpm --filter @omnidesk/omni-studio tauri dev",
       "group": "build",
@@ -65,7 +65,7 @@
       }
     },
     {
-      "label": "🖥️ Dev: Omni Profile",
+      "label": "dev-omni-profile",
       "type": "shell",
       "command": "node scripts/task-logger.mjs dev-omni-profile.log pnpm --filter @omnidesk/omni-profile tauri dev",
       "group": "build",
@@ -78,7 +78,7 @@
       }
     },
     {
-      "label": "🖥️ Dev: Omni Engine",
+      "label": "dev-omni-engine",
       "type": "shell",
       "command": "node scripts/task-logger.mjs dev-omni-engine.log pnpm --filter @omnidesk/omni-engine tauri dev",
       "group": "build",
@@ -91,7 +91,7 @@
       }
     },
     {
-      "label": "🚀 Dev: All (Web + Docs)",
+      "label": "dev-all-web-docs",
       "type": "shell",
       "command": "node scripts/task-logger.mjs dev-all-web-docs.log pnpm dev:all",
       "group": "build",
@@ -104,7 +104,7 @@
       }
     },
     {
-      "label": "🚀 Dev: All Automa (WF + PRF + RT)",
+      "label": "dev-all-automa-wf-prf-rt",
       "type": "shell",
       "command": "node scripts/task-logger.mjs dev-all-automa-wf-prf-rt.log pnpm dev:omni",
       "group": "build",
@@ -117,7 +117,7 @@
       }
     },
     {
-      "label": "🖥️ Dev: Automa Extension",
+      "label": "dev-automa-extension",
       "type": "shell",
       "command": "node scripts/task-logger.mjs dev-automa-extension.log pnpm --filter @omnidesk/omni-extension dev",
       "group": "build",
@@ -133,7 +133,7 @@
     // === Type Checking
     // ==========================================
     {
-      "label": "⚡ TypeCheck: Native (tsgo)",
+      "label": "typecheck-native",
       "type": "shell",
       "command": "node scripts/task-logger.mjs typecheck-native-tsgo.log pnpm typecheck:native",
       "group": "build",
@@ -145,7 +145,7 @@
       }
     },
     {
-      "label": "🔍 TypeCheck: Standard (tsc)",
+      "label": "typecheck-standard",
       "type": "shell",
       "command": "node scripts/task-logger.mjs typecheck-standard-tsc.log pnpm turbo typecheck",
       "group": "build",
@@ -161,7 +161,7 @@
     // === Linting & Formatting
     // ==========================================
     {
-      "label": "🧹 Lint: All",
+      "label": "lint-all",
       "type": "shell",
       "command": "node scripts/task-logger.mjs lint-all.log pnpm turbo lint",
       "group": "build",
@@ -173,7 +173,7 @@
       }
     },
     {
-      "label": "✨ Format: All",
+      "label": "format-all",
       "type": "shell",
       "command": "node scripts/task-logger.mjs format-all.log pnpm format",
       "group": "build",
@@ -184,7 +184,7 @@
       }
     },
     {
-      "label": "📋 Format: Check",
+      "label": "format-check",
       "type": "shell",
       "command": "node scripts/task-logger.mjs format-check.log pnpm format:check",
       "group": "build",
@@ -199,7 +199,7 @@
     // === Build
     // ==========================================
     {
-      "label": "📦 Build: All (Turbo)",
+      "label": "build-all",
       "type": "shell",
       "command": "node scripts/task-logger.mjs build-all-turbo.log pnpm turbo build",
       "group": {
@@ -214,7 +214,7 @@
       }
     },
     {
-      "label": "📦 Build: Web Only",
+      "label": "build-web-only",
       "type": "shell",
       "command": "node scripts/task-logger.mjs build-web-only.log pnpm --filter @omnidesk/web-portal build",
       "group": "build",
@@ -226,7 +226,7 @@
       }
     },
     {
-      "label": "📦 Build: All Tauri Apps",
+      "label": "build-all-tauri-apps",
       "type": "shell",
       "command": "node scripts/task-logger.mjs build-all-tauri-apps.log pnpm --filter \"@omnidesk/omni-*\" tauri build",
       "group": "build",
@@ -242,7 +242,7 @@
     // === Testing
     // ==========================================
     {
-      "label": "🧪 Test: All",
+      "label": "test-all",
       "type": "shell",
       "command": "node scripts/task-logger.mjs test-all.log pnpm turbo test",
       "group": {
@@ -261,7 +261,7 @@
     // === Utilities
     // ==========================================
     {
-      "label": "📥 Install: Dependencies",
+      "label": "install-dependencies",
       "type": "shell",
       "command": "node scripts/task-logger.mjs install-dependencies.log pnpm install",
       "problemMatcher": [],
@@ -271,9 +271,19 @@
       }
     },
     {
-      "label": "🗑️ Clean: All",
+      "label": "clean-all",
       "type": "shell",
       "command": "node scripts/task-logger.mjs clean-all.log pnpm clean",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "scan-data-testid",
+      "type": "shell",
+      "command": "node scripts/task-logger.mjs scan-testids.log node scripts/scan-testids.mjs",
       "problemMatcher": [],
       "presentation": {
         "reveal": "always",
@@ -285,7 +295,7 @@
     // === Rust (Tauri Backend)
     // ==========================================
     {
-      "label": "🦀 Rust: Check All",
+      "label": "rust-check-all",
       "type": "shell",
       "command": "node scripts/task-logger.mjs rust-check-all.log cargo check",
       "options": {
@@ -299,7 +309,7 @@
       }
     },
     {
-      "label": "🦀 Rust: Check Runtime",
+      "label": "rust-check-runtime",
       "type": "shell",
       "command": "node scripts/task-logger.mjs rust-check-runtime.log cargo check",
       "options": {
@@ -313,7 +323,7 @@
       }
     },
     {
-      "label": "🦀 Rust: Check Workflow",
+      "label": "rust-check-workflow",
       "type": "shell",
       "command": "node scripts/task-logger.mjs rust-check-workflow.log cargo check",
       "options": {
@@ -327,7 +337,7 @@
       }
     },
     {
-      "label": "🦀 Rust: Check Profile",
+      "label": "rust-check-profile",
       "type": "shell",
       "command": "node scripts/task-logger.mjs rust-check-profile.log cargo check",
       "options": {
@@ -345,7 +355,7 @@
     // === Git & Deploy
     // ==========================================
     {
-      "label": "📤 Git: Push",
+      "label": "git-push",
       "type": "shell",
       "command": "node scripts/task-logger.mjs git-push.log git push origin main",
       "problemMatcher": [],
@@ -355,7 +365,7 @@
       }
     },
     {
-      "label": "🚀 Deploy: Trigger GitHub Release",
+      "label": "deploy-trigger-github-release",
       "type": "shell",
       "command": "node scripts/task-logger.mjs deploy-trigger-github-release.log git tag ${input:releaseVersion} && git push origin ${input:releaseVersion}",
       "group": "build",

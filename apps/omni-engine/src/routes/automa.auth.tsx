@@ -93,7 +93,7 @@ function AutomaAuthPage() {
             </div>
           </div>
 
-          <div className="space-y-2">
+          <div className="flex flex-col gap-2">
             <h1 className="text-2xl font-bold tracking-tight">Kết nối Extension thành công!</h1>
             <p className="text-sm text-muted-foreground leading-relaxed">
               Automa Extension đã nhận được phiên đăng nhập của bạn. Bạn có thể đóng tab này và quay
@@ -113,12 +113,12 @@ function AutomaAuthPage() {
   // Chưa đăng nhập → hiển thị form login
   return (
     <div className="flex flex-1 w-full items-center justify-center p-6 md:p-10">
-      <div className="w-full max-w-sm space-y-6">
+      <div className="w-full max-w-sm flex flex-col gap-6">
         <div className="flex flex-col items-center gap-3 text-center">
           <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10 ring-1 ring-primary/20">
             <Puzzle className="h-7 w-7 text-primary" />
           </div>
-          <div className="space-y-1">
+          <div className="flex flex-col gap-1">
             <h1 className="text-xl font-semibold tracking-tight">Kết nối Automa Extension</h1>
             <p className="text-sm text-muted-foreground">
               Đăng nhập để đồng bộ phiên làm việc với Extension

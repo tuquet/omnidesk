@@ -11,6 +11,7 @@ import {
   TabsList,
   TabsTrigger,
   TabsContent,
+  ScrollArea,
 } from '@omnidesk/ui';
 import {
   WorkflowParametersEditor,
@@ -244,42 +245,46 @@ function WorkflowEditorCore({
             />
           </TabsContent>
 
-          <TabsContent value="parameters" className="flex-1 min-h-0 overflow-auto border rounded-md p-4 m-0 bg-background">
-            {isValidJson && (
-              <WorkflowParametersEditor
-                value={parsedJson ? getParameters(parsedJson as WorkflowDataParsed) : []}
-                onChange={(parameters) => {
-                  setJsonValue((prevJson) => {
-                    try {
-                      const parsed = JSON.parse(prevJson) as WorkflowDataParsed;
-                      updateParameters(parsed, parameters as WorkflowParameter[]);
-                      return JSON.stringify(parsed, null, 2);
-                    } catch {
-                      return prevJson;
-                    }
-                  });
-                }}
-              />
-            )}
+          <TabsContent value="parameters" className="flex-1 min-h-0 border rounded-md p-2 m-0 bg-background">
+            <ScrollArea className="h-full pr-3">
+              {isValidJson && (
+                <WorkflowParametersEditor
+                  value={parsedJson ? getParameters(parsedJson as WorkflowDataParsed) : []}
+                  onChange={(parameters) => {
+                    setJsonValue((prevJson) => {
+                      try {
+                        const parsed = JSON.parse(prevJson) as WorkflowDataParsed;
+                        updateParameters(parsed, parameters as WorkflowParameter[]);
+                        return JSON.stringify(parsed, null, 2);
+                      } catch {
+                        return prevJson;
+                      }
+                    });
+                  }}
+                />
+              )}
+            </ScrollArea>
           </TabsContent>
 
-          <TabsContent value="triggers" className="flex-1 min-h-0 overflow-auto border rounded-md p-4 m-0 bg-background">
-            {isValidJson && (
-              <WorkflowTriggersEditor
-                value={parsedJson ? getTriggers(parsedJson as WorkflowDataParsed) : []}
-                onChange={(triggers) => {
-                  setJsonValue((prevJson) => {
-                    try {
-                      const parsed = JSON.parse(prevJson) as WorkflowDataParsed;
-                      updateTriggers(parsed, triggers as WorkflowTrigger[]);
-                      return JSON.stringify(parsed, null, 2);
-                    } catch {
-                      return prevJson;
-                    }
-                  });
-                }}
-              />
-            )}
+          <TabsContent value="triggers" className="flex-1 min-h-0 border rounded-md p-2 m-0 bg-background">
+            <ScrollArea className="h-full pr-3">
+              {isValidJson && (
+                <WorkflowTriggersEditor
+                  value={parsedJson ? getTriggers(parsedJson as WorkflowDataParsed) : []}
+                  onChange={(triggers) => {
+                    setJsonValue((prevJson) => {
+                      try {
+                        const parsed = JSON.parse(prevJson) as WorkflowDataParsed;
+                        updateTriggers(parsed, triggers as WorkflowTrigger[]);
+                        return JSON.stringify(parsed, null, 2);
+                      } catch {
+                        return prevJson;
+                      }
+                    });
+                  }}
+                />
+              )}
+            </ScrollArea>
           </TabsContent>
 
           <TabsContent value="global_data" className="flex-1 min-h-0 border rounded-md overflow-hidden m-0">

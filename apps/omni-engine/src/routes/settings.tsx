@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { PageContainer, PageHeader, PageTitle, Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter, Button, Input, Label, Switch, Badge } from '@omnidesk/ui';
+import { PageContainer, PageHeader, PageTitle, Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter, Button, Input, Switch, Badge, FieldGroup, Field, FieldLabel, FieldDescription } from '@omnidesk/ui';
 import { CloudIcon, RefreshCwIcon, SaveIcon, DatabaseIcon, AlertCircleIcon } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
@@ -81,9 +81,9 @@ function SettingsPage() {
         <PageTitle>Engine Settings</PageTitle>
       </PageHeader>
       
-      <div className="max-w-4xl space-y-6">
+      <div className="max-w-4xl flex flex-col gap-6">
         <Card>
-          <CardHeader>
+          <CardHeader className="p-3 border-b">
             <div className="flex items-center gap-2">
               <CloudIcon className="w-5 h-5 text-primary" />
               <CardTitle>Cloud Sync (Supabase)</CardTitle>
@@ -92,40 +92,44 @@ function SettingsPage() {
               Configure connection to Supabase for cloud synchronization. Omni Engine will act as the background worker pushing local SQLite data to Postgres.
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex items-center justify-between p-4 bg-muted/50 rounded-lg border">
-              <div className="space-y-0.5">
-                <Label className="text-base">Enable Background Sync</Label>
-                <p className="text-sm text-muted-foreground">Automatically sync changes every 30 seconds.</p>
-              </div>
-              <Switch checked={isSyncEnabled} onCheckedChange={setIsSyncEnabled} />
-            </div>
+          <CardContent className="p-3">
+            <FieldGroup>
+              <Field orientation="horizontal" className="p-3 bg-muted/50 rounded-lg border flex justify-between items-center">
+                <div className="flex flex-col gap-0.5">
+                  <FieldLabel className="text-base">Enable Background Sync</FieldLabel>
+                  <FieldDescription>Automatically sync changes every 30 seconds.</FieldDescription>
+                </div>
+                <Switch checked={isSyncEnabled} onCheckedChange={setIsSyncEnabled} />
+              </Field>
 
-            <div className="space-y-2">
-              <Label>Supabase Project URL</Label>
-              <Input 
-                placeholder="https://xxxxxx.supabase.co" 
-                value={supabaseUrl}
-                onChange={(e) => setSupabaseUrl(e.target.value)}
-              />
-            </div>
-            
-            <div className="space-y-2">
-              <Label>Supabase Service Role Key</Label>
-              <Input 
-                type="password" 
-                placeholder="eyJh..." 
-                value={supabaseKey}
-                onChange={(e) => setSupabaseKey(e.target.value)}
-              />
-              <p className="text-xs text-muted-foreground flex items-center gap-1">
-                <AlertCircleIcon className="w-3 h-3" />
-                Required for Engine to bypass RLS policies during background sync operations.
-              </p>
-            </div>
+              <Field>
+                <FieldLabel>Supabase Project URL</FieldLabel>
+                <Input 
+                  placeholder="https://xxxxxx.supabase.co" 
+                  value={supabaseUrl}
+                  onChange={(e) => setSupabaseUrl(e.target.value)}
+                  className="h-8 text-sm"
+                />
+              </Field>
+              
+              <Field>
+                <FieldLabel>Supabase Service Role Key</FieldLabel>
+                <Input 
+                  type="password" 
+                  placeholder="eyJh..." 
+                  value={supabaseKey}
+                  onChange={(e) => setSupabaseKey(e.target.value)}
+                  className="h-8 text-sm"
+                />
+                <FieldDescription className="flex items-center gap-1">
+                  <AlertCircleIcon className="w-3 h-3" />
+                  Required for Engine to bypass RLS policies during background sync operations.
+                </FieldDescription>
+              </Field>
+            </FieldGroup>
           </CardContent>
-          <CardFooter className="bg-muted/30 border-t px-6 py-4">
-            <Button onClick={handleSave} disabled={isSaving}>
+          <CardFooter className="bg-muted/30 border-t p-3">
+            <Button size="sm" onClick={handleSave} disabled={isSaving}>
               {isSaving ? <RefreshCwIcon className="w-4 h-4 mr-2 animate-spin" /> : <SaveIcon className="w-4 h-4 mr-2" />}
               Save Configuration
             </Button>
@@ -133,24 +137,24 @@ function SettingsPage() {
         </Card>
 
         <Card>
-          <CardHeader>
+          <CardHeader className="p-3 border-b">
             <div className="flex items-center gap-2">
               <DatabaseIcon className="w-5 h-5 text-primary" />
               <CardTitle>Sync Queue Status</CardTitle>
             </div>
             <CardDescription>Monitor the background sync queue</CardDescription>
           </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="bg-muted p-4 rounded-lg border flex flex-col gap-1">
+          <CardContent className="p-3">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+              <div className="bg-muted p-3 rounded-lg border flex flex-col gap-1">
                 <span className="text-sm text-muted-foreground">Pending Items</span>
-                <span className="text-2xl font-semibold">{syncStats.pendingItems}</span>
+                <span className="text-xl font-semibold">{syncStats.pendingItems}</span>
               </div>
-              <div className="bg-muted p-4 rounded-lg border flex flex-col gap-1">
+              <div className="bg-muted p-3 rounded-lg border flex flex-col gap-1">
                 <span className="text-sm text-muted-foreground">Last Sync</span>
-                <span className="text-lg font-semibold truncate">{syncStats.lastSync}</span>
+                <span className="text-base font-semibold truncate">{syncStats.lastSync}</span>
               </div>
-              <div className="bg-muted p-4 rounded-lg border flex flex-col gap-1">
+              <div className="bg-muted p-3 rounded-lg border flex flex-col gap-1">
                 <span className="text-sm text-muted-foreground">Worker Status</span>
                 <div className="flex items-center gap-2 mt-1">
                   <Badge variant={syncStats.status === 'Syncing' ? 'default' : 'secondary'} className={syncStats.status === 'Syncing' ? 'bg-amber-500' : ''}>
@@ -161,8 +165,8 @@ function SettingsPage() {
               </div>
             </div>
           </CardContent>
-          <CardFooter className="bg-muted/30 border-t px-6 py-4">
-            <Button variant="outline" onClick={handleManualSync} disabled={syncStats.status === 'Syncing' || !supabaseUrl}>
+          <CardFooter className="bg-muted/30 border-t p-3">
+            <Button size="sm" variant="outline" onClick={handleManualSync} disabled={syncStats.status === 'Syncing' || !supabaseUrl}>
               <RefreshCwIcon className={`w-4 h-4 mr-2 ${syncStats.status === 'Syncing' ? 'animate-spin' : ''}`} />
               Force Sync Now
             </Button>
@@ -170,43 +174,48 @@ function SettingsPage() {
         </Card>
 
         <Card>
-          <CardHeader>
+          <CardHeader className="p-3 border-b">
             <div className="flex items-center gap-2">
               <DatabaseIcon className="w-5 h-5 text-primary" />
               <CardTitle>Hardware & Runtime</CardTitle>
             </div>
             <CardDescription>Configure execution limits and polling settings for the Engine</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <Label>Max Concurrent Runs</Label>
-              <Input 
-                type="number"
-                placeholder="5" 
-                defaultValue={5}
-                min={1}
-                max={20}
-              />
-              <p className="text-xs text-muted-foreground">
-                Maximum number of browser instances running at the same time. Higher values consume more RAM.
-              </p>
-            </div>
-            <div className="space-y-2">
-              <Label>DB Polling Interval (seconds)</Label>
-              <Input 
-                type="number"
-                placeholder="10" 
-                defaultValue={10}
-                min={5}
-                max={60}
-              />
-              <p className="text-xs text-muted-foreground">
-                How often the Engine checks the database for scheduled jobs.
-              </p>
-            </div>
+          <CardContent className="p-3">
+            <FieldGroup>
+              <Field>
+                <FieldLabel>Max Concurrent Runs</FieldLabel>
+                <Input 
+                  type="number"
+                  placeholder="5" 
+                  defaultValue={5}
+                  min={1}
+                  max={20}
+                  className="h-8 text-sm"
+                />
+                <FieldDescription>
+                  Maximum number of browser instances running at the same time. Higher values consume more RAM.
+                </FieldDescription>
+              </Field>
+              <Field>
+                <FieldLabel>DB Polling Interval (seconds)</FieldLabel>
+                <Input 
+                  type="number"
+                  placeholder="10" 
+                  defaultValue={10}
+                  min={5}
+                  max={60}
+                  className="h-8 text-sm"
+                />
+                <FieldDescription>
+                  How often the Engine checks the database for scheduled jobs.
+                </FieldDescription>
+              </Field>
+            </FieldGroup>
           </CardContent>
         </Card>
       </div>
     </PageContainer>
   );
 }
+

@@ -1,5 +1,6 @@
 
 import { DragDropContext, Droppable, Draggable, type DropResult } from '@hello-pangea/dnd';
+import { ScrollArea } from '@omnidesk/ui';
 import { Button } from '@omnidesk/ui';
 import { Input } from '@omnidesk/ui';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@omnidesk/ui';
@@ -61,7 +62,7 @@ export function WorkflowParametersEditor({ value = [], onChange }: WorkflowParam
   };
 
   return (
-    <div className="w-full space-y-4">
+    <div className="w-full flex flex-col gap-4">
       {value.length === 0 ? (
         <div className="text-center text-sm text-muted-foreground py-4 border rounded-md border-dashed">
           No parameters
@@ -78,7 +79,8 @@ export function WorkflowParametersEditor({ value = [], onChange }: WorkflowParam
           <DragDropContext onDragEnd={handleDragEnd}>
             <Droppable droppableId="parameters-list">
               {(provided) => (
-                <div {...provided.droppableProps} ref={provided.innerRef} className="divide-y">
+                <ScrollArea className="max-h-[400px]">
+                  <div {...provided.droppableProps} ref={provided.innerRef} className="divide-y">
                   {value.map((param, index) => {
                     const uniqueId = param.id || param.name || `param-${index}`;
                     return (
@@ -170,7 +172,7 @@ export function WorkflowParametersEditor({ value = [], onChange }: WorkflowParam
                             </CollapsibleTrigger>
                             <CollapsibleContent className="pl-11 pr-3 pb-4">
                               <div className="flex items-start gap-2 pt-2 border-t">
-                                <div className="space-y-1.5 flex-1 max-w-[400px]">
+                                <div className="flex flex-col gap-1.5 flex-1 max-w-[400px]">
                                   <Label className="text-xs">Description</Label>
                                   <Textarea 
                                     placeholder="Description" 
@@ -204,6 +206,7 @@ export function WorkflowParametersEditor({ value = [], onChange }: WorkflowParam
                   })}
                   {provided.placeholder}
                 </div>
+                </ScrollArea>
               )}
             </Droppable>
           </DragDropContext>

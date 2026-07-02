@@ -39,7 +39,7 @@ function SettingsPage() {
         <PageTitle>Profile Settings</PageTitle>
       </PageHeader>
 
-      <div className="max-w-4xl space-y-4">
+      <div className="max-w-4xl flex flex-col gap-4">
         <Card>
           <CardHeader>
             <div className="flex items-center gap-2">
@@ -48,16 +48,16 @@ function SettingsPage() {
             </div>
             <CardDescription>Configure which Chromium binary to use for launching profiles</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-2">
+          <CardContent className="flex flex-col gap-2">
             <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg border">
-              <div className="space-y-0.5">
+              <div className="flex flex-col gap-0.5">
                 <Label className="text-base">Use System Chrome</Label>
                 <p className="text-sm text-muted-foreground">Try to find and use Chrome installed on your system instead of downloading a custom binary.</p>
               </div>
               <Switch checked={useSystemChrome} onCheckedChange={setUseSystemChrome} />
             </div>
 
-            <div className="space-y-2">
+            <div className="flex flex-col gap-2">
               <Label>Custom Executable Path</Label>
               <Input 
                 placeholder="C:\Path\To\chrome.exe" 
@@ -80,8 +80,8 @@ function SettingsPage() {
             </div>
             <CardDescription>Manage where browser data is stored</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-2">
-            <div className="space-y-2">
+          <CardContent className="flex flex-col gap-2">
+            <div className="flex flex-col gap-2">
               <Label>Profiles Storage Path</Label>
               <Input 
                 value={storagePath}

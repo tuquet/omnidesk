@@ -69,14 +69,14 @@ function AuthCallbackPage() {
 
   if (error) {
     return (
-      <div className="flex flex-1 w-full items-center justify-center p-6">
+      <div className="flex flex-1 w-full items-center justify-center p-3">
         <div className="flex flex-col items-center gap-4 text-center">
           <div className="flex h-16 w-16 items-center justify-center rounded-full bg-destructive/20">
             <svg className="h-8 w-8 text-destructive" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
           </div>
-          <div className="space-y-2">
+          <div className="flex flex-col gap-2">
             <h1 className="text-2xl font-bold tracking-tight">Xác thực thất bại</h1>
             <p className="text-sm text-muted-foreground">{error}</p>
           </div>
@@ -92,7 +92,7 @@ function AuthCallbackPage() {
   }
 
   return (
-    <div className="flex flex-1 w-full items-center justify-center p-6">
+    <div className="flex flex-1 w-full items-center justify-center p-3">
       <div className="flex flex-col items-center gap-4">
         <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
         <p className="text-muted-foreground text-sm font-medium">Đang xử lý đăng nhập...</p>

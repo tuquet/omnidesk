@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Button, Input, ScrollArea, Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, useConfirmDialog, DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@omnidesk/ui';
+import { Button, Input, ScrollArea, Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, useConfirmDialog, DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, FieldGroup, Field } from '@omnidesk/ui';
 import { FolderIcon, PlusIcon, MoreVerticalIcon, PencilIcon, TrashIcon } from 'lucide-react';
 import { toast } from 'sonner';
 import { client } from '@/lib/api-client';
@@ -135,7 +135,7 @@ export function FolderPanel({ activeFolderId, onSelectFolder }: FolderPanelProps
       </div>
 
       <ScrollArea className="flex-1">
-        <div className="p-2 space-y-1">
+        <div className="p-2 flex flex-col gap-1">
           <Button
             variant={activeFolderId === null ? 'secondary' : 'ghost'}
             className="w-full justify-start font-normal h-8 text-sm"
@@ -206,15 +206,17 @@ export function FolderPanel({ activeFolderId, onSelectFolder }: FolderPanelProps
             <DialogTitle>Create Folder</DialogTitle>
           </DialogHeader>
           <form onSubmit={handleCreate}>
-            <div className="py-2">
-              <Input
-                placeholder="Folder name"
-                value={folderName}
-                className="h-8 text-sm"
-                onChange={(e) => setFolderName(e.target.value)}
-                autoFocus
-              />
-            </div>
+            <FieldGroup className="py-2">
+              <Field>
+                <Input
+                  placeholder="Folder name"
+                  value={folderName}
+                  className="h-8 text-sm"
+                  onChange={(e) => setFolderName(e.target.value)}
+                  autoFocus
+                />
+              </Field>
+            </FieldGroup>
             <DialogFooter>
               <Button type="button" variant="outline" onClick={() => setIsCreateOpen(false)}>Cancel</Button>
               <Button type="submit" disabled={!folderName.trim() || createMutation.isPending}>
@@ -231,15 +233,17 @@ export function FolderPanel({ activeFolderId, onSelectFolder }: FolderPanelProps
             <DialogTitle>Edit Folder</DialogTitle>
           </DialogHeader>
           <form onSubmit={handleUpdate}>
-            <div className="py-2">
-              <Input
-                placeholder="Folder name"
-                value={folderName}
-                className="h-8 text-sm"
-                onChange={(e) => setFolderName(e.target.value)}
-                autoFocus
-              />
-            </div>
+            <FieldGroup className="py-2">
+              <Field>
+                <Input
+                  placeholder="Folder name"
+                  value={folderName}
+                  className="h-8 text-sm"
+                  onChange={(e) => setFolderName(e.target.value)}
+                  autoFocus
+                />
+              </Field>
+            </FieldGroup>
             <DialogFooter>
               <Button type="button" variant="outline" onClick={() => setIsEditOpen(false)}>Cancel</Button>
               <Button type="submit" disabled={!folderName.trim() || updateMutation.isPending}>

@@ -12,8 +12,7 @@ export function SignupForm({
     <div className={cn("flex flex-col gap-2", className)} {...props}>
       <Card className="overflow-hidden p-0">
         <CardContent className="grid p-0 md:grid-cols-2">
-          <form className="p-3 md:p-4">
-            <FieldGroup>
+          <FieldGroup className="p-3 flex flex-col gap-4">
               <div className="flex flex-col items-center gap-2 text-center">
                 <h1 className="text-2xl font-bold">Create your account</h1>
                 <p className="text-sm text-balance text-muted-foreground">
@@ -89,7 +88,6 @@ export function SignupForm({
                 Already have an account? <a href="#">Sign in</a>
               </FieldDescription>
             </FieldGroup>
-          </form>
           <div className="relative hidden bg-muted md:block">
             <img
               src="/placeholder.svg"

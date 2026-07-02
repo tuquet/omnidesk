@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { PageContainer, PageHeader, PageTitle, Button, Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, Alert, AlertTitle, AlertDescription, useConfirmDialog, ResizablePanelGroup, ResizablePanel, ResizableHandle } from '@omnidesk/ui';
+import { PageContainer, PageHeader, PageTitle, Button, Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, Alert, AlertTitle, AlertDescription, useConfirmDialog, ResizablePanelGroup, ResizablePanel, ResizableHandle, ScrollArea } from '@omnidesk/ui';
 import { RunWorkflowModal } from '@omnidesk/features';;
 import { WorkflowIcon, FolderOpenIcon, AlertCircleIcon } from 'lucide-react';
 import { useState, useMemo, useDeferredValue, useCallback, useEffect } from 'react';
@@ -523,8 +523,9 @@ function WorkflowsPage() {
           </ResizablePanel>
           <ResizableHandle className="mx-2" />
           <ResizablePanel defaultSize={80}>
-            <div className="flex-1 flex flex-col gap-2 min-w-0 overflow-y-auto pr-2">
-            <div className="flex flex-col sm:flex-row gap-2 items-start sm:items-center justify-between">
+            <ScrollArea className="h-full pr-2">
+              <div className="flex flex-col gap-2 min-w-0">
+                <div className="flex flex-col sm:flex-row gap-2 items-start sm:items-center justify-between">
               <WorkflowsToolbar
                 searchQuery={searchQuery}
                 setSearchQuery={setSearchQuery}
@@ -680,7 +681,8 @@ function WorkflowsPage() {
               rowSelection={rowSelection}
               onRowSelectionChange={setRowSelection}
             />
-            </div>
+              </div>
+            </ScrollArea>
           </ResizablePanel>
         </ResizablePanelGroup>
       )}

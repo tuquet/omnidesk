@@ -1,7 +1,7 @@
 import type { BrowserProfile } from '@omnidesk/types';
 
 import { useState, useEffect } from 'react';
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription, Button, Input, Label, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Textarea, Separator } from '@omnidesk/ui';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription, Button, Input, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Textarea, Separator, ScrollArea, FieldGroup, Field, FieldLabel } from '@omnidesk/ui';
 import { Loader2Icon, SaveIcon, PlusIcon } from 'lucide-react';
 import { toast } from 'sonner';
 import { useBrowserProfileStore } from '@omnidesk/browser-profiles';
@@ -142,7 +142,7 @@ export function ProfileFormDialog({
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent className="overflow-y-auto p-6 sm:p-8 flex flex-col gap-0 sm:max-w-[540px] w-full">
+      <SheetContent className="p-3 flex flex-col gap-0 sm:max-w-[540px] w-full">
         <SheetHeader className="mb-6">
           <SheetTitle className="text-xl">
             {mode === 'create' ? 'Create New Profile' : `Edit: ${profile?.name}`}
@@ -153,12 +153,14 @@ export function ProfileFormDialog({
           </SheetDescription>
         </SheetHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-5 flex-1 mt-2">
+        <ScrollArea className="flex-1 mt-2">
+        <form onSubmit={handleSubmit} className="flex flex-col gap-5 p-1">
           {/* Name */}
-          <div className="space-y-2">
-            <Label htmlFor="profile-name">
+          <FieldGroup>
+            <Field>
+            <FieldLabel htmlFor="profile-name">
               Profile Name <span className="text-destructive">*</span>
-            </Label>
+            </FieldLabel>
             <Input
               id="profile-name"
               placeholder="e.g., Main FB Account"
@@ -168,14 +170,15 @@ export function ProfileFormDialog({
               required
               minLength={3}
             />
-          </div>
+            </Field>
+          </FieldGroup>
 
           {/* Browser + Version + OS */}
-          <div className="grid grid-cols-12 gap-3">
-            <div className="col-span-7 space-y-2">
-              <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+          <FieldGroup className="grid grid-cols-12 gap-3">
+            <Field className="col-span-7">
+              <FieldLabel className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                 Browser Engine
-              </Label>
+              </FieldLabel>
               <Select value={browserType} onValueChange={setBrowserType}>
                 <SelectTrigger className="w-full">
                   <SelectValue />
@@ -188,11 +191,11 @@ export function ProfileFormDialog({
                   <SelectItem value="webkit">WebKit (Playwright)</SelectItem>
                 </SelectContent>
               </Select>
-            </div>
-            <div className="col-span-5 space-y-2">
-              <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+            </Field>
+            <Field className="col-span-5">
+              <FieldLabel className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                 Version
-              </Label>
+              </FieldLabel>
               <Select value={browserVersion} onValueChange={setBrowserVersion}>
                 <SelectTrigger className="w-full">
                   <SelectValue />
@@ -206,14 +209,15 @@ export function ProfileFormDialog({
                   ))}
                 </SelectContent>
               </Select>
-            </div>
-          </div>
+            </Field>
+          </FieldGroup>
 
           {/* Executable Path */}
-          <div className="space-y-2">
-            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+          <FieldGroup>
+            <Field>
+            <FieldLabel className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
               Browser Executable Path (Optional)
-            </Label>
+            </FieldLabel>
             <Input
               placeholder="Leave empty to auto-download / use default"
               value={executablePath}
@@ -221,32 +225,37 @@ export function ProfileFormDialog({
                 setExecutablePath(e.target.value)
               }
             />
-          </div>
+            </Field>
+          </FieldGroup>
 
           {/* Tags */}
-          <div className="space-y-2">
-            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+          <FieldGroup>
+            <Field>
+            <FieldLabel className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
               Tags
-            </Label>
+            </FieldLabel>
             <Input
               placeholder="facebook, main, ads (comma-separated)"
               value={tagsInput}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) => setTagsInput(e.target.value)}
             />
-          </div>
+            </Field>
+          </FieldGroup>
 
           {/* Notes */}
-          <div className="space-y-2">
-            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+          <FieldGroup>
+            <Field>
+            <FieldLabel className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
               Notes
-            </Label>
+            </FieldLabel>
             <Textarea
               className="min-h-[80px] resize-none"
               placeholder="Optional notes about this profile..."
               value={notes}
               onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setNotes(e.target.value)}
             />
-          </div>
+            </Field>
+          </FieldGroup>
 
           <Separator />
 
@@ -267,16 +276,17 @@ export function ProfileFormDialog({
             </Button>
             <Button type="submit" className="flex-1" disabled={isSubmitting}>
               {isSubmitting ? (
-                <Loader2Icon className="h-4 w-4 animate-spin mr-2" />
+                <Loader2Icon className="animate-spin" data-icon="inline-start" />
               ) : mode === 'create' ? (
-                <PlusIcon className="h-4 w-4 mr-2" />
+                <PlusIcon data-icon="inline-start" />
               ) : (
-                <SaveIcon className="h-4 w-4 mr-2" />
+                <SaveIcon data-icon="inline-start" />
               )}
               {mode === 'create' ? 'Create Profile' : 'Save Changes'}
             </Button>
           </div>
         </form>
+        </ScrollArea>
       </SheetContent>
     </Sheet>
   );

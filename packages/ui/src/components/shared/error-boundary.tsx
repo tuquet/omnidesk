@@ -90,7 +90,7 @@ interface ErrorFallbackProps {
  */
 export function DefaultErrorFallback({ error, reset }: ErrorFallbackProps) {
   return (
-    <div className="relative flex min-h-[50vh] w-full flex-col items-center justify-center overflow-hidden px-6 py-12">
+    <div className="relative flex min-h-[50vh] w-full flex-col items-center justify-center overflow-hidden px-4 py-8">
       {/* Background effects */}
       <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,hsl(var(--muted)/0.3)_1px,transparent_1px),linear-gradient(to_bottom,hsl(var(--muted)/0.3)_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_50%,black_40%,transparent_100%)]" />
       <div className="pointer-events-none absolute top-1/4 left-1/3 h-48 w-48 animate-pulse rounded-full bg-destructive/5 blur-3xl" />
@@ -98,20 +98,20 @@ export function DefaultErrorFallback({ error, reset }: ErrorFallbackProps) {
 
       <div className="relative z-10 flex flex-col items-center text-center">
         {/* Icon */}
-        <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-destructive/10 ring-1 ring-destructive/20">
+        <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-destructive/10 ring-1 ring-destructive/20">
           <AlertTriangle className="h-8 w-8 text-destructive" />
         </div>
 
         {/* Heading */}
-        <h2 className="mb-2 text-2xl font-bold tracking-tight text-foreground">
+        <h2 className="mb-1 text-lg font-bold tracking-tight text-foreground">
           Something went wrong
         </h2>
-        <p className="mb-6 max-w-md text-sm text-muted-foreground">
+        <p className="mb-4 max-w-md text-sm text-muted-foreground">
           An unexpected error occurred. You can try again or go back.
         </p>
 
         {/* Error details (dev) */}
-        <details className="mb-6 w-full max-w-lg rounded-lg border bg-muted/30 text-left">
+        <details className="mb-4 w-full max-w-lg rounded-lg border bg-muted/30 text-left">
           <summary className="cursor-pointer px-4 py-2 text-sm font-medium text-muted-foreground">
             Error Details
           </summary>

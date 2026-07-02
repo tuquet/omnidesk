@@ -50,6 +50,7 @@ import { Input } from '@omnidesk/ui';
 import { Label } from '@omnidesk/ui';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@omnidesk/ui';
 import { Separator } from '@omnidesk/ui';
+import { FieldGroup, Field, FieldLabel, ScrollArea } from '@omnidesk/ui';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@omnidesk/ui';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@omnidesk/ui';
 import { GripVerticalIcon, CircleCheckIcon, LoaderIcon, EllipsisVerticalIcon, Columns3Icon, ChevronDownIcon, PlusIcon, ChevronsLeftIcon, ChevronLeftIcon, ChevronRightIcon, ChevronsRightIcon, TrendingUpIcon } from "lucide-react"
@@ -164,14 +165,18 @@ const columns: ColumnDef<z.infer<typeof schema>>[] = [
           })
         }}
       >
-        <Label htmlFor={`${row.original.id}-target`} className="sr-only">
-          Target
-        </Label>
-        <Input
-          className="h-8 w-16 border-transparent bg-transparent text-end shadow-none hover:bg-input/30 focus-visible:border focus-visible:bg-background dark:bg-transparent dark:hover:bg-input/30 dark:focus-visible:bg-input/30"
-          defaultValue={row.original.target}
-          id={`${row.original.id}-target`}
-        />
+        <FieldGroup>
+          <Field>
+            <FieldLabel htmlFor={`${row.original.id}-target`} className="sr-only">
+              Target
+            </FieldLabel>
+            <Input
+              className="h-8 w-16 border-transparent bg-transparent text-end shadow-none hover:bg-input/30 focus-visible:border focus-visible:bg-background dark:bg-transparent dark:hover:bg-input/30 dark:focus-visible:bg-input/30"
+              defaultValue={row.original.target}
+              id={`${row.original.id}-target`}
+            />
+          </Field>
+        </FieldGroup>
       </form>
     ),
   },
@@ -189,14 +194,18 @@ const columns: ColumnDef<z.infer<typeof schema>>[] = [
           })
         }}
       >
-        <Label htmlFor={`${row.original.id}-limit`} className="sr-only">
-          Limit
-        </Label>
-        <Input
-          className="h-8 w-16 border-transparent bg-transparent text-end shadow-none hover:bg-input/30 focus-visible:border focus-visible:bg-background dark:bg-transparent dark:hover:bg-input/30 dark:focus-visible:bg-input/30"
-          defaultValue={row.original.limit}
-          id={`${row.original.id}-limit`}
-        />
+        <FieldGroup>
+          <Field>
+            <FieldLabel htmlFor={`${row.original.id}-limit`} className="sr-only">
+              Limit
+            </FieldLabel>
+            <Input
+              className="h-8 w-16 border-transparent bg-transparent text-end shadow-none hover:bg-input/30 focus-visible:border focus-visible:bg-background dark:bg-transparent dark:hover:bg-input/30 dark:focus-visible:bg-input/30"
+              defaultValue={row.original.limit}
+              id={`${row.original.id}-limit`}
+            />
+          </Field>
+        </FieldGroup>
       </form>
     ),
   },
@@ -431,59 +440,61 @@ export function DataTable({
       </div>
       <TabsContent
         value="outline"
-        className="relative flex flex-col gap-2 overflow-auto px-2 lg:px-3"
+        className="relative flex flex-col gap-2 px-2 lg:px-3"
       >
-        <div className="overflow-hidden rounded-lg border">
-          <DndContext
-            collisionDetection={closestCenter}
-            modifiers={[restrictToVerticalAxis]}
-            onDragEnd={handleDragEnd}
-            sensors={sensors}
-            id={sortableId}
-          >
-            <Table>
-              <TableHeader className="sticky top-0 z-10 bg-muted">
-                {table.getHeaderGroups().map((headerGroup) => (
-                  <TableRow key={headerGroup.id}>
-                    {headerGroup.headers.map((header) => {
-                      return (
-                        <TableHead key={header.id} colSpan={header.colSpan}>
-                          {header.isPlaceholder
-                            ? null
-                            : flexRender(
-                                header.column.columnDef.header,
-                                header.getContext()
-                              )}
-                        </TableHead>
-                      )
-                    })}
-                  </TableRow>
-                ))}
-              </TableHeader>
-              <TableBody className="**:data-[slot=table-cell]:first:w-8">
-                {table.getRowModel().rows?.length ? (
-                  <SortableContext
-                    items={dataIds}
-                    strategy={verticalListSortingStrategy}
-                  >
-                    {table.getRowModel().rows.map((row) => (
-                      <DraggableRow key={row.id} row={row} />
-                    ))}
-                  </SortableContext>
-                ) : (
-                  <TableRow>
-                    <TableCell
-                      colSpan={columns.length}
-                      className="h-24 text-center"
+        <ScrollArea className="overflow-auto flex-1">
+          <div className="overflow-hidden rounded-lg border">
+            <DndContext
+              collisionDetection={closestCenter}
+              modifiers={[restrictToVerticalAxis]}
+              onDragEnd={handleDragEnd}
+              sensors={sensors}
+              id={sortableId}
+            >
+              <Table>
+                <TableHeader className="sticky top-0 z-10 bg-muted">
+                  {table.getHeaderGroups().map((headerGroup) => (
+                    <TableRow key={headerGroup.id}>
+                      {headerGroup.headers.map((header) => {
+                        return (
+                          <TableHead key={header.id} colSpan={header.colSpan}>
+                            {header.isPlaceholder
+                              ? null
+                              : flexRender(
+                                  header.column.columnDef.header,
+                                  header.getContext()
+                                )}
+                          </TableHead>
+                        )
+                      })}
+                    </TableRow>
+                  ))}
+                </TableHeader>
+                <TableBody className="**:data-[slot=table-cell]:first:w-8">
+                  {table.getRowModel().rows?.length ? (
+                    <SortableContext
+                      items={dataIds}
+                      strategy={verticalListSortingStrategy}
                     >
-                      No results.
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
-          </DndContext>
-        </div>
+                      {table.getRowModel().rows.map((row) => (
+                        <DraggableRow key={row.id} row={row} />
+                      ))}
+                    </SortableContext>
+                  ) : (
+                    <TableRow>
+                      <TableCell
+                        colSpan={columns.length}
+                        className="h-24 text-center"
+                      >
+                        No results.
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </DndContext>
+          </div>
+        </ScrollArea>
         <div className="flex items-center justify-between px-4">
           <div className="hidden flex-1 text-sm text-muted-foreground lg:flex">
             {table.getFilteredSelectedRowModel().rows.length} of{" "}
@@ -624,7 +635,7 @@ function TableCellViewer({ item }: { item: z.infer<typeof schema> }) {
             Showing total visitors for the last 6 months
           </DrawerDescription>
         </DrawerHeader>
-        <div className="flex flex-col gap-2 overflow-y-auto px-2 text-sm">
+        <ScrollArea className="flex flex-col gap-2 px-2 text-sm max-h-[80vh]">
           {!isMobile && (
             <>
               <ChartContainer config={chartConfig}>
@@ -682,85 +693,87 @@ function TableCellViewer({ item }: { item: z.infer<typeof schema> }) {
               <Separator />
             </>
           )}
-          <form className="flex flex-col gap-2">
-            <div className="flex flex-col gap-3">
-              <Label htmlFor="header">Header</Label>
-              <Input id="header" defaultValue={item.header} />
-            </div>
-            <div className="grid grid-cols-2 gap-2">
-              <div className="flex flex-col gap-3">
-                <Label htmlFor="type">Type</Label>
-                <Select defaultValue={item.type}>
-                  <SelectTrigger id="type" className="w-full">
-                    <SelectValue placeholder="Select a type" />
+          <form>
+            <FieldGroup className="flex flex-col gap-2">
+              <Field>
+                <FieldLabel htmlFor="header">Header</FieldLabel>
+                <Input id="header" defaultValue={item.header} />
+              </Field>
+              <div className="grid grid-cols-2 gap-2">
+                <Field>
+                  <FieldLabel htmlFor="type">Type</FieldLabel>
+                  <Select defaultValue={item.type}>
+                    <SelectTrigger id="type" className="w-full">
+                      <SelectValue placeholder="Select a type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectGroup>
+                        <SelectItem value="Table of Contents">
+                          Table of Contents
+                        </SelectItem>
+                        <SelectItem value="Executive Summary">
+                          Executive Summary
+                        </SelectItem>
+                        <SelectItem value="Technical Approach">
+                          Technical Approach
+                        </SelectItem>
+                        <SelectItem value="Design">Design</SelectItem>
+                        <SelectItem value="Capabilities">Capabilities</SelectItem>
+                        <SelectItem value="Focus Documents">
+                          Focus Documents
+                        </SelectItem>
+                        <SelectItem value="Narrative">Narrative</SelectItem>
+                        <SelectItem value="Cover Page">Cover Page</SelectItem>
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
+                </Field>
+                <Field>
+                  <FieldLabel htmlFor="status">Status</FieldLabel>
+                  <Select defaultValue={item.status}>
+                    <SelectTrigger id="status" className="w-full">
+                      <SelectValue placeholder="Select a status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectGroup>
+                        <SelectItem value="Done">Done</SelectItem>
+                        <SelectItem value="In Progress">In Progress</SelectItem>
+                        <SelectItem value="Not Started">Not Started</SelectItem>
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
+                </Field>
+              </div>
+              <div className="grid grid-cols-2 gap-2">
+                <Field>
+                  <FieldLabel htmlFor="target">Target</FieldLabel>
+                  <Input id="target" defaultValue={item.target} />
+                </Field>
+                <Field>
+                  <FieldLabel htmlFor="limit">Limit</FieldLabel>
+                  <Input id="limit" defaultValue={item.limit} />
+                </Field>
+              </div>
+              <Field>
+                <FieldLabel htmlFor="reviewer">Reviewer</FieldLabel>
+                <Select defaultValue={item.reviewer}>
+                  <SelectTrigger id="reviewer" className="w-full">
+                    <SelectValue placeholder="Select a reviewer" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectGroup>
-                      <SelectItem value="Table of Contents">
-                        Table of Contents
+                      <SelectItem value="Eddie Lake">Eddie Lake</SelectItem>
+                      <SelectItem value="Jamik Tashpulatov">
+                        Jamik Tashpulatov
                       </SelectItem>
-                      <SelectItem value="Executive Summary">
-                        Executive Summary
-                      </SelectItem>
-                      <SelectItem value="Technical Approach">
-                        Technical Approach
-                      </SelectItem>
-                      <SelectItem value="Design">Design</SelectItem>
-                      <SelectItem value="Capabilities">Capabilities</SelectItem>
-                      <SelectItem value="Focus Documents">
-                        Focus Documents
-                      </SelectItem>
-                      <SelectItem value="Narrative">Narrative</SelectItem>
-                      <SelectItem value="Cover Page">Cover Page</SelectItem>
+                      <SelectItem value="Emily Whalen">Emily Whalen</SelectItem>
                     </SelectGroup>
                   </SelectContent>
                 </Select>
-              </div>
-              <div className="flex flex-col gap-3">
-                <Label htmlFor="status">Status</Label>
-                <Select defaultValue={item.status}>
-                  <SelectTrigger id="status" className="w-full">
-                    <SelectValue placeholder="Select a status" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectGroup>
-                      <SelectItem value="Done">Done</SelectItem>
-                      <SelectItem value="In Progress">In Progress</SelectItem>
-                      <SelectItem value="Not Started">Not Started</SelectItem>
-                    </SelectGroup>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-            <div className="grid grid-cols-2 gap-2">
-              <div className="flex flex-col gap-3">
-                <Label htmlFor="target">Target</Label>
-                <Input id="target" defaultValue={item.target} />
-              </div>
-              <div className="flex flex-col gap-3">
-                <Label htmlFor="limit">Limit</Label>
-                <Input id="limit" defaultValue={item.limit} />
-              </div>
-            </div>
-            <div className="flex flex-col gap-3">
-              <Label htmlFor="reviewer">Reviewer</Label>
-              <Select defaultValue={item.reviewer}>
-                <SelectTrigger id="reviewer" className="w-full">
-                  <SelectValue placeholder="Select a reviewer" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectGroup>
-                    <SelectItem value="Eddie Lake">Eddie Lake</SelectItem>
-                    <SelectItem value="Jamik Tashpulatov">
-                      Jamik Tashpulatov
-                    </SelectItem>
-                    <SelectItem value="Emily Whalen">Emily Whalen</SelectItem>
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
-            </div>
+              </Field>
+            </FieldGroup>
           </form>
-        </div>
+        </ScrollArea>
         <DrawerFooter>
           <Button>Submit</Button>
           <DrawerClose asChild>

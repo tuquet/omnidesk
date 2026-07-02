@@ -36,6 +36,10 @@ These rules are **always enforced**. Each links to a file with Incorrect/Correct
 - **Resizable Layouts**: Use `<Resizable>` for split panes like Native apps.
 - **Dense Typography**: Use `text-sm font-semibold`, avoid `text-3xl`/`text-4xl` for panel headers.
 
+### Data TestID Guidelines → [data-testid.md](./rules/data-testid.md)
+- **Format**: `[app]:[component]:[element-or-action]`.
+- **Uniqueness**: Must be globally unique. Append indexes inside iterations.
+
 ### Styling & Tailwind → [styling.md](./rules/styling.md)
 
 - **`className` for layout, not styling.** Never override component colors or typography.

@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { PageContainer, PageHeader, PageTitle, Button, Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, useConfirmDialog, Badge, Input, Label, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Switch } from '@omnidesk/ui';
+import { PageContainer, PageHeader, PageTitle, Button, Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, useConfirmDialog, Badge, Input, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Switch, FieldGroup, Field, FieldLabel } from '@omnidesk/ui';
 import { CalendarClockIcon, PlusIcon, TrashIcon, PencilIcon } from 'lucide-react';
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -267,63 +267,65 @@ function SchedulesPage() {
           <DialogHeader>
             <DialogTitle>{editingSchedule ? 'Edit Schedule' : 'Create Schedule'}</DialogTitle>
           </DialogHeader>
-          <form onSubmit={handleSubmit} className="space-y-3 py-2">
-            <div className="space-y-2">
-              <Label>Schedule Name</Label>
-              <Input 
-                placeholder="e.g. Daily Data Scraper"
-                value={formData.name}
-                className="h-8 text-sm"
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              />
-            </div>
-            
-            <div className="space-y-2">
-              <Label>Workflow</Label>
-              <Select
-                value={formData.workflow_id}
-                onValueChange={(val) => setFormData({ ...formData, workflow_id: val })}
-              >
-                <SelectTrigger className="h-8 text-sm">
-                  <SelectValue placeholder="Select a workflow" />
-                </SelectTrigger>
-                <SelectContent>
-                  {workflows.map((wf) => (
-                    <SelectItem key={wf.id} value={wf.id}>{wf.name}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+          <form onSubmit={handleSubmit} className="flex flex-col gap-3 py-2">
+            <FieldGroup>
+              <Field>
+                <FieldLabel>Schedule Name</FieldLabel>
+                <Input 
+                  placeholder="e.g. Daily Data Scraper"
+                  value={formData.name}
+                  className="h-8 text-sm"
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                />
+              </Field>
+              
+              <Field>
+                <FieldLabel>Workflow</FieldLabel>
+                <Select
+                  value={formData.workflow_id}
+                  onValueChange={(val) => setFormData({ ...formData, workflow_id: val })}
+                >
+                  <SelectTrigger className="h-8 text-sm">
+                    <SelectValue placeholder="Select a workflow" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {workflows.map((wf) => (
+                      <SelectItem key={wf.id} value={wf.id}>{wf.name}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </Field>
 
-            <div className="space-y-2">
-              <Label>Browser Profile</Label>
-              <Select
-                value={formData.profile_id}
-                onValueChange={(val) => setFormData({ ...formData, profile_id: val })}
-              >
-                <SelectTrigger className="h-8 text-sm">
-                  <SelectValue placeholder="Select a profile" />
-                </SelectTrigger>
-                <SelectContent>
-                  {profiles.map((pf) => (
-                    <SelectItem key={pf.id} value={pf.id}>{pf.name}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+              <Field>
+                <FieldLabel>Browser Profile</FieldLabel>
+                <Select
+                  value={formData.profile_id}
+                  onValueChange={(val) => setFormData({ ...formData, profile_id: val })}
+                >
+                  <SelectTrigger className="h-8 text-sm">
+                    <SelectValue placeholder="Select a profile" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {profiles.map((pf) => (
+                      <SelectItem key={pf.id} value={pf.id}>{pf.name}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </Field>
 
-            <div className="space-y-2">
-              <Label>Cron Expression</Label>
-              <Input 
-                placeholder="*/5 * * * *"
-                value={formData.cron_expr}
-                className="h-8 text-sm"
-                onChange={(e) => setFormData({ ...formData, cron_expr: e.target.value })}
-              />
-              <p className="text-xs text-muted-foreground">
-                Format: minute, hour, day of month, month, day of week. Example: <code>0 12 * * *</code> (every day at 12:00)
-              </p>
-            </div>
+              <Field>
+                <FieldLabel>Cron Expression</FieldLabel>
+                <Input 
+                  placeholder="*/5 * * * *"
+                  value={formData.cron_expr}
+                  className="h-8 text-sm"
+                  onChange={(e) => setFormData({ ...formData, cron_expr: e.target.value })}
+                />
+                <p className="text-xs text-muted-foreground mt-1">
+                  Format: minute, hour, day of month, month, day of week. Example: <code>0 12 * * *</code> (every day at 12:00)
+                </p>
+              </Field>
+            </FieldGroup>
 
             <DialogFooter className="pt-4">
               <Button type="button" variant="outline" onClick={() => setIsModalOpen(false)}>Cancel</Button>

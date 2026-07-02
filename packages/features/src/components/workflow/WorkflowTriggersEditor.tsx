@@ -1,6 +1,6 @@
 import { Label } from '@omnidesk/ui';
 import { Input } from '@omnidesk/ui';
-import { Checkbox } from '@omnidesk/ui';
+import { Checkbox, ScrollArea } from '@omnidesk/ui';
 
 import { Button } from '@omnidesk/ui';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@omnidesk/ui';
@@ -58,8 +58,8 @@ export function WorkflowTriggersEditor({ value = [], onChange }: WorkflowTrigger
   };
 
   return (
-    <div className="w-full space-y-4">
-      <div className="space-y-2 max-h-[500px] overflow-auto pr-2">
+    <div className="w-full flex flex-col gap-4">
+      <ScrollArea className="flex flex-col gap-2 max-h-[500px] pr-2">
         {value.length === 0 ? (
           <div className="text-center text-sm text-muted-foreground py-8 border rounded-md border-dashed">
             No triggers configured. Add one below.
@@ -94,7 +94,7 @@ export function WorkflowTriggersEditor({ value = [], onChange }: WorkflowTrigger
             );
           })
         )}
-      </div>
+      </ScrollArea>
 
       <Popover>
         <PopoverTrigger asChild>
@@ -147,9 +147,9 @@ function getDefaultDataForTrigger(type: string) {
 function TriggerForm({ type, data, onChange }: { type: string, data: any, onChange: (data: any) => void }) {
   if (type === 'interval') {
     return (
-      <div className="space-y-4">
+      <div className="flex flex-col gap-4">
         <div className="grid grid-cols-2 gap-2">
-          <div className="space-y-1.5">
+          <div className="flex flex-col gap-1.5">
             <Label>Interval (minutes)</Label>
             <Input 
               type="number" 
@@ -157,7 +157,7 @@ function TriggerForm({ type, data, onChange }: { type: string, data: any, onChan
               onChange={(e) => onChange({ interval: Number(e.target.value) })} 
             />
           </div>
-          <div className="space-y-1.5">
+          <div className="flex flex-col gap-1.5">
             <Label>Delay (seconds)</Label>
             <Input 
               type="number" 
@@ -180,7 +180,7 @@ function TriggerForm({ type, data, onChange }: { type: string, data: any, onChan
   
   if (type === 'cron-job') {
     return (
-      <div className="space-y-1.5">
+      <div className="flex flex-col gap-1.5">
         <Label>Cron Expression</Label>
         <Input 
           value={data.expression} 
@@ -194,7 +194,7 @@ function TriggerForm({ type, data, onChange }: { type: string, data: any, onChan
 
   if (type === 'context-menu') {
     return (
-      <div className="space-y-1.5">
+      <div className="flex flex-col gap-1.5">
         <Label>Context Menu Name</Label>
         <Input 
           value={data.contextMenuName} 
@@ -207,7 +207,7 @@ function TriggerForm({ type, data, onChange }: { type: string, data: any, onChan
 
   if (type === 'date') {
     return (
-      <div className="space-y-1.5">
+      <div className="flex flex-col gap-1.5">
         <Label>Specific Date</Label>
         <Input 
           type="datetime-local"
@@ -220,8 +220,8 @@ function TriggerForm({ type, data, onChange }: { type: string, data: any, onChan
 
   if (type === 'visit-web') {
     return (
-      <div className="space-y-4">
-        <div className="space-y-1.5">
+      <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-1.5">
           <Label>URL</Label>
           <Input 
             value={data.url} 
@@ -229,7 +229,7 @@ function TriggerForm({ type, data, onChange }: { type: string, data: any, onChan
             placeholder="https://example.com/*"
           />
         </div>
-        <div className="flex flex-col space-y-2">
+        <div className="flex flex-col gap-2">
           <div className="flex items-center space-x-2">
             <Checkbox 
               checked={data.isUrlRegex}
@@ -251,7 +251,7 @@ function TriggerForm({ type, data, onChange }: { type: string, data: any, onChan
 
   if (type === 'keyboard-shortcut') {
     return (
-      <div className="space-y-1.5">
+      <div className="flex flex-col gap-1.5">
         <Label>Shortcut</Label>
         <Input 
           value={data.shortcut} 

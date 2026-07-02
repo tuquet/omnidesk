@@ -93,8 +93,8 @@ function QuickRunTab() {
         <CardTitle className="text-xl">Execution Order</CardTitle>
         <CardDescription>Select a workflow and target profiles to run immediately</CardDescription>
       </CardHeader>
-      <CardContent className="space-y-4 p-3">
-        <div className="space-y-4">
+      <CardContent className="flex flex-col gap-4 p-3">
+        <div className="flex flex-col gap-4">
           <label className="text-base font-medium leading-none flex items-center gap-2">
             <span className="flex h-6 w-6 items-center justify-center rounded-full bg-primary/20 text-primary text-xs font-bold">1</span>
             Select Workflow
@@ -123,7 +123,7 @@ function QuickRunTab() {
           </Select>
         </div>
 
-        <div className="space-y-4">
+        <div className="flex flex-col gap-4">
           <div className="flex items-center justify-between">
             <label className="text-base font-medium leading-none flex items-center gap-2">
               <span className="flex h-6 w-6 items-center justify-center rounded-full bg-primary/20 text-primary text-xs font-bold">2</span>
@@ -134,7 +134,7 @@ function QuickRunTab() {
             </span>
           </div>
           <ScrollArea className="h-64 border rounded-md bg-muted/10">
-            <div className="p-2 space-y-1">
+            <div className="p-2 flex flex-col gap-1">
               {profiles.length === 0 && (
                 <div className="p-3 text-sm text-muted-foreground text-center">
                   {isLoading ? "Loading profiles..." : "No profiles found. Start Omni Profile first."}
@@ -226,7 +226,7 @@ function MonitorTab() {
   const runningRuns = recentRuns.filter(r => r.status === 'RUNNING' || r.status === 'LAUNCHING');
 
   return (
-    <div className="space-y-6">
+    <div className="flex flex-col gap-6">
       {/* Stats Cards */}
       <div className="grid grid-cols-3 gap-2">
         <Card className="border-border/50">
@@ -285,7 +285,7 @@ function MonitorTab() {
               No active schedules. Create schedules in Omni Studio.
             </div>
           ) : (
-            <div className="space-y-2">
+            <div className="flex flex-col gap-2">
               {activeSchedules.map((schedule) => (
                 <div
                   key={schedule.id}
@@ -330,7 +330,7 @@ function MonitorTab() {
               No runs yet. Execute a workflow or wait for a schedule to trigger.
             </div>
           ) : (
-            <div className="space-y-2">
+            <div className="flex flex-col gap-2">
               {recentRuns.map((run) => (
                 <div
                   key={run.id}

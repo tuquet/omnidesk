@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from '@tanstack/react-router';
-import { PageContainer, PageHeader, PageTitle, Card, CardContent, Table, TableHeader, TableRow, TableHead, TableBody, TableCell, Badge } from '@omnidesk/ui';;
+import { PageContainer, PageHeader, PageTitle, Card, CardContent, Table, TableHeader, TableRow, TableHead, TableBody, TableCell, Badge, ScrollArea } from '@omnidesk/ui';
 import { ROUTES } from '@/config/route-config';
 import { Clock, PlayCircle, CheckCircle2, XCircle, AlertCircle } from 'lucide-react';
 
@@ -80,48 +80,50 @@ function RunnersPage() {
         </div>
       </PageHeader>
 
-      <Card className="border-border/50 shadow-sm overflow-hidden">
-        <CardContent className="p-0">
-          <Table>
-            <TableHeader className="bg-muted/30">
-              <TableRow>
-                <TableHead className="w-[120px] font-semibold">Runner ID</TableHead>
-                <TableHead className="font-semibold">Workflow</TableHead>
-                <TableHead className="font-semibold">Status</TableHead>
-                <TableHead className="font-semibold">Profiles</TableHead>
-                <TableHead className="font-semibold">Started</TableHead>
-                <TableHead className="font-semibold">Ended</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {MOCK_RUNNERS.map((runner) => (
-                <TableRow key={runner.id} className="group hover:bg-muted/40 cursor-pointer transition-colors">
-                  <TableCell className="font-medium">
-                    <Link to={ROUTES.RUNNER_DETAIL} params={{ runnerId: runner.id }} className="flex items-center text-primary group-hover:underline">
-                      {runner.id}
-                    </Link>
-                  </TableCell>
-                  <TableCell>{runner.workflowName}</TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-2">
-                      {getStatusIcon(runner.status)}
-                      {getStatusBadge(runner.status)}
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant="outline" className="bg-background">
-                      {runner.profilesCount} targets
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="text-muted-foreground flex items-center gap-1">
-                    <Clock className="w-3 h-3" />
-                    {runner.startTime}
-                  </TableCell>
-                  <TableCell className="text-muted-foreground">{runner.endTime}</TableCell>
+      <Card className="border-border/50 shadow-sm overflow-hidden flex flex-col h-[calc(100vh-140px)]">
+        <CardContent className="p-0 flex-1 overflow-hidden">
+          <ScrollArea className="h-full">
+            <Table>
+              <TableHeader className="bg-muted/30">
+                <TableRow>
+                  <TableHead className="w-[120px] font-semibold">Runner ID</TableHead>
+                  <TableHead className="font-semibold">Workflow</TableHead>
+                  <TableHead className="font-semibold">Status</TableHead>
+                  <TableHead className="font-semibold">Profiles</TableHead>
+                  <TableHead className="font-semibold">Started</TableHead>
+                  <TableHead className="font-semibold">Ended</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {MOCK_RUNNERS.map((runner) => (
+                  <TableRow key={runner.id} className="group hover:bg-muted/40 cursor-pointer transition-colors">
+                    <TableCell className="font-medium">
+                      <Link to={ROUTES.RUNNER_DETAIL} params={{ runnerId: runner.id }} className="flex items-center text-primary group-hover:underline">
+                        {runner.id}
+                      </Link>
+                    </TableCell>
+                    <TableCell>{runner.workflowName}</TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        {getStatusIcon(runner.status)}
+                        {getStatusBadge(runner.status)}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant="outline" className="bg-background">
+                        {runner.profilesCount} targets
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-muted-foreground flex items-center gap-1">
+                      <Clock className="w-3 h-3" />
+                      {runner.startTime}
+                    </TableCell>
+                    <TableCell className="text-muted-foreground">{runner.endTime}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </ScrollArea>
         </CardContent>
       </Card>
     </PageContainer>

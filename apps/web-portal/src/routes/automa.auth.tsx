@@ -70,7 +70,7 @@ function AutomaAuthPage() {
   // Nếu đang kiểm tra session
   if (checking) {
     return (
-      <div className="flex flex-1 w-full items-center justify-center p-4">
+      <div className="flex flex-1 w-full items-center justify-center p-3">
         <div className="flex flex-col items-center gap-4">
           <Loader2 className="h-6 w-6 animate-spin text-primary" />
           <p className="text-sm text-muted-foreground">Đang kiểm tra phiên đăng nhập...</p>
@@ -82,7 +82,7 @@ function AutomaAuthPage() {
   // Đã đăng nhập & sync xong
   if (synced) {
     return (
-      <div className="flex flex-1 w-full items-center justify-center p-4">
+      <div className="flex flex-1 w-full items-center justify-center p-3">
         <div className="flex flex-col items-center gap-6 text-center max-w-md">
           <div className="relative">
             <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-green-500/10 ring-1 ring-green-500/20">
@@ -93,7 +93,7 @@ function AutomaAuthPage() {
             </div>
           </div>
 
-          <div className="space-y-2">
+          <div className="flex flex-col gap-2">
             <h1 className="text-2xl font-bold tracking-tight">Kết nối Extension thành công!</h1>
             <p className="text-sm text-muted-foreground leading-relaxed">
               Automa Extension đã nhận được phiên đăng nhập của bạn. Bạn có thể đóng tab này và quay
@@ -112,13 +112,13 @@ function AutomaAuthPage() {
 
   // Chưa đăng nhập → hiển thị form login
   return (
-    <div className="flex flex-1 w-full items-center justify-center p-4">
-      <div className="w-full max-w-sm space-y-6">
+    <div className="flex flex-1 w-full items-center justify-center p-3">
+      <div className="w-full max-w-sm flex flex-col gap-6">
         <div className="flex flex-col items-center gap-3 text-center">
           <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 ring-1 ring-primary/20">
             <Puzzle className="h-6 w-6 text-primary" />
           </div>
-          <div className="space-y-1">
+          <div className="flex flex-col gap-1">
             <h1 className="text-xl font-semibold tracking-tight">Kết nối Automa Extension</h1>
             <p className="text-sm text-muted-foreground">
               Đăng nhập để đồng bộ phiên làm việc với Extension

@@ -106,7 +106,7 @@ export function AutoUpdater() {
 
           <div className="mt-4">
             {isUpdating ? (
-              <div className="space-y-2">
+              <div className="flex flex-col gap-2">
                 <div className="flex items-center justify-between text-xs font-medium">
                   <span className="text-muted-foreground">Đang tải xuống...</span>
                   <span>{percent}%</span>

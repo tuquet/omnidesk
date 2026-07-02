@@ -19,7 +19,7 @@ const PageHeader = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <div
     ref={ref}
-    className={cn("flex items-center justify-between space-y-2", className)}
+    className={cn("flex items-center justify-between", className)}
     {...props}
   />
 ))
@@ -31,7 +31,7 @@ const PageTitle = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <h1
     ref={ref}
-    className={cn("text-3xl font-bold tracking-tight", className)}
+    className={cn("text-lg font-semibold tracking-tight", className)}
     {...props}
   />
 ))

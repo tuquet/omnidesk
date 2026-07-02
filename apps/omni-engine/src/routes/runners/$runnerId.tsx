@@ -19,7 +19,7 @@ function RunnerDetailPage() {
 
   return (
     <PageContainer className="bg-background max-w-5xl mx-auto w-full flex flex-col h-[calc(100vh-80px)]">
-      <PageHeader className="pb-6 flex-none">
+      <PageHeader className="pb-3 flex-none">
         <div className="flex items-center gap-2">
           <Button variant="ghost" size="icon" asChild className="rounded-full h-10 w-10">
             <Link to={ROUTES.RUNNERS}>
@@ -57,7 +57,7 @@ function RunnerDetailPage() {
       </PageHeader>
 
       <Card className="flex-1 flex flex-col min-h-0 border-border/50 shadow-sm overflow-hidden">
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3 bg-muted/30 border-b flex-none">
+        <CardHeader className="flex flex-row items-center justify-between pb-3 bg-muted/30 border-b flex-none">
           <CardTitle className="text-base font-semibold flex items-center gap-2">
             <TerminalSquare className="w-5 h-5 text-muted-foreground" />
             Automa Live Logs
@@ -72,7 +72,7 @@ function RunnerDetailPage() {
         <ScrollArea className="flex-1 bg-zinc-950">
           <CardContent className="font-mono text-sm leading-relaxed p-2 text-zinc-300">
             {!isCurrentRunner && logs.length === 0 ? (
-              <div className="h-full flex flex-col items-center justify-center text-zinc-500 gap-2 p-4">
+              <div className="h-full flex flex-col items-center justify-center text-zinc-500 gap-2 p-3">
               <TerminalSquare className="w-16 h-16 opacity-30" strokeWidth={1} />
               <p className="text-base">No logs available for this runner.</p>
             </div>

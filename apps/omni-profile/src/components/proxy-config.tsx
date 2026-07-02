@@ -1,4 +1,4 @@
-import { Label, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Switch, Input } from '@omnidesk/ui';;
+import { Label, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Switch, Input, FieldGroup, Field, FieldLabel } from '@omnidesk/ui';
 import { ShieldIcon } from 'lucide-react';
 
 export interface ProxyData {
@@ -22,7 +22,7 @@ export function ProxyConfig({ proxy, onChange }: ProxyConfigProps) {
   };
 
   return (
-    <div className="space-y-2">
+    <div className="flex flex-col gap-2">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <ShieldIcon className="h-4 w-4 text-muted-foreground" />
@@ -35,12 +35,12 @@ export function ProxyConfig({ proxy, onChange }: ProxyConfigProps) {
       </div>
 
       {proxy.enabled && (
-        <div className="space-y-2 rounded-lg border p-3 bg-muted/30 animate-in fade-in slide-in-from-top-2 duration-300">
-          <div className="grid grid-cols-3 gap-2">
-            <div className="col-span-1 space-y-1.5">
-              <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+        <div className="flex flex-col gap-2 rounded-lg border p-3 bg-muted/30 animate-in fade-in slide-in-from-top-2 duration-300">
+          <FieldGroup className="grid grid-cols-3 gap-2">
+            <Field className="col-span-1">
+              <FieldLabel className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                 Protocol
-              </Label>
+              </FieldLabel>
               <Select
                 value={proxy.type && proxy.type !== 'AUTO' ? proxy.type : 'HTTP'}
                 onValueChange={(v: 'HTTP' | 'SOCKS5') => update({ type: v })}
@@ -53,52 +53,52 @@ export function ProxyConfig({ proxy, onChange }: ProxyConfigProps) {
                   <SelectItem value="SOCKS5">SOCKS5</SelectItem>
                 </SelectContent>
               </Select>
-            </div>
-            <div className="col-span-1 space-y-1.5">
-              <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+            </Field>
+            <Field className="col-span-1">
+              <FieldLabel className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                 Host / IP
-              </Label>
+              </FieldLabel>
               <Input
                 placeholder="192.168.1.1"
                 value={proxy.host || ''}
                 onChange={(e) => update({ host: e.target.value })}
               />
-            </div>
-            <div className="col-span-1 space-y-1.5">
-              <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+            </Field>
+            <Field className="col-span-1">
+              <FieldLabel className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                 Port
-              </Label>
+              </FieldLabel>
               <Input
                 placeholder="8080"
                 value={proxy.port || ''}
                 onChange={(e) => update({ port: e.target.value })}
               />
-            </div>
-          </div>
+            </Field>
+          </FieldGroup>
 
-          <div className="grid grid-cols-2 gap-2">
-            <div className="space-y-1.5">
-              <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+          <FieldGroup className="grid grid-cols-2 gap-2">
+            <Field>
+              <FieldLabel className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                 Username (Optional)
-              </Label>
+              </FieldLabel>
               <Input
                 placeholder="Username"
                 value={proxy.username || ''}
                 onChange={(e) => update({ username: e.target.value })}
               />
-            </div>
-            <div className="space-y-1.5">
-              <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+            </Field>
+            <Field>
+              <FieldLabel className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                 Password (Optional)
-              </Label>
+              </FieldLabel>
               <Input
                 type="password"
                 placeholder="Password"
                 value={proxy.password || ''}
                 onChange={(e) => update({ password: e.target.value })}
               />
-            </div>
-          </div>
+            </Field>
+          </FieldGroup>
         </div>
       )}
     </div>

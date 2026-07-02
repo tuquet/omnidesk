@@ -1,6 +1,6 @@
  
 import { memo, useRef, useMemo, useCallback } from 'react';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, Badge, Button, Skeleton, Tooltip, TooltipContent, TooltipProvider, TooltipTrigger, Checkbox } from '@omnidesk/ui';;
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, Badge, Button, Skeleton, Tooltip, TooltipContent, TooltipProvider, TooltipTrigger, Checkbox, ScrollArea } from '@omnidesk/ui';;
 import {
   PlayIcon,
   EditIcon,
@@ -335,7 +335,7 @@ export const WorkflowsTable = memo(function WorkflowsTable({
 
   const virtualizer = useVirtualizer({
     count: isLoading ? 0 : workflows.length,
-    getScrollElement: () => parentRef.current,
+    getScrollElement: () => parentRef.current?.querySelector('[data-radix-scroll-area-viewport]') as HTMLDivElement | null,
     estimateSize: () => 53,
     overscan: 10,
   });
@@ -349,9 +349,9 @@ export const WorkflowsTable = memo(function WorkflowsTable({
 
   return (
     <TooltipProvider delayDuration={300}>
-      <div
+      <ScrollArea
         ref={parentRef}
-        className="rounded-md border bg-card shadow-sm overflow-auto flex-1 relative"
+        className="rounded-md border bg-card shadow-sm flex-1 relative min-h-0"
       >
         <Table
           data-testid="table-workflows-list"
@@ -482,7 +482,7 @@ export const WorkflowsTable = memo(function WorkflowsTable({
             )}
           </TableBody>
         </Table>
-      </div>
+      </ScrollArea>
     </TooltipProvider>
   );
 });

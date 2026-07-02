@@ -17,13 +17,9 @@ function AuthCallbackPage() {
   useEffect(() => {
     const handleCallback = async () => {
       try {
-        // Supabase handles the code exchange automatically when
-        // the URL contains the auth parameters (code, access_token, etc.)
         const { data: { session }, error: authError } = await supabase.auth.getSession();
         
-        if (authError) {
-          throw authError;
-        }
+        if (authError) throw authError;
 
         if (session) {
           if (!hasToasted.current) {
@@ -32,8 +28,6 @@ function AuthCallbackPage() {
           }
           navigate({ to: DEFAULT_AUTHENTICATED_ROUTE });
         } else {
-          // If no session yet, Supabase may still be processing
-          // Listen for the auth state change
           const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
             if (event === 'SIGNED_IN' && session) {
               if (!hasToasted.current) {
@@ -45,13 +39,11 @@ function AuthCallbackPage() {
             }
           });
 
-          // Timeout after 10 seconds
           const timeoutId = setTimeout(() => {
             subscription.unsubscribe();
             setError('Xác thực hết thời gian. Vui lòng thử lại.');
           }, 10000);
 
-          // Cleanup on unmount
           return () => {
             clearTimeout(timeoutId);
             subscription.unsubscribe();
@@ -76,7 +68,7 @@ function AuthCallbackPage() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
           </div>
-          <div className="space-y-2">
+          <div className="flex flex-col gap-2">
             <h1 className="text-2xl font-bold tracking-tight">Xác thực thất bại</h1>
             <p className="text-sm text-muted-foreground">{error}</p>
           </div>

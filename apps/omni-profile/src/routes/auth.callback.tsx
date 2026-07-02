@@ -76,7 +76,7 @@ function AuthCallbackPage() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
           </div>
-          <div className="space-y-2">
+          <div className="flex flex-col gap-2">
             <h1 className="text-lg font-semibold tracking-tight">Xác thực thất bại</h1>
             <p className="text-sm text-muted-foreground">{error}</p>
           </div>

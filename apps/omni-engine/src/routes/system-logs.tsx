@@ -119,7 +119,7 @@ function SystemLogsPage() {
         </div>
 
         <ScrollArea className="flex-1 bg-[#0d1117]">
-          <div className="p-2 text-[#c9d1d9] font-mono text-xs leading-relaxed space-y-1">
+          <div className="p-2 text-[#c9d1d9] font-mono text-xs leading-relaxed flex flex-col gap-1">
           {filteredLogs.length === 0 ? (
             <div className="text-center text-muted-foreground italic mt-4">
               No logs match your filters.

@@ -1,7 +1,7 @@
 import type { BrowserProfile } from '@omnidesk/types';
 
 import { useRef, useMemo, useCallback } from 'react';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, Badge, Button, Skeleton, Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@omnidesk/ui';;
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, Badge, Button, Skeleton, Tooltip, TooltipContent, TooltipProvider, TooltipTrigger, ScrollArea } from '@omnidesk/ui';
 import {
   PlayIcon,
   EditIcon,
@@ -263,7 +263,7 @@ export function ProfileTable({
 
   const virtualizer = useVirtualizer({
     count: isLoading ? 0 : profiles.length,
-    getScrollElement: () => parentRef.current,
+    getScrollElement: () => (parentRef.current?.querySelector('[data-slot="scroll-area-viewport"]') as HTMLDivElement | null) || parentRef.current,
     estimateSize: () => 53, // Estimated row height including border
     overscan: 10,
   });
@@ -277,9 +277,9 @@ export function ProfileTable({
 
   return (
     <TooltipProvider delayDuration={300}>
-      <div
+      <ScrollArea
         ref={parentRef}
-        className="rounded-md border bg-card shadow-sm overflow-auto h-[calc(100vh-280px)] min-h-[400px] relative"
+        className="rounded-md border bg-card shadow-sm h-[calc(100vh-280px)] min-h-[400px] relative"
       >
         <Table
           data-testid="table-profile-list"
@@ -418,7 +418,7 @@ export function ProfileTable({
             )}
           </TableBody>
         </Table>
-      </div>
+      </ScrollArea>
     </TooltipProvider>
   );
 }
