@@ -1,8 +1,3 @@
----
-name: shadcn-desktop-design
-description: Áp dụng các tiêu chuẩn thiết kế High-Density (Mật độ cao) / Compact UI dành riêng cho Desktop App khi sử dụng Shadcn UI.
----
-
 # Hướng Dẫn Thiết Kế Giao Diện Desktop (High-Density UI) với Shadcn
 
 Khi bạn (AI Agent) được yêu cầu tạo mới hoặc chỉnh sửa các giao diện UI sử dụng Shadcn trong dự án OmniDesk, bạn **BẮT BUỘC** phải tuân thủ các quy tắc thiết kế dạng "Compact/High-Density" dành cho ứng dụng Desktop (tương tự như VS Code, Notion, Figma). Tuyệt đối không thiết kế theo dạng Mobile-first thưa thớt.
