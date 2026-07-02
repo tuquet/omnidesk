@@ -2,7 +2,7 @@ import glob
 import re
 import os
 
-files = glob.glob('d:/Repository/kill-bug-machine/packages/ui/src/**/*.tsx', recursive=True)
+files = glob.glob('./src/**/*.tsx', recursive=True)
 
 for f in files:
     with open(f, 'r', encoding='utf-8') as file:
