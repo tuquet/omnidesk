@@ -140,7 +140,7 @@ pub fn run() {
 
                             tauri::async_runtime::spawn(async move {
                                 // Start Background Worker for Offline Queue
-                                services::worker::start_background_worker(pool_for_worker);
+                                omni_shared::worker::start_background_worker(pool_for_worker);
 
                                 // Realtime listener has been extracted/removed
 

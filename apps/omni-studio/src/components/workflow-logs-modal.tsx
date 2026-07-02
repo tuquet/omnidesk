@@ -88,12 +88,12 @@ export function WorkflowLogsModal({ workflowId, isOpen, onOpenChange }: Workflow
       }
     } else {
       if (!selectedRunId || !runs.some(r => r.id === selectedRunId)) {
-        setSelectedRunId(runs[0].id);
+        setSelectedRunId(runs[0]!.id);
       }
     }
   }, [runs, selectedRunId, isRunsLoading]);
 
-  const selectedRun = runs.find((r) => r.id === selectedRunId);
+  const selectedRun = runs?.find((r) => r.id === selectedRunId);
   const isRunActive = selectedRun?.status === 'RUNNING';
 
   // Fetch logs for selected run

@@ -24,8 +24,6 @@ pub struct AppState {
     pub app_handle: AppHandle,
     /// Broadcast channel for sync WS — notifies Extension of workflow changes
     pub sync_tx: tokio::sync::broadcast::Sender<handlers::sync_ws::SyncEvent>,
-    /// Broadcast channel for automa WS — notifies Extension to execute workflows
-    pub automa_ws_tx: tokio::sync::broadcast::Sender<omni_shared::automa::AutomaEvent>,
     pub active_sync_connections: Arc<std::sync::atomic::AtomicUsize>,
 }
 
@@ -89,7 +87,6 @@ pub struct ApiDoc;
 pub async fn serve(pool: SqlitePool, app_dir: PathBuf, port: u16, app_handle: AppHandle) {
     let mcp_sessions = Arc::new(RwLock::new(HashMap::new()));
     let (sync_tx, _rx) = tokio::sync::broadcast::channel(100);
-    let (automa_ws_tx, _) = tokio::sync::broadcast::channel(100);
 
     let state = AppState {
         db: pool.clone(),
@@ -97,7 +94,6 @@ pub async fn serve(pool: SqlitePool, app_dir: PathBuf, port: u16, app_handle: Ap
         app_dir: app_dir.clone(),
         app_handle,
         sync_tx: sync_tx.clone(),
-        automa_ws_tx,
         active_sync_connections: Arc::new(std::sync::atomic::AtomicUsize::new(0)),
     };
 
@@ -118,8 +114,10 @@ pub async fn serve(pool: SqlitePool, app_dir: PathBuf, port: u16, app_handle: Ap
         .nest("/api/automa/workflows", handlers::workflows::router())
         .nest("/api/workflows", handlers::workflows::router()) // Alias for Automa Extension
         .nest("/api/me/workflows", handlers::workflows::router()) // Alias for Automa Extension's /me/workflows
-        .nest("/api/mcp", handlers::mcp::router())
+        .nest("/api/mcp", omni_shared::mcp::handler::router().with_state(omni_shared::mcp::handler::SharedMcpState { db: state.db.clone(), mcp_sessions: state.mcp_sessions.clone() }))
         .nest("/api/git", handlers::git::router())
+        .nest("/api/automa/folders", handlers::folders::router())
+        .nest("/api/automa/schedules", handlers::schedules::router())
         .nest("/api/automa", handlers::automa::router())
         .route(
             "/api/automa/ws/sync",

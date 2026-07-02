@@ -62,6 +62,10 @@ class WorkflowManager {
       blocksHandler: blocksHandler(),
     });
 
+    if (options?.runId) {
+      engine.id = options.runId;
+    }
+
     engine.init();
     
     // Notify Studio that the workflow has started

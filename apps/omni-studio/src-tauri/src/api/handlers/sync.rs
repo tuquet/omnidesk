@@ -1,10 +1,9 @@
 use crate::api::AppState;
 use crate::db::models::workflow::Workflow;
 use crate::error::AppError;
-use crate::services::file_watcher::FileWatcherService;
-use crate::services::workflow_service::WorkflowService;
+use omni_shared::services::workflow_service::WorkflowService;
 use axum::{
-    extract::{Path, State},
+    extract::{Path, State, Query},
     routing::{get, post},
     Json, Router,
 };
@@ -60,10 +59,15 @@ async fn push_workflows(
     let mut upserted = 0;
     let mut synced_workflows = Vec::new();
     for workflow in &payload.workflows {
+        if let Ok(existing) = WorkflowService::get_by_id(&state.db, &workflow.id).await {
+            if existing.is_identical_data(workflow) {
+                continue;
+            }
+        }
+
         // Upsert into SQLite
         if let Ok(wf) = WorkflowService::upsert(&state.db, workflow).await {
-            // Export to file for OneDrive sync
-            let _ = FileWatcherService::export_workflow_file(&watch_dir, &wf).await;
+            // File Watcher is removed.
             synced_workflows.push(wf);
             upserted += 1;
         }
@@ -104,10 +108,7 @@ async fn export_workflow(
     let workflow = WorkflowService::get_by_id(&state.db, &id).await?;
 
     // Also write to the watch directory
-    let watch_dir = state.app_dir.join("workflows");
-    std::fs::create_dir_all(&watch_dir)
-        .map_err(|e| AppError::Internal(format!("Failed to create watch dir: {}", e)))?;
-    FileWatcherService::export_workflow_file(&watch_dir, &workflow).await?;
+    // File Watcher is removed.
 
     Ok(Json(workflow))
 }
@@ -124,29 +125,33 @@ async fn export_workflow(
 )]
 async fn import_workflow(
     State(state): State<AppState>,
+    Query(_params): Query<crate::api::handlers::workflows::WorkspaceQuery>,
     Json(mut payload): Json<omni_shared::automa::workflow::WorkflowPayload>,
 ) -> Result<Json<Workflow>, AppError> {
-    // Agent-generated files might have empty IDs or names
     if payload.id.trim().is_empty() {
-        let name_bytes = if payload.name.trim().is_empty() {
-            b"Untitled Workflow"
-        } else {
-            payload.name.as_bytes()
-        };
-        payload.id = uuid::Uuid::new_v5(&uuid::Uuid::NAMESPACE_OID, name_bytes).to_string();
+        payload.id = uuid::Uuid::new_v4().to_string();
     }
     if payload.name.trim().is_empty() {
         payload.name = "Untitled Workflow".to_string();
     }
 
+    if payload.created_at.as_deref().map(|s| s.trim().is_empty()).unwrap_or(false) {
+        payload.created_at = None;
+    }
+    if payload.updated_at.as_deref().map(|s| s.trim().is_empty()).unwrap_or(false) {
+        payload.updated_at = None;
+    }
+
     let workflow: Workflow = payload.into();
+
+    if let Ok(existing) = WorkflowService::get_by_id(&state.db, &workflow.id).await {
+        if existing.is_identical_data(&workflow) {
+            return Ok(Json(existing));
+        }
+    }
+
     let upserted = WorkflowService::upsert(&state.db, &workflow).await?;
-    let watch_dir = state.app_dir.join("workflows");
-    let _ = std::fs::create_dir_all(&watch_dir);
-    let _ = crate::services::file_watcher::FileWatcherService::export_workflow_file(
-        &watch_dir, &upserted,
-    )
-    .await;
+    // File Watcher is removed.
 
     // Broadcast to Extension that there's a new workflow
     let event = crate::api::handlers::sync_ws::SyncEvent {
@@ -213,13 +218,26 @@ async fn sync_local(
     let db_ids: std::collections::HashSet<String> =
         active_workflows.into_iter().map(|w| w.id).collect();
 
-    let entries = std::fs::read_dir(&watch_dir)
-        .map_err(|e| AppError::Internal(format!("Failed to read dir: {}", e)))?;
+    let walker = walkdir::WalkDir::new(&watch_dir).into_iter();
 
     let mut count = 0;
     let mut file_ids = std::collections::HashSet::new();
+    let mut walker_error = false;
 
-    for entry in entries.flatten() {
+    for entry_res in walker {
+        let entry = match entry_res {
+            Ok(e) => e,
+            Err(e) => {
+                log::error!("Error reading workflows directory: {}", e);
+                walker_error = true;
+                break;
+            }
+        };
+
+        if !entry.file_type().is_file() {
+            continue;
+        }
+
         let path = entry.path();
         if path.extension().is_some_and(|ext| ext == "json") {
             let content = match std::fs::read_to_string(&path) {
@@ -241,13 +259,6 @@ async fn sync_local(
                 }
 
                 if WorkflowService::upsert(&state.db, &workflow).await.is_ok() {
-                    let expected_filename = format!("{}.automa.json", workflow.id);
-                    if path.file_name().and_then(|s| s.to_str()) != Some(&expected_filename) {
-                        let new_path = path.with_file_name(&expected_filename);
-                        if let Ok(_) = std::fs::rename(&path, &new_path) {
-                            log::info!("Sync: Auto-renamed {:?} to {:?}", path, new_path);
-                        }
-                    }
                     file_ids.insert(workflow.id.clone());
                     count += 1;
                 }
@@ -278,12 +289,26 @@ async fn sync_local(
                         .map(|s| s.to_string());
                     let drawflow = obj
                         .get("drawflow")
-                        .map(|v| v.to_string())
-                        .unwrap_or_else(|| "{}".to_string());
+                        .map(|v| {
+                            if let Some(s) = v.as_str() {
+                                serde_json::from_str(s).unwrap_or_else(|_| serde_json::json!({}))
+                            } else {
+                                v.clone()
+                            }
+                        })
+                        .map(sqlx::types::Json)
+                        .unwrap_or_else(|| sqlx::types::Json(serde_json::json!({})));
                     let settings = obj
                         .get("settings")
-                        .map(|v| v.to_string())
-                        .unwrap_or_else(|| "{}".to_string());
+                        .map(|v| {
+                            if let Some(s) = v.as_str() {
+                                serde_json::from_str(s).unwrap_or_else(|_| serde_json::json!({}))
+                            } else {
+                                v.clone()
+                            }
+                        })
+                        .map(sqlx::types::Json)
+                        .unwrap_or_else(|| sqlx::types::Json(serde_json::json!({})));
                     let _is_disabled = obj.get("isDisabled").and_then(|v| v.as_bool()).unwrap_or(false);
 
                     if id.trim().is_empty() {
@@ -298,12 +323,12 @@ async fn sync_local(
                     }
 
                     let global_data = obj.get("globalData").map(|v| {
-                        if v.is_string() {
-                            v.as_str().unwrap().to_string()
+                        if let Some(s) = v.as_str() {
+                            serde_json::from_str(s).unwrap_or_else(|_| serde_json::json!({}))
                         } else {
-                            v.to_string()
+                            v.clone()
                         }
-                    });
+                    }).map(sqlx::types::Json);
                     let version = obj
                         .get("version")
                         .and_then(|v| v.as_str())
@@ -333,20 +358,16 @@ async fn sync_local(
                     };
 
                     if WorkflowService::upsert(&state.db, &workflow).await.is_ok() {
-                        let expected_filename = format!("{}.automa.json", id);
-                        if path.file_name().and_then(|s| s.to_str()) != Some(&expected_filename) {
-                            let new_path = path.with_file_name(&expected_filename);
-                            if let Ok(_) = std::fs::rename(&path, &new_path) {
-                                log::info!("Sync: Auto-renamed {:?} to {:?}", path, new_path);
-                            }
-                        }
-
                         file_ids.insert(id);
                         count += 1;
                     }
                 }
             }
         }
+    }
+
+    if walker_error {
+        return Err(AppError::Internal("Failed to read workflow directory completely. Aborting sync reconciliation to prevent data loss.".to_string()));
     }
 
     // 3. Reconcile: Soft-delete DB workflows not found in the filesystem

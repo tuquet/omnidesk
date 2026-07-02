@@ -28,9 +28,9 @@ pub fn start_background_worker(pool: SqlitePool) {
         loop {
             interval.tick().await;
 
-            // Fetch pending jobs
+            // Fetch pending jobs atomically with RETURNING to prevent race conditions between Omni apps
             let jobs_result = sqlx::query_as::<_, SyncJob>(
-                "SELECT id, user_id, action, payload FROM sync_queue WHERE status = 'PENDING' ORDER BY created_at ASC"
+                "UPDATE sync_queue SET status = 'PROCESSING' WHERE status = 'PENDING' RETURNING id, user_id, action, payload"
             )
             .fetch_all(&pool)
             .await;
@@ -49,7 +49,7 @@ pub fn start_background_worker(pool: SqlitePool) {
 
                     // Decrypt Payload
                     let (priv_key, _pub) =
-                        match omni_shared::crypto::get_or_generate_keypair(&job.user_id) {
+                        match crate::crypto::get_or_generate_keypair(&job.user_id) {
                             Ok(keys) => keys,
                             Err(e) => {
                                 eprintln!(
@@ -60,7 +60,7 @@ pub fn start_background_worker(pool: SqlitePool) {
                             }
                         };
 
-                    let decrypted_payload = match omni_shared::crypto::decrypt_payload(
+                    let decrypted_payload = match crate::crypto::decrypt_payload(
                         &priv_key,
                         &job.payload,
                     ) {
@@ -77,7 +77,7 @@ pub fn start_background_worker(pool: SqlitePool) {
 
                     // Sign Payload
                     let signature =
-                        match omni_shared::crypto::sign_payload(&priv_key, &decrypted_payload) {
+                        match crate::crypto::sign_payload(&priv_key, &decrypted_payload) {
                             Ok(s) => s,
                             Err(e) => {
                                 eprintln!("[Worker] Failed to sign job {}: {:?}", job.id, e);

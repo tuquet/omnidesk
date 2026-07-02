@@ -4,6 +4,7 @@ import { RunWorkflowModal } from '@omnidesk/features';;
 import { WorkflowIcon, FolderOpenIcon, AlertCircleIcon } from 'lucide-react';
 import { useState, useMemo, useDeferredValue, useCallback, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { z } from 'zod';
 import { toast } from 'sonner';
 import { client } from '@/lib/api-client';
 import { useWorkspaceStore, usePlatform } from '@omnidesk/core';
@@ -14,12 +15,38 @@ import {
   importWorkflow,
   deleteWorkflow,
   updateWorkflow,
-  syncLocal,
   type WorkflowPayload
 } from '@omnidesk/types/client';
 import { WorkflowsToolbar } from '../components/workflows-toolbar';
 import { WorkflowJsonEditorModal } from '../components/workflow-json-editor-modal';
 import { WorkflowLogsModal } from '../components/workflow-logs-modal';
+
+const ImportWorkflowSchema = z.object({
+  id: z.string().optional().transform(v => (v && v.trim() !== '') ? v : crypto.randomUUID()),
+  name: z.string().default('Imported Workflow'),
+  description: z.string().optional().nullable(),
+  icon: z.string().optional().nullable(),
+  folder_id: z.string().optional().nullable(),
+  trigger: z.any().optional().nullable(),
+  version: z.string().optional().nullable(),
+  drawflow: z.object({
+    nodes: z.any(),
+    edges: z.any()
+  }),
+  settings: z.any().default({}),
+  global_data: z.any().optional().nullable(),
+  table_data: z.any().optional().nullable(),
+  data_columns: z.any().optional().nullable(),
+  content: z.string().optional().nullable(),
+  connected_table: z.string().optional().nullable(),
+  is_disabled: z.number().optional().nullable(),
+  source: z.string().optional().nullable()
+}).transform((data: any) => {
+  // Automa logic: handle table/dataColumns
+  data.table_data = data.table_data || data.data_columns;
+  delete data.data_columns;
+  return data;
+});
 
 export const Route = createFileRoute('/')({
   component: WorkflowsPage,
@@ -75,15 +102,7 @@ function WorkflowsPage() {
     queryFn: async () => {
       if (!selectedWorkspacePath) return [];
 
-      // We first trigger a sync from local folder to SQLite (only in active mode)
-      if (viewMode === 'active') {
-        await syncLocal({
-          client,
-          body: { folder_path: selectedWorkspacePath },
-        });
-      }
-
-      // Then fetch from SQLite
+      // Fetch from SQLite directly
       // Note: We don't have a specific GET /trash endpoint in the generated SDK yet.
       // Assuming listWorkflows handles it, or we fallback to client.request for trash
       let result;
@@ -130,6 +149,8 @@ function WorkflowsPage() {
       const { data, error } = await importWorkflow({
         client,
         body: workflowJson as WorkflowPayload,
+        // @ts-expect-error typed query might not support this
+        query: { workspacePath: selectedWorkspacePath },
       });
       if (error) throw error;
       return data;
@@ -451,11 +472,33 @@ function WorkflowsPage() {
           )}
         </PageTitle>
         <div className="flex gap-2">
+          {isWorkspaceSelected && selectedWorkspacePath && (
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={async () => {
+                try {
+                  await platformApi.invoke('plugin:omni_tauri_core|open_folder', { path: selectedWorkspacePath });
+                } catch {
+                  // Fallback for direct invoke
+                  try {
+                    await platformApi.invoke('open_folder', { path: selectedWorkspacePath });
+                  } catch {
+                    toast.error('Failed to open workspace folder');
+                  }
+                }
+              }}
+              className="h-8 w-8"
+              title="Open Workspace in Explorer"
+            >
+              <FolderOpenIcon className="h-4 w-4" />
+            </Button>
+          )}
           <Button
             variant="outline"
             size="sm"
             onClick={handleSelectWorkspace}
-            className="text-xs"
+            className="text-xs h-8"
             title={selectedWorkspacePath || 'Select Workspace'}
           >
             <FolderOpenIcon className="mr-2 h-3.5 w-3.5" />
@@ -480,26 +523,48 @@ function WorkflowsPage() {
               }}
               onImport={(content) => {
                 try {
-                  const parsed = JSON.parse(content) as unknown;
-                  const workflows: Partial<Workflow>[] = Array.isArray(parsed)
-                    ? (parsed as Partial<Workflow>[])
-                    : ([parsed] as Partial<Workflow>[]);
+                  const rawParsed = JSON.parse(content);
+                  const workflowsToProcess: any[] = [];
 
-                  if (workflows.length === 0) {
+                  const processRaw = (raw: any) => {
+                    if (!raw || typeof raw !== 'object') return;
+                    workflowsToProcess.push(raw);
+                    
+                    if (raw.includedWorkflows) {
+                      Object.keys(raw.includedWorkflows).forEach((workflowId) => {
+                        const subWf = raw.includedWorkflows[workflowId];
+                        if (subWf) {
+                          subWf.id = workflowId;
+                          workflowsToProcess.push(subWf);
+                        }
+                      });
+                    }
+                  };
+
+                  if (Array.isArray(rawParsed)) {
+                    rawParsed.forEach(processRaw);
+                  } else {
+                    processRaw(rawParsed);
+                  }
+
+                  if (workflowsToProcess.length === 0) {
                     throw new Error('No workflows found in file');
                   }
 
                   let successCount = 0;
-                  for (const wf of workflows) {
-                    if (!wf || typeof wf !== 'object') continue;
+                  for (const rawWf of workflowsToProcess) {
+                    if (rawWf.extId && !rawWf.id) {
+                      rawWf.id = rawWf.extId;
+                    }
+                    
+                    const result = ImportWorkflowSchema.safeParse(rawWf);
+                    
+                    if (!result.success) {
+                      const errorMessages = result.error.issues.map((e: z.ZodIssue) => `${e.path.join('.')}: ${e.message}`).join(', ');
+                      throw new Error(`Invalid format for "${rawWf.name || 'Unknown'}": ${errorMessages}`);
+                    }
 
-                    // Assign missing required fields
-                    wf.id = wf.id || (wf as Record<string, string>).extId || crypto.randomUUID();
-                    wf.name = wf.name || 'Imported Workflow';
-                    wf.drawflow = wf.drawflow || ({} as Workflow['drawflow']);
-                    wf.settings = wf.settings || ({} as Workflow['settings']);
-
-                    importMutation.mutate(wf);
+                    importMutation.mutate(result.data as WorkflowPayload);
                     successCount++;
                   }
 

@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useDeferredValue } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -115,18 +115,20 @@ function WorkflowEditorCore({
 }) {
   const queryClient = useQueryClient();
   const [jsonValue, setJsonValue] = useState<string>(() => JSON.stringify(initialData, null, 2));
+  const deferredJsonValue = useDeferredValue(jsonValue);
+
   const [activeTab, setActiveTab] = useState<string>('json');
   const [globalDataStr, setGlobalDataStr] = useState<string>(() => JSON.stringify(initialData.global_data || {}, null, 2));
 
   const { parsedJson, isValidJson } = useMemo(() => {
-    if (!jsonValue) return { parsedJson: null, isValidJson: true };
+    if (!deferredJsonValue) return { parsedJson: null, isValidJson: true };
     try {
-      const parsed = JSON.parse(jsonValue) as WorkflowDataParsed;
+      const parsed = JSON.parse(deferredJsonValue) as WorkflowDataParsed;
       return { parsedJson: parsed, isValidJson: true };
     } catch {
       return { parsedJson: null, isValidJson: false };
     }
-  }, [jsonValue]);
+  }, [deferredJsonValue]);
 
   const isGlobalDataValid = useMemo(() => {
     try {
@@ -176,26 +178,44 @@ function WorkflowEditorCore({
   });
 
   const handleSave = () => {
-    try {
-      const parsed = JSON.parse(jsonValue) as WorkflowDataParsed;
-      saveMutation.mutate(parsed);
-    } catch {
+    if (!isValidJson || !parsedJson) {
       toast.error('Invalid JSON format. Please fix the errors before saving.');
+      return;
     }
+
+    let payloadToSave = parsedJson;
+    // If the user is on the global_data tab and clicks Save, we need to merge the latest text
+    if (activeTab === 'global_data') {
+      try {
+        const globalParsed = JSON.parse(globalDataStr);
+        payloadToSave = { ...parsedJson, global_data: globalParsed };
+      } catch {
+        toast.error('Invalid Global Data JSON format. Please fix the errors before saving.');
+        return;
+      }
+    }
+
+    saveMutation.mutate(payloadToSave);
   };
 
   return (
     <>
       <div className="flex-1 min-h-0 relative px-6 py-2 flex flex-col">
         <Tabs value={activeTab} onValueChange={(val) => {
-          setActiveTab(val);
-          if (val === 'global_data' && isValidJson) {
+          // If leaving global_data tab, merge global_data back into jsonValue
+          if (activeTab === 'global_data' && val !== 'global_data' && isValidJson && parsedJson) {
             try {
-              const parsed = JSON.parse(jsonValue) as WorkflowDataParsed;
-              setGlobalDataStr(JSON.stringify(parsed.global_data || {}, null, 2));
+              const globalParsed = JSON.parse(globalDataStr);
+              const newParsed = { ...parsedJson, global_data: globalParsed };
+              setJsonValue(JSON.stringify(newParsed, null, 2));
             } catch {
-              // ignore
+              // ignore invalid global data when switching
             }
+          }
+          
+          setActiveTab(val);
+          if (val === 'global_data' && isValidJson && parsedJson) {
+            setGlobalDataStr(JSON.stringify(parsedJson.global_data || {}, null, 2));
           }
         }} className="flex-1 flex flex-col min-h-0">
           <TabsList className="mb-2 self-start">
@@ -270,14 +290,6 @@ function WorkflowEditorCore({
               onChange={(val) => {
                 if (val !== undefined) {
                   setGlobalDataStr(val);
-                    try {
-                      const parsedGlobal = JSON.parse(val) as Record<string, unknown>;
-                      const parsedMain = JSON.parse(jsonValue) as WorkflowDataParsed;
-                      parsedMain.global_data = parsedGlobal;
-                      setJsonValue(JSON.stringify(parsedMain, null, 2));
-                    } catch {
-                      // wait for valid JSON
-                    }
                 }
               }}
               theme="vs-dark"

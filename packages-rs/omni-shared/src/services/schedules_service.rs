@@ -1,7 +1,28 @@
-use crate::api::handlers::schedules::{CreateSchedulePayload, UpdateSchedulePayload};
-use crate::db::models::workflow::Schedule;
 use crate::error::AppError;
+use crate::models::workflow::Schedule;
+use serde::Deserialize;
 use sqlx::SqlitePool;
+use utoipa::ToSchema;
+
+// ─── Payload Types (shared between Studio & Engine) ─────────
+
+#[derive(Debug, Deserialize, ToSchema)]
+pub struct CreateSchedulePayload {
+    pub name: String,
+    pub workflow_id: String,
+    pub profile_id: String,
+    pub cron_expr: String,
+}
+
+#[derive(Debug, Deserialize, ToSchema)]
+pub struct UpdateSchedulePayload {
+    pub name: Option<String>,
+    pub workflow_id: Option<String>,
+    pub profile_id: Option<String>,
+    pub cron_expr: Option<String>,
+}
+
+// ─── Pure CRUD Service (no scheduler dependency) ─────────
 
 pub async fn list_schedules(pool: &SqlitePool) -> Result<Vec<Schedule>, AppError> {
     let schedules =
@@ -46,7 +67,6 @@ pub async fn update_schedule(
     id: &str,
     payload: &UpdateSchedulePayload,
 ) -> Result<Schedule, AppError> {
-    let now_str = chrono::Utc::now().to_rfc3339();
     let mut schedule = get_schedule(pool, id).await?;
 
     if let Some(ref n) = payload.name {
@@ -61,7 +81,6 @@ pub async fn update_schedule(
     if let Some(ref c) = payload.cron_expr {
         schedule.cron_expr = c.clone();
     }
-    schedule.updated_at = Some(now_str);
 
     sqlx::query(
         "UPDATE schedules SET name = ?, workflow_id = ?, profile_id = ?, cron_expr = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?"
@@ -74,6 +93,7 @@ pub async fn update_schedule(
     .execute(pool)
     .await?;
 
+    schedule.updated_at = Some(chrono::Utc::now().to_rfc3339());
     Ok(schedule)
 }
 
@@ -94,7 +114,6 @@ pub async fn toggle_schedule(pool: &SqlitePool, id: &str) -> Result<Schedule, Ap
     let mut schedule = get_schedule(pool, id).await?;
 
     let new_val = if schedule.is_enabled == Some(1) { 0 } else { 1 };
-    let now_str = chrono::Utc::now().to_rfc3339();
 
     sqlx::query("UPDATE schedules SET is_enabled = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?")
         .bind(new_val)
@@ -103,7 +122,7 @@ pub async fn toggle_schedule(pool: &SqlitePool, id: &str) -> Result<Schedule, Ap
         .await?;
 
     schedule.is_enabled = Some(new_val);
-    schedule.updated_at = Some(now_str);
+    schedule.updated_at = Some(chrono::Utc::now().to_rfc3339());
 
     Ok(schedule)
 }

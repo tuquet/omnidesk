@@ -205,6 +205,7 @@ function handleExecuteWorkflow(payload) {
       trigger: 'api',
       data: { variables: variables || {} },
       checkParams: false,
+      runId: run_id,
     });
   }
 }

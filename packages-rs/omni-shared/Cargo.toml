@@ -27,3 +27,4 @@ tauri = { version = "2", features = ["protocol-asset", "macos-private-api", "tra
 axum = { version = "0.7", features = ["ws"] }
 omni-tauri-core = { version = "0.1.0", path = "../omni-tauri-core" }
 jsonwebtoken = "10.4.0"
+async-stream = "0.3.6"

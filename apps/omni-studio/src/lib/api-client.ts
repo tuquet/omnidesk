@@ -6,9 +6,8 @@ import type { ApiResponse, ApiError } from '@omnidesk/types';
 import { ERROR_CODES } from '@omnidesk/types';
 
 import { WORKFLOW_API_URL } from '@omnidesk/core';
-import type { Client } from '@omnidesk/types/client';
 
-const client = createClient({}) as unknown as Client;
+const client = createClient({}) as any;
 
 // ─── Config ────────────────────────────────────────────────────────────────────
 
@@ -87,10 +86,16 @@ client.interceptors.response.use(async (response: Response) => {
 
   // Try to parse response body as ApiResponse
   let body: ApiResponse | null = null;
+  let textBody: string | null = null;
   try {
     body = (await response.clone().json()) as unknown as ApiResponse;
   } catch {
-    // Response body is not JSON
+    // Response body is not JSON, might be plain text from axum (e.g. 422 Unprocessable Entity)
+    try {
+      textBody = await response.clone().text();
+    } catch {
+      // ignore
+    }
   }
 
   // If backend returned structured errors, resolve via i18n
@@ -112,29 +117,29 @@ client.interceptors.response.use(async (response: Response) => {
   // Fallback: backend didn't return structured errors
   switch (response.status) {
     case 401:
-      toastErrorWithCopy(i18n.t(ERROR_CODES.AUTH.UNAUTHORIZED));
+      toastErrorWithCopy(i18n.t(ERROR_CODES.AUTH.UNAUTHORIZED), textBody || undefined);
       authActions.logout().catch(console.error);
       window.location.href = '/login';
       break;
     case 403:
-      toastErrorWithCopy(i18n.t(ERROR_CODES.AUTH.FORBIDDEN));
+      toastErrorWithCopy(i18n.t(ERROR_CODES.AUTH.FORBIDDEN), textBody || undefined);
       break;
     case 404:
-      toastErrorWithCopy(i18n.t(ERROR_CODES.RESOURCE.NOT_FOUND));
+      toastErrorWithCopy(i18n.t(ERROR_CODES.RESOURCE.NOT_FOUND), textBody || undefined);
       break;
     case 429:
-      toastErrorWithCopy(i18n.t(ERROR_CODES.SERVER.RATE_LIMIT));
+      toastErrorWithCopy(i18n.t(ERROR_CODES.SERVER.RATE_LIMIT), textBody || undefined);
       break;
     case 503:
-      toastErrorWithCopy(i18n.t(ERROR_CODES.SERVER.SERVICE_UNAVAILABLE));
+      toastErrorWithCopy(i18n.t(ERROR_CODES.SERVER.SERVICE_UNAVAILABLE), textBody || undefined);
       break;
     default:
       if (response.status >= 500) {
-        const msg = `${response.status}: ${response.statusText}`;
-        toastErrorWithCopy(i18n.t(ERROR_CODES.SERVER.INTERNAL_ERROR), msg);
-        console.error(`API Error 500+: ${response.url} - ${msg}`);
+        const msg = `${response.status}: ${response.statusText || 'Server Error'}`;
+        toastErrorWithCopy(i18n.t(ERROR_CODES.SERVER.INTERNAL_ERROR), textBody || msg);
+        console.error(`API Error 500+: ${response.url} - ${msg}`, textBody);
       } else {
-        toastErrorWithCopy(`${response.status}: ${response.statusText}`);
+        toastErrorWithCopy(`${response.status}: ${response.statusText || 'Error'}`, textBody || undefined);
       }
   }
 

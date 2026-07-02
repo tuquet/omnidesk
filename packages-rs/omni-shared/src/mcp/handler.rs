@@ -9,19 +9,22 @@ use std::convert::Infallible;
 use tokio::sync::mpsc;
 use uuid::Uuid;
 
-use crate::{api::AppState, services::mcp_service};
-use axum::routing::{get, post};
+use crate::services::mcp_service;
+use sqlx::SqlitePool;
+use std::sync::Arc;
+use tokio::sync::RwLock;
+use std::collections::HashMap;
 
-pub fn router() -> axum::Router<AppState> {
-    axum::Router::new()
-        .route("/sse", get(mcp_sse))
-        .route("/messages", post(mcp_messages))
+#[derive(Clone)]
+pub struct SharedMcpState {
+    pub db: SqlitePool,
+    pub mcp_sessions: Arc<RwLock<HashMap<String, mpsc::Sender<serde_json::Value>>>>,
 }
 
-use omni_shared::models::mcp::{JsonRpcRequest, JsonRpcResponse, SessionQuery};
+use crate::models::mcp::{JsonRpcRequest, JsonRpcResponse, SessionQuery};
 
 pub async fn mcp_sse(
-    State(state): State<AppState>,
+    State(state): State<SharedMcpState>,
 ) -> Sse<impl Stream<Item = Result<Event, Infallible>>> {
     let session_id = Uuid::now_v7().to_string();
     let (tx, mut rx) = mpsc::channel::<serde_json::Value>(32);
@@ -57,7 +60,7 @@ pub async fn mcp_sse(
 }
 
 pub async fn mcp_messages(
-    State(state): State<AppState>,
+    State(state): State<SharedMcpState>,
     Query(query): Query<SessionQuery>,
     Json(payload): Json<JsonRpcRequest>,
 ) -> Result<StatusCode, (StatusCode, String)> {
@@ -257,3 +260,13 @@ async fn handle_mcp_request(req: JsonRpcRequest, _db: sqlx::SqlitePool) -> JsonR
 
     response
 }
+
+use axum::routing::{get, post};
+use axum::Router;
+
+pub fn router() -> Router<SharedMcpState> {
+    Router::new()
+        .route("/sse", get(mcp_sse))
+        .route("/messages", post(mcp_messages))
+}
+

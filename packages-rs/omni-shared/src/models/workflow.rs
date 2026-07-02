@@ -10,12 +10,18 @@ pub struct Workflow {
     pub icon: Option<String>,
     pub folder_id: Option<String>,
     pub description: Option<String>,
-    pub drawflow: String,
-    pub settings: String,
-    pub trigger: Option<String>,
-    pub global_data: Option<String>,
-    pub table_data: Option<String>,
-    pub data_columns: Option<String>,
+    #[schema(value_type = Object)]
+    pub drawflow: sqlx::types::Json<serde_json::Value>,
+    #[schema(value_type = Object)]
+    pub settings: sqlx::types::Json<serde_json::Value>,
+    #[schema(value_type = Option<Object>)]
+    pub trigger: Option<sqlx::types::Json<serde_json::Value>>,
+    #[schema(value_type = Option<Object>)]
+    pub global_data: Option<sqlx::types::Json<serde_json::Value>>,
+    #[schema(value_type = Option<Object>)]
+    pub table_data: Option<sqlx::types::Json<serde_json::Value>>,
+    #[schema(value_type = Option<Object>)]
+    pub data_columns: Option<sqlx::types::Json<serde_json::Value>>,
     pub content: Option<String>,
     pub connected_table: Option<String>,
     pub version: Option<String>,
@@ -25,6 +31,27 @@ pub struct Workflow {
     pub updated_at: Option<String>,
     pub deleted_at: Option<String>,
     pub delete_source: Option<String>,
+}
+
+impl Workflow {
+    /// Compares two workflows for structural data equality, ignoring metadata like updated_at, deleted_at, source.
+    /// This is used to prevent infinite sync loops.
+    pub fn is_identical_data(&self, other: &Self) -> bool {
+        self.name == other.name
+            && self.icon == other.icon
+            && self.folder_id == other.folder_id
+            && self.description == other.description
+            && self.drawflow.0 == other.drawflow.0
+            && self.settings.0 == other.settings.0
+            && self.trigger.as_ref().map(|j| &j.0) == other.trigger.as_ref().map(|j| &j.0)
+            && self.global_data.as_ref().map(|j| &j.0) == other.global_data.as_ref().map(|j| &j.0)
+            && self.table_data.as_ref().map(|j| &j.0) == other.table_data.as_ref().map(|j| &j.0)
+            && self.data_columns.as_ref().map(|j| &j.0) == other.data_columns.as_ref().map(|j| &j.0)
+            && self.content == other.content
+            && self.connected_table == other.connected_table
+            && self.version == other.version
+            && self.is_disabled == other.is_disabled
+    }
 }
 
 use crate::automa::workflow::WorkflowPayload;
@@ -37,12 +64,12 @@ impl From<Workflow> for WorkflowPayload {
             w.icon,
             w.folder_id,
             w.description,
-            w.drawflow,
-            w.settings,
-            w.trigger,
-            w.global_data,
-            w.table_data,
-            w.data_columns,
+            w.drawflow.0,
+            w.settings.0,
+            w.trigger.map(|j| j.0),
+            w.global_data.map(|j| j.0),
+            w.table_data.map(|j| j.0),
+            w.data_columns.map(|j| j.0),
             w.content,
             w.connected_table,
             w.version,
@@ -64,12 +91,12 @@ impl From<WorkflowPayload> for Workflow {
             icon: aw.icon,
             folder_id: aw.folder_id,
             description: aw.description,
-            drawflow: serde_json::to_string(&aw.drawflow).unwrap_or_else(|_| "{}".to_string()),
-            settings: serde_json::to_string(&aw.settings).unwrap_or_else(|_| "{}".to_string()),
-            trigger: aw.trigger.map(|v| serde_json::to_string(&v).unwrap_or_default()),
-            global_data: aw.global_data.map(|v| serde_json::to_string(&v).unwrap_or_default()),
-            table_data: aw.table_data.map(|v| serde_json::to_string(&v).unwrap_or_default()),
-            data_columns: aw.data_columns.map(|v| serde_json::to_string(&v).unwrap_or_default()),
+            drawflow: sqlx::types::Json(aw.drawflow),
+            settings: sqlx::types::Json(aw.settings),
+            trigger: aw.trigger.map(sqlx::types::Json),
+            global_data: aw.global_data.map(sqlx::types::Json),
+            table_data: aw.table_data.map(sqlx::types::Json),
+            data_columns: aw.data_columns.map(sqlx::types::Json),
             content: aw.content,
             connected_table: aw.connected_table,
             version: aw.version,

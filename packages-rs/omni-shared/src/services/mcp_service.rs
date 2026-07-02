@@ -32,10 +32,10 @@ pub async fn queue_sync_command(
     })
     .to_string();
 
-    let (_priv, pub_key) = omni_shared::crypto::get_or_generate_keypair(user_id)
+    let (_priv, pub_key) = crate::crypto::get_or_generate_keypair(user_id)
         .map_err(|e| AppError::Internal(format!("Failed to get keypair: {:?}", e)))?;
 
-    let encrypted_payload = omni_shared::crypto::encrypt_payload(&pub_key, &payload)
+    let encrypted_payload = crate::crypto::encrypt_payload(&pub_key, &payload)
         .map_err(|e| AppError::Internal(format!("Failed to encrypt: {:?}", e)))?;
 
     sqlx::query("INSERT INTO sync_queue (id, user_id, action, payload) VALUES (?, ?, ?, ?)")

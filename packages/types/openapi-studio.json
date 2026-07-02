@@ -1,0 +1,1269 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "omni-studio",
+    "description": "Premium B2B Enterprise Platform with App Marketplace",
+    "contact": {
+      "name": "OmniDesk Team"
+    },
+    "license": {
+      "name": ""
+    },
+    "version": "0.1.0"
+  },
+  "paths": {
+    "/api/automa/workflows": {
+      "get": {
+        "tags": [
+          "workflows"
+        ],
+        "operationId": "list_workflows",
+        "parameters": [
+          {
+            "name": "since",
+            "in": "query",
+            "description": "ISO timestamp - return only workflows changed after this time",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List all workflows (or changed since timestamp)"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "workflows"
+        ],
+        "operationId": "create_workflow",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WorkflowPayload"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Workflow created"
+          }
+        }
+      }
+    },
+    "/api/automa/workflows/runs/{run_id}": {
+      "delete": {
+        "tags": [
+          "workflows"
+        ],
+        "operationId": "delete_workflow_run",
+        "parameters": [
+          {
+            "name": "run_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Run deleted successfully"
+          }
+        }
+      }
+    },
+    "/api/automa/workflows/runs/{run_id}/logs": {
+      "get": {
+        "tags": [
+          "workflows"
+        ],
+        "operationId": "get_run_logs",
+        "parameters": [
+          {
+            "name": "run_id",
+            "in": "path",
+            "description": "Run ID",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List workflow logs"
+          }
+        }
+      }
+    },
+    "/api/automa/workflows/sync/export/{id}": {
+      "get": {
+        "tags": [
+          "sync"
+        ],
+        "summary": "GET /api/automa/workflows/sync/export/:id\nExport a single workflow as downloadable JSON",
+        "operationId": "export_workflow",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Workflow ID",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Workflow JSON exported"
+          }
+        }
+      }
+    },
+    "/api/automa/workflows/sync/import": {
+      "post": {
+        "tags": [
+          "sync"
+        ],
+        "summary": "POST /api/automa/workflows/sync/import\nImport a workflow from JSON body",
+        "operationId": "import_workflow",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WorkflowPayload"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Workflow imported"
+          }
+        }
+      }
+    },
+    "/api/automa/workflows/sync/local": {
+      "post": {
+        "tags": [
+          "sync"
+        ],
+        "summary": "POST /api/automa/workflows/sync/local\nReads workflows from a given local folder path and upserts to DB",
+        "operationId": "sync_local",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SyncLocalPayload"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Local folder synced successfully"
+          }
+        }
+      }
+    },
+    "/api/automa/workflows/sync/push": {
+      "post": {
+        "tags": [
+          "sync"
+        ],
+        "summary": "POST /api/automa/workflows/sync/push\nReceives workflows from the Extension and upserts them into the database + files",
+        "operationId": "push_workflows",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PushWorkflowsPayload"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Workflows synced successfully"
+          }
+        }
+      }
+    },
+    "/api/automa/workflows/sync/status": {
+      "get": {
+        "tags": [
+          "sync"
+        ],
+        "summary": "GET /api/automa/workflows/sync/status\nReturns current sync status",
+        "operationId": "sync_status",
+        "responses": {
+          "200": {
+            "description": "Sync status"
+          }
+        }
+      }
+    },
+    "/api/automa/workflows/{id}": {
+      "get": {
+        "tags": [
+          "workflows"
+        ],
+        "operationId": "get_workflow",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Workflow ID",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Get workflow by ID"
+          },
+          "404": {
+            "description": "Workflow not found"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "workflows"
+        ],
+        "operationId": "update_workflow",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Workflow ID",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WorkflowPayload"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Workflow updated"
+          },
+          "404": {
+            "description": "Workflow not found"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "workflows"
+        ],
+        "operationId": "delete_workflow",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Workflow ID",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "workspacePath",
+            "in": "query",
+            "description": "Workspace path",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Workflow deleted"
+          },
+          "404": {
+            "description": "Workflow not found"
+          }
+        }
+      }
+    },
+    "/api/automa/workflows/{id}/runs": {
+      "get": {
+        "tags": [
+          "workflows"
+        ],
+        "operationId": "get_workflow_runs",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Workflow ID",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List workflow runs"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "workflows"
+        ],
+        "operationId": "delete_all_workflow_runs",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "All runs for workflow deleted successfully"
+          }
+        }
+      }
+    },
+    "/api/me": {
+      "get": {
+        "tags": [],
+        "operationId": "me",
+        "responses": {
+          "200": {
+            "description": "User info"
+          }
+        }
+      }
+    },
+    "/health": {
+      "get": {
+        "tags": [],
+        "operationId": "health_check",
+        "responses": {
+          "200": {
+            "description": "Health status"
+          }
+        }
+      }
+    },
+    "/ping": {
+      "get": {
+        "tags": [],
+        "operationId": "ping",
+        "responses": {
+          "200": {
+            "description": "Pong"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Credential": {
+        "type": "object",
+        "required": [
+          "name"
+        ],
+        "properties": {
+          "id": {},
+          "name": {
+            "type": "string"
+          },
+          "value": {}
+        }
+      },
+      "DrawflowData": {
+        "type": "object",
+        "properties": {
+          "edges": {},
+          "nodes": {}
+        }
+      },
+      "DrawflowEdge": {
+        "type": "object",
+        "required": [
+          "source",
+          "target"
+        ],
+        "properties": {
+          "id": {},
+          "source": {},
+          "target": {}
+        }
+      },
+      "DrawflowNode": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/DrawflowNodeData"
+              }
+            ]
+          },
+          "id": {},
+          "label": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "type": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      },
+      "DrawflowNodeData": {
+        "type": "object",
+        "properties": {
+          "parameters": {
+            "type": [
+              "array",
+              "null"
+            ],
+            "items": {
+              "$ref": "#/components/schemas/WorkflowParameter"
+            }
+          },
+          "triggers": {
+            "type": [
+              "array",
+              "null"
+            ],
+            "items": {
+              "$ref": "#/components/schemas/WorkflowTrigger"
+            }
+          }
+        }
+      },
+      "Folder": {
+        "type": "object",
+        "required": [
+          "id",
+          "name"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "updatedAt": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      },
+      "LogCtxData": {
+        "type": "object",
+        "required": [
+          "logId",
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object"
+          },
+          "id": {},
+          "logId": {
+            "type": "string"
+          }
+        }
+      },
+      "LogData": {
+        "type": "object",
+        "required": [
+          "logId",
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object"
+          },
+          "id": {},
+          "logId": {
+            "type": "string"
+          }
+        }
+      },
+      "LogHistory": {
+        "type": "object",
+        "required": [
+          "logId"
+        ],
+        "properties": {
+          "data": {
+            "type": [
+              "array",
+              "null"
+            ],
+            "items": {}
+          },
+          "id": {},
+          "logId": {
+            "type": "string"
+          }
+        }
+      },
+      "LogItem": {
+        "type": "object",
+        "required": [
+          "name",
+          "status",
+          "parentLog"
+        ],
+        "properties": {
+          "collectionId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "endedAt": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64"
+          },
+          "id": {},
+          "message": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "name": {
+            "type": "string"
+          },
+          "parentLog": {
+            "type": "object"
+          },
+          "saveLog": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "startedAt": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64"
+          },
+          "status": {
+            "type": "string"
+          },
+          "teamId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "workflowId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      },
+      "PushWorkflowsPayload": {
+        "type": "object",
+        "description": "Request payload for pushing workflows from the Extension",
+        "required": [
+          "workflows"
+        ],
+        "properties": {
+          "workflows": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Workflow"
+            }
+          }
+        }
+      },
+      "Schedule": {
+        "type": "object",
+        "description": "Schedule: Profile × Workflow on a cron.",
+        "required": [
+          "id",
+          "name",
+          "workflow_id",
+          "profile_id",
+          "cron_expr"
+        ],
+        "properties": {
+          "created_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "cron_expr": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "is_enabled": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64"
+          },
+          "last_run_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "name": {
+            "type": "string"
+          },
+          "next_run_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "profile_id": {
+            "type": "string"
+          },
+          "run_count": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64"
+          },
+          "updated_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "workflow_id": {
+            "type": "string"
+          }
+        }
+      },
+      "SyncLocalPayload": {
+        "type": "object",
+        "required": [
+          "folder_path"
+        ],
+        "properties": {
+          "folder_path": {
+            "type": "string"
+          }
+        }
+      },
+      "SyncStatusResponse": {
+        "type": "object",
+        "description": "Response for sync status",
+        "required": [
+          "watch_dir",
+          "workflow_count"
+        ],
+        "properties": {
+          "last_sync": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "watch_dir": {
+            "type": "string"
+          },
+          "workflow_count": {
+            "type": "integer",
+            "minimum": 0
+          }
+        }
+      },
+      "TableData": {
+        "type": "object",
+        "required": [
+          "tableId"
+        ],
+        "properties": {
+          "columnsIndex": {
+            "type": [
+              "array",
+              "null"
+            ],
+            "items": {}
+          },
+          "id": {},
+          "items": {
+            "type": [
+              "array",
+              "null"
+            ],
+            "items": {}
+          },
+          "tableId": {
+            "type": "string"
+          }
+        }
+      },
+      "TableItem": {
+        "type": "object",
+        "required": [
+          "name"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64"
+          },
+          "id": {},
+          "modifiedAt": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64"
+          },
+          "name": {
+            "type": "string"
+          },
+          "rowsCount": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64"
+          }
+        }
+      },
+      "TriggerData": {
+        "type": "object",
+        "properties": {
+          "parameters": {
+            "type": [
+              "array",
+              "null"
+            ],
+            "items": {
+              "$ref": "#/components/schemas/WorkflowParameter"
+            }
+          },
+          "triggers": {
+            "type": [
+              "array",
+              "null"
+            ],
+            "items": {
+              "$ref": "#/components/schemas/WorkflowTrigger"
+            }
+          }
+        }
+      },
+      "Variable": {
+        "type": "object",
+        "required": [
+          "name"
+        ],
+        "properties": {
+          "id": {},
+          "name": {
+            "type": "string"
+          },
+          "value": {}
+        }
+      },
+      "Workflow": {
+        "type": "object",
+        "description": "Workflow definition — mirrors the Automa Extension's workflow JSON structure.",
+        "required": [
+          "id",
+          "name",
+          "drawflow",
+          "settings"
+        ],
+        "properties": {
+          "connected_table": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "content": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "created_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "data_columns": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "delete_source": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "deleted_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "description": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "drawflow": {
+            "type": "string"
+          },
+          "folder_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "global_data": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "icon": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "id": {
+            "type": "string"
+          },
+          "is_disabled": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64"
+          },
+          "name": {
+            "type": "string"
+          },
+          "settings": {
+            "type": "string"
+          },
+          "source": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "table_data": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "trigger": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "updated_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "version": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      },
+      "WorkflowLog": {
+        "type": "object",
+        "description": "Per-block execution log entry within a run.",
+        "required": [
+          "id",
+          "run_id",
+          "block_id",
+          "status"
+        ],
+        "properties": {
+          "block_id": {
+            "type": "string"
+          },
+          "block_label": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "data": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "duration_ms": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64"
+          },
+          "id": {
+            "type": "string"
+          },
+          "run_id": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "timestamp": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      },
+      "WorkflowParameter": {
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "type",
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object"
+          },
+          "defaultValue": {},
+          "description": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "id": {
+            "type": "string"
+          },
+          "label": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "name": {
+            "type": "string"
+          },
+          "placeholder": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "type": {
+            "type": "string"
+          }
+        }
+      },
+      "WorkflowPayload": {
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "drawflow",
+          "settings"
+        ],
+        "properties": {
+          "connected_table": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "content": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "created_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "data_columns": {
+            "type": [
+              "object",
+              "null"
+            ]
+          },
+          "delete_source": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "deleted_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "description": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "drawflow": {
+            "$ref": "#/components/schemas/DrawflowData"
+          },
+          "folder_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "global_data": {
+            "type": [
+              "object",
+              "null"
+            ]
+          },
+          "icon": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "id": {
+            "type": "string"
+          },
+          "is_disabled": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64"
+          },
+          "name": {
+            "type": "string"
+          },
+          "settings": {
+            "type": "object"
+          },
+          "source": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "table_data": {
+            "type": [
+              "object",
+              "null"
+            ]
+          },
+          "trigger": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/TriggerData"
+              }
+            ]
+          },
+          "updated_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "version": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      },
+      "WorkflowRun": {
+        "type": "object",
+        "description": "A single execution of a workflow.",
+        "required": [
+          "id",
+          "workflow_id",
+          "status"
+        ],
+        "properties": {
+          "created_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "error_message": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "finished_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "id": {
+            "type": "string"
+          },
+          "profile_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "schedule_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "started_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "status": {
+            "type": "string"
+          },
+          "summary": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "workflow_id": {
+            "type": "string"
+          }
+        }
+      },
+      "WorkflowTrigger": {
+        "type": "object",
+        "required": [
+          "type"
+        ],
+        "properties": {
+          "config": {},
+          "data": {},
+          "enabled": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "type": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "health",
+      "description": "Health check endpoints"
+    },
+    {
+      "name": "workflows",
+      "description": "Workflow management endpoints"
+    },
+    {
+      "name": "sync",
+      "description": "Sync endpoints"
+    }
+  ]
+}

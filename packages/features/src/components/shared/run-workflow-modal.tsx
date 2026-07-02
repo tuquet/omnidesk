@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogFooter, DialogTitle, DialogDescription, Button, Input, Label, Switch, Select, SelectTrigger, SelectValue, SelectContent, SelectItem, Skeleton } from '@omnidesk/ui';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { toast } from 'sonner';
@@ -93,28 +93,44 @@ export function RunWorkflowModal({ workflowId, profileId, isOpen, onClose, onRun
     }
   }, [isOpen, selectedWorkflow, refetch]);
 
-  // 3. Extract Trigger Parameters
-  const triggerParams = useMemo<TriggerParameter[]>(() => {
-    if (!workflow?.drawflow) return [];
-    try {
-      let drawflowObj = workflow.drawflow;
-      if (typeof drawflowObj === 'string') {
-        drawflowObj = JSON.parse(drawflowObj);
-      }
-      
-      const nodes = drawflowObj.drawflow?.Home?.data || drawflowObj.nodes || {};
-      
-      const nodesList = Array.isArray(nodes) ? nodes : Object.values(nodes);
-      const triggerNode: any = nodesList.find((n: any) => n.name === 'trigger' || n.label === 'trigger');
-      
-      if (triggerNode && triggerNode.data && triggerNode.data.parameters) {
-        const params = triggerNode.data.parameters;
-        return Array.isArray(params) ? params : Object.values(params);
-      }
-    } catch (err) {
-      console.error('Failed to parse drawflow', err);
+  // 3. Extract Trigger Parameters (Asynchronously to avoid blocking UI thread)
+  const [triggerParams, setTriggerParams] = useState<TriggerParameter[]>([]);
+  const [isParsing, setIsParsing] = useState(false);
+
+  useEffect(() => {
+    if (!workflow?.drawflow) {
+      setTriggerParams([]);
+      return;
     }
-    return [];
+
+    setIsParsing(true);
+    // Use setTimeout to yield to the main thread, allowing the Dialog opening animation to run smoothly
+    const timer = setTimeout(() => {
+      try {
+        let drawflowObj = workflow.drawflow;
+        if (typeof drawflowObj === 'string') {
+          drawflowObj = JSON.parse(drawflowObj);
+        }
+        
+        const nodes = drawflowObj.drawflow?.Home?.data || drawflowObj.nodes || {};
+        const nodesList = Array.isArray(nodes) ? nodes : Object.values(nodes);
+        const triggerNode: any = nodesList.find((n: any) => n.name === 'trigger' || n.label === 'trigger');
+        
+        if (triggerNode && triggerNode.data && triggerNode.data.parameters) {
+          const params = triggerNode.data.parameters;
+          setTriggerParams(Array.isArray(params) ? params : Object.values(params));
+        } else {
+          setTriggerParams([]);
+        }
+      } catch (err) {
+        console.error('Failed to parse drawflow', err);
+        setTriggerParams([]);
+      } finally {
+        setIsParsing(false);
+      }
+    }, 50);
+
+    return () => clearTimeout(timer);
   }, [workflow]);
 
   // Initialize variables from default values
@@ -173,7 +189,7 @@ export function RunWorkflowModal({ workflowId, profileId, isOpen, onClose, onRun
     setVariables(prev => ({ ...prev, [name]: value }));
   };
 
-  const isLoading = (loadingProfiles && !profileId) || (loadingWorkflowsList && !workflowId) || loadingWorkflow;
+  const isLoading = (loadingProfiles && !profileId) || (loadingWorkflowsList && !workflowId) || loadingWorkflow || isParsing;
 
   const handleClose = () => {
     // Reset state if needed

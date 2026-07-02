@@ -57,6 +57,7 @@ notify = { version = "7", features = ["macos_kqueue"] }
 globset = "0.4"
 tauri-plugin-dialog = "2.2.0"
 log = "0.4"
+walkdir = "2.5.0"
 
 [[bin]]
 name = "omni-studio-cli"

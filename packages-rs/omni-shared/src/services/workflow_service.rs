@@ -1,4 +1,4 @@
-use crate::db::models::workflow::{Workflow, WorkflowLog, WorkflowRun};
+use crate::models::workflow::{Workflow, WorkflowLog, WorkflowRun};
 use crate::error::AppError;
 use sqlx::SqlitePool;
 use uuid::Uuid;
@@ -310,9 +310,9 @@ impl WorkflowService {
             };
 
             // Parse drawflow to find execute-workflow nodes
-            if let Ok(value) = serde_json::from_str::<serde_json::Value>(&wf.drawflow) {
+            if let Some(obj) = wf.drawflow.0.as_object() {
                 // Format 1: drawflow.Home.data
-                if let Some(nodes) = value
+                if let Some(nodes) = wf.drawflow.0
                     .pointer("/drawflow/Home/data")
                     .and_then(|v| v.as_object())
                 {
@@ -332,7 +332,7 @@ impl WorkflowService {
                 }
 
                 // Format 2: nodes array
-                if let Some(nodes) = value.get("nodes").and_then(|v| v.as_array()) {
+                if let Some(nodes) = obj.get("nodes").and_then(|v| v.as_array()) {
                     for node in nodes {
                         if let Some(label) = node.get("label").and_then(|v| v.as_str()) {
                             if label == "execute-workflow" {

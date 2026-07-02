@@ -10,7 +10,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::api::AppState;
 use crate::db::models::workflow::Workflow;
-use crate::services::workflow_service::WorkflowService;
+use omni_shared::services::workflow_service::WorkflowService;
 
 /// Sync event sent via WebSocket to the Extension
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -166,182 +166,201 @@ async fn handle_extension_message(
     profile_id: Option<&str>,
 ) {
     match msg.msg_type.as_str() {
-        "push_workflows" => {
-            if let Some(pid) = profile_id {
-                println!(
-                    "[SyncWS] Ignoring push_workflows from worker profile {}",
-                    pid
-                );
-                return;
-            }
-
-            if let Some(payload) = msg.payload {
-                if let Ok(workflows) = serde_json::from_value::<Vec<Workflow>>(payload) {
-                    let watch_dir = app_dir.join("workflows");
-                    let _ = std::fs::create_dir_all(&watch_dir);
-
-                    let mut count = 0;
-                    for wf in &workflows {
-                        // Ignore zombie workflows with empty ID
-                        if wf.id.trim().is_empty() {
-                            println!("[SyncWS] Ignored push_workflows with empty ID: {:?}", wf.name);
-                            continue;
-                        }
-
-                        // If it is soft-deleted in Studio, DO NOT upsert. Tell extension to delete it.
-                        if let Ok(existing) = WorkflowService::get_by_id(db, &wf.id).await {
-                            if existing.deleted_at.is_some() {
-                                println!("[SyncWS] Workflow {} is soft-deleted in Studio. Telling Extension to delete it.", wf.id);
-                                let event = SyncEvent {
-                                    event_type: "workflow_deleted".to_string(),
-                                    payload: serde_json::json!({ "id": wf.id, "source": "studio" }),
-                                };
-                                let _ = sync_tx.send(event);
-                                continue;
-                            }
-                        }
-
-                        if WorkflowService::upsert(db, wf).await.is_ok() {
-                            // Export to JSON for OneDrive sync
-                            let _ = crate::services::file_watcher::FileWatcherService::export_workflow_file(&watch_dir, wf).await;
-                            count += 1;
-                        }
-                    }
-                    println!("[SyncWS] Received {} workflows from Extension", count);
-
-                    if count > 0 {
-                        use tauri::Emitter;
-                        app_handle
-                            .emit("workflows-synced", serde_json::json!({ "count": count }))
-                            .ok();
-                    }
-                }
-            }
-        }
+        "push_workflows" => handle_push_workflows(db, sync_tx, app_dir, app_handle, msg, profile_id).await,
         "delete_workflow" => {
             println!("[SyncWS] Ignored delete_workflow request from Extension. Deletion must happen via Studio UI.");
         }
-        "request_full_sync" => {
-            // Extension requesting all workflows (e.g., after reconnect)
-            if let Ok(workflows) = WorkflowService::get_all(db).await {
-                let event = SyncEvent {
-                    event_type: "full_sync".to_string(),
-                    payload: serde_json::to_value(&workflows).unwrap_or_default(),
-                };
-                let _ = sync_tx.send(event);
-                println!(
-                    "[SyncWS] Full sync requested, sent {} workflows",
-                    workflows.len()
-                );
-            }
-        }
-        "workflow_run_started" => {
-            if let Some(payload) = msg.payload {
-                if let (Some(id), Some(workflow_id)) = (
-                    payload.get("id").and_then(|v| v.as_str()),
-                    payload.get("workflowId").and_then(|v| v.as_str()),
-                ) {
-                    // Prevent duplicate runs: 
-                    // When launched via Bridge WS, the backend already created a run. 
-                    // The extension's Sync WS will try to push a duplicate run.
-                    // We check if there's a recent RUNNING run for this workflow.
-                    if let Ok(recent_runs) = sqlx::query_as::<_, crate::db::models::workflow::WorkflowRun>(
-                        "SELECT * FROM workflow_runs WHERE workflow_id = ? AND status = 'RUNNING' ORDER BY started_at DESC LIMIT 1"
-                    )
-                    .bind(workflow_id)
-                    .fetch_optional(db)
-                    .await {
-                        if let Some(run) = recent_runs {
-                            // The extension generated its own run_id.
-                            // To ensure logs and finish events from the extension match,
-                            // we update the backend's Bridge run to use the extension's ID.
-                            let _ = sqlx::query("UPDATE workflow_runs SET id = ? WHERE id = ?")
-                                .bind(id)
-                                .bind(&run.id)
-                                .execute(db)
-                                .await;
-                            println!("[SyncWS] Merged Bridge run {} to Extension run {}", run.id, id);
-                            return;
-                        }
-                    }
-
-                    let _ =
-                        WorkflowService::create_run(db, Some(id), workflow_id, profile_id, None)
-                            .await;
-                    println!("[SyncWS] Workflow run started: {}", id);
-                }
-            }
-        }
-        "workflow_log" => {
-            if let Some(payload) = msg.payload {
-                if let (Some(run_id), Some(block_id), Some(block_label), Some(status)) = (
-                    payload.get("runId").and_then(|v| v.as_str()),
-                    payload.get("blockId").and_then(|v| v.as_str()),
-                    payload.get("blockLabel").and_then(|v| v.as_str()),
-                    payload.get("status").and_then(|v| v.as_str()),
-                ) {
-                    let duration_ms = payload.get("durationMs").and_then(|v| v.as_i64());
-                    let mut data_val = payload.get("data").cloned();
-                    if data_val.is_none() || data_val.as_ref().is_some_and(|v| v.is_null()) {
-                        if let Some(desc) = payload.get("description") {
-                            data_val = Some(serde_json::json!({ "description": desc }));
-                        }
-                    }
-                    let data = data_val.map(|v| serde_json::to_string(&v).unwrap_or_default());
-
-                    let _ = WorkflowService::add_log(
-                        db,
-                        run_id,
-                        block_id,
-                        block_label,
-                        status,
-                        duration_ms,
-                        data.as_deref(),
-                    )
-                    .await;
-                    println!("[SyncWS] Added log for run {}: block {}", run_id, block_id);
-                }
-            }
-        }
-        "workflow_run_finished" => {
-            if let Some(payload) = msg.payload {
-                if let (Some(run_id), Some(raw_status)) = (
-                    payload.get("runId").and_then(|v| v.as_str()),
-                    payload.get("status").and_then(|v| v.as_str()),
-                ) {
-                    let mut status = raw_status.to_uppercase();
-                    if status == "FAILED" || status == "STOPPED" {
-                        status = "ERROR".to_string();
-                    }
-                    
-                    let error = payload.get("error").and_then(|v| v.as_str());
-                    let error_block_id = payload.get("errorBlockId").and_then(|v| v.as_str());
-                    let error_block_name = payload.get("errorBlockName").and_then(|v| v.as_str());
-                    let summary = payload.get("summary").and_then(|v| v.as_str());
-
-                    // If we have an error and a block ID, insert a synthetic log for the failed block
-                    if let (Some(err_msg), Some(block_id)) = (error, error_block_id) {
-                        let block_name = error_block_name.unwrap_or("Failed Block");
-                        let err_data = serde_json::json!({ "error": err_msg }).to_string();
-                        let _ = WorkflowService::add_log(
-                            db,
-                            run_id,
-                            block_id,
-                            block_name,
-                            "error",
-                            Some(0),
-                            Some(&err_data),
-                        ).await;
-                        println!("[SyncWS] Added synthetic error log for block {}", block_id);
-                    }
-
-                    let _ = WorkflowService::finish_run(db, run_id, &status, error, summary).await;
-                    println!("[SyncWS] Workflow run finished: {}", run_id);
-                }
-            }
-        }
+        "request_full_sync" => handle_request_full_sync(db, sync_tx).await,
+        "workflow_run_started" => handle_workflow_run_started(db, msg, profile_id).await,
+        "workflow_log" => handle_workflow_log(db, msg).await,
+        "workflow_run_finished" => handle_workflow_run_finished(db, msg).await,
         _ => {
             println!("[SyncWS] Unknown message type: {}", msg.msg_type);
+        }
+    }
+}
+
+async fn handle_push_workflows(
+    db: &sqlx::SqlitePool,
+    sync_tx: &tokio::sync::broadcast::Sender<SyncEvent>,
+    app_dir: &std::path::Path,
+    app_handle: &tauri::AppHandle,
+    msg: ExtensionMessage,
+    profile_id: Option<&str>,
+) {
+    if let Some(pid) = profile_id {
+        println!(
+            "[SyncWS] Ignoring push_workflows from worker profile {}",
+            pid
+        );
+        return;
+    }
+
+    if let Some(payload) = msg.payload {
+        if let Ok(workflows) = serde_json::from_value::<Vec<Workflow>>(payload) {
+            let watch_dir = app_dir.join("workflows");
+            let _ = std::fs::create_dir_all(&watch_dir);
+
+            let mut count = 0;
+            for wf in &workflows {
+                if wf.id.trim().is_empty() {
+                    println!("[SyncWS] Ignored push_workflows with empty ID: {:?}", wf.name);
+                    continue;
+                }
+
+                if let Ok(existing) = WorkflowService::get_by_id(db, &wf.id).await {
+                    if existing.deleted_at.is_some() {
+                        println!("[SyncWS] Workflow {} is soft-deleted in Studio. Telling Extension to delete it.", wf.id);
+                        let event = SyncEvent {
+                            event_type: "workflow_deleted".to_string(),
+                            payload: serde_json::json!({ "id": wf.id, "source": "studio" }),
+                        };
+                        if let Err(e) = sync_tx.send(event) {
+                            log::error!("Failed to send workflow_deleted event: {}", e);
+                        }
+                        continue;
+                    }
+
+                    if existing.is_identical_data(wf) {
+                        continue;
+                    }
+                }
+
+                if WorkflowService::upsert(db, wf).await.is_ok() {
+                    count += 1;
+                }
+            }
+            println!("[SyncWS] Received {} workflows from Extension", count);
+
+            if count > 0 {
+                use tauri::Emitter;
+                app_handle
+                    .emit("workflows-synced", serde_json::json!({ "count": count }))
+                    .ok();
+            }
+        }
+    }
+}
+
+async fn handle_request_full_sync(
+    db: &sqlx::SqlitePool,
+    sync_tx: &tokio::sync::broadcast::Sender<SyncEvent>,
+) {
+    if let Ok(workflows) = WorkflowService::get_all(db).await {
+        let event = SyncEvent {
+            event_type: "full_sync".to_string(),
+            payload: serde_json::to_value(&workflows).unwrap_or_default(),
+        };
+        if let Err(e) = sync_tx.send(event) {
+            log::error!("Failed to send full_sync event: {}", e);
+        }
+        println!(
+            "[SyncWS] Full sync requested, sent {} workflows",
+            workflows.len()
+        );
+    }
+}
+
+async fn handle_workflow_run_started(
+    db: &sqlx::SqlitePool,
+    msg: ExtensionMessage,
+    profile_id: Option<&str>,
+) {
+    if let Some(payload) = msg.payload {
+        if let (Some(id), Some(workflow_id)) = (
+            payload.get("id").and_then(|v| v.as_str()),
+            payload.get("workflowId").and_then(|v| v.as_str()),
+        ) {
+            // Prevent duplicate runs: 
+            // When launched via Bridge WS, the backend already created a run with this exact ID.
+            if let Ok(_) = WorkflowService::get_run_by_id(db, id).await {
+                println!("[SyncWS] Run {} already exists, ignoring duplicate start event.", id);
+                return;
+            }
+
+            if let Err(e) = WorkflowService::create_run(db, Some(id), workflow_id, profile_id, None).await {
+                log::error!("Failed to create workflow run {}: {:?}", id, e);
+            } else {
+                println!("[SyncWS] Workflow run started: {}", id);
+            }
+        }
+    }
+}
+
+async fn handle_workflow_log(db: &sqlx::SqlitePool, msg: ExtensionMessage) {
+    if let Some(payload) = msg.payload {
+        if let (Some(run_id), Some(block_id), Some(block_label), Some(status)) = (
+            payload.get("runId").and_then(|v| v.as_str()),
+            payload.get("blockId").and_then(|v| v.as_str()),
+            payload.get("blockLabel").and_then(|v| v.as_str()),
+            payload.get("status").and_then(|v| v.as_str()),
+        ) {
+            let duration_ms = payload.get("durationMs").and_then(|v| v.as_i64());
+            let mut data_val = payload.get("data").cloned();
+            if data_val.is_none() || data_val.as_ref().is_some_and(|v| v.is_null()) {
+                if let Some(desc) = payload.get("description") {
+                    data_val = Some(serde_json::json!({ "description": desc }));
+                }
+            }
+            let data = data_val.map(|v| serde_json::to_string(&v).unwrap_or_default());
+
+            if let Err(e) = WorkflowService::add_log(
+                db,
+                run_id,
+                block_id,
+                block_label,
+                status,
+                duration_ms,
+                data.as_deref(),
+            )
+            .await {
+                log::error!("Failed to add log for run {}: {:?}", run_id, e);
+            } else {
+                println!("[SyncWS] Added log for run {}: block {}", run_id, block_id);
+            }
+        }
+    }
+}
+
+async fn handle_workflow_run_finished(db: &sqlx::SqlitePool, msg: ExtensionMessage) {
+    if let Some(payload) = msg.payload {
+        if let (Some(run_id), Some(raw_status)) = (
+            payload.get("runId").and_then(|v| v.as_str()),
+            payload.get("status").and_then(|v| v.as_str()),
+        ) {
+            let mut status = raw_status.to_uppercase();
+            if status == "FAILED" || status == "STOPPED" {
+                status = "ERROR".to_string();
+            }
+            
+            let error = payload.get("error").and_then(|v| v.as_str());
+            let error_block_id = payload.get("errorBlockId").and_then(|v| v.as_str());
+            let error_block_name = payload.get("errorBlockName").and_then(|v| v.as_str());
+            let summary = payload.get("summary").and_then(|v| v.as_str());
+
+            if let (Some(err_msg), Some(block_id)) = (error, error_block_id) {
+                let block_name = error_block_name.unwrap_or("Failed Block");
+                let err_data = serde_json::json!({ "error": err_msg }).to_string();
+                if let Err(e) = WorkflowService::add_log(
+                    db,
+                    run_id,
+                    block_id,
+                    block_name,
+                    "error",
+                    Some(0),
+                    Some(&err_data),
+                ).await {
+                    log::error!("Failed to add synthetic error log for run {}: {:?}", run_id, e);
+                } else {
+                    println!("[SyncWS] Added synthetic error log for block {}", block_id);
+                }
+            }
+
+            if let Err(e) = WorkflowService::finish_run(db, run_id, &status, error, summary).await {
+                log::error!("Failed to finish run {}: {:?}", run_id, e);
+            } else {
+                println!("[SyncWS] Workflow run finished: {}", run_id);
+            }
         }
     }
 }

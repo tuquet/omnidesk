@@ -6,8 +6,8 @@ use omni_shared::models::system::GlobalConfig;
 pub fn get_global_config_path(app_handle: &tauri::AppHandle) -> Result<PathBuf, String> {
     app_handle
         .path()
-        .app_data_dir()
-        .map(|dir| dir.join("global.json"))
+        .local_data_dir()
+        .map(|dir| dir.join("omnidesk").join("global.json"))
         .map_err(|e| e.to_string())
 }
 
@@ -44,5 +44,5 @@ pub fn get_active_storage_path(app_handle: &tauri::AppHandle) -> Result<PathBuf,
     }
 
     // Fallback to default
-    app_handle.path().app_data_dir().map_err(|e| e.to_string())
+    app_handle.path().local_data_dir().map(|dir| dir.join("omnidesk")).map_err(|e| e.to_string())
 }

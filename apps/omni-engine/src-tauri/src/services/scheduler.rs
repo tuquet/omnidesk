@@ -5,8 +5,7 @@ use tokio::sync::RwLock;
 use tokio_cron_scheduler::{Job, JobScheduler};
 use uuid::Uuid as JobUuid;
 
-use crate::db::models::workflow::Schedule;
-use crate::db::models::workflow::WorkflowRun;
+use omni_shared::models::workflow::{Schedule, WorkflowRun};
 use crate::error::AppError;
 use omni_shared::automa::executor::{ExecutionResult, SharedWorkflowExecutor};
 use omni_shared::automa::AutomaEvent;
@@ -123,12 +122,12 @@ impl SchedulerService {
                         w.icon,
                         w.folder_id,
                         w.description,
-                        w.drawflow,
-                        w.settings,
-                        w.trigger,
-                        w.global_data,
-                        w.table_data,
-                        w.data_columns,
+                        w.drawflow.0,
+                        w.settings.0,
+                        w.trigger.map(|j| j.0),
+                        w.global_data.map(|j| j.0),
+                        w.table_data.map(|j| j.0),
+                        w.data_columns.map(|j| j.0),
                         w.content,
                         w.connected_table,
                         w.version,
@@ -273,5 +272,57 @@ impl SchedulerService {
             error_message: None,
             summary: None,
         })
+    }
+
+    /// Start a background loop that polls the DB every 30s to detect schedule
+    /// changes made by Studio (or any other app). This enables zero-coupling
+    /// between Studio (CRUD owner) and Engine (runtime executor).
+    pub fn start_polling(self) {
+        tokio::spawn(async move {
+            let mut interval = tokio::time::interval(std::time::Duration::from_secs(30));
+            // Skip the first immediate tick (we already loaded on startup)
+            interval.tick().await;
+
+            loop {
+                interval.tick().await;
+
+                let db_schedules = sqlx::query_as::<_, Schedule>(
+                    "SELECT * FROM schedules WHERE is_enabled = 1"
+                )
+                .fetch_all(&self.db)
+                .await
+                .unwrap_or_default();
+
+                let db_ids: std::collections::HashSet<String> =
+                    db_schedules.iter().map(|s| s.id.clone()).collect();
+
+                let current_map = self.job_map.read().await;
+                let current_ids: std::collections::HashSet<String> =
+                    current_map.keys().cloned().collect();
+                drop(current_map);
+
+                // Remove schedules that are no longer enabled or were deleted
+                for id in current_ids.difference(&db_ids) {
+                    println!("[Scheduler Poll] Removing schedule: {}", id);
+                    self.remove_schedule(id).await;
+                }
+
+                // Add or update schedules
+                for schedule in &db_schedules {
+                    let map = self.job_map.read().await;
+                    let exists = map.contains_key(&schedule.id);
+                    drop(map);
+
+                    if !exists {
+                        println!("[Scheduler Poll] Adding new schedule: '{}'", schedule.name);
+                        if let Err(e) = self.add_schedule(schedule).await {
+                            eprintln!("[Scheduler Poll] Failed to add '{}': {:?}", schedule.name, e);
+                        }
+                    }
+                    // Note: cron_expr changes require remove + re-add.
+                    // For simplicity, we rely on the updated_at field in future iterations.
+                }
+            }
+        });
     }
 }

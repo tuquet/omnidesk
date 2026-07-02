@@ -128,7 +128,7 @@ pub fn run() {
                             
                             tauri::async_runtime::spawn(async move {
                                 // Start Background Worker for Offline Queue
-                                services::worker::start_background_worker(pool_for_worker);
+                                omni_shared::worker::start_background_worker(pool_for_worker);
                                 
                                 // Realtime listener has been extracted/removed
                                 
@@ -168,6 +168,7 @@ pub fn run() {
             browser_profiles::update_browser_profile,
             browser_profiles::delete_browser_profile,
             browser_profiles::launch_browser_profile,
+            browser_profiles::stop_browser_profile,
             omni_tauri_core::system::open_app_folder,
             omni_tauri_core::system::get_app_version,
             omni_tauri_core::window::toggle_always_on_top,

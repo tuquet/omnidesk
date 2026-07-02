@@ -3,7 +3,7 @@ pub mod handlers;
 
 use axum::{
     response::IntoResponse,
-    routing::{get, post},
+    routing::get,
     Json, Router,
 };
 use sqlx::SqlitePool;
@@ -41,32 +41,17 @@ pub struct AppState {
         me,
         handlers::automa::ws_handler,
         handlers::automa::run_e2e,
-        handlers::schedules::list_schedules,
-        handlers::schedules::create_schedule,
-        handlers::schedules::get_schedule,
-        handlers::schedules::update_schedule,
-        handlers::schedules::delete_schedule,
-        handlers::schedules::toggle_schedule,
         handlers::schedules::run_now,
-          handlers::folders::list_folders,
-          handlers::folders::create_folder,
-          handlers::folders::update_folder,
-          handlers::folders::delete_folder,
     ),
     components(
         schemas(
             crate::db::models::workflow::Schedule,
-            handlers::schedules::CreateSchedulePayload,
-            handlers::schedules::UpdateSchedulePayload,
             omni_shared::automa::workflow::WorkflowPayload,
             omni_shared::automa::workflow::WorkflowParameter,
             omni_shared::automa::workflow::WorkflowTrigger,
             omni_shared::automa::workflow::DrawflowNodeData,
             omni_shared::automa::workflow::DrawflowNode,
             omni_shared::automa::workflow::DrawflowEdge,
-              omni_shared::automa::workflow::Folder,
-              handlers::folders::CreateFolderPayload,
-              handlers::folders::UpdateFolderPayload,
               omni_shared::automa::logs::LogItem,
               omni_shared::automa::logs::LogHistory,
               omni_shared::automa::logs::LogCtxData,
@@ -100,6 +85,8 @@ pub async fn serve(pool: SqlitePool, app_dir: PathBuf, port: u16, app_handle: Ap
     {
         Ok(s) => {
             println!("[Runtime] Scheduler started successfully");
+            // Start background DB polling to detect schedule changes from Studio
+            s.clone().start_polling();
             Some(s)
         }
         Err(e) => {
@@ -135,10 +122,8 @@ pub async fn serve(pool: SqlitePool, app_dir: PathBuf, port: u16, app_handle: Ap
         .route("/api/me", get(me))
         .nest("/api/automa", handlers::automa::router())
         .nest("/api/automa/schedules", handlers::schedules::router())
-        .nest("/api/automa/folders", handlers::folders::router())
         .nest("/api/engine/runs", handlers::runs::router())
-        .route("/mcp/sse", get(handlers::mcp::mcp_sse))
-        .route("/mcp/messages", post(handlers::mcp::mcp_messages))
+        .nest("/mcp", omni_shared::mcp::handler::router().with_state(omni_shared::mcp::handler::SharedMcpState { db: state.db.clone(), mcp_sessions: state.mcp_sessions.clone() }))
         .nest_service("/apps", ServeDir::new(apps_sandbox_dir))
         .layer(CorsLayer::permissive())
         .with_state(state);
