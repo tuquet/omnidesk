@@ -22,7 +22,7 @@ export function ProxyConfig({ proxy, onChange }: ProxyConfigProps) {
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-2">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <ShieldIcon className="h-4 w-4 text-muted-foreground" />
@@ -35,9 +35,9 @@ export function ProxyConfig({ proxy, onChange }: ProxyConfigProps) {
       </div>
 
       {proxy.enabled && (
-        <div className="space-y-4 rounded-lg border p-4 bg-muted/30 animate-in fade-in slide-in-from-top-2 duration-300">
-          <div className="grid grid-cols-3 gap-4">
-            <div className="col-span-1 space-y-2">
+        <div className="space-y-2 rounded-lg border p-3 bg-muted/30 animate-in fade-in slide-in-from-top-2 duration-300">
+          <div className="grid grid-cols-3 gap-2">
+            <div className="col-span-1 space-y-1.5">
               <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                 Protocol
               </Label>
@@ -54,7 +54,7 @@ export function ProxyConfig({ proxy, onChange }: ProxyConfigProps) {
                 </SelectContent>
               </Select>
             </div>
-            <div className="col-span-1 space-y-2">
+            <div className="col-span-1 space-y-1.5">
               <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                 Host / IP
               </Label>
@@ -64,7 +64,7 @@ export function ProxyConfig({ proxy, onChange }: ProxyConfigProps) {
                 onChange={(e) => update({ host: e.target.value })}
               />
             </div>
-            <div className="col-span-1 space-y-2">
+            <div className="col-span-1 space-y-1.5">
               <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                 Port
               </Label>
@@ -76,8 +76,8 @@ export function ProxyConfig({ proxy, onChange }: ProxyConfigProps) {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
+          <div className="grid grid-cols-2 gap-2">
+            <div className="space-y-1.5">
               <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                 Username (Optional)
               </Label>
@@ -87,7 +87,7 @@ export function ProxyConfig({ proxy, onChange }: ProxyConfigProps) {
                 onChange={(e) => update({ username: e.target.value })}
               />
             </div>
-            <div className="space-y-2">
+            <div className="space-y-1.5">
               <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                 Password (Optional)
               </Label>

@@ -118,8 +118,8 @@ export function FolderPanel({ activeFolderId, onSelectFolder }: FolderPanelProps
   if (!selectedWorkspacePath) return null;
 
   return (
-    <div className="w-64 flex flex-col border-r bg-card h-full">
-      <div className="p-4 border-b flex items-center justify-between">
+    <div className="flex flex-col bg-card h-full">
+      <div className="p-2 border-b flex items-center justify-between">
         <h3 className="font-semibold text-sm">Folders</h3>
         <Button
           variant="ghost"
@@ -138,7 +138,7 @@ export function FolderPanel({ activeFolderId, onSelectFolder }: FolderPanelProps
         <div className="p-2 space-y-1">
           <Button
             variant={activeFolderId === null ? 'secondary' : 'ghost'}
-            className="w-full justify-start font-normal h-9"
+            className="w-full justify-start font-normal h-8 text-sm"
             onClick={() => onSelectFolder(null)}
           >
             <FolderIcon className="mr-2 h-4 w-4 text-muted-foreground" />
@@ -151,7 +151,7 @@ export function FolderPanel({ activeFolderId, onSelectFolder }: FolderPanelProps
             folders.map((folder) => (
               <div
                 key={folder.id}
-                className={`group flex items-center justify-between rounded-md px-3 py-2 text-sm cursor-pointer transition-colors ${
+                className={`group flex items-center justify-between rounded-md px-2 py-1.5 text-sm cursor-pointer transition-colors ${
                   activeFolderId === folder.id
                     ? 'bg-primary/10 text-primary font-medium'
                     : 'hover:bg-muted'
@@ -206,10 +206,11 @@ export function FolderPanel({ activeFolderId, onSelectFolder }: FolderPanelProps
             <DialogTitle>Create Folder</DialogTitle>
           </DialogHeader>
           <form onSubmit={handleCreate}>
-            <div className="py-4">
+            <div className="py-2">
               <Input
                 placeholder="Folder name"
                 value={folderName}
+                className="h-8 text-sm"
                 onChange={(e) => setFolderName(e.target.value)}
                 autoFocus
               />
@@ -230,10 +231,11 @@ export function FolderPanel({ activeFolderId, onSelectFolder }: FolderPanelProps
             <DialogTitle>Edit Folder</DialogTitle>
           </DialogHeader>
           <form onSubmit={handleUpdate}>
-            <div className="py-4">
+            <div className="py-2">
               <Input
                 placeholder="Folder name"
                 value={folderName}
+                className="h-8 text-sm"
                 onChange={(e) => setFolderName(e.target.value)}
                 autoFocus
               />

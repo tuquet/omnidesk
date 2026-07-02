@@ -70,7 +70,7 @@ function AutomaAuthPage() {
   // Nếu đang kiểm tra session
   if (checking) {
     return (
-      <div className="flex flex-1 w-full items-center justify-center p-6">
+      <div className="flex flex-1 w-full items-center justify-center p-3">
         <div className="flex flex-col items-center gap-4">
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
           <p className="text-sm text-muted-foreground">Đang kiểm tra phiên đăng nhập...</p>
@@ -82,8 +82,8 @@ function AutomaAuthPage() {
   // Đã đăng nhập & sync xong
   if (synced) {
     return (
-      <div className="flex flex-1 w-full items-center justify-center p-6">
-        <div className="flex flex-col items-center gap-6 text-center max-w-md">
+      <div className="flex flex-1 w-full items-center justify-center p-3">
+        <div className="flex flex-col items-center gap-4 text-center max-w-md">
           <div className="relative">
             <div className="flex h-20 w-20 items-center justify-center rounded-2xl bg-green-500/10 ring-1 ring-green-500/20">
               <CheckCircle2 className="h-10 w-10 text-green-500" />
@@ -94,7 +94,7 @@ function AutomaAuthPage() {
           </div>
 
           <div className="space-y-2">
-            <h1 className="text-2xl font-bold tracking-tight">Kết nối Extension thành công!</h1>
+            <h1 className="text-lg font-semibold tracking-tight">Kết nối Extension thành công!</h1>
             <p className="text-sm text-muted-foreground leading-relaxed">
               Automa Extension đã nhận được phiên đăng nhập của bạn. Bạn có thể đóng tab này và quay
               lại sử dụng Extension.
@@ -112,14 +112,14 @@ function AutomaAuthPage() {
 
   // Chưa đăng nhập → hiển thị form login
   return (
-    <div className="flex flex-1 w-full items-center justify-center p-6 md:p-10">
-      <div className="w-full max-w-sm space-y-6">
+    <div className="flex flex-1 w-full items-center justify-center p-3 md:p-4">
+      <div className="w-full max-w-sm space-y-4">
         <div className="flex flex-col items-center gap-3 text-center">
           <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10 ring-1 ring-primary/20">
             <Puzzle className="h-7 w-7 text-primary" />
           </div>
           <div className="space-y-1">
-            <h1 className="text-xl font-semibold tracking-tight">Kết nối Automa Extension</h1>
+            <h1 className="text-lg font-semibold tracking-tight">Kết nối Automa Extension</h1>
             <p className="text-sm text-muted-foreground">
               Đăng nhập để đồng bộ phiên làm việc với Extension
             </p>

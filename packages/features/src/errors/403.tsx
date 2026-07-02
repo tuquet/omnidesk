@@ -6,7 +6,7 @@ export function Error403Page() {
   return (
     <div className="flex min-h-svh w-full flex-col items-center justify-center bg-background px-6 py-12">
       <div className="relative z-10 flex flex-col items-center text-center max-w-md">
-        <div className="mb-6 rounded-full bg-muted/50 p-4 ring-1 ring-border/50 shadow-sm">
+        <div className="mb-6 rounded-full bg-muted/50 p-2 ring-1 ring-border/50 shadow-sm">
           <ShieldAlert className="h-10 w-10 text-muted-foreground" strokeWidth={1.5} />
         </div>
 

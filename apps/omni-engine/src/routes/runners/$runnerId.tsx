@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from '@tanstack/react-router';
-import { PageContainer, PageHeader, PageTitle, Card, CardHeader, CardTitle, CardContent, Button } from '@omnidesk/ui';;
+import { PageContainer, PageHeader, PageTitle, Card, CardHeader, CardTitle, CardContent, Button, ScrollArea } from '@omnidesk/ui';
 import { TerminalSquare, ArrowLeft, Loader2, PlayCircle, Clock } from 'lucide-react';
 import { useDashboardStore } from '../../stores/use-dashboard-store';
 import { ROUTES } from '@/config/route-config';
@@ -20,7 +20,7 @@ function RunnerDetailPage() {
   return (
     <PageContainer className="bg-background max-w-5xl mx-auto w-full flex flex-col h-[calc(100vh-80px)]">
       <PageHeader className="pb-6 flex-none">
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2">
           <Button variant="ghost" size="icon" asChild className="rounded-full h-10 w-10">
             <Link to={ROUTES.RUNNERS}>
               <ArrowLeft className="h-5 w-5" />
@@ -40,7 +40,7 @@ function RunnerDetailPage() {
                 </span>
               )}
             </div>
-            <div className="text-sm text-muted-foreground mt-2 flex items-center gap-4">
+            <div className="text-sm text-muted-foreground mt-2 flex items-center gap-2">
               <span className="flex items-center gap-1.5">
                 <span className="font-semibold text-foreground">Workflow:</span> Daily Lead Scraping
               </span>
@@ -69,9 +69,10 @@ function RunnerDetailPage() {
             </div>
           )}
         </CardHeader>
-        <CardContent className="flex-1 overflow-y-auto font-mono text-sm leading-relaxed p-6 bg-zinc-950 text-zinc-300">
-          {!isCurrentRunner && logs.length === 0 ? (
-            <div className="h-full flex flex-col items-center justify-center text-zinc-500 gap-4">
+        <ScrollArea className="flex-1 bg-zinc-950">
+          <CardContent className="font-mono text-sm leading-relaxed p-2 text-zinc-300">
+            {!isCurrentRunner && logs.length === 0 ? (
+              <div className="h-full flex flex-col items-center justify-center text-zinc-500 gap-2 p-4">
               <TerminalSquare className="w-16 h-16 opacity-30" strokeWidth={1} />
               <p className="text-base">No logs available for this runner.</p>
             </div>
@@ -98,7 +99,8 @@ function RunnerDetailPage() {
               )}
             </div>
           )}
-        </CardContent>
+          </CardContent>
+        </ScrollArea>
       </Card>
     </PageContainer>
   );

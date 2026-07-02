@@ -16,8 +16,8 @@ export const Route = createFileRoute('/forgot-password')({
 
 function ForgotPasswordPage() {
   return (
-    <div className="flex flex-1 flex-col items-center justify-center gap-6 bg-muted p-6 md:p-10">
-      <div className="flex w-full max-w-sm flex-col gap-6">
+    <div className="flex flex-1 w-full items-center justify-center p-4">
+      <div className="flex w-full max-w-sm flex-col gap-4">
         <ForgotPasswordForm />
       </div>
     </div>

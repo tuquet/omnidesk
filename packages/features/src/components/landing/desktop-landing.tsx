@@ -30,7 +30,7 @@ export function DesktopLanding({ isAuthenticated }: { isAuthenticated: boolean }
         </p>
 
         {/* System Status Indicators */}
-        <div className="flex flex-wrap items-center justify-center gap-4 mb-12">
+        <div className="flex flex-wrap items-center justify-center gap-2 mb-12">
           <div className="flex items-center gap-2 px-4 py-2 rounded-full border bg-background/50 backdrop-blur-sm text-sm font-medium">
             <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
             <Network className="w-4 h-4 text-emerald-500" />
@@ -49,7 +49,7 @@ export function DesktopLanding({ isAuthenticated }: { isAuthenticated: boolean }
           )}
         </div>
 
-        <div className="flex flex-col sm:flex-row gap-4 w-full justify-center">
+        <div className="flex flex-col sm:flex-row gap-2 w-full justify-center">
           {isAuthenticated ? (
             <Button
               asChild

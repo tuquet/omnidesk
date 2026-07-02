@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { PageContainer, PageHeader, PageTitle, Button, Badge, Input, Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@omnidesk/ui';
+import { PageContainer, PageHeader, PageTitle, Button, Input, Select, SelectTrigger, SelectValue, SelectContent, SelectItem, ScrollArea } from '@omnidesk/ui';
 import { TerminalIcon, SearchIcon, TrashIcon, DownloadIcon } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 import { listen } from '@tauri-apps/api/event';
@@ -118,7 +118,8 @@ function SystemLogsPage() {
           </Select>
         </div>
 
-        <div className="flex-1 overflow-y-auto p-4 bg-[#0d1117] text-[#c9d1d9] font-mono text-xs leading-relaxed space-y-1">
+        <ScrollArea className="flex-1 bg-[#0d1117]">
+          <div className="p-2 text-[#c9d1d9] font-mono text-xs leading-relaxed space-y-1">
           {filteredLogs.length === 0 ? (
             <div className="text-center text-muted-foreground italic mt-4">
               No logs match your filters.
@@ -142,7 +143,8 @@ function SystemLogsPage() {
             ))
           )}
           <div ref={bottomRef} />
-        </div>
+          </div>
+        </ScrollArea>
       </div>
     </PageContainer>
   );

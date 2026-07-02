@@ -91,7 +91,7 @@ function BrowserProfilesPage() {
 
       <div className="flex flex-col gap-4">
         {downloadProgress && (
-          <div className="bg-primary/5 border rounded-lg p-4 flex flex-col gap-2 shadow-sm">
+          <div className="bg-primary/5 border rounded-lg p-3 flex flex-col gap-2 shadow-sm">
             <div className="flex justify-between text-sm font-medium">
               <span className="capitalize">
                 {downloadProgress.status === 'downloading'

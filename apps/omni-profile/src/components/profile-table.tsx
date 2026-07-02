@@ -359,12 +359,12 @@ export function ProfileTable({
               // EMPTY STATE
               <TableRow>
                 <TableCell colSpan={columns.length} className="h-64">
-                  <div className="flex flex-col items-center justify-center text-center p-8 border-2 border-dashed border-muted-foreground/20 rounded-xl m-4 bg-muted/10">
-                    <div className="mb-4 rounded-full bg-primary/10 p-4 ring-1 ring-primary/20 shadow-inner">
-                      <GhostIcon className="h-8 w-8 text-primary/70" />
+                  <div className="flex flex-col items-center justify-center text-center p-4 border-2 border-dashed border-muted-foreground/20 rounded-xl m-2 bg-muted/10">
+                    <div className="mb-2 rounded-full bg-primary/10 p-2 ring-1 ring-primary/20 shadow-inner">
+                      <GhostIcon className="h-5 w-5 text-primary/70" />
                     </div>
-                    <h3 className="text-lg font-semibold tracking-tight">No profiles found</h3>
-                    <p className="text-sm text-muted-foreground max-w-sm mt-2 mb-6">
+                    <h3 className="text-base font-semibold tracking-tight">No profiles found</h3>
+                    <p className="text-xs text-muted-foreground max-w-sm mt-1 mb-4">
                       There are no browser profiles matching your current filters, or you haven't
                       created one yet.
                     </p>

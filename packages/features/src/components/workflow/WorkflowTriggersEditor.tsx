@@ -83,7 +83,7 @@ export function WorkflowTriggersEditor({ value = [], onChange }: WorkflowTrigger
                     <Trash2 className="h-4 w-4" />
                   </Button>
                 </div>
-                <CollapsibleContent className="p-4">
+                <CollapsibleContent className="p-3">
                   <TriggerForm 
                     type={trigger.type} 
                     data={trigger.data} 
@@ -148,7 +148,7 @@ function TriggerForm({ type, data, onChange }: { type: string, data: any, onChan
   if (type === 'interval') {
     return (
       <div className="space-y-4">
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-2 gap-2">
           <div className="space-y-1.5">
             <Label>Interval (minutes)</Label>
             <Input 
@@ -271,7 +271,7 @@ function TriggerForm({ type, data, onChange }: { type: string, data: any, onChan
   }
 
   return (
-    <div className="text-sm text-muted-foreground p-4 bg-muted/30 rounded-md border border-dashed">
+    <div className="text-sm text-muted-foreground p-3 bg-muted/30 rounded-md border border-dashed">
       Trigger configuration for <strong>{type}</strong> is not fully implemented yet.
       <pre className="mt-2 text-xs">{JSON.stringify(data, null, 2)}</pre>
     </div>

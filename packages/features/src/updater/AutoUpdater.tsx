@@ -69,7 +69,7 @@ export function AutoUpdater() {
   return (
     <div className="fixed bottom-12 right-6 z-50 w-72 animate-in slide-in-from-bottom-5 fade-in duration-300">
       <div className="overflow-hidden rounded-md border bg-popover text-popover-foreground shadow-md">
-        <div className="p-4">
+        <div className="p-2">
           <div className="flex items-start justify-between">
             <div className="flex items-center gap-3">
               <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10">

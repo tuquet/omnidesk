@@ -188,7 +188,7 @@ function SchedulesPage() {
           <CalendarClockIcon className="w-5 h-5 text-primary" />
           Schedules
         </PageTitle>
-        <Button onClick={openCreate}>
+        <Button onClick={openCreate} size="sm" className="h-8 text-sm">
           <PlusIcon className="w-4 h-4 mr-2" />
           New Schedule
         </Button>
@@ -247,10 +247,10 @@ function SchedulesPage() {
                       </div>
                     </TableCell>
                     <TableCell className="text-right">
-                      <Button variant="ghost" size="icon" onClick={() => openEdit(schedule)}>
+                      <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => openEdit(schedule)}>
                         <PencilIcon className="h-4 w-4" />
                       </Button>
-                      <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive" onClick={() => handleDelete(schedule)}>
+                      <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:text-destructive" onClick={() => handleDelete(schedule)}>
                         <TrashIcon className="h-4 w-4" />
                       </Button>
                     </TableCell>
@@ -267,12 +267,13 @@ function SchedulesPage() {
           <DialogHeader>
             <DialogTitle>{editingSchedule ? 'Edit Schedule' : 'Create Schedule'}</DialogTitle>
           </DialogHeader>
-          <form onSubmit={handleSubmit} className="space-y-4 py-4">
+          <form onSubmit={handleSubmit} className="space-y-3 py-2">
             <div className="space-y-2">
               <Label>Schedule Name</Label>
               <Input 
                 placeholder="e.g. Daily Data Scraper"
                 value={formData.name}
+                className="h-8 text-sm"
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
               />
             </div>
@@ -283,7 +284,7 @@ function SchedulesPage() {
                 value={formData.workflow_id}
                 onValueChange={(val) => setFormData({ ...formData, workflow_id: val })}
               >
-                <SelectTrigger>
+                <SelectTrigger className="h-8 text-sm">
                   <SelectValue placeholder="Select a workflow" />
                 </SelectTrigger>
                 <SelectContent>
@@ -300,7 +301,7 @@ function SchedulesPage() {
                 value={formData.profile_id}
                 onValueChange={(val) => setFormData({ ...formData, profile_id: val })}
               >
-                <SelectTrigger>
+                <SelectTrigger className="h-8 text-sm">
                   <SelectValue placeholder="Select a profile" />
                 </SelectTrigger>
                 <SelectContent>
@@ -316,6 +317,7 @@ function SchedulesPage() {
               <Input 
                 placeholder="*/5 * * * *"
                 value={formData.cron_expr}
+                className="h-8 text-sm"
                 onChange={(e) => setFormData({ ...formData, cron_expr: e.target.value })}
               />
               <p className="text-xs text-muted-foreground">

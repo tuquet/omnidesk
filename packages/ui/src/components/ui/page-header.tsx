@@ -7,7 +7,7 @@ const PageContainer = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <div
     ref={ref}
-    className={cn("flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-8", className)}
+    className={cn("flex flex-1 flex-col gap-2 p-3 md:gap-4 md:p-4", className)}
     {...props}
   />
 ))

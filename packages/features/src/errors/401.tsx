@@ -16,7 +16,7 @@ export function Error401Page() {
         {/* Shield icon with pulse ring */}
         <div className="relative mb-6">
           <div className="absolute inset-0 animate-ping rounded-full bg-primary/5 [animation-duration:2.5s]" />
-          <div className="relative rounded-full bg-muted/50 p-4">
+          <div className="relative rounded-full bg-muted/50 p-2">
             <ShieldOff className="h-12 w-12 text-muted-foreground/60" strokeWidth={1.5} />
           </div>
         </div>

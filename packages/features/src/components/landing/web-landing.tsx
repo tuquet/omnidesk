@@ -31,7 +31,7 @@ export function WebLanding() {
         </p>
 
         {/* Action Buttons */}
-        <div className="flex flex-col sm:flex-row gap-4 w-full justify-center mb-20">
+        <div className="flex flex-col sm:flex-row gap-2 w-full justify-center mb-20">
           <Button
             asChild
             size="lg"
@@ -54,7 +54,7 @@ export function WebLanding() {
 
         {/* Feature Highlights */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-left w-full max-w-4xl">
-          <div className="flex flex-col p-6 rounded-2xl bg-card border shadow-sm hover:shadow-md transition-shadow">
+          <div className="flex flex-col p-3 rounded-2xl bg-card border shadow-sm hover:shadow-md transition-shadow">
             <div className="h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
               <LayoutDashboard className="h-6 w-6 text-primary" />
             </div>
@@ -65,7 +65,7 @@ export function WebLanding() {
             </p>
           </div>
 
-          <div className="flex flex-col p-6 rounded-2xl bg-card border shadow-sm hover:shadow-md transition-shadow">
+          <div className="flex flex-col p-3 rounded-2xl bg-card border shadow-sm hover:shadow-md transition-shadow">
             <div className="h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
               <Workflow className="h-6 w-6 text-primary" />
             </div>
@@ -76,7 +76,7 @@ export function WebLanding() {
             </p>
           </div>
 
-          <div className="flex flex-col p-6 rounded-2xl bg-card border shadow-sm hover:shadow-md transition-shadow">
+          <div className="flex flex-col p-3 rounded-2xl bg-card border shadow-sm hover:shadow-md transition-shadow">
             <div className="h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
               <ShieldCheck className="h-6 w-6 text-primary" />
             </div>

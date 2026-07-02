@@ -19,7 +19,7 @@ interface MyRouterContext {
 function NotFound() {
   const navigate = useNavigate();
   return (
-    <div className="relative flex flex-1 w-full flex-col items-center justify-center overflow-hidden bg-background px-6 py-12">
+    <div className="relative flex flex-1 w-full flex-col items-center justify-center overflow-hidden bg-background px-4 py-6">
       {/* Subtle animated background grid */}
       <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,hsl(var(--muted)/0.3)_1px,transparent_1px),linear-gradient(to_bottom,hsl(var(--muted)/0.3)_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_50%,black_40%,transparent_100%)]" />
 
@@ -34,7 +34,7 @@ function NotFound() {
         </div>
 
         {/* Large 404 */}
-        <h1 className="bg-gradient-to-b from-foreground via-foreground/80 to-foreground/20 bg-clip-text text-[10rem] leading-none font-black tracking-tighter text-transparent sm:text-[14rem]">
+        <h1 className="bg-gradient-to-b from-foreground via-foreground/80 to-foreground/20 bg-clip-text text-[6rem] leading-none font-black tracking-tighter text-transparent sm:text-[8rem]">
           404
         </h1>
 
@@ -42,7 +42,7 @@ function NotFound() {
         <div className="mt-2 mb-6 h-1 w-24 rounded-full bg-gradient-to-r from-transparent via-primary/60 to-transparent" />
 
         {/* Subtitle */}
-        <h2 className="mb-3 text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
+        <h2 className="mb-3 text-xl font-semibold tracking-tight text-foreground sm:text-2xl">
           Page Not Found
         </h2>
 
@@ -53,7 +53,7 @@ function NotFound() {
         </p>
 
         {/* Go Home button */}
-        <Button size="lg" className="gap-2 px-8" onClick={() => navigate({ to: ROUTES.HOME })}>
+        <Button size="sm" className="gap-1 px-4" onClick={() => navigate({ to: ROUTES.HOME })}>
           <ArrowLeft className="h-4 w-4" />
           Go Home
         </Button>

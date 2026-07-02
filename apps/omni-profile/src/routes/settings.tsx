@@ -39,7 +39,7 @@ function SettingsPage() {
         <PageTitle>Profile Settings</PageTitle>
       </PageHeader>
 
-      <div className="max-w-4xl space-y-6">
+      <div className="max-w-4xl space-y-4">
         <Card>
           <CardHeader>
             <div className="flex items-center gap-2">
@@ -48,8 +48,8 @@ function SettingsPage() {
             </div>
             <CardDescription>Configure which Chromium binary to use for launching profiles</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex items-center justify-between p-4 bg-muted/50 rounded-lg border">
+          <CardContent className="space-y-2">
+            <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg border">
               <div className="space-y-0.5">
                 <Label className="text-base">Use System Chrome</Label>
                 <p className="text-sm text-muted-foreground">Try to find and use Chrome installed on your system instead of downloading a custom binary.</p>
@@ -80,7 +80,7 @@ function SettingsPage() {
             </div>
             <CardDescription>Manage where browser data is stored</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-2">
             <div className="space-y-2">
               <Label>Profiles Storage Path</Label>
               <Input 
@@ -93,7 +93,7 @@ function SettingsPage() {
               </p>
             </div>
           </CardContent>
-          <CardFooter className="bg-muted/30 border-t px-6 py-4">
+          <CardFooter className="bg-muted/30 border-t px-4 py-3">
             <Button onClick={handleSave} disabled={isSaving}>
               <SaveIcon className="w-4 h-4 mr-2" />
               Save Configuration

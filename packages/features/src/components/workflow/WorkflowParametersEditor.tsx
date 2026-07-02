@@ -169,7 +169,7 @@ export function WorkflowParametersEditor({ value = [], onChange }: WorkflowParam
                               </div>
                             </CollapsibleTrigger>
                             <CollapsibleContent className="pl-11 pr-3 pb-4">
-                              <div className="flex items-start gap-6 pt-2 border-t">
+                              <div className="flex items-start gap-2 pt-2 border-t">
                                 <div className="space-y-1.5 flex-1 max-w-[400px]">
                                   <Label className="text-xs">Description</Label>
                                   <Textarea 

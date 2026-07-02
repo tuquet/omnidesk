@@ -63,7 +63,7 @@ function ActiveRunsPage() {
           <ActivityIcon className="w-5 h-5 text-primary" />
           Active Runs
         </PageTitle>
-        <Button variant="outline" size="sm" onClick={() => refetch()} disabled={isRefetching}>
+        <Button variant="outline" size="sm" className="h-8 text-sm" onClick={() => refetch()} disabled={isRefetching}>
           <RefreshCwIcon className={`w-4 h-4 mr-2 ${isRefetching ? 'animate-spin' : ''}`} />
           Refresh
         </Button>
@@ -112,7 +112,7 @@ function ActiveRunsPage() {
                       </Badge>
                     </TableCell>
                     <TableCell className="text-right">
-                      <Button variant="ghost" size="sm" className="text-destructive hover:text-destructive" onClick={() => handleStopRun(run.id)}>
+                      <Button variant="ghost" size="sm" className="h-8 text-sm text-destructive hover:text-destructive" onClick={() => handleStopRun(run.id)}>
                         <StopCircleIcon className="w-4 h-4 mr-2" />
                         Stop
                       </Button>

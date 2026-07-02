@@ -34,13 +34,14 @@ export function WorkflowsToolbar({
   };
 
   return (
-    <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between bg-card p-4 rounded-lg border shadow-sm w-full">
-      <div className="flex items-center gap-4 w-full sm:w-auto">
+    <div className="flex flex-col sm:flex-row gap-2 items-start sm:items-center justify-between bg-card p-2 rounded-lg border shadow-sm w-full">
+      <div className="flex items-center gap-2 w-full sm:w-auto">
         <div className="flex bg-muted p-1 rounded-lg">
           <Button
             variant={viewMode === 'active' ? 'default' : 'ghost'}
             size="sm"
             onClick={() => setViewMode('active')}
+            className="h-8 text-sm"
           >
             Active
           </Button>
@@ -48,6 +49,7 @@ export function WorkflowsToolbar({
             variant={viewMode === 'trash' ? 'default' : 'ghost'}
             size="sm"
             onClick={() => setViewMode('trash')}
+            className="h-8 text-sm"
           >
             Trash
           </Button>
@@ -58,7 +60,7 @@ export function WorkflowsToolbar({
             placeholder="Filter workflows..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-9 h-9 bg-background/50 border-muted-foreground/20 hover:border-muted-foreground/30 focus-visible:ring-primary/30 transition-all"
+            className="pl-9 h-8 text-sm bg-background/50 border-muted-foreground/20 hover:border-muted-foreground/30 focus-visible:ring-primary/30 transition-all"
           />
         </div>
       </div>
@@ -72,14 +74,14 @@ export function WorkflowsToolbar({
               ref={fileInputRef} 
               onChange={handleFileChange} 
             />
-            <Button onClick={() => fileInputRef.current?.click()} size="sm" variant="outline" className="font-medium bg-background hover:bg-muted">
+            <Button onClick={() => fileInputRef.current?.click()} size="sm" variant="outline" className="font-medium bg-background hover:bg-muted h-8 text-sm">
               <UploadIcon className="mr-2 h-4 w-4" />
               Import Workflow
             </Button>
           </>
         )}
         {onAdd && (
-          <Button onClick={onAdd} size="sm" className="font-medium">
+          <Button onClick={onAdd} size="sm" className="font-medium h-8 text-sm">
             <PlusIcon className="mr-2 h-4 w-4" />
             New Workflow
           </Button>

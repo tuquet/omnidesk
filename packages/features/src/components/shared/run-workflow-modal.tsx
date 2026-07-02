@@ -287,7 +287,7 @@ export function RunWorkflowModal({ workflowId, profileId, isOpen, onClose, onRun
                 </div>
                 
                 <div className="pl-9 space-y-4">
-                  <div className="p-4 rounded-md border bg-muted/50 space-y-4">
+                  <div className="p-3 rounded-md border bg-muted/50 space-y-4">
                     {triggerParams.map((param) => (
                       <div key={param.name} className="space-y-2 flex flex-col">
                         <Label htmlFor={`var-${param.name}`}>

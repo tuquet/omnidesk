@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { PageContainer, PageHeader, PageTitle, Button, Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, Alert, AlertTitle, AlertDescription, useConfirmDialog } from '@omnidesk/ui';
+import { PageContainer, PageHeader, PageTitle, Button, Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, Alert, AlertTitle, AlertDescription, useConfirmDialog, ResizablePanelGroup, ResizablePanel, ResizableHandle } from '@omnidesk/ui';
 import { RunWorkflowModal } from '@omnidesk/features';;
 import { WorkflowIcon, FolderOpenIcon, AlertCircleIcon } from 'lucide-react';
 import { useState, useMemo, useDeferredValue, useCallback, useEffect } from 'react';
@@ -429,9 +429,9 @@ function WorkflowsPage() {
           onInteractOutside={(e) => e.preventDefault()}
           onEscapeKeyDown={(e) => e.preventDefault()}
         >
-          <div className="bg-muted/50 px-6 py-4 border-b">
+          <div className="bg-muted/50 px-4 py-3 border-b">
             <DialogHeader>
-              <div className="mx-auto bg-primary/10 p-3 rounded-full w-12 h-12 flex items-center justify-center mb-2">
+              <div className="mx-auto bg-primary/10 p-2 rounded-full w-10 h-10 flex items-center justify-center mb-2">
                 <FolderOpenIcon className="h-6 w-6 text-primary" />
               </div>
               <DialogTitle className="text-center text-lg">Select Workspace</DialogTitle>
@@ -442,8 +442,8 @@ function WorkflowsPage() {
             </DialogHeader>
           </div>
 
-          <div className="p-6">
-            <Alert className="bg-muted/50 text-foreground border-primary/20 mb-6">
+          <div className="p-4">
+            <Alert className="bg-muted/50 text-foreground border-primary/20 mb-4">
               <AlertCircleIcon className="h-4 w-4 text-primary" />
               <AlertTitle className="font-semibold text-primary">Why is this required?</AlertTitle>
               <AlertDescription className="text-xs text-muted-foreground mt-2">
@@ -513,10 +513,18 @@ function WorkflowsPage() {
       </PageHeader>
 
       {isWorkspaceSelected && (
-        <div className="flex h-[calc(100vh-140px)] gap-6">
-          <FolderPanel activeFolderId={activeFolderId} onSelectFolder={setActiveFolderId} />
-          <div className="flex-1 flex flex-col gap-4 min-w-0 overflow-y-auto pr-2">
-            <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center justify-between">
+        <ResizablePanelGroup
+          // @ts-expect-error react-resizable-panels typing missing direction
+          direction="horizontal"
+          className="h-[calc(100vh-140px)]"
+        >
+          <ResizablePanel defaultSize={20} minSize={15} maxSize={40}>
+            <FolderPanel activeFolderId={activeFolderId} onSelectFolder={setActiveFolderId} />
+          </ResizablePanel>
+          <ResizableHandle className="mx-2" />
+          <ResizablePanel defaultSize={80}>
+            <div className="flex-1 flex flex-col gap-2 min-w-0 overflow-y-auto pr-2">
+            <div className="flex flex-col sm:flex-row gap-2 items-start sm:items-center justify-between">
               <WorkflowsToolbar
                 searchQuery={searchQuery}
                 setSearchQuery={setSearchQuery}
@@ -672,8 +680,9 @@ function WorkflowsPage() {
               rowSelection={rowSelection}
               onRowSelectionChange={setRowSelection}
             />
-          </div>
-        </div>
+            </div>
+          </ResizablePanel>
+        </ResizablePanelGroup>
       )}
 
       <Dialog open={!!workflowToDelete} onOpenChange={() => setWorkflowToDelete(null)}>
